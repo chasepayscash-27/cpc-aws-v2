@@ -32,11 +32,11 @@ export default function App() {
       <main style={{ maxWidth: 900, margin: "0 auto" }}>
         <h1>Chase Pays Cash Analytics</h1>
         <h2>Financial Statements</h2>
-        <h3>Flipper Force Data</h3>
-        <h4>MLS - Paragon</h4>
-        <h5>Acquisitions</h5>
-        <h6>Procurement - Materials</h6>
-        <p>Trade Flow</p>
+        <h2>Flipper Force Data</h2>
+        <h2>MLS - Paragon</h2>
+        <h2>Acquisitions</h2>
+        <h2>Procurement - Materials</h2>
+        <h2>Trade Flow</h2>
 
         <button onClick={createTodo}>+ new</button>
 
