@@ -7,25 +7,32 @@ const client = generateClient<Schema>();
 function App() {
   const [todos, setTodos] = useState<Array<Schema["Todo"]["type"]>>([]);
 
-  useEffect(() => {
-    client.models.Todo.observeQuery().subscribe({
-      next: (data) => setTodos([...data.items]),
-    });
-  }, []);
+useEffect(() => {
+  const sub = client.models.Todo.observeQuery().subscribe({
+    next: (data) => setTodos([...data.items]),
+  });
+  return () => sub.unsubscribe();
+}, []);
 
-  function createTodo() {
-    client.models.Todo.create({ content: window.prompt("Todo content") });
-  }
+async function createTodo() {
+  const content = window.prompt("Todo content");
+  if (!content?.trim()) return;
+  await client.models.Todo.create({ content: content.trim() });
+}
 
-  return (
-    <main>
-      <h1>Chase Pays Cash Analytics</h1>
-      <h2>Financial Statements</h2>
-      <h3>Flipper Force Data</h3>
-      <h4>MLS - Paragon</h4>
-      <h5>Aquisitions</h5>
-      <h6>Procurement - Materials</h6>
-      <h7>Trade Flow</h7>
+return (
+  <main>
+    <h1>Chase Pays Cash Analytics</h1>
+    <h2>Financial Statements</h2>
+    <h3>Flipper Force Data</h3>
+    <h4>MLS - Paragon</h4>
+    <h5>Acquisitions</h5>
+    <h6>Procurement - Materials</h6>
+    <p>Trade Flow</p>
+    {/* rest... */}
+  </main>
+);
+
       <button onClick={createTodo}>+ new</button>
       <ul>
         {todos.map((todo) => (
