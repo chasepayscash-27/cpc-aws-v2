@@ -4,50 +4,56 @@ import { generateClient } from "aws-amplify/data";
 
 const client = generateClient<Schema>();
 
-function App() {
+export default function App() {
   const [todos, setTodos] = useState<Array<Schema["Todo"]["type"]>>([]);
 
-useEffect(() => {
-  const sub = client.models.Todo.observeQuery().subscribe({
-    next: (data) => setTodos([...data.items]),
-  });
-  return () => sub.unsubscribe();
-}, []);
+  useEffect(() => {
+    const sub = client.models.Todo.observeQuery().subscribe({
+      next: ({ items }) => setTodos([...items]),
+    });
 
-async function createTodo() {
-  const content = window.prompt("Todo content");
-  if (!content?.trim()) return;
-  await client.models.Todo.create({ content: content.trim() });
-}
+    return () => sub.unsubscribe();
+  }, []);
 
-return (
-  <main>
-    <h1>Chase Pays Cash Analytics</h1>
-    <h2>Financial Statements</h2>
-    <h3>Flipper Force Data</h3>
-    <h4>MLS - Paragon</h4>
-    <h5>Acquisitions</h5>
-    <h6>Procurement - Materials</h6>
-    <p>Trade Flow</p>
-    {/* rest... */}
-  </main>
-);
+  async function createTodo() {
+    const content = window.prompt("Todo content");
+    if (!content?.trim()) return;
+    await client.models.Todo.create({ content: content.trim() });
+  }
 
-      <button onClick={createTodo}>+ new</button>
-      <ul>
-        {todos.map((todo) => (
-          <li key={todo.id}>{todo.content}</li>
-        ))}
-      </ul>
-      <div>
-        🥳 App successfully hosted. Try creating a new todo.
-        <br />
-        <a href="https://docs.amplify.aws/react/start/quickstart/#make-frontend-updates">
-          Review next step of this tutorial.
-        </a>
-      </div>
-    </main>
+  return (
+    <div
+      style={{
+        backgroundColor: "#f3f4f6",
+        minHeight: "100vh",
+        padding: "40px",
+      }}
+    >
+      <main style={{ maxWidth: 900, margin: "0 auto" }}>
+        <h1>Chase Pays Cash Analytics</h1>
+        <h2>Financial Statements</h2>
+        <h3>Flipper Force Data</h3>
+        <h4>MLS - Paragon</h4>
+        <h5>Acquisitions</h5>
+        <h6>Procurement - Materials</h6>
+        <p>Trade Flow</p>
+
+        <button onClick={createTodo}>+ new</button>
+
+        <ul>
+          {todos.map((todo) => (
+            <li key={todo.id}>{todo.content}</li>
+          ))}
+        </ul>
+
+        <div style={{ marginTop: 24 }}>
+          🥳 App successfully hosted. Try creating a new todo.
+          <br />
+          <a href="https://docs.amplify.aws/react/start/quickstart/#make-frontend-updates">
+            Review next step of this tutorial.
+          </a>
+        </div>
+      </main>
+    </div>
   );
 }
-
-export default App;
