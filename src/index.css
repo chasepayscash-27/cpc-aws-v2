@@ -16,18 +16,40 @@ html, body, #root {
 
 body {
   margin: 0;
-  background: var(--bg);
+  background-color: var(--bg);
   color: var(--text);
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
 }
 
-/* Layout */
+/* ✅ Watermark layer (logo) */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+
+  /* watermark logo */
+  background-image: url("./assets/logo.png");
+  background-repeat: no-repeat;
+  background-position: center 120px;
+  background-size: 900px;
+  background-attachment: fixed;
+
+  /* controls how faint it is */
+  opacity: 0.08;
+}
+
+/* ensure app sits above the watermark */
 .app {
+  position: relative;
+  z-index: 1;
   min-height: 100%;
   display: grid;
   grid-template-rows: 64px 1fr;
 }
 
+/* Header */
 .header {
   background: #0b0f19;
   color: white;
@@ -67,6 +89,7 @@ body {
   align-items: center;
 }
 
+/* Layout */
 .container {
   display: grid;
   grid-template-columns: 260px 1fr;
@@ -178,4 +201,10 @@ li:hover { border-color: #cbd5e1; }
 /* Responsive */
 @media (max-width: 900px) {
   .container { grid-template-columns: 1fr; }
+
+  /* Optional: scale watermark down on mobile */
+  body::before {
+    background-size: 520px;
+    background-position: center 80px;
+  }
 }
