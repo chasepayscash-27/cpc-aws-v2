@@ -1,6 +1,8 @@
 import type { APIGatewayProxyHandler } from "aws-lambda";
 import * as mysql from "mysql2/promise";
 
+declare const process: any;
+
 export const handler: APIGatewayProxyHandler = async (event) => {
   const headers: Record<string, string> = {
     "Access-Control-Allow-Origin": "*",
@@ -19,14 +21,14 @@ export const handler: APIGatewayProxyHandler = async (event) => {
 
   try {
     const conn = await mysql.createConnection({
-      host: process.env.DB_HOST!,
-      user: process.env.DB_USER!,
-      password: process.env.DB_PASS!,
-      database: process.env.DB_NAME!,
+      host: process.env.DB_HOST,
+      user: process.env.DB_USER,
+      password: process.env.DB_PASS,
+      database: process.env.DB_NAME,
       port: Number(process.env.DB_PORT || 3306),
     });
 
-    const [rows] = await conn.execute(sql, params);
+    const [rows] = await conn.query(sql, params);
     await conn.end();
 
     return { statusCode: 200, headers, body: JSON.stringify(rows) };
