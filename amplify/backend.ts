@@ -28,7 +28,8 @@ const httpApi = new HttpApi(apiStack, "HttpApi", {
   corsPreflight: {
     allowOrigins: ["*"],
     allowHeaders: ["*"],
-    allowMethods: [CorsHttpMethod.POST, CorsHttpMethod.OPTIONS],
+    allowMethods: [CorsHttpMethod.POST, CorsHttpMethod.OPTIONS, CorsHttpMethod.GET],
+
   },
   createDefaultStage: true,
 });
