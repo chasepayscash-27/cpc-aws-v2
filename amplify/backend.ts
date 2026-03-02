@@ -11,7 +11,7 @@ import { data } from "./data/resource";
 import { rdsQuery } from "./functions/rds-query/resource";
 
 const backend = defineBackend({
-  auth,
+ /* auth, */
   data,
   rdsQuery,
 });
