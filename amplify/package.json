@@ -1,7 +1,7 @@
 {
-  "type": "module"
-  "mysql2": "^3.9.0"
-  "devDependencies": 
-  "@types/node": "^22.0.0"
+  "name": "rds-query",
+  "version": "1.0.0",
+  "dependencies": {
+    "mysql2": "^3.11.0"
+  }
 }
-
