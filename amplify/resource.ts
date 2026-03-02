@@ -1,4 +1,3 @@
-
 import { defineFunction, secret } from "@aws-amplify/backend";
 
 export const rdsQuery = defineFunction({
