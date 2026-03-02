@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { generateClient } from "aws-amplify/data";
 
-const client = generateClient<Schema>();
+const client = generateClient();
+
 
 export default function App() {
   const [todos, setTodos] = useState<any[]>([]);
