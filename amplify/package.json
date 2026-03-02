@@ -1,4 +1,7 @@
 {
   "type": "module"
   "mysql2": "^3.9.0"
+  "devDependencies": 
+  "@types/node": "^22.0.0"
 }
+
