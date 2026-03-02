@@ -1,5 +1,4 @@
 import { defineBackend } from "@aws-amplify/backend";
-import { Stack } from "aws-cdk-lib";
 import { Cors, LambdaIntegration, RestApi } from "aws-cdk-lib/aws-apigateway";
 
 import { auth } from "./auth/resource";
