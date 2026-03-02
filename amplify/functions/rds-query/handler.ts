@@ -1,4 +1,3 @@
-
 import type { APIGatewayProxyHandler } from "aws-lambda";
 import * as mysql from "mysql2/promise";
 
@@ -10,7 +9,6 @@ export const handler: APIGatewayProxyHandler = async (event) => {
     "Content-Type": "application/json",
   };
 
-  // Handle preflight quickly
   if (event.httpMethod === "OPTIONS") {
     return { statusCode: 200, headers, body: "" };
   }
