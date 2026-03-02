@@ -20,15 +20,15 @@ export const handler: APIGatewayProxyHandler = async (event) => {
   const params: any[] = body.params ?? [];
 
   try {
-    const conn = await mysql.createConnection({
-      host: process.env.DB_HOST,
-      user: process.env.DB_USER,
-      password: process.env.DB_PASS,
-      database: process.env.DB_NAME,
-      port: Number(process.env.DB_PORT || 3306),
+const conn: any = await mysql.createConnection({
+    host: process.env.DB_HOST!,
+    user: process.env.DB_USER!,
+    password: process.env.DB_PASS!,
+    database: process.env.DB_NAME!,
+    port: Number(process.env.DB_PORT || 3306),
     });
 
-    const [rows] = await conn.query(sql, params);
+    const [rows] = await conn.execute(sql, params);
     await conn.end();
 
     return { statusCode: 200, headers, body: JSON.stringify(rows) };
