@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 import { generateClient } from "aws-amplify/data";
+import type { Schema } from "../amplify/data/resource";
 
-const client = generateClient();
-
+const client = generateClient<Schema>();
 
 export default function App() {
-  const [todos, setTodos] = useState<any[]>([]);
+  const [todos, setTodos] = useState<Schema["Todo"][]>([]);
   const [active, setActive] = useState<
     "Financial Statements" | "Flipper Force" | "MLS - Paragon" | "Acquisitions" | "Procurement" | "Trade Flow"
   >("Financial Statements");
