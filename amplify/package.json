@@ -1,1 +1,10 @@
-{"name":"rds-query","version":"1.0.0","dependencies":{"aws-amplify":"^6.16.2","mysql2":"^3.11.0"}}
+
+{
+  "name": "rds-query",
+  "version": "1.0.0",
+  "type": "module",
+  "dependencies": {
+    "aws-amplify": "^6.16.2",
+    "mysql2": "^3.11.0"
+  }
+}
