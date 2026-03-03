@@ -4,17 +4,15 @@ import type { Schema } from "../amplify/data/resource";
 
 const client = generateClient<Schema>();
 
-type Todo = Schema["Todo"];
-
 export default function App() {
-  const [todos, setTodos] = useState<Todo[]>([]);
+  const [todos, setTodos] = useState<any[]>([]);
   const [active, setActive] = useState<
     "Financial Statements" | "Flipper Force" | "MLS - Paragon" | "Acquisitions" | "Procurement" | "Trade Flow"
   >("Financial Statements");
 
   useEffect(() => {
     const sub = client.models.Todo.observeQuery().subscribe(
-      ({ items }) => setTodos(items as Todo[])
+      ({ items }: any) => setTodos(items)
     );
 
     return () => sub.unsubscribe();
