@@ -7,8 +7,8 @@ import {
 import { HttpLambdaIntegration } from "aws-cdk-lib/aws-apigatewayv2-integrations";
 
 
-import { data } from "./data/resource.js";  // ✅ Add .js extension
-import { rdsQuery } from "./functions/rds-query/resource.js";  // ✅ Add .js 
+import { data } from "./data/resource"; 
+import { rdsQuery } from "./functions/rds-query/resource"; 
 
 const backend = defineBackend({
  /* auth, */
