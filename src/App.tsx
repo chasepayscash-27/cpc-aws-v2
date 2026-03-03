@@ -13,9 +13,9 @@ export default function App() {
   >("Financial Statements");
 
   useEffect(() => {
-    const sub = client.models.Todo.observeQuery().subscribe({
-      next: ({ items }: { items: Todo[] }) => setTodos(items),
-    });
+    const sub = client.models.Todo.observeQuery().subscribe(
+      ({ items }) => setTodos(items as Todo[])
+    );
 
     return () => sub.unsubscribe();
   }, []);
