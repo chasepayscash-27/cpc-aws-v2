@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import outputs from "../../amplify_outputs.json";
+import outputs from "../../amplify/amplify_outputs.json";
 import {
   LineChart,
   Line,
@@ -48,7 +48,11 @@ export function AnalyticsDashboard() {
       setLoading(true);
       // Replace with your actual API endpoint
 
-    const apiEndpoint = `${outputs.custom.cpcHttpApi.url}query`;
+      const baseUrl = (outputs as { custom?: { cpcHttpApi?: { url?: string } } }).custom?.cpcHttpApi?.url;
+      if (!baseUrl) {
+        throw new Error("API endpoint is not configured in amplify_outputs.json");
+      }
+      const apiEndpoint = `${baseUrl}query`;
       
       const response = await fetch(apiEndpoint, {
         method: "POST",
