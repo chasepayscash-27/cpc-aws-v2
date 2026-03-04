@@ -1,83 +1,27 @@
-import { useEffect, useState } from "react";
-import { generateClient } from "aws-amplify/data";
-import type { Schema } from "../amplify/data/resource";
+import React, { useState, useEffect } from 'react';
 
-const client = generateClient<Schema>(); 
+const App: React.FC = () => {
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
 
-export default function App() {
-  const [todos, setTodos] = useState<any[]>([]);
-  const [active, setActive] = useState<
-    "Financial Statements" | "Flipper Force" | "MLS - Paragon" | "Acquisitions" | "Procurement" | "Trade Flow"
-  >("Financial Statements");
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+    useEffect(() => {
+        // simulate an API call
+        setTimeout(() => {
+            setLoading(false);
+            // Uncomment below to simulate an error
+            // setError('An error occurred');
+        }, 2000);
+    }, []);
 
-  useEffect(() => {
-    try {
-      const sub = client.models.Todo.observeQuery().subscribe(
-        ({ items }: any) => {
-          setTodos(items);
-          setLoading(false);
-        },
-        (err: any) => {
-          console.error("Error loading todos:", err);
-          setError(err?.message || "Failed to load todos");
-          setLoading(false);
-        }
-      );
-
-      return () => sub.unsubscribe();
-    } catch (err: any) {
-      console.error("Error setting up subscription:", err);
-      setError(err?.message || "Failed to set up subscription");
-      setLoading(false);
+    if (loading) {
+        return <div>Loading...</div>;
     }
-  }, []);
 
-  async function createTodo() {
-    const content = window.prompt("Todo content");
-    if (!content?.trim()) return;
-    try {
-      await client.models.Todo.create({ content: content.trim() });
-    } catch (err: any) {
-      console.error("Error creating todo:", err);
-      alert("Failed to create todo: " + (err?.message || "Unknown error"));
+    if (error) {
+        return <div>Error: {error}</div>;
     }
-  }
 
-  return (
-    <div
-      style={{
-        backgroundColor: "#f3f4f6",
-        minHeight: "100vh",
-        padding: "40px",
-      }}
-    >
-      <main style={{ maxWidth: 900, margin: "0 auto" }}>
-        <h1>Chase Pays Cash Analytics</h1>
-        <h2>Financial Statements</h2>
-        <h3>Flipper Force Data</h3>
-        <h4>MLS - Paragon</h4>
-        <h5>Acquisitions</h5>
-        <h6>Procurement - Materials</h6>
-        <p>Trade Flow</p>
+    return <div>Hello World!</div>;
+};
 
-        <button onClick={createTodo}>+ new</button>
-
-        <ul>
-          {todos.map((todo) => (
-            <li key={todo.id}>{todo.content}</li>
-          ))}
-        </ul>
-
-        <div style={{ marginTop: 24 }}>
-          🥳 App successfully hosted. Try creating a new todo.
-          <br />
-          <a href="https://docs.amplify.aws/react/start/quickstart/#make-frontend-updates">
-            Review next step of this tutorial.
-          </a>
-        </div>
-      </main>
-    </div>
-  );
-}
+export default App;
