@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import outputs from "../../amplify_outputs.json";
 import {
   LineChart,
   Line,
@@ -46,8 +47,8 @@ export function AnalyticsDashboard() {
     try {
       setLoading(true);
       // Replace with your actual API endpoint
-      const apiEndpoint =
-        "https://your-api-endpoint.execute-api.us-east-1.amazonaws.com/properties";
+
+    const apiEndpoint = `${outputs.custom.cpcHttpApi.url}query`;
       
       const response = await fetch(apiEndpoint, {
         method: "POST",
