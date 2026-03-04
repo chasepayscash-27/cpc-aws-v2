@@ -1,27 +1,35 @@
 import React, { useState, useEffect } from 'react';
+import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 
-const App: React.FC = () => {
+function App() {
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
+    const [error, setError] = useState(null);
 
     useEffect(() => {
-        // simulate an API call
+        // Simulating data fetching
         setTimeout(() => {
             setLoading(false);
-            // Uncomment below to simulate an error
-            // setError('An error occurred');
         }, 2000);
     }, []);
 
-    if (loading) {
-        return <div>Loading...</div>;
-    }
-
-    if (error) {
-        return <div>Error: {error}</div>;
-    }
-
-    return <div>Hello World!</div>;
-};
+    return (
+        <Router>
+            <div className="App">
+                {loading ? ( // show loading
+                    <div>Loading...</div>
+                ) : error ? ( // show error
+                    <div>Error: {error}</div>
+                ) : ( // normal content
+                    <Switch>
+                        {/* Navigation Map and Sidebar */}
+                        <Route path="/">
+                            <h1>Welcome to the App</h1>
+                        </Route>
+                    </Switch>
+                )}
+            </div>
+        </Router>
+    );
+}
 
 export default App;
