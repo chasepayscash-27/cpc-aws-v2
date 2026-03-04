@@ -1,34 +1,24 @@
-import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
+import React from 'react';
 
 function App() {
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
-
-    useEffect(() => {
-        // Simulating data fetching
-        setTimeout(() => {
-            setLoading(false);
-        }, 2000);
-    }, []);
+    const { loading, error, todos } = useTodos(); // Assuming this is how you fetch todos
 
     return (
-        <Router>
-            <div className="App">
-                {loading ? ( // show loading
-                    <div>Loading...</div>
-                ) : error ? ( // show error
-                    <div>Error: {error}</div>
-                ) : ( // normal content
-                    <Switch>
-                        {/* Navigation Map and Sidebar */}
-                        <Route path="/">
-                            <h1>Welcome to the App</h1>
-                        </Route>
-                    </Switch>
+        <div>
+            <Header />
+            <Sidebar />
+            <main>
+                {loading && <p>Loading...</p>}
+                {error && <p>Error: {error}</p>}
+                {!loading && !error && (
+                    <ul>
+                        {todos.map(todo => (
+                            <li key={todo.id}>{todo.text}</li>
+                        ))}
+                    </ul>
                 )}
-            </div>
-        </Router>
+            </main>
+        </div>
     );
 }
 
