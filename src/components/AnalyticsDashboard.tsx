@@ -42,7 +42,7 @@ const colors = {
   gold: "#D4A574",
 };
 
-export function AnalyticsDashboard() {
+export function AnalyticsDashboard({ refreshKey = 0 }: { refreshKey?: number }) {
   const [properties, setProperties] = useState<PropertyData[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -50,17 +50,19 @@ export function AnalyticsDashboard() {
 
   useEffect(() => {
     fetchPropertyData();
-  }, []);
+  }, [refreshKey]);
 
   const fetchPropertyData = async () => {
     try {
       setLoading(true);
 
-      const baseUrl = outputs.data.url;
+      const baseUrl = outputs.custom?.cpcHttpApi?.url;
       if (!baseUrl) {
-        throw new Error("API endpoint is not configured in amplify_outputs.json");
+        throw new Error("API endpoint is not configured in amplify_outputs.json (custom.cpcHttpApi.url)");
       }
-      const apiEndpoint = `${baseUrl}query`;
+      const apiEndpoint = baseUrl.endsWith("/")
+        ? `${baseUrl}query`
+        : `${baseUrl}/query`;
 
       const response = await fetch(apiEndpoint, {
         method: "POST",
