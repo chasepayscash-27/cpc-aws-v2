@@ -1,42 +1,153 @@
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+:root {
+  --bg: #0b1020;
+  --panel: rgba(255, 255, 255, 0.06);
+  --panel2: rgba(255, 255, 255, 0.08);
+  --text: rgba(255, 255, 255, 0.92);
+  --muted: rgba(255, 255, 255, 0.65);
+  --border: rgba(255, 255, 255, 0.10);
+  --accent: #7c3aed;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+html, body {
+  height: 100%;
 }
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+body {
+  margin: 0;
+  background: radial-gradient(1200px 600px at 20% 0%, rgba(124,58,237,.25), transparent 60%),
+              radial-gradient(900px 500px at 80% 20%, rgba(59,130,246,.18), transparent 55%),
+              var(--bg);
+  color: var(--text);
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
+.appShell {
+  min-height: 100vh;
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--border);
+  backdrop-filter: blur(10px);
+  background: rgba(10, 14, 28, 0.55);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.brand { display: flex; gap: 12px; align-items: center; }
+.brandMark {
+  width: 40px; height: 40px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, rgba(124,58,237,.9), rgba(59,130,246,.85));
+  display: grid; place-items: center;
+  font-weight: 800;
+  letter-spacing: .5px;
+}
+.brandTitle { font-weight: 700; line-height: 1.1; }
+.brandSub { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+.topbarActions { display: flex; gap: 10px; }
+
+.btn, .btnPrimary {
+  border: 1px solid var(--border);
+  background: rgba(255,255,255,0.06);
+  color: var(--text);
+  padding: 10px 12px;
+  border-radius: 12px;
+  cursor: pointer;
+}
+.btnPrimary {
+  background: linear-gradient(135deg, rgba(124,58,237,.9), rgba(59,130,246,.85));
+  border: 1px solid rgba(255,255,255,.18);
+  font-weight: 700;
+}
+
+.body {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  gap: 14px;
+  padding: 14px;
+}
+
+.sidebar {
+  border: 1px solid var(--border);
+  background: var(--panel);
+  border-radius: 18px;
+  padding: 10px;
+  height: calc(100vh - 86px);
+  position: sticky;
+  top: 72px;
+  overflow: auto;
+}
+.sidebar.collapsed {
+  width: 68px;
+  grid-column: 1;
+}
+
+.navItem {
+  width: 100%;
+  text-align: left;
+  padding: 10px 12px;
+  border-radius: 14px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--text);
+  cursor: pointer;
+  margin-bottom: 6px;
+}
+.navItem:hover { background: var(--panel2); }
+.navItem.active {
+  background: rgba(124,58,237,.22);
+  border-color: rgba(124,58,237,.35);
+}
+
+.content {
+  border: 1px solid var(--border);
+  background: var(--panel);
+  border-radius: 18px;
+  padding: 18px;
+  min-height: calc(100vh - 86px);
+}
+
+.pageHeader { margin-bottom: 14px; }
+.h1 { margin: 0; font-size: 22px; }
+.muted { color: var(--muted); }
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin: 12px 0 14px;
 }
 
 .card {
-  padding: 2em;
+  border: 1px solid var(--border);
+  background: rgba(255,255,255,0.05);
+  border-radius: 18px;
+  padding: 14px;
 }
 
-.read-the-docs {
-  color: #888;
+.cardLabel { font-size: 12px; color: var(--muted); }
+.cardValue { font-size: 28px; font-weight: 800; margin-top: 6px; }
+.cardSub { margin-top: 6px; font-size: 12px; }
+
+.chartCard { margin-top: 10px; }
+.chartPlaceholder {
+  margin-top: 12px;
+  height: 260px;
+  border-radius: 16px;
+  border: 1px dashed rgba(255,255,255,0.18);
+  display: grid;
+  place-items: center;
+  color: var(--muted);
+}
+
+@media (max-width: 980px) {
+  .body { grid-template-columns: 1fr; }
+  .sidebar { position: relative; top: 0; height: auto; }
+  .grid { grid-template-columns: 1fr; }
 }
