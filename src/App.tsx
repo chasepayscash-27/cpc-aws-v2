@@ -46,71 +46,38 @@ export default function App() {
   }
 
   return (
-    <div className="app">
-      <header className="header">
-        <div className="brand">
-          <div className="brand-badge" />
-          <div>
-            <div className="brand-title">Chase Pays Cash Analytics</div>
-            <div className="brand-subtitle">Insights • Reporting • Operations</div>
-          </div>
+    <div
+      style={{
+        backgroundColor: "#f3f4f6",
+        minHeight: "100vh",
+        padding: "40px",
+      }}
+    >
+      <main style={{ maxWidth: 900, margin: "0 auto" }}>
+        <h1>Chase Pays Cash Analytics</h1>
+        <h2>Financial Statements</h2>
+        <h3>Flipper Force Data</h3>
+        <h4>MLS - Paragon</h4>
+        <h5>Acquisitions</h5>
+        <h6>Procurement - Materials</h6>
+        <p>Trade Flow</p>
+
+        <button onClick={createTodo}>+ new</button>
+
+        <ul>
+          {todos.map((todo) => (
+            <li key={todo.id}>{todo.content}</li>
+          ))}
+        </ul>
+
+        <div style={{ marginTop: 24 }}>
+          🥳 App successfully hosted. Try creating a new todo.
+          <br />
+          <a href="https://docs.amplify.aws/react/start/quickstart/#make-frontend-updates">
+            Review next step of this tutorial.
+          </a>
         </div>
-
-        <div className="header-actions">
-          <button className="accent" onClick={createTodo}>+ New Note</button>
-        </div>
-      </header>
-
-      <div className="container">
-        <aside className="sidebar">
-          <div className="nav-title">Navigation</div>
-          <nav className="nav">
-            {[
-              "Financial Statements",
-              "Flipper Force",
-              "MLS - Paragon",
-              "Acquisitions",
-              "Procurement",
-              "Trade Flow",
-            ].map((label) => (
-              <a
-                key={label}
-                href="#"
-                className={active === label ? "active" : ""}
-                onClick={(e) => {
-                  e.preventDefault();
-                  setActive(label as any);
-                }}
-              >
-                {label}
-              </a>
-            ))}
-          </nav>
-        </aside>
-
-        <main className="main">
-          <section className="card">
-            <h2>{active}</h2>
-            <p>Placeholder content for this section. Next step: cards + charts + KPI tiles.</p>
-          </section>
-
-          <section className="card">
-            <h2>Quick Notes (Todos)</h2>
-            {loading && <p>Loading todos...</p>}
-            {error && <p style={{ color: "red" }}>Error: {error}</p>}
-            {!loading && !error && (
-              <>
-                <p>Lightweight scratchpad for tasks while you build the real modules.</p>
-                <ul>
-                  {todos.map((todo) => (
-                    <li key={todo.id}>{todo.content}</li>
-                  ))}
-                </ul>
-              </>
-            )}
-          </section>
-        </main>
-      </div>
+      </main>
     </div>
   );
 }
