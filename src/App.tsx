@@ -2,6 +2,7 @@
 import React, { useMemo, useState } from "react";
 import "./App.css";
 import { AnalyticsDashboard } from "./components/AnalyticsDashboard";
+import DaysInInventoryChart from "./components/DaysInInventoryChart";
 
 type NavItem = { label: string; key: string };
 
@@ -13,6 +14,7 @@ const App: React.FC = () => {
   const nav: NavItem[] = useMemo(
     () => [
       { label: "Overview", key: "overview" },
+      { label: "Days in Inventory", key: "inventory" },
       { label: "Profit by Category", key: "profit" },
       { label: "Properties", key: "properties" },
       { label: "Settings", key: "settings" },
@@ -20,19 +22,15 @@ const App: React.FC = () => {
     []
   );
 
-  const renderContent = () => {
-    if (active === "overview") {
-      return <AnalyticsDashboard refreshKey={refreshKey} />;
-    }
+  const renderPlaceholder = (
+    title: string,
+    subtitle: string = "This section is ready for the next chart or API-fed widget."
+  ) => {
     return (
       <>
         <div className="pageHeader">
-          <h1 className="h1">
-            {nav.find((n) => n.key === active)?.label ?? "Dashboard"}
-          </h1>
-          <p className="muted">
-            This is where we'll render charts fed from your RDS via an API.
-          </p>
+          <h1 className="h1">{title}</h1>
+          <p className="muted">{subtitle}</p>
         </div>
 
         <section className="grid">
@@ -54,11 +52,55 @@ const App: React.FC = () => {
         </section>
 
         <section className="card chartCard">
-          <div className="cardLabel">Profit by Category</div>
+          <div className="cardLabel">{title}</div>
           <div className="chartPlaceholder">[Chart goes here]</div>
         </section>
       </>
     );
+  };
+
+  const renderContent = () => {
+    switch (active) {
+      case "overview":
+        return <AnalyticsDashboard refreshKey={refreshKey} />;
+
+      case "inventory":
+        return (
+          <>
+            <div className="pageHeader">
+              <h1 className="h1">Days in Inventory</h1>
+              <p className="muted">
+                Static CSV-powered chart deployed with your Amplify frontend.
+              </p>
+            </div>
+
+            <section className="card chartCard">
+              <DaysInInventoryChart />
+            </section>
+          </>
+        );
+
+      case "profit":
+        return renderPlaceholder(
+          "Profit by Category",
+          "This is where we'll render charts fed from your RDS via an API."
+        );
+
+      case "properties":
+        return renderPlaceholder(
+          "Properties",
+          "Property-level detail views can live here."
+        );
+
+      case "settings":
+        return renderPlaceholder(
+          "Settings",
+          "Dashboard settings and filters can live here."
+        );
+
+      default:
+        return renderPlaceholder("Dashboard");
+    }
   };
 
   return (
