@@ -15,6 +15,7 @@ const App: React.FC = () => {
     () => [
       { label: "Overview", key: "overview" },
       { label: "Days in Inventory", key: "inventory" },
+      { label: "Flipper Force Data", key: "flipper" },
       { label: "Profit by Category", key: "profit" },
       { label: "Properties", key: "properties" },
       { label: "Settings", key: "settings" },
