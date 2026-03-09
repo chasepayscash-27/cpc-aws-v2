@@ -51,8 +51,7 @@ export default function DaysInInventoryChart() {
           .sort(
             (a: ChartData, b: ChartData) =>
               b.daysInInventory - a.daysInInventory
-          )
-          .slice(0, 15);
+          ); // removed slice so all records show
 
         setData(cleaned);
       })
@@ -62,22 +61,48 @@ export default function DaysInInventoryChart() {
   }, []);
 
   return (
-    <div style={{ width: "100%", height: 500 }}>
-      <h2>Top Properties by Days in Inventory</h2>
+    <div style={{ width: "100%", height: 700 }}>
+      <h2 style={{ color: "#ffffff" }}>Properties by Days in Inventory</h2>
 
       <ResponsiveContainer width="100%" height="100%">
         <BarChart
           layout="vertical"
           data={data}
-          margin={{ top: 10, right: 20, left: 120, bottom: 10 }}
+          margin={{ top: 10, right: 20, left: 200, bottom: 10 }}
         >
-          <CartesianGrid strokeDasharray="3 3" />
-          <XAxis type="number" />
-          <YAxis type="category" dataKey="house" width={200} />
-          <Tooltip
-            formatter={(value) => [`${String(value)} days`, "Days in Inventory"]}
+          <CartesianGrid stroke="#444" strokeDasharray="3 3" />
+
+          <XAxis
+            type="number"
+            stroke="#ffffff"
+            tick={{ fill: "#ffffff" }}
           />
-          <Bar dataKey="daysInInventory" />
+
+          <YAxis
+            type="category"
+            dataKey="house"
+            width={250}
+            stroke="#ffffff"
+            tick={{ fill: "#ffffff", fontSize: 12 }}
+          />
+
+          <Tooltip
+            contentStyle={{
+              backgroundColor: "#1f2937",
+              border: "none",
+              color: "#ffffff",
+            }}
+            formatter={(value) => [
+              `${String(value)} days`,
+              "Days in Inventory",
+            ]}
+          />
+
+          <Bar
+            dataKey="daysInInventory"
+            fill="#3b82f6"   // bright blue bars
+            radius={[4, 4, 4, 4]}
+          />
         </BarChart>
       </ResponsiveContainer>
     </div>
