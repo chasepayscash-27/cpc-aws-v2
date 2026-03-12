@@ -60,10 +60,13 @@ export default function DaysInInventoryChart() {
       });
   }, []);
 
+  const chartHeight = Math.max(700, data.length * 25);
+
   return (
-    <div style={{ width: "100%", height: 700 }}>
+    <div style={{ width: "100%", maxHeight: "80vh", overflowY: "auto" }}>
       <h2 style={{ color: "#ffffff" }}>Properties by Days in Inventory</h2>
 
+      <div style={{ width: "100%", height: chartHeight }}>
       <ResponsiveContainer width="100%" height="100%">
         <BarChart
           layout="vertical"
@@ -84,6 +87,7 @@ export default function DaysInInventoryChart() {
             width={250}
             stroke="#ffffff"
             tick={{ fill: "#ffffff", fontSize: 12 }}
+            interval={0}
           />
 
           <Tooltip
@@ -105,6 +109,7 @@ export default function DaysInInventoryChart() {
           />
         </BarChart>
       </ResponsiveContainer>
+      </div>
     </div>
   );
 }
