@@ -1,7 +1,6 @@
 // src/App.tsx
 import React, { useMemo, useState } from "react";
 import "./App.css";
-import { AnalyticsDashboard } from "./components/AnalyticsDashboard";
 import DaysInInventoryChart from "./components/DaysInInventoryChart";
 import ProjectsPage from "./pages/ProjectsPage";
 
@@ -9,12 +8,10 @@ type NavItem = { label: string; key: string };
 
 const App: React.FC = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(true);
-  const [active, setActive] = useState("overview");
-  const [refreshKey, setRefreshKey] = useState(0);
+  const [active, setActive] = useState("inventory");
 
   const nav: NavItem[] = useMemo(
     () => [
-      { label: "Overview", key: "overview" },
       { label: "Days in Inventory", key: "inventory" },
       { label: "Projects", key: "projects" },
       { label: "Flipper Force Data", key: "flipper" },
@@ -64,9 +61,6 @@ const App: React.FC = () => {
 
   const renderContent = () => {
     switch (active) {
-      case "overview":
-        return <AnalyticsDashboard refreshKey={refreshKey} />;
-
       case "inventory":
         return (
           <>
@@ -123,12 +117,6 @@ const App: React.FC = () => {
         <div className="topbarActions">
           <button className="btn" onClick={() => setSidebarOpen((s) => !s)}>
             {isSidebarOpen ? "Hide" : "Show"} Menu
-          </button>
-          <button
-            className="btnPrimary"
-            onClick={() => setRefreshKey((k) => k + 1)}
-          >
-            Refresh
           </button>
         </div>
       </header>
