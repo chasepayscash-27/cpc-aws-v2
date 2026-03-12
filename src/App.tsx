@@ -3,6 +3,7 @@ import React, { useMemo, useState } from "react";
 import "./App.css";
 import { AnalyticsDashboard } from "./components/AnalyticsDashboard";
 import DaysInInventoryChart from "./components/DaysInInventoryChart";
+import ProjectsPage from "./pages/ProjectsPage";
 
 type NavItem = { label: string; key: string };
 
@@ -15,6 +16,7 @@ const App: React.FC = () => {
     () => [
       { label: "Overview", key: "overview" },
       { label: "Days in Inventory", key: "inventory" },
+      { label: "Projects", key: "projects" },
       { label: "Flipper Force Data", key: "flipper" },
       { label: "Profit by Category", key: "profit" },
       { label: "Properties", key: "properties" },
@@ -80,6 +82,9 @@ const App: React.FC = () => {
             </section>
           </>
         );
+
+      case "projects":
+        return <ProjectsPage />;
 
       case "profit":
         return renderPlaceholder(
