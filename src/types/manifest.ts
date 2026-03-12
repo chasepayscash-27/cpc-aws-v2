@@ -1,9 +1,5 @@
 export interface PullManifestRow {
-  source_name?: string;
-  file_name?: string;
-  pull_date?: string;
-  loaded_at?: string;
-  record_count?: string | number;
-  status?: string;
-  notes?: string;
+  project_uuid?: string;
+  project_name?: string;
+  photo_log_status?: string;
 }

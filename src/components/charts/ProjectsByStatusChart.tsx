@@ -25,10 +25,10 @@ export default function ProjectsByStatusChart() {
     async function fetchData() {
       try {
         setLoading(true);
-        const rows = await loadCsv<ProjectRow>("/data/projects.csv");
+        const rows = await loadCsv<ProjectRow>("/data/projects_v2.csv");
 
         const grouped = rows.reduce<Record<string, number>>((acc, row) => {
-          const status = (row.status || "Unknown").toString().trim() || "Unknown";
+          const status = (row.stage || "Unknown").toString().trim() || "Unknown";
           acc[status] = (acc[status] || 0) + 1;
           return acc;
         }, {});

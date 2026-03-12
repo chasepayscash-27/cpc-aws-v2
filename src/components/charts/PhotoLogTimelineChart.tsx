@@ -26,10 +26,10 @@ export default function PhotoLogTimelineChart() {
     async function fetchData() {
       try {
         setLoading(true);
-        const rows = await loadCsv<PhotoLogRow>("/data/project_photo_log.csv");
+        const rows = await loadCsv<PhotoLogRow>("/data/project_photo_log_v2.csv");
 
         const grouped = rows.reduce<Record<string, number>>((acc, row) => {
-          const rawDate = row.photo_date || row.uploaded_at || "Unknown";
+          const rawDate = row.photo_date || row.group_date || "Unknown";
           const date = rawDate.toString().slice(0, 10);
           acc[date] = (acc[date] || 0) + 1;
           return acc;

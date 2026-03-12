@@ -1,15 +1,26 @@
 export interface ProjectRow {
-  project_name?: string;
-  house?: string;
-  address?: string;
+  project_uuid?: string;
+  workspace_uuid?: string;
+  created_at?: string;
+  updated_at?: string;
+  name?: string;
+  full_address?: string;
+  address_1?: string;
+  address_2?: string;
   city?: string;
   state?: string;
-  zip?: string;
-  status?: string;
-  purchase_date?: string;
-  sale_date?: string;
-  budget?: string | number;
-  actual_cost?: string | number;
-  profit?: string | number;
-  days_in_inventory?: string | number;
+  postal_code?: string;
+  country?: string;
+  lat?: string;
+  lng?: string;
+  investment_strategy?: string;
+  stage?: string;
+  type?: string;
+  style?: string;
+  square_feet?: string;
+  beds?: string;
+  baths?: string;
+  year_built?: string;
+  featured_image_url?: string;
+  permissions_json?: string;
 }

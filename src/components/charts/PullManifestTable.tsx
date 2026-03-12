@@ -11,7 +11,7 @@ export default function PullManifestTable() {
     async function fetchData() {
       try {
         setLoading(true);
-        const data = await loadCsv<PullManifestRow>("/data/pull_manifest.csv");
+        const data = await loadCsv<PullManifestRow>("/data/pull_manifest_v2.csv");
         setRows(data);
       } catch (err) {
         setError(err instanceof Error ? err.message : "Failed to load manifest");
@@ -34,23 +34,17 @@ export default function PullManifestTable() {
         <table className="min-w-full border-collapse text-sm text-white">
           <thead>
             <tr className="border-b border-slate-700">
-              <th className="px-3 py-2 text-left">Source</th>
-              <th className="px-3 py-2 text-left">File</th>
-              <th className="px-3 py-2 text-left">Pull Date</th>
-              <th className="px-3 py-2 text-left">Loaded At</th>
-              <th className="px-3 py-2 text-left">Record Count</th>
-              <th className="px-3 py-2 text-left">Status</th>
+              <th className="px-3 py-2 text-left">Project UUID</th>
+              <th className="px-3 py-2 text-left">Project Name</th>
+              <th className="px-3 py-2 text-left">Photo Log Status</th>
             </tr>
           </thead>
           <tbody>
             {rows.map((row, index) => (
               <tr key={index} className="border-b border-slate-800">
-                <td className="px-3 py-2">{row.source_name || "-"}</td>
-                <td className="px-3 py-2">{row.file_name || "-"}</td>
-                <td className="px-3 py-2">{row.pull_date || "-"}</td>
-                <td className="px-3 py-2">{row.loaded_at || "-"}</td>
-                <td className="px-3 py-2">{row.record_count || "-"}</td>
-                <td className="px-3 py-2">{row.status || "-"}</td>
+                <td className="px-3 py-2">{row.project_uuid || "-"}</td>
+                <td className="px-3 py-2">{row.project_name || "-"}</td>
+                <td className="px-3 py-2">{row.photo_log_status || "-"}</td>
               </tr>
             ))}
           </tbody>

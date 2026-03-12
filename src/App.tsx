@@ -3,6 +3,8 @@ import React, { useMemo, useState } from "react";
 import "./App.css";
 import { AnalyticsDashboard } from "./components/AnalyticsDashboard";
 import DaysInInventoryChart from "./components/DaysInInventoryChart";
+import ProjectsTable from "./components/ProjectsTable";
+import ProjectsGallery from "./components/ProjectsGallery";
 
 type NavItem = { label: string; key: string };
 
@@ -15,9 +17,9 @@ const App: React.FC = () => {
     () => [
       { label: "Overview", key: "overview" },
       { label: "Days in Inventory", key: "inventory" },
-      { label: "Flipper Force Data", key: "flipper" },
+      { label: "Projects Gallery", key: "flipper" },
       { label: "Profit by Category", key: "profit" },
-      { label: "Properties", key: "properties" },
+      { label: "Properties Table", key: "properties" },
       { label: "Settings", key: "settings" },
     ],
     []
@@ -81,6 +83,19 @@ const App: React.FC = () => {
           </>
         );
 
+      case "flipper":
+        return (
+          <>
+            <div className="pageHeader">
+              <h1 className="h1">Projects Gallery</h1>
+              <p className="muted">
+                Browse all Flipper Force projects with photos, stage, and property details.
+              </p>
+            </div>
+            <ProjectsGallery />
+          </>
+        );
+
       case "profit":
         return renderPlaceholder(
           "Profit by Category",
@@ -88,9 +103,16 @@ const App: React.FC = () => {
         );
 
       case "properties":
-        return renderPlaceholder(
-          "Properties",
-          "Property-level detail views can live here."
+        return (
+          <>
+            <div className="pageHeader">
+              <h1 className="h1">Properties Table</h1>
+              <p className="muted">
+                Sortable and searchable table of all Flipper Force projects.
+              </p>
+            </div>
+            <ProjectsTable />
+          </>
         );
 
       case "settings":
