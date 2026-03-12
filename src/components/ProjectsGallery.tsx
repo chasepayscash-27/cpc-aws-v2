@@ -1,5 +1,6 @@
-import { CSSProperties } from "react";
+import { CSSProperties, useState } from "react";
 import type { ProjectRow } from "../types/project";
+import ProjectDetailsModal from "./ProjectDetailsModal";
 
 interface Props {
   rows: ProjectRow[];
@@ -31,6 +32,8 @@ function badgeStyle(value: string | undefined, colorMap: Record<string, string>)
 }
 
 export default function ProjectsGallery({ rows }: Props) {
+  const [selectedProject, setSelectedProject] = useState<ProjectRow | null>(null);
+
   const gridStyle: CSSProperties = {
     display: "grid",
     gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))",
@@ -43,16 +46,21 @@ export default function ProjectsGallery({ rows }: Props) {
     overflow: "hidden",
     background: "rgba(255,255,255,0.05)",
     transition: "transform 0.15s, border-color 0.15s",
-    cursor: "default",
+    cursor: "pointer",
   };
 
   return (
-    <div style={gridStyle}>
-      {rows.map((row, i) => (
-        <div
-          key={row.project_uuid ?? i}
-          style={cardStyle}
-          onMouseEnter={(e) => {
+    <>
+      {selectedProject && (
+        <ProjectDetailsModal project={selectedProject} onClose={() => setSelectedProject(null)} />
+      )}
+      <div style={gridStyle}>
+        {rows.map((row, i) => (
+          <div
+            key={row.project_uuid ?? i}
+            style={cardStyle}
+            onClick={() => setSelectedProject(row)}
+            onMouseEnter={(e) => {
             (e.currentTarget as HTMLDivElement).style.transform = "translateY(-2px)";
             (e.currentTarget as HTMLDivElement).style.borderColor = "rgba(124,58,237,0.50)";
           }}
@@ -152,6 +160,7 @@ export default function ProjectsGallery({ rows }: Props) {
           </div>
         </div>
       ))}
-    </div>
+      </div>
+    </>
   );
 }
