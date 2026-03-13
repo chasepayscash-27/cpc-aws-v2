@@ -19,6 +19,7 @@ const App: React.FC = () => {
       { label: "Flipper Force Data", key: "flipper" },
       { label: "Profit by Category", key: "profit" },
       { label: "Properties", key: "properties" },
+      { label: "Financials", key: "financials" }, 
       { label: "Resources", key: "resources" },
       { label: "Settings", key: "settings" },
     ],
@@ -94,6 +95,8 @@ const App: React.FC = () => {
           "Properties",
           "Property-level detail views can live here."
         );
+      case "financials":
+        return <FinancialsPage />;
       case "resources":
         return <ResourcesPage />;
       case "settings":
