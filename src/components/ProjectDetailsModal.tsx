@@ -1,5 +1,6 @@
 import { CSSProperties, useEffect, useCallback } from "react";
 import type { ProjectRow } from "../types/project";
+import PropertyFinancials from "./PropertyFinancials";
 
 interface Props {
   project: ProjectRow;
@@ -276,6 +277,15 @@ export default function ProjectDetailsModal({ project: row, onClose }: Props) {
                   <DetailRow label="Created" value={createdDate} />
                   <DetailRow label="Last Updated" value={updatedDate} />
                 </div>
+              </>
+            )}
+
+            {/* Financials section */}
+            {row.name && (
+              <>
+                <div style={dividerStyle} />
+                <div style={sectionLabelStyle}>💰 Financials</div>
+                <PropertyFinancials propertyName={row.name} />
               </>
             )}
           </div>
