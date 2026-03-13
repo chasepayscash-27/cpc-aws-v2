@@ -3,6 +3,7 @@ import React, { useMemo, useState } from "react";
 import "./App.css";
 import DaysInInventoryChart from "./components/DaysInInventoryChart";
 import ProjectsPage from "./pages/ProjectsPage";
+import ResourcesPage from "./pages/ResourcesPage";
 
 type NavItem = { label: string; key: string };
 
@@ -17,6 +18,7 @@ const App: React.FC = () => {
       { label: "Flipper Force Data", key: "flipper" },
       { label: "Profit by Category", key: "profit" },
       { label: "Properties", key: "properties" },
+      { label: "Resources", key: "resources" },
       { label: "Settings", key: "settings" },
     ],
     []
@@ -91,7 +93,8 @@ const App: React.FC = () => {
           "Properties",
           "Property-level detail views can live here."
         );
-
+      case "resources":
+        return <ResourcesPage />;
       case "settings":
         return renderPlaceholder(
           "Settings",
