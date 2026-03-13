@@ -4,6 +4,7 @@ import "./App.css";
 import DaysInInventoryChart from "./components/DaysInInventoryChart";
 import ProjectsPage from "./pages/ProjectsPage";
 import ResourcesPage from "./pages/ResourcesPage";
+import FinancialsPage from "./pages/FinancialsPage";
 
 type NavItem = { label: string; key: string };
 
