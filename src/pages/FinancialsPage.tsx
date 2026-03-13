@@ -14,7 +14,7 @@ const FinancialsPage: React.FC = () => {
 
   // Load CSV data on component mount
   useEffect(() => {
-    fetch('/sweet_home_bama_pl_long_fixed.csv')
+    fetch('/data/sweet_home_bama_pl_long_fixed.csv')  // ← FIXED PATH
       .then(response => response.text())
       .then(csvText => {
         const lines = csvText.trim().split('\n');
