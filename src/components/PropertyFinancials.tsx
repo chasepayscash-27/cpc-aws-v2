@@ -43,11 +43,21 @@ const PropertyFinancials: React.FC<PropertyFinancialsProps> = ({ propertyName })
       });
   }, []);
 
-  const propertyData = useMemo(
-    () => data.filter(record => record.property_name === propertyName),
-    [data, propertyName]
-  );
+  const normalizePropertyName = (name: string): string => {
+    return name
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, ' ')           // normalize spaces
+    .replace(/\./g, '')              // remove periods
+    .replace(/\b(mtn|mt|dr|cir|ln)\./gi, '$1'); // standardize abbreviations
+};
 
+const propertyData = useMemo(
+  () => data.filter(record => 
+    normalizePropertyName(record.property_name) === normalizePropertyName(propertyName)
+  ),
+  [data, propertyName]
+);
   const totalIncome = useMemo(
     () =>
       propertyData
