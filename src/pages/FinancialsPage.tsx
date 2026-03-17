@@ -97,7 +97,7 @@ const FinancialsPage: React.FC = () => {
         </div>
         <div className="card">
           <div className="cardLabel">Net Profit</div>
-          <div className="cardValue" style={{ color: netProfit < 0 ? '#ff6b6b' : '#ffd700' }}>
+          <div className="cardValue" style={{ color: netProfit < 0 ? '#dc2626' : '#1a7a3c' }}>
             ${netProfit.toLocaleString('en-US', { maximumFractionDigits: 2 })}
           </div>
         </div>
@@ -117,7 +117,7 @@ const FinancialsPage: React.FC = () => {
                 padding: '8px 12px',
                 borderRadius: '8px',
                 border: '1px solid var(--border)',
-                background: 'rgba(30, 91, 168, 0.05)',
+                background: '#f0f7f1',
                 color: 'var(--text)',
                 cursor: 'pointer',
               }}
@@ -142,7 +142,7 @@ const FinancialsPage: React.FC = () => {
                 padding: '8px 12px',
                 borderRadius: '8px',
                 border: '1px solid var(--border)',
-                background: 'rgba(30, 91, 168, 0.05)',
+                background: '#f0f7f1',
                 color: 'var(--text)',
               }}
             />
@@ -156,14 +156,14 @@ const FinancialsPage: React.FC = () => {
           <table style={{ width: '100%', borderCollapse: 'collapse' }}>
             <thead>
               <tr style={{ borderBottom: '1px solid var(--border)' }}>
-                <th style={{ textAlign: 'left', padding: '8px', color: 'var(--gold)', fontWeight: '600' }}>Account</th>
-                <th style={{ textAlign: 'left', padding: '8px', color: 'var(--gold)', fontWeight: '600' }}>Property</th>
-                <th style={{ textAlign: 'right', padding: '8px', color: 'var(--gold)', fontWeight: '600' }}>Amount</th>
+                <th style={{ textAlign: 'left', padding: '8px', color: 'var(--accent)', fontWeight: '600' }}>Account</th>
+                <th style={{ textAlign: 'left', padding: '8px', color: 'var(--accent)', fontWeight: '600' }}>Property</th>
+                <th style={{ textAlign: 'right', padding: '8px', color: 'var(--accent)', fontWeight: '600' }}>Amount</th>
               </tr>
             </thead>
             <tbody>
               {filteredData.map((record, idx) => (
-                <tr key={idx} style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.05)' }}>
+                <tr key={idx} style={{ borderBottom: '1px solid #eaf4ec' }}>
                   <td style={{ padding: '8px' }}>{record.account}</td>
                   <td style={{ padding: '8px', color: 'var(--muted)', fontSize: '12px' }}>{record.property_name}</td>
                   <td style={{ textAlign: 'right', padding: '8px' }}>

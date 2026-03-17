@@ -29,15 +29,15 @@ export default function ProjectsPage() {
   }, []);
 
   const activeTabStyle = {
-    background: "rgba(124,58,237,0.30)",
-    borderColor: "rgba(124,58,237,0.50)",
-    color: "rgba(255,255,255,0.92)",
+    background: "rgba(26,122,60,0.15)",
+    borderColor: "rgba(26,122,60,0.50)",
+    color: "#1a7a3c",
   };
 
   const inactiveTabStyle = {
     background: "transparent",
-    borderColor: "rgba(255,255,255,0.10)",
-    color: "rgba(255,255,255,0.55)",
+    borderColor: "rgba(26,122,60,0.15)",
+    color: "#5a7060",
   };
 
   return (
@@ -86,7 +86,7 @@ export default function ProjectsPage() {
               marginLeft: "auto",
               alignSelf: "center",
               fontSize: 12,
-              color: "rgba(255,255,255,0.45)",
+              color: "#5a7060",
             }}
           >
             {rows.length} projects
@@ -101,7 +101,7 @@ export default function ProjectsPage() {
             style={{
               padding: 40,
               textAlign: "center",
-              color: "rgba(255,255,255,0.55)",
+              color: "#5a7060",
             }}
           >
             Loading projects…
@@ -123,7 +123,7 @@ export default function ProjectsPage() {
             style={{
               padding: 40,
               textAlign: "center",
-              color: "rgba(255,255,255,0.45)",
+              color: "#5a7060",
             }}
           >
             No projects found.

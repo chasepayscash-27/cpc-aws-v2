@@ -19,7 +19,7 @@ const STRATEGY_COLORS: Record<string, string> = {
 
 function badge(value: string | undefined, colorMap: Record<string, string>) {
   const label = value ? value.replace(/_/g, " ") : "—";
-  const bg = value ? (colorMap[value] ?? "rgba(255,255,255,0.08)") : "rgba(255,255,255,0.08)";
+  const bg = value ? (colorMap[value] ?? "rgba(26,122,60,0.10)") : "rgba(26,122,60,0.10)";
   const style: CSSProperties = {
     display: "inline-block",
     padding: "2px 8px",
@@ -39,16 +39,16 @@ export default function ProjectsTable({ rows }: Props) {
     textAlign: "left",
     fontSize: 11,
     fontWeight: 700,
-    color: "rgba(255,255,255,0.55)",
+    color: "#1a7a3c",
     letterSpacing: "0.08em",
     textTransform: "uppercase",
-    borderBottom: "1px solid rgba(255,255,255,0.10)",
+    borderBottom: "1px solid #d4e8d8",
     whiteSpace: "nowrap",
   };
 
   const tdStyle: CSSProperties = {
     padding: "10px 12px",
-    borderBottom: "1px solid rgba(255,255,255,0.07)",
+    borderBottom: "1px solid #eaf4ec",
     fontSize: 13,
     verticalAlign: "middle",
   };
@@ -75,7 +75,7 @@ export default function ProjectsTable({ rows }: Props) {
               style={{ transition: "background 0.15s" }}
               onMouseEnter={(e) =>
                 ((e.currentTarget as HTMLTableRowElement).style.background =
-                  "rgba(255,255,255,0.04)")
+                  "rgba(26,122,60,0.04)")
               }
               onMouseLeave={(e) =>
                 ((e.currentTarget as HTMLTableRowElement).style.background = "")
@@ -103,7 +103,7 @@ export default function ProjectsTable({ rows }: Props) {
                       width: 56,
                       height: 56,
                       borderRadius: 10,
-                      background: "rgba(255,255,255,0.08)",
+                      background: "rgba(26,122,60,0.08)",
                       display: "grid",
                       placeItems: "center",
                       fontSize: 20,
@@ -117,7 +117,7 @@ export default function ProjectsTable({ rows }: Props) {
               <td style={tdStyle}>
                 <div>{row.city && row.state ? `${row.city}, ${row.state}` : row.full_address ?? "—"}</div>
                 {row.postal_code && (
-                  <div style={{ fontSize: 11, color: "rgba(255,255,255,0.5)" }}>{row.postal_code}</div>
+                  <div style={{ fontSize: 11, color: "#5a7060" }}>{row.postal_code}</div>
                 )}
               </td>
               <td style={tdStyle}>{badge(row.stage, STAGE_COLORS)}</td>

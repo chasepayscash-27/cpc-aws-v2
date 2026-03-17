@@ -26,10 +26,11 @@ function badgeStyle(value: string | undefined, colorMap: Record<string, string>)
     borderRadius: 12,
     fontSize: 12,
     fontWeight: 600,
-    background: value ? (colorMap[value] ?? "rgba(255,255,255,0.10)") : "rgba(255,255,255,0.10)",
-    border: "1px solid rgba(255,255,255,0.12)",
+    background: value ? (colorMap[value] ?? "rgba(26,122,60,0.10)") : "rgba(26,122,60,0.10)",
+    border: "1px solid rgba(26,122,60,0.15)",
     textTransform: "capitalize",
     whiteSpace: "nowrap",
+    color: "#1a2e1a",
   };
 }
 
@@ -37,10 +38,10 @@ function DetailRow({ label, value }: { label: string; value?: string | null }) {
   if (!value) return null;
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
-      <span style={{ fontSize: 10, fontWeight: 600, color: "rgba(255,255,255,0.40)", textTransform: "uppercase", letterSpacing: "0.06em" }}>
+      <span style={{ fontSize: 10, fontWeight: 600, color: "#5a7060", textTransform: "uppercase", letterSpacing: "0.06em" }}>
         {label}
       </span>
-      <span style={{ fontSize: 14, color: "rgba(255,255,255,0.88)" }}>{value}</span>
+      <span style={{ fontSize: 14, color: "#1a2e1a" }}>{value}</span>
     </div>
   );
 }
@@ -76,14 +77,14 @@ export default function ProjectDetailsModal({ project: row, onClose }: Props) {
   };
 
   const modalStyle: CSSProperties = {
-    background: "linear-gradient(145deg, rgba(30,20,55,0.98) 0%, rgba(18,12,40,0.98) 100%)",
-    border: "1px solid rgba(124,58,237,0.30)",
+    background: "#ffffff",
+    border: "1px solid #d4e8d8",
     borderRadius: 20,
     width: "100%",
     maxWidth: 680,
     maxHeight: "90vh",
     overflowY: "auto",
-    boxShadow: "0 24px 80px rgba(0,0,0,0.60), 0 0 0 1px rgba(124,58,237,0.12)",
+    boxShadow: "0 24px 80px rgba(0,0,0,0.15), 0 0 0 1px rgba(26,122,60,0.10)",
     animation: "slideUp 0.22s ease",
     position: "relative",
   };
@@ -95,9 +96,9 @@ export default function ProjectDetailsModal({ project: row, onClose }: Props) {
     width: 32,
     height: 32,
     borderRadius: "50%",
-    border: "1px solid rgba(255,255,255,0.15)",
-    background: "rgba(255,255,255,0.07)",
-    color: "rgba(255,255,255,0.70)",
+    border: "1px solid #d4e8d8",
+    background: "#f0f7f1",
+    color: "#5a7060",
     fontSize: 18,
     lineHeight: 1,
     cursor: "pointer",
@@ -111,14 +112,14 @@ export default function ProjectDetailsModal({ project: row, onClose }: Props) {
   const sectionLabelStyle: CSSProperties = {
     fontSize: 11,
     fontWeight: 700,
-    color: "rgba(124,58,237,0.85)",
+    color: "#1a7a3c",
     textTransform: "uppercase",
     letterSpacing: "0.08em",
     marginBottom: 12,
   };
 
   const dividerStyle: CSSProperties = {
-    borderTop: "1px solid rgba(255,255,255,0.07)",
+    borderTop: "1px solid #eaf4ec",
     margin: "20px 0",
   };
 
@@ -138,7 +139,7 @@ export default function ProjectDetailsModal({ project: row, onClose }: Props) {
       <style>{`
         @keyframes fadeIn { from { opacity: 0 } to { opacity: 1 } }
         @keyframes slideUp { from { opacity: 0; transform: translateY(24px) } to { opacity: 1; transform: translateY(0) } }
-        .modal-close-btn:hover { background: rgba(255,255,255,0.14) !important; color: rgba(255,255,255,0.95) !important; }
+        .modal-close-btn:hover { background: #d4e8d8 !important; color: #1a7a3c !important; }
       `}</style>
       <div style={overlayStyle} onClick={onClose} role="dialog" aria-modal="true" aria-label={row.name ?? "Project details"}>
         <div style={modalStyle} onClick={(e) => e.stopPropagation()}>
@@ -174,7 +175,7 @@ export default function ProjectDetailsModal({ project: row, onClose }: Props) {
                 {row.name ?? "Unnamed Project"}
               </h2>
               {cityStateZip && (
-                <p style={{ margin: 0, fontSize: 14, color: "rgba(255,255,255,0.55)" }}>
+                <p style={{ margin: 0, fontSize: 14, color: "#5a7060" }}>
                   {cityStateZip}
                 </p>
               )}
@@ -204,8 +205,8 @@ export default function ProjectDetailsModal({ project: row, onClose }: Props) {
                     display: "grid",
                     gridTemplateColumns: "repeat(auto-fill, minmax(100px, 1fr))",
                     gap: 12,
-                    background: "rgba(255,255,255,0.04)",
-                    border: "1px solid rgba(255,255,255,0.08)",
+                    background: "#f0f7f1",
+                    border: "1px solid #d4e8d8",
                     borderRadius: 12,
                     padding: "14px 16px",
                     marginBottom: 20,
@@ -214,13 +215,13 @@ export default function ProjectDetailsModal({ project: row, onClose }: Props) {
                   {row.beds && (
                     <div style={{ textAlign: "center" }}>
                       <div style={{ fontSize: 20, fontWeight: 700 }}>{row.beds}</div>
-                      <div style={{ fontSize: 10, color: "rgba(255,255,255,0.45)", textTransform: "uppercase" }}>Beds</div>
+                      <div style={{ fontSize: 10, color: "#5a7060", textTransform: "uppercase" }}>Beds</div>
                     </div>
                   )}
                   {row.baths && (
                     <div style={{ textAlign: "center" }}>
                       <div style={{ fontSize: 20, fontWeight: 700 }}>{row.baths}</div>
-                      <div style={{ fontSize: 10, color: "rgba(255,255,255,0.45)", textTransform: "uppercase" }}>Baths</div>
+                      <div style={{ fontSize: 10, color: "#5a7060", textTransform: "uppercase" }}>Baths</div>
                     </div>
                   )}
                   {sqft && (
@@ -228,13 +229,13 @@ export default function ProjectDetailsModal({ project: row, onClose }: Props) {
                       <div style={{ fontSize: 20, fontWeight: 700 }}>
                         {sqftFormatted}
                       </div>
-                      <div style={{ fontSize: 10, color: "rgba(255,255,255,0.45)", textTransform: "uppercase" }}>Sq Ft</div>
+                      <div style={{ fontSize: 10, color: "#5a7060", textTransform: "uppercase" }}>Sq Ft</div>
                     </div>
                   )}
                   {row.year_built && (
                     <div style={{ textAlign: "center" }}>
                       <div style={{ fontSize: 20, fontWeight: 700 }}>{row.year_built}</div>
-                      <div style={{ fontSize: 10, color: "rgba(255,255,255,0.45)", textTransform: "uppercase" }}>Year Built</div>
+                      <div style={{ fontSize: 10, color: "#5a7060", textTransform: "uppercase" }}>Year Built</div>
                     </div>
                   )}
                 </div>
