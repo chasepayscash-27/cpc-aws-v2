@@ -11,6 +11,12 @@ type NavItem = { label: string; key: string };
 const App: React.FC = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(true);
   const [active, setActive] = useState("inventory");
+  const [financialProperty, setFinancialProperty] = useState<string | undefined>(undefined);
+
+  const handleViewFullPnL = (name: string) => {
+    setFinancialProperty(name);
+    setActive("financials");
+  };
 
   const nav: NavItem[] = useMemo(
     () => [
@@ -82,7 +88,7 @@ const App: React.FC = () => {
         );
 
       case "projects":
-        return <ProjectsPage />;
+        return <ProjectsPage onViewFullPnL={handleViewFullPnL} />;
 
       case "profit":
         return renderPlaceholder(
@@ -96,7 +102,7 @@ const App: React.FC = () => {
           "Property-level detail views can live here."
         );
       case "financials":
-        return <FinancialsPage />;
+        return <FinancialsPage initialProperty={financialProperty} />;
       case "resources":
         return <ResourcesPage />;
       case "settings":
@@ -134,7 +140,7 @@ const App: React.FC = () => {
             <button
               key={n.key}
               className={`navItem ${active === n.key ? "active" : ""}`}
-              onClick={() => setActive(n.key)}
+              onClick={() => { setActive(n.key); if (n.key !== "financials") setFinancialProperty(undefined); }}
             >
               {n.label}
             </button>

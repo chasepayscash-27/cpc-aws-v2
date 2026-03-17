@@ -6,7 +6,11 @@ import ProjectsGallery from "../components/ProjectsGallery";
 
 type ViewMode = "table" | "gallery";
 
-export default function ProjectsPage() {
+interface Props {
+  onViewFullPnL?: (propertyName: string) => void;
+}
+
+export default function ProjectsPage({ onViewFullPnL }: Props) {
   const [rows, setRows] = useState<ProjectRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -130,10 +134,10 @@ export default function ProjectsPage() {
           </div>
         )}
         {!loading && !error && rows.length > 0 && viewMode === "table" && (
-          <ProjectsTable rows={rows} />
+          <ProjectsTable rows={rows} onViewFullPnL={onViewFullPnL} />
         )}
         {!loading && !error && rows.length > 0 && viewMode === "gallery" && (
-          <ProjectsGallery rows={rows} />
+          <ProjectsGallery rows={rows} onViewFullPnL={onViewFullPnL} />
         )}
       </div>
     </>

@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useMemo } from 'react';
+import { normalizeAddress } from '../utils/normalizeAddress';
 
 interface FinancialRecord {
   account: string;
@@ -6,7 +7,11 @@ interface FinancialRecord {
   amount: number;
 }
 
-const FinancialsPage: React.FC = () => {
+interface Props {
+  initialProperty?: string;
+}
+
+const FinancialsPage: React.FC<Props> = ({ initialProperty }) => {
   const [data, setData] = useState<FinancialRecord[]>([]);
   const [selectedProperty, setSelectedProperty] = useState<string>('all');
   const [searchTerm, setSearchTerm] = useState<string>('');
@@ -39,6 +44,15 @@ const FinancialsPage: React.FC = () => {
         setIsLoading(false);
       });
   }, []);
+
+  // When initialProperty changes (or data loads), find the matching P&L property name
+  useEffect(() => {
+    if (!initialProperty || data.length === 0) return;
+    const normalizedInitial = normalizeAddress(initialProperty);
+    const uniqueNames = [...new Set(data.map(r => r.property_name))];
+    const match = uniqueNames.find(n => normalizeAddress(n) === normalizedInitial);
+    setSelectedProperty(match ?? 'all');
+  }, [initialProperty, data]);
 
   const properties = useMemo(() => {
     const unique = [...new Set(data.map(d => d.property_name))];
