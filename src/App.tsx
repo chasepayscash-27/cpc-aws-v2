@@ -10,7 +10,7 @@ type NavItem = { label: string; key: string };
 
 const App: React.FC = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(true);
-  const [active, setActive] = useState("inventory");
+  const [active, setActive] = useState("pipeline");
   const [financialProperty, setFinancialProperty] = useState<string | undefined>(undefined);
 
   const handleViewFullPnL = (name: string) => {
@@ -20,6 +20,7 @@ const App: React.FC = () => {
 
   const nav: NavItem[] = useMemo(
     () => [
+      { label: "Current Pipeline", key: "pipeline" },
       { label: "Days in Inventory", key: "inventory" },
       { label: "Projects", key: "projects" },
       { label: "Flipper Force Data", key: "flipper" },
@@ -71,6 +72,41 @@ const App: React.FC = () => {
 
   const renderContent = () => {
     switch (active) {
+      case "pipeline":
+        return (
+          <>
+            <div className="pageHeader">
+              <h1 className="h1">Current Pipeline</h1>
+              <p className="muted">
+                Active deals and properties currently in the pipeline.
+              </p>
+            </div>
+
+            <section className="grid">
+              <div className="card">
+                <div className="cardLabel">Active Deals</div>
+                <div className="cardValue">—</div>
+                <div className="cardSub muted">Properties in progress</div>
+              </div>
+              <div className="card">
+                <div className="cardLabel">Total Pipeline Value</div>
+                <div className="cardValue">$—</div>
+                <div className="cardSub muted">Estimated value of open deals</div>
+              </div>
+              <div className="card">
+                <div className="cardLabel">Avg Days in Pipeline</div>
+                <div className="cardValue">—</div>
+                <div className="cardSub muted">Across all active deals</div>
+              </div>
+            </section>
+
+            <section className="card chartCard">
+              <div className="cardLabel">Pipeline Overview</div>
+              <div className="chartPlaceholder">[Pipeline chart coming soon]</div>
+            </section>
+          </>
+        );
+
       case "inventory":
         return (
           <>
