@@ -97,7 +97,7 @@ const propertyData = useMemo(
 
   if (loading) {
     return (
-      <div style={{ padding: '16px', textAlign: 'center', color: 'rgba(255,255,255,0.55)', fontSize: 13 }}>
+      <div style={{ padding: '16px', textAlign: 'center', color: '#5a7060', fontSize: 13 }}>
         Loading financials…
       </div>
     );
@@ -105,7 +105,7 @@ const propertyData = useMemo(
 
   if (error) {
     return (
-      <div style={{ padding: '16px', textAlign: 'center', color: '#ff6b6b', fontSize: 13 }}>
+      <div style={{ padding: '16px', textAlign: 'center', color: '#dc2626', fontSize: 13 }}>
         {error}
       </div>
     );
@@ -113,7 +113,7 @@ const propertyData = useMemo(
 
   if (propertyData.length === 0) {
     return (
-      <div style={{ padding: '16px', textAlign: 'center', color: 'rgba(255,255,255,0.55)', fontSize: 13 }}>
+      <div style={{ padding: '16px', textAlign: 'center', color: '#5a7060', fontSize: 13 }}>
         No financial data available for this property.
       </div>
     );
@@ -134,13 +134,13 @@ const propertyData = useMemo(
           <div
             key={label}
             style={{
-              background: 'rgba(255,255,255,0.05)',
-              border: '1px solid rgba(255,255,255,0.10)',
+              background: '#f0f7f1',
+              border: '1px solid #d4e8d8',
               borderRadius: 12,
               padding: '12px 14px',
             }}
           >
-            <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.50)', marginBottom: 6 }}>{label}</div>
+            <div style={{ fontSize: 11, color: '#5a7060', marginBottom: 6 }}>{label}</div>
             <div
               style={{
                 fontSize: 16,
@@ -148,9 +148,9 @@ const propertyData = useMemo(
                 color:
                   label === 'Net Profit'
                     ? value < 0
-                      ? '#ff6b6b'
-                      : '#51cf66'
-                    : '#ffd700',
+                      ? '#dc2626'
+                      : '#1a7a3c'
+                    : '#1a7a3c',
               }}
             >
               {fmt(value)}
@@ -163,7 +163,7 @@ const propertyData = useMemo(
       {lineItems.length > 0 && (
         <div
           style={{
-            border: '1px solid rgba(255,255,255,0.10)',
+            border: '1px solid #d4e8d8',
             borderRadius: 12,
             overflow: 'hidden',
           }}
@@ -177,12 +177,12 @@ const propertyData = useMemo(
                 alignItems: 'center',
                 padding: '9px 14px',
                 borderBottom:
-                  idx < lineItems.length - 1 ? '1px solid rgba(255,255,255,0.05)' : 'none',
+                  idx < lineItems.length - 1 ? '1px solid #eaf4ec' : 'none',
                 fontSize: 13,
               }}
             >
-              <span style={{ color: 'rgba(255,255,255,0.82)' }}>{record.account}</span>
-              <span style={{ color: 'rgba(255,255,255,0.55)' }}>{fmt(record.amount)}</span>
+              <span style={{ color: '#1a2e1a' }}>{record.account}</span>
+              <span style={{ color: '#5a7060' }}>{fmt(record.amount)}</span>
             </div>
           ))}
         </div>

@@ -52,16 +52,16 @@ export default function ProjectsByStatusChart() {
   if (error) return <div>Error: {error}</div>;
 
   return (
-    <div className="rounded-2xl bg-slate-900 p-4 shadow-lg">
-      <h2 className="mb-4 text-xl font-semibold text-white">Projects by Status</h2>
+    <div style={{ background: '#f5f7f5', borderRadius: '14px', padding: '16px' }}>
+      <h2 style={{ marginBottom: '16px', fontSize: '18px', fontWeight: 600, color: '#1a7a3c' }}>Projects by Status</h2>
       <div style={{ width: "100%", height: 350 }}>
         <ResponsiveContainer>
           <BarChart data={data}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="status" stroke="#ffffff" />
-            <YAxis stroke="#ffffff" allowDecimals={false} />
-            <Tooltip />
-            <Bar dataKey="count" fill="#3b82f6" />
+            <CartesianGrid strokeDasharray="3 3" stroke="#d4e8d8" />
+            <XAxis dataKey="status" stroke="#5a7060" tick={{ fill: "#1a2e1a" }} />
+            <YAxis stroke="#5a7060" allowDecimals={false} tick={{ fill: "#1a2e1a" }} />
+            <Tooltip contentStyle={{ backgroundColor: '#ffffff', border: '1px solid #d4e8d8', color: '#1a2e1a' }} />
+            <Bar dataKey="count" fill="#1a7a3c" radius={[4,4,4,4]} />
           </BarChart>
         </ResponsiveContainer>
       </div>

@@ -59,35 +59,35 @@ const ResourcesPage: React.FC = () => {
           justify-content: space-between;
           padding: 16px 18px;
           cursor: pointer;
-          border: 1px solid rgba(124, 58, 237, 0.3);
-          background: linear-gradient(135deg, rgba(124, 58, 237, 0.08), rgba(59, 130, 246, 0.08));
+          border: 1px solid rgba(26, 122, 60, 0.25);
+          background: linear-gradient(135deg, rgba(26, 122, 60, 0.06), rgba(40, 168, 82, 0.04));
           transition: all 0.3s ease;
           min-height: 60px;
         }
 
         .resourceCard:hover {
-          border: 1px solid rgba(124, 58, 237, 0.6);
-          background: linear-gradient(135deg, rgba(124, 58, 237, 0.15), rgba(59, 130, 246, 0.15));
-          box-shadow: 0 8px 16px rgba(124, 58, 237, 0.15);
+          border: 1px solid rgba(26, 122, 60, 0.50);
+          background: linear-gradient(135deg, rgba(26, 122, 60, 0.10), rgba(40, 168, 82, 0.08));
+          box-shadow: 0 8px 16px rgba(26, 122, 60, 0.12);
         }
 
         .resourceLinkText {
           font-weight: 500;
           font-size: 14px;
-          color: rgba(255, 255, 255, 0.92);
+          color: #1a2e1a;
           flex: 1;
         }
 
         .resourceArrow {
           font-size: 18px;
-          color: rgba(124, 58, 237, 0.8);
+          color: rgba(26, 122, 60, 0.7);
           margin-left: 12px;
           transition: all 0.3s ease;
           font-weight: 600;
         }
 
         .resourceLink:hover .resourceArrow {
-          color: rgba(124, 58, 237, 1);
+          color: #1a7a3c;
           transform: translateX(4px);
         }
       `}</style>

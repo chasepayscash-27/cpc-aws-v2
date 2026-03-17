@@ -54,16 +54,16 @@ export default function PhotoLogTimelineChart() {
   if (error) return <div>Error: {error}</div>;
 
   return (
-    <div className="rounded-2xl bg-slate-900 p-4 shadow-lg">
-      <h2 className="mb-4 text-xl font-semibold text-white">Photo Log Timeline</h2>
+    <div style={{ background: '#f5f7f5', borderRadius: '14px', padding: '16px' }}>
+      <h2 style={{ marginBottom: '16px', fontSize: '18px', fontWeight: 600, color: '#1a7a3c' }}>Photo Log Timeline</h2>
       <div style={{ width: "100%", height: 350 }}>
         <ResponsiveContainer>
           <LineChart data={data}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="date" stroke="#ffffff" />
-            <YAxis stroke="#ffffff" allowDecimals={false} />
-            <Tooltip />
-            <Line type="monotone" dataKey="count" stroke="#3b82f6" strokeWidth={3} />
+            <CartesianGrid strokeDasharray="3 3" stroke="#d4e8d8" />
+            <XAxis dataKey="date" stroke="#5a7060" tick={{ fill: "#1a2e1a" }} />
+            <YAxis stroke="#5a7060" allowDecimals={false} tick={{ fill: "#1a2e1a" }} />
+            <Tooltip contentStyle={{ backgroundColor: '#ffffff', border: '1px solid #d4e8d8', color: '#1a2e1a' }} />
+            <Line type="monotone" dataKey="count" stroke="#1a7a3c" strokeWidth={3} />
           </LineChart>
         </ResponsiveContainer>
       </div>

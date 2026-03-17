@@ -31,15 +31,15 @@ interface PropertyData {
   agent: string;
 }
 
-const COLORS = ["#D4A574", "#C4956E", "#B4875C", "#8B7355", "#704F35"];
+const COLORS = ["#1a7a3c", "#28a852", "#3dbd68", "#52d27e", "#67e794"];
 
-// Color scheme to match App.tsx
+// Color scheme matching green real estate theme
 const colors = {
-  lightBrown: "#F5EBE0",
-  darkBrown: "#5C4033",
-  accentBrown: "#8B7355",
+  lightGreen: "#f0f7f1",
+  darkGreen: "#1a2e1a",
+  accentGreen: "#1a7a3c",
   white: "#FFFFFF",
-  gold: "#D4A574",
+  green: "#28a852",
 };
 
 export function AnalyticsDashboard({ refreshKey = 0 }: { refreshKey?: number }) {
@@ -92,7 +92,7 @@ export function AnalyticsDashboard({ refreshKey = 0 }: { refreshKey?: number }) 
       <div style={{ 
         padding: "40px", 
         textAlign: "center",
-        color: colors.darkBrown,
+        color: colors.darkGreen,
         fontSize: "16px"
       }}>
         Loading analytics...
@@ -186,14 +186,14 @@ export function AnalyticsDashboard({ refreshKey = 0 }: { refreshKey?: number }) 
   return (
     <div style={{ 
       padding: "40px", 
-      backgroundColor: colors.lightBrown,
+      backgroundColor: colors.lightGreen,
       minHeight: "100vh"
     }}>
       <div style={{ maxWidth: "1400px", margin: "0 auto" }}>
-        <h1 style={{ color: colors.darkBrown, marginTop: 0, marginBottom: "10px" }}>
+        <h1 style={{ color: colors.darkGreen, marginTop: 0, marginBottom: "10px" }}>
           Chase Pays Cash Analytics
         </h1>
-        <p style={{ color: colors.accentBrown, fontSize: "14px", marginTop: 0 }}>
+        <p style={{ color: colors.accentGreen, fontSize: "14px", marginTop: 0 }}>
           Last updated: {lastUpdated}
         </p>
 
@@ -217,7 +217,7 @@ export function AnalyticsDashboard({ refreshKey = 0 }: { refreshKey?: number }) 
           <MetricCard
             title="Total Profit"
             value={`$${(totalProfit / 1000000).toFixed(2)}M`}
-            color={colors.gold}
+            color={colors.green}
           />
           <MetricCard
             title="Avg Days on Market"
@@ -241,33 +241,33 @@ export function AnalyticsDashboard({ refreshKey = 0 }: { refreshKey?: number }) 
               padding: "20px",
               borderRadius: "8px",
               boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-              borderTop: `4px solid ${colors.gold}`,
+              borderTop: `4px solid ${colors.green}`,
             }}
           >
-            <h2 style={{ color: colors.darkBrown, marginTop: 0 }}>
+            <h2 style={{ color: colors.darkGreen, marginTop: 0 }}>
               Monthly Revenue & Profit
             </h2>
             <ResponsiveContainer width="100%" height={300}>
               <LineChart data={monthlyData}>
-                <CartesianGrid strokeDasharray="3 3" stroke={colors.accentBrown} />
-                <XAxis dataKey="month" stroke={colors.darkBrown} />
-                <YAxis stroke={colors.darkBrown} />
+                <CartesianGrid strokeDasharray="3 3" stroke={colors.accentGreen} />
+                <XAxis dataKey="month" stroke={colors.darkGreen} />
+                <YAxis stroke={colors.darkGreen} />
                 <Tooltip 
                   formatter={(value: any) => `$${value.toLocaleString()}`}
-                  contentStyle={{ backgroundColor: colors.lightBrown, border: `1px solid ${colors.gold}` }}
+                  contentStyle={{ backgroundColor: colors.lightGreen, border: `1px solid ${colors.green}` }}
                 />
                 <Legend />
                 <Line
                   type="monotone"
                   dataKey="revenue"
-                  stroke={colors.accentBrown}
+                  stroke={colors.accentGreen}
                   name="Revenue"
                   strokeWidth={2}
                 />
                 <Line
                   type="monotone"
                   dataKey="profit"
-                  stroke={colors.gold}
+                  stroke={colors.green}
                   name="Profit"
                   strokeWidth={2}
                 />
@@ -282,28 +282,28 @@ export function AnalyticsDashboard({ refreshKey = 0 }: { refreshKey?: number }) 
               padding: "20px",
               borderRadius: "8px",
               boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-              borderTop: `4px solid ${colors.gold}`,
+              borderTop: `4px solid ${colors.green}`,
             }}
           >
-            <h2 style={{ color: colors.darkBrown, marginTop: 0 }}>
+            <h2 style={{ color: colors.darkGreen, marginTop: 0 }}>
               Top Agents by Profit
             </h2>
             <ResponsiveContainer width="100%" height={300}>
               <BarChart data={profitByAgent}>
-                <CartesianGrid strokeDasharray="3 3" stroke={colors.accentBrown} />
+                <CartesianGrid strokeDasharray="3 3" stroke={colors.accentGreen} />
                 <XAxis
                   dataKey="agent"
                   angle={-45}
                   textAnchor="end"
                   height={80}
-                  stroke={colors.darkBrown}
+                  stroke={colors.darkGreen}
                 />
-                <YAxis stroke={colors.darkBrown} />
+                <YAxis stroke={colors.darkGreen} />
                 <Tooltip 
                   formatter={(value: any) => `$${value.toLocaleString()}`}
-                  contentStyle={{ backgroundColor: colors.lightBrown, border: `1px solid ${colors.gold}` }}
+                  contentStyle={{ backgroundColor: colors.lightGreen, border: `1px solid ${colors.green}` }}
                 />
-                <Bar dataKey="profit" fill={colors.gold} />
+                <Bar dataKey="profit" fill={colors.green} />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -315,10 +315,10 @@ export function AnalyticsDashboard({ refreshKey = 0 }: { refreshKey?: number }) 
               padding: "20px",
               borderRadius: "8px",
               boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-              borderTop: `4px solid ${colors.gold}`,
+              borderTop: `4px solid ${colors.green}`,
             }}
           >
-            <h2 style={{ color: colors.darkBrown, marginTop: 0 }}>
+            <h2 style={{ color: colors.darkGreen, marginTop: 0 }}>
               Lead Sources Distribution
             </h2>
             <ResponsiveContainer width="100%" height={300}>
@@ -328,7 +328,7 @@ export function AnalyticsDashboard({ refreshKey = 0 }: { refreshKey?: number }) 
                   cx="50%"
                   cy="50%"
                   outerRadius={80}
-                  fill={colors.gold}
+                  fill={colors.green}
                   dataKey="value"
                 >
                   {leadSources.map((_, index) => (
@@ -339,7 +339,7 @@ export function AnalyticsDashboard({ refreshKey = 0 }: { refreshKey?: number }) 
                   ))}
                 </Pie>
                 <Tooltip 
-                  contentStyle={{ backgroundColor: colors.lightBrown, border: `1px solid ${colors.gold}` }}
+                  contentStyle={{ backgroundColor: colors.lightGreen, border: `1px solid ${colors.green}` }}
                 />
               </PieChart>
             </ResponsiveContainer>
@@ -353,21 +353,21 @@ export function AnalyticsDashboard({ refreshKey = 0 }: { refreshKey?: number }) 
             padding: "20px",
             borderRadius: "8px",
             boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-            borderTop: `4px solid ${colors.gold}`,
+            borderTop: `4px solid ${colors.green}`,
           }}
         >
-          <h2 style={{ color: colors.darkBrown, marginTop: 0 }}>Recent Properties</h2>
+          <h2 style={{ color: colors.darkGreen, marginTop: 0 }}>Recent Properties</h2>
           <div style={{ overflowX: "auto" }}>
             <table style={{ width: "100%", borderCollapse: "collapse" }}>
               <thead>
-                <tr style={{ borderBottom: `2px solid ${colors.gold}` }}>
+                <tr style={{ borderBottom: `2px solid ${colors.green}` }}>
                   <th
                     style={{
                       textAlign: "left",
                       padding: "12px",
-                      color: colors.darkBrown,
+                      color: colors.darkGreen,
                       fontWeight: "600",
-                      backgroundColor: colors.lightBrown,
+                      backgroundColor: colors.lightGreen,
                     }}
                   >
                     Address
@@ -376,9 +376,9 @@ export function AnalyticsDashboard({ refreshKey = 0 }: { refreshKey?: number }) 
                     style={{
                       textAlign: "left",
                       padding: "12px",
-                      color: colors.darkBrown,
+                      color: colors.darkGreen,
                       fontWeight: "600",
-                      backgroundColor: colors.lightBrown,
+                      backgroundColor: colors.lightGreen,
                     }}
                   >
                     Closed Date
@@ -387,9 +387,9 @@ export function AnalyticsDashboard({ refreshKey = 0 }: { refreshKey?: number }) 
                     style={{
                       textAlign: "left",
                       padding: "12px",
-                      color: colors.darkBrown,
+                      color: colors.darkGreen,
                       fontWeight: "600",
-                      backgroundColor: colors.lightBrown,
+                      backgroundColor: colors.lightGreen,
                     }}
                   >
                     Sold Amount
@@ -398,9 +398,9 @@ export function AnalyticsDashboard({ refreshKey = 0 }: { refreshKey?: number }) 
                     style={{
                       textAlign: "left",
                       padding: "12px",
-                      color: colors.darkBrown,
+                      color: colors.darkGreen,
                       fontWeight: "600",
-                      backgroundColor: colors.lightBrown,
+                      backgroundColor: colors.lightGreen,
                     }}
                   >
                     Profit
@@ -409,9 +409,9 @@ export function AnalyticsDashboard({ refreshKey = 0 }: { refreshKey?: number }) 
                     style={{
                       textAlign: "left",
                       padding: "12px",
-                      color: colors.darkBrown,
+                      color: colors.darkGreen,
                       fontWeight: "600",
-                      backgroundColor: colors.lightBrown,
+                      backgroundColor: colors.lightGreen,
                     }}
                   >
                     Agent
@@ -423,17 +423,17 @@ export function AnalyticsDashboard({ refreshKey = 0 }: { refreshKey?: number }) 
                   <tr
                     key={idx}
                     style={{
-                      borderBottom: `1px solid ${colors.lightBrown}`,
-                      backgroundColor: idx % 2 === 0 ? colors.white : colors.lightBrown,
+                      borderBottom: `1px solid ${colors.lightGreen}`,
+                      backgroundColor: idx % 2 === 0 ? colors.white : colors.lightGreen,
                     }}
                   >
-                    <td style={{ padding: "12px", color: colors.darkBrown }}>
+                    <td style={{ padding: "12px", color: colors.darkGreen }}>
                       {prop.property_address}
                     </td>
-                    <td style={{ padding: "12px", color: colors.darkBrown }}>
+                    <td style={{ padding: "12px", color: colors.darkGreen }}>
                       {new Date(prop.closed_date_dt).toLocaleDateString()}
                     </td>
-                    <td style={{ padding: "12px", color: colors.darkBrown }}>
+                    <td style={{ padding: "12px", color: colors.darkGreen }}>
                       ${prop.sold_amount_num?.toLocaleString()}
                     </td>
                     <td
@@ -441,14 +441,14 @@ export function AnalyticsDashboard({ refreshKey = 0 }: { refreshKey?: number }) 
                         padding: "12px",
                         color:
                           prop.gross_profit_num > 0
-                            ? colors.gold
+                            ? colors.green
                             : "#dc2626",
                         fontWeight: "600",
                       }}
                     >
                       ${prop.gross_profit_num?.toLocaleString()}
                     </td>
-                    <td style={{ padding: "12px", color: colors.darkBrown }}>
+                    <td style={{ padding: "12px", color: colors.darkGreen }}>
                       {prop.agent}
                     </td>
                   </tr>
@@ -479,7 +479,7 @@ function MetricCard({
         padding: "20px",
         borderRadius: "8px",
         boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-        borderLeft: `4px solid ${color || colors.accentBrown}`,
+        borderLeft: `4px solid ${color || colors.accentGreen}`,
         transition: "transform 0.2s ease",
       }}
       onMouseEnter={(e) => {
@@ -491,14 +491,14 @@ function MetricCard({
         e.currentTarget.style.boxShadow = "0 2px 8px rgba(0,0,0,0.1)";
       }}
     >
-      <div style={{ fontSize: "12px", color: colors.accentBrown, marginBottom: "10px", fontWeight: "600" }}>
+      <div style={{ fontSize: "12px", color: colors.accentGreen, marginBottom: "10px", fontWeight: "600" }}>
         {title}
       </div>
       <div
         style={{
           fontSize: "28px",
           fontWeight: "bold",
-          color: color || colors.darkBrown,
+          color: color || colors.darkGreen,
         }}
       >
         {value}

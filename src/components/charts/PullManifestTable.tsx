@@ -27,30 +27,30 @@ export default function PullManifestTable() {
   if (error) return <div>Error: {error}</div>;
 
   return (
-    <div className="rounded-2xl bg-slate-900 p-4 shadow-lg">
-      <h2 className="mb-4 text-xl font-semibold text-white">Pull Manifest</h2>
+    <div style={{ background: '#f5f7f5', borderRadius: '14px', padding: '16px' }}>
+      <h2 style={{ marginBottom: '16px', fontSize: '18px', fontWeight: 600, color: '#1a7a3c' }}>Pull Manifest</h2>
 
-      <div className="overflow-x-auto">
-        <table className="min-w-full border-collapse text-sm text-white">
+      <div style={{ overflowX: 'auto' }}>
+        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px', color: '#1a2e1a' }}>
           <thead>
-            <tr className="border-b border-slate-700">
-              <th className="px-3 py-2 text-left">Source</th>
-              <th className="px-3 py-2 text-left">File</th>
-              <th className="px-3 py-2 text-left">Pull Date</th>
-              <th className="px-3 py-2 text-left">Loaded At</th>
-              <th className="px-3 py-2 text-left">Record Count</th>
-              <th className="px-3 py-2 text-left">Status</th>
+            <tr style={{ borderBottom: '1px solid #d4e8d8' }}>
+              <th style={{ padding: '8px 12px', textAlign: 'left', color: '#1a7a3c', fontWeight: 700, textTransform: 'uppercase', fontSize: 11, letterSpacing: '0.08em' }}>Source</th>
+              <th style={{ padding: '8px 12px', textAlign: 'left', color: '#1a7a3c', fontWeight: 700, textTransform: 'uppercase', fontSize: 11, letterSpacing: '0.08em' }}>File</th>
+              <th style={{ padding: '8px 12px', textAlign: 'left', color: '#1a7a3c', fontWeight: 700, textTransform: 'uppercase', fontSize: 11, letterSpacing: '0.08em' }}>Pull Date</th>
+              <th style={{ padding: '8px 12px', textAlign: 'left', color: '#1a7a3c', fontWeight: 700, textTransform: 'uppercase', fontSize: 11, letterSpacing: '0.08em' }}>Loaded At</th>
+              <th style={{ padding: '8px 12px', textAlign: 'left', color: '#1a7a3c', fontWeight: 700, textTransform: 'uppercase', fontSize: 11, letterSpacing: '0.08em' }}>Record Count</th>
+              <th style={{ padding: '8px 12px', textAlign: 'left', color: '#1a7a3c', fontWeight: 700, textTransform: 'uppercase', fontSize: 11, letterSpacing: '0.08em' }}>Status</th>
             </tr>
           </thead>
           <tbody>
             {rows.map((row, index) => (
-              <tr key={index} className="border-b border-slate-800">
-                <td className="px-3 py-2">{row.source_name || "-"}</td>
-                <td className="px-3 py-2">{row.file_name || "-"}</td>
-                <td className="px-3 py-2">{row.pull_date || "-"}</td>
-                <td className="px-3 py-2">{row.loaded_at || "-"}</td>
-                <td className="px-3 py-2">{row.record_count || "-"}</td>
-                <td className="px-3 py-2">{row.status || "-"}</td>
+              <tr key={index} style={{ borderBottom: '1px solid #eaf4ec' }}>
+                <td style={{ padding: '8px 12px' }}>{row.source_name || "-"}</td>
+                <td style={{ padding: '8px 12px' }}>{row.file_name || "-"}</td>
+                <td style={{ padding: '8px 12px' }}>{row.pull_date || "-"}</td>
+                <td style={{ padding: '8px 12px' }}>{row.loaded_at || "-"}</td>
+                <td style={{ padding: '8px 12px' }}>{row.record_count || "-"}</td>
+                <td style={{ padding: '8px 12px' }}>{row.status || "-"}</td>
               </tr>
             ))}
           </tbody>

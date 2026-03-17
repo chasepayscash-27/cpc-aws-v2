@@ -25,9 +25,10 @@ function badgeStyle(value: string | undefined, colorMap: Record<string, string>)
     borderRadius: 10,
     fontSize: 11,
     fontWeight: 600,
-    background: value ? (colorMap[value] ?? "rgba(255,255,255,0.10)") : "rgba(255,255,255,0.10)",
+    background: value ? (colorMap[value] ?? "rgba(26,122,60,0.10)") : "rgba(26,122,60,0.10)",
     textTransform: "capitalize",
     whiteSpace: "nowrap",
+    color: "#1a2e1a",
   };
 }
 
@@ -41,11 +42,11 @@ export default function ProjectsGallery({ rows }: Props) {
   };
 
   const cardStyle: CSSProperties = {
-    border: "1px solid rgba(255,255,255,0.10)",
+    border: "1px solid #d4e8d8",
     borderRadius: 18,
     overflow: "hidden",
-    background: "rgba(255,255,255,0.05)",
-    transition: "transform 0.15s, border-color 0.15s",
+    background: "#ffffff",
+    transition: "transform 0.15s, border-color 0.15s, box-shadow 0.15s",
     cursor: "pointer",
   };
 
@@ -62,15 +63,17 @@ export default function ProjectsGallery({ rows }: Props) {
             onClick={() => setSelectedProject(row)}
             onMouseEnter={(e) => {
             (e.currentTarget as HTMLDivElement).style.transform = "translateY(-2px)";
-            (e.currentTarget as HTMLDivElement).style.borderColor = "rgba(124,58,237,0.50)";
+            (e.currentTarget as HTMLDivElement).style.borderColor = "rgba(26,122,60,0.50)";
+            (e.currentTarget as HTMLDivElement).style.boxShadow = "0 8px 24px rgba(26,122,60,0.12)";
           }}
           onMouseLeave={(e) => {
             (e.currentTarget as HTMLDivElement).style.transform = "";
-            (e.currentTarget as HTMLDivElement).style.borderColor = "rgba(255,255,255,0.10)";
+            (e.currentTarget as HTMLDivElement).style.borderColor = "#d4e8d8";
+            (e.currentTarget as HTMLDivElement).style.boxShadow = "";
           }}
         >
           {/* Image */}
-          <div style={{ position: "relative", height: 180, background: "rgba(255,255,255,0.04)" }}>
+          <div style={{ position: "relative", height: 180, background: "#f0f7f1" }}>
             {row.featured_image_url ? (
               <img
                 src={row.featured_image_url}
@@ -88,7 +91,7 @@ export default function ProjectsGallery({ rows }: Props) {
                   display: "grid",
                   placeItems: "center",
                   fontSize: 40,
-                  color: "rgba(255,255,255,0.20)",
+                  color: "rgba(26,122,60,0.20)",
                 }}
               >
                 🏠
@@ -103,7 +106,7 @@ export default function ProjectsGallery({ rows }: Props) {
                   right: 8,
                   ...badgeStyle(row.stage, STAGE_COLORS),
                   backdropFilter: "blur(4px)",
-                  border: "1px solid rgba(255,255,255,0.12)",
+                  border: "1px solid rgba(26,122,60,0.15)",
                 }}
               >
                 {row.stage.replace(/_/g, " ")}
@@ -116,7 +119,7 @@ export default function ProjectsGallery({ rows }: Props) {
             <div style={{ fontWeight: 700, fontSize: 14, marginBottom: 4, lineHeight: 1.3 }}>
               {row.name ?? "Unnamed Project"}
             </div>
-            <div style={{ fontSize: 12, color: "rgba(255,255,255,0.55)", marginBottom: 10 }}>
+            <div style={{ fontSize: 12, color: "#5a7060", marginBottom: 10 }}>
               {row.city && row.state
                 ? `${row.city}, ${row.state}${row.postal_code ? " " + row.postal_code : ""}`
                 : row.full_address ?? ""}
@@ -136,20 +139,20 @@ export default function ProjectsGallery({ rows }: Props) {
                 gridTemplateColumns: "1fr 1fr 1fr",
                 gap: 4,
                 fontSize: 12,
-                borderTop: "1px solid rgba(255,255,255,0.08)",
+                borderTop: "1px solid #eaf4ec",
                 paddingTop: 10,
               }}
             >
               <div>
-                <div style={{ color: "rgba(255,255,255,0.45)", fontSize: 10, marginBottom: 2 }}>BEDS</div>
+                <div style={{ color: "#5a7060", fontSize: 10, marginBottom: 2 }}>BEDS</div>
                 <div style={{ fontWeight: 600 }}>{row.beds ?? "—"}</div>
               </div>
               <div>
-                <div style={{ color: "rgba(255,255,255,0.45)", fontSize: 10, marginBottom: 2 }}>BATHS</div>
+                <div style={{ color: "#5a7060", fontSize: 10, marginBottom: 2 }}>BATHS</div>
                 <div style={{ fontWeight: 600 }}>{row.baths ?? "—"}</div>
               </div>
               <div>
-                <div style={{ color: "rgba(255,255,255,0.45)", fontSize: 10, marginBottom: 2 }}>SQ FT</div>
+                <div style={{ color: "#5a7060", fontSize: 10, marginBottom: 2 }}>SQ FT</div>
                 <div style={{ fontWeight: 600 }}>
                   {row.square_feet && !isNaN(Number(row.square_feet))
                     ? Number(row.square_feet).toLocaleString()
