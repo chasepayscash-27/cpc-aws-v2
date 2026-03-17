@@ -13,6 +13,11 @@ const App: React.FC = () => {
   const [active, setActive] = useState("inventory");
   const [financialProperty, setFinancialProperty] = useState<string | undefined>(undefined);
 
+  const handleViewFullPnL = (name: string) => {
+    setFinancialProperty(name);
+    setActive("financials");
+  };
+
   const nav: NavItem[] = useMemo(
     () => [
       { label: "Days in Inventory", key: "inventory" },
@@ -83,14 +88,7 @@ const App: React.FC = () => {
         );
 
       case "projects":
-        return (
-          <ProjectsPage
-            onViewFullPnL={(name) => {
-              setFinancialProperty(name);
-              setActive("financials");
-            }}
-          />
-        );
+        return <ProjectsPage onViewFullPnL={handleViewFullPnL} />;
 
       case "profit":
         return renderPlaceholder(
@@ -104,7 +102,7 @@ const App: React.FC = () => {
           "Property-level detail views can live here."
         );
       case "financials":
-        return <FinancialsPage initialProperty={financialProperty} key={financialProperty ?? 'all'} />;
+        return <FinancialsPage initialProperty={financialProperty} />;
       case "resources":
         return <ResourcesPage />;
       case "settings":

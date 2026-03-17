@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useMemo } from 'react';
+import { normalizeAddress } from '../utils/normalizeAddress';
 
 interface FinancialRecord {
   account: string;
@@ -15,27 +16,6 @@ const FinancialsPage: React.FC<Props> = ({ initialProperty }) => {
   const [selectedProperty, setSelectedProperty] = useState<string>('all');
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [isLoading, setIsLoading] = useState(true);
-
-  // Normalize a property name/address to allow matching abbreviations to full forms
-  const normalizePropertyName = (name: string): string => {
-    const wordMap: Record<string, string> = {
-      'dr': 'drive', 'rd': 'road', 'cir': 'circle', 'ln': 'lane',
-      'st': 'street', 'blvd': 'boulevard', 'ave': 'avenue',
-      'mtn': 'mountain', 'mt': 'mountain', 'hwy': 'highway',
-      'prkwy': 'parkway', 'pkwy': 'parkway', 'terr': 'terrace', 'ter': 'terrace',
-      'ne': 'northeast', 'nw': 'northwest', 'se': 'southeast', 'sw': 'southwest',
-      'pl': 'place', 'ct': 'court',
-      'n': 'north', 's': 'south', 'e': 'east', 'w': 'west',
-    };
-    return name
-      .trim()
-      .toLowerCase()
-      .replace(/\./g, '')
-      .replace(/\s+/g, ' ')
-      .split(' ')
-      .map(word => wordMap[word] ?? word)
-      .join(' ');
-  };
 
   // Load CSV data on component mount
   useEffect(() => {
@@ -57,25 +37,22 @@ const FinancialsPage: React.FC<Props> = ({ initialProperty }) => {
         }
         
         setData(records);
-
-        // If an initialProperty was provided, find the best matching P&L property name
-        if (initialProperty) {
-          const normalizedInitial = normalizePropertyName(initialProperty);
-          const uniqueNames = [...new Set(records.map(r => r.property_name))];
-          const match = uniqueNames.find(
-            n => normalizePropertyName(n) === normalizedInitial
-          );
-          setSelectedProperty(match ?? 'all');
-        }
-
         setIsLoading(false);
       })
       .catch(err => {
         console.error('Error loading CSV:', err);
         setIsLoading(false);
       });
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // When initialProperty changes (or data loads), find the matching P&L property name
+  useEffect(() => {
+    if (!initialProperty || data.length === 0) return;
+    const normalizedInitial = normalizeAddress(initialProperty);
+    const uniqueNames = [...new Set(data.map(r => r.property_name))];
+    const match = uniqueNames.find(n => normalizeAddress(n) === normalizedInitial);
+    setSelectedProperty(match ?? 'all');
+  }, [initialProperty, data]);
 
   const properties = useMemo(() => {
     const unique = [...new Set(data.map(d => d.property_name))];

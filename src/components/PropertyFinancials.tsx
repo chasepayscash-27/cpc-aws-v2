@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useMemo } from 'react';
+import { normalizeAddress } from '../utils/normalizeAddress';
 
 interface FinancialRecord {
   account: string;
@@ -44,48 +45,9 @@ const PropertyFinancials: React.FC<PropertyFinancialsProps> = ({ propertyName, o
       });
   }, []);
 
-  const normalizePropertyName = (name: string): string => {
-    // Map of common street abbreviations to their full forms
-    const wordMap: Record<string, string> = {
-      'dr': 'drive',
-      'rd': 'road',
-      'cir': 'circle',
-      'ln': 'lane',
-      'st': 'street',
-      'blvd': 'boulevard',
-      'ave': 'avenue',
-      'mtn': 'mountain',
-      'mt': 'mountain',
-      'hwy': 'highway',
-      'prkwy': 'parkway',
-      'pkwy': 'parkway',
-      'terr': 'terrace',
-      'ter': 'terrace',
-      'ne': 'northeast',
-      'nw': 'northwest',
-      'se': 'southeast',
-      'sw': 'southwest',
-      'pl': 'place',
-      'ct': 'court',
-      'n': 'north',
-      's': 'south',
-      'e': 'east',
-      'w': 'west',
-    };
-
-    return name
-      .trim()
-      .toLowerCase()
-      .replace(/\./g, '')      // remove periods
-      .replace(/\s+/g, ' ')   // normalize spaces
-      .split(' ')
-      .map(word => wordMap[word] ?? word)
-      .join(' ');
-  };
-
 const propertyData = useMemo(
-  () => data.filter(record => 
-    normalizePropertyName(record.property_name) === normalizePropertyName(propertyName)
+  () => data.filter(record =>
+    normalizeAddress(record.property_name) === normalizeAddress(propertyName)
   ),
   [data, propertyName]
 );

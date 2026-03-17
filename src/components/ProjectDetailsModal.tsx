@@ -290,7 +290,9 @@ export default function ProjectDetailsModal({ project: row, onClose, onViewFullP
                 <PropertyFinancials
                   propertyName={row.name}
                   onViewFullPnL={
-                    onViewFullPnL ? () => { onViewFullPnL(row.name!); onClose(); } : undefined
+                    onViewFullPnL && row.name
+                      ? () => { onViewFullPnL(row.name as string); onClose(); }
+                      : undefined
                   }
                 />
               </>
