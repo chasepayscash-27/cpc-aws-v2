@@ -1,8 +1,10 @@
-import { CSSProperties } from "react";
+import { CSSProperties, useState } from "react";
 import type { ProjectRow } from "../types/project";
+import ProjectDetailsModal from "./ProjectDetailsModal";
 
 interface Props {
   rows: ProjectRow[];
+  onViewFullPnL?: (propertyName: string) => void;
 }
 
 const STAGE_COLORS: Record<string, string> = {
@@ -33,7 +35,8 @@ function badge(value: string | undefined, colorMap: Record<string, string>) {
   return <span style={style}>{label}</span>;
 }
 
-export default function ProjectsTable({ rows }: Props) {
+export default function ProjectsTable({ rows, onViewFullPnL }: Props) {
+  const [selectedProject, setSelectedProject] = useState<ProjectRow | null>(null);
   const thStyle: CSSProperties = {
     padding: "8px 12px",
     textAlign: "left",
@@ -54,7 +57,15 @@ export default function ProjectsTable({ rows }: Props) {
   };
 
   return (
-    <div style={{ overflowX: "auto" }}>
+    <>
+      {selectedProject && (
+        <ProjectDetailsModal
+          project={selectedProject}
+          onClose={() => setSelectedProject(null)}
+          onViewFullPnL={onViewFullPnL}
+        />
+      )}
+      <div style={{ overflowX: "auto" }}>
       <table style={{ width: "100%", borderCollapse: "collapse" }}>
         <thead>
           <tr>
@@ -72,7 +83,8 @@ export default function ProjectsTable({ rows }: Props) {
           {rows.map((row, i) => (
             <tr
               key={row.project_uuid ?? i}
-              style={{ transition: "background 0.15s" }}
+              style={{ transition: "background 0.15s", cursor: "pointer" }}
+              onClick={() => setSelectedProject(row)}
               onMouseEnter={(e) =>
                 ((e.currentTarget as HTMLTableRowElement).style.background =
                   "rgba(26,122,60,0.04)")
@@ -136,5 +148,6 @@ export default function ProjectsTable({ rows }: Props) {
         </tbody>
       </table>
     </div>
+    </>
   );
 }

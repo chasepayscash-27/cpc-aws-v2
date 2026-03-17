@@ -8,9 +8,10 @@ interface FinancialRecord {
 
 interface PropertyFinancialsProps {
   propertyName: string;
+  onViewFullPnL?: () => void;
 }
 
-const PropertyFinancials: React.FC<PropertyFinancialsProps> = ({ propertyName }) => {
+const PropertyFinancials: React.FC<PropertyFinancialsProps> = ({ propertyName, onViewFullPnL }) => {
   const [data, setData] = useState<FinancialRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -44,13 +45,43 @@ const PropertyFinancials: React.FC<PropertyFinancialsProps> = ({ propertyName })
   }, []);
 
   const normalizePropertyName = (name: string): string => {
+    // Map of common street abbreviations to their full forms
+    const wordMap: Record<string, string> = {
+      'dr': 'drive',
+      'rd': 'road',
+      'cir': 'circle',
+      'ln': 'lane',
+      'st': 'street',
+      'blvd': 'boulevard',
+      'ave': 'avenue',
+      'mtn': 'mountain',
+      'mt': 'mountain',
+      'hwy': 'highway',
+      'prkwy': 'parkway',
+      'pkwy': 'parkway',
+      'terr': 'terrace',
+      'ter': 'terrace',
+      'ne': 'northeast',
+      'nw': 'northwest',
+      'se': 'southeast',
+      'sw': 'southwest',
+      'pl': 'place',
+      'ct': 'court',
+      'n': 'north',
+      's': 'south',
+      'e': 'east',
+      'w': 'west',
+    };
+
     return name
-    .trim()
-    .toLowerCase()
-    .replace(/\s+/g, ' ')           // normalize spaces
-    .replace(/\./g, '')              // remove periods
-    .replace(/\b(mtn|mt|dr|cir|ln)\./gi, '$1'); // standardize abbreviations
-};
+      .trim()
+      .toLowerCase()
+      .replace(/\./g, '')      // remove periods
+      .replace(/\s+/g, ' ')   // normalize spaces
+      .split(' ')
+      .map(word => wordMap[word] ?? word)
+      .join(' ');
+  };
 
 const propertyData = useMemo(
   () => data.filter(record => 
@@ -185,6 +216,30 @@ const propertyData = useMemo(
               <span style={{ color: '#5a7060' }}>{fmt(record.amount)}</span>
             </div>
           ))}
+        </div>
+      )}
+
+      {/* Link to full P&L */}
+      {onViewFullPnL && (
+        <div style={{ marginTop: 14, textAlign: 'right' }}>
+          <button
+            onClick={onViewFullPnL}
+            style={{
+              background: 'none',
+              border: '1px solid rgba(26,122,60,0.40)',
+              borderRadius: 8,
+              padding: '6px 14px',
+              fontSize: 12,
+              fontWeight: 600,
+              color: '#1a7a3c',
+              cursor: 'pointer',
+              transition: 'background 0.15s',
+            }}
+            onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(26,122,60,0.08)')}
+            onMouseLeave={(e) => (e.currentTarget.style.background = 'none')}
+          >
+            View Full P&amp;L →
+          </button>
         </div>
       )}
     </div>

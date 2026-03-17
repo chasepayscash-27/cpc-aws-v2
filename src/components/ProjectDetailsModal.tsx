@@ -5,6 +5,7 @@ import PropertyFinancials from "./PropertyFinancials";
 interface Props {
   project: ProjectRow;
   onClose: () => void;
+  onViewFullPnL?: (propertyName: string) => void;
 }
 
 const STAGE_COLORS: Record<string, string> = {
@@ -46,7 +47,7 @@ function DetailRow({ label, value }: { label: string; value?: string | null }) {
   );
 }
 
-export default function ProjectDetailsModal({ project: row, onClose }: Props) {
+export default function ProjectDetailsModal({ project: row, onClose, onViewFullPnL }: Props) {
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
@@ -286,7 +287,12 @@ export default function ProjectDetailsModal({ project: row, onClose }: Props) {
               <>
                 <div style={dividerStyle} />
                 <div style={sectionLabelStyle}>💰 Financials</div>
-                <PropertyFinancials propertyName={row.name} />
+                <PropertyFinancials
+                  propertyName={row.name}
+                  onViewFullPnL={
+                    onViewFullPnL ? () => { onViewFullPnL(row.name!); onClose(); } : undefined
+                  }
+                />
               </>
             )}
           </div>

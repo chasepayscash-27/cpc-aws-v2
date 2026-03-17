@@ -4,6 +4,7 @@ import ProjectDetailsModal from "./ProjectDetailsModal";
 
 interface Props {
   rows: ProjectRow[];
+  onViewFullPnL?: (propertyName: string) => void;
 }
 
 const STAGE_COLORS: Record<string, string> = {
@@ -32,7 +33,7 @@ function badgeStyle(value: string | undefined, colorMap: Record<string, string>)
   };
 }
 
-export default function ProjectsGallery({ rows }: Props) {
+export default function ProjectsGallery({ rows, onViewFullPnL }: Props) {
   const [selectedProject, setSelectedProject] = useState<ProjectRow | null>(null);
 
   const gridStyle: CSSProperties = {
@@ -53,7 +54,7 @@ export default function ProjectsGallery({ rows }: Props) {
   return (
     <>
       {selectedProject && (
-        <ProjectDetailsModal project={selectedProject} onClose={() => setSelectedProject(null)} />
+        <ProjectDetailsModal project={selectedProject} onClose={() => setSelectedProject(null)} onViewFullPnL={onViewFullPnL} />
       )}
       <div style={gridStyle}>
         {rows.map((row, i) => (
