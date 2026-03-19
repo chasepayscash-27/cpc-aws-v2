@@ -1,35 +1,39 @@
-import React from 'react';
-import Navigation from './Navigation';
-import Content from './Content';
+import { Routes, Route, Navigate } from 'react-router-dom';
+import Navigation from './components/Navigation';
+import Dashboard from './pages/Dashboard';
+import ProjectsPage from './pages/ProjectsPage';
+import FinancialsPage from './pages/FinancialsPage';
+import ResourcesPage from './pages/ResourcesPage';
+import CurrentPipelinePage from './pages/CurrentPipelinePage';
+import './App.css';
 
 const App = () => {
-    const nav = [
-        'Home',
-        'About',
-        'Contact',
-        // Removed 'Flipper Force Data' and 'Properties' navigation items
-    ];
-
-    const renderContent = (caseType) => {
-        switch (caseType) {
-            case 'home':
-                return <Content type='home' />;
-            case 'about':
-                return <Content type='about' />;
-            case 'contact':
-                return <Content type='contact' />;
-            // Removed case 'flipper' and case 'properties' handlers
-            default:
-                return <Content type='404' />;
-        }
-    };
-
-    return (
-        <div>
-            <Navigation items={nav} />
-            {renderContent('home')}
+  return (
+    <div className="appShell">
+      <header className="topbar">
+        <div className="brand">
+          <div className="brandMark">CPC</div>
+          <div>
+            <div className="brandTitle">Chase Pays Cash</div>
+            <div className="brandSub">Analytics Dashboard</div>
+          </div>
         </div>
-    );
+      </header>
+      <div className="body">
+        <Navigation />
+        <main className="content">
+          <Routes>
+            <Route path="/" element={<Dashboard />} />
+            <Route path="/projects" element={<ProjectsPage />} />
+            <Route path="/financials" element={<FinancialsPage />} />
+            <Route path="/current-pipeline" element={<CurrentPipelinePage />} />
+            <Route path="/resources" element={<ResourcesPage />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </main>
+      </div>
+    </div>
+  );
 };
 
 export default App;
