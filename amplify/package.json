@@ -1,12 +1,1 @@
-
-{
-  "name": "rds-query",
-  "version": "1.0.0",
-  "type": "module",
-  "dependencies": {
-    "@aws-amplify/backend": "^1.2.0",
-    "aws-amplify": "^6.16.2",
-    "aws-cdk-lib": "^2.150.0",
-    "mysql2": "^3.11.0"
-  }
-}
+{\n  \"name\": \"amplify\",\n  \"version\": \"0.1.0\",\n  \"dependencies\": {\n    \"aws-cdk-lib\": \"^2.160.0\",\n    \"constructs\": \"^10.0.0\"\n  }\n}
