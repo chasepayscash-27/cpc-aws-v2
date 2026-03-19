@@ -4,7 +4,9 @@
   "version": "1.0.0",
   "type": "module",
   "dependencies": {
+    "@aws-amplify/backend": "^1.0.0",
     "aws-amplify": "^6.16.2",
+    "aws-cdk-lib": "^2.100.0",
     "mysql2": "^3.11.0"
   }
 }
