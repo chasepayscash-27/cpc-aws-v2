@@ -1,1 +1,1 @@
-{\n  \"name\": \"amplify\",\n  \"version\": \"0.1.0\",\n  \"dependencies\": {\n    \"aws-cdk-lib\": \"^2.160.0\",\n    \"constructs\": \"^10.0.0\"\n  }\n}
+{\n  "dependencies": {\n    "@aws-amplify/backend": "^2.160.0",\n    "aws-amplify": "^2.160.0",\n    "aws-cdk-lib": "^2.160.0",\n    "mysql2": "^2.3.3"\n  }\n}
