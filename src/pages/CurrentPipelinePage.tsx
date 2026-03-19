@@ -23,7 +23,7 @@ export default function CurrentPipelinePage() {
   const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
-    loadCsv<PipelineRow>('/data/ytd_data.csv')
+    loadCsv<PipelineRow>('/data/ytd_csv_looker.csv')
       .then((data) => {
         setRows(data);
         setLoading(false);
