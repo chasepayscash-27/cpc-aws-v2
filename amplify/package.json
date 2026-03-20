@@ -1,1 +1,10 @@
-{\n  \"dependencies\": {\n    \"@aws-amplify/backend\": \"^1.16.1\",\n    \"aws-amplify\": \"^6.16.2\",\n    \"aws-cdk-lib\": \"^2.160.0\",\n    \"constructs\": \"^10.0.0\",\n    \"mysql2\": \"^3.11.0\"\n  }\n}
+{
+  "type": "module",
+  "dependencies": {
+    "@aws-amplify/backend": "^1.16.1",
+    "aws-amplify": "^6.16.2",
+    "aws-cdk-lib": "^2.160.0",
+    "constructs": "^10.0.0",
+    "mysql2": "^3.11.0"
+  }
+}
