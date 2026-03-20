@@ -7,6 +7,7 @@ const navItems = [
   { label: '💰 Financials', path: '/financials' },
   { label: '📊 Current Pipeline', path: '/current-pipeline' },
   { label: '🔧 Resources', path: '/resources' },
+  { label: '📈 YTD Summary', path: '/ytd-summary' },
 ];
 
 const Navigation: React.FC = () => {

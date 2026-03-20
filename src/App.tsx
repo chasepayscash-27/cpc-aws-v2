@@ -5,6 +5,7 @@ import ProjectsPage from './pages/ProjectsPage';
 import FinancialsPage from './pages/FinancialsPage';
 import ResourcesPage from './pages/ResourcesPage';
 import CurrentPipelinePage from './pages/CurrentPipelinePage';
+import YTDSummaryPage from './pages/YTDSummaryPage';
 import './App.css';
 
 const App = () => {
@@ -28,6 +29,7 @@ const App = () => {
             <Route path="/financials" element={<FinancialsPage />} />
             <Route path="/current-pipeline" element={<CurrentPipelinePage />} />
             <Route path="/resources" element={<ResourcesPage />} />
+            <Route path="/ytd-summary" element={<YTDSummaryPage />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </main>
