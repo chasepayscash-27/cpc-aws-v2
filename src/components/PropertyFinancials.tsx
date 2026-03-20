@@ -59,12 +59,27 @@ const propertyData = useMemo(
     [propertyData]
   );
 
-  const totalExpenses = useMemo(
+  const lineItems = useMemo(
     () =>
-      propertyData
-        .filter(r => r.account === 'Total for Expenses')
-        .reduce((sum, r) => sum + r.amount, 0),
+      propertyData.filter(
+        r =>
+          r.account !== 'Sale of property' &&
+          r.account !== 'Rehab Reimbursement' &&
+          r.account !== 'Sales (deleted)' &&
+          !r.account.includes('Total') &&
+          !r.account.includes('Gross Profit') &&
+          !r.account.includes('Net Operating') &&
+          !r.account.includes('Net Income') &&
+          !r.account.includes('Net Other Income') &&
+          !r.account.includes('Mortgage') &&
+          !r.account.includes('Transfer')
+      ),
     [propertyData]
+  );
+
+  const totalExpenses = useMemo(
+    () => lineItems.reduce((sum, r) => sum + r.amount, 0),
+    [lineItems]
   );
 
   const netProfit = useMemo(() => {
@@ -74,19 +89,6 @@ const propertyData = useMemo(
     }
     return totalIncome - totalExpenses;
   }, [propertyData, totalIncome, totalExpenses]);
-
-  const lineItems = useMemo(
-    () =>
-      propertyData.filter(
-        r =>
-          r.account !== 'Sale of property' &&
-          !r.account.includes('Total') &&
-          !r.account.includes('Gross Profit') &&
-          !r.account.includes('Net Operating') &&
-          !r.account.includes('Net Income')
-      ),
-    [propertyData]
-  );
 
   if (loading) {
     return (

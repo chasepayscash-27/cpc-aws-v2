@@ -75,7 +75,18 @@ const FinancialsPage: React.FC<Props> = ({ initialProperty }) => {
 
   const totalExpenses = useMemo(() => {
     return filteredData
-      .filter(r => r.account === 'Total for Expenses')
+      .filter(r =>
+        r.account !== 'Sale of property' &&
+        r.account !== 'Rehab Reimbursement' &&
+        r.account !== 'Sales (deleted)' &&
+        !r.account.includes('Total') &&
+        !r.account.includes('Gross Profit') &&
+        !r.account.includes('Net Operating') &&
+        !r.account.includes('Net Income') &&
+        !r.account.includes('Net Other Income') &&
+        !r.account.includes('Mortgage') &&
+        !r.account.includes('Transfer')
+      )
       .reduce((sum, r) => sum + r.amount, 0);
   }, [filteredData]);
 
