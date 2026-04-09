@@ -1,5 +1,7 @@
-import { CSSProperties, useEffect, useCallback } from "react";
+import { CSSProperties, useEffect, useCallback, useState } from "react";
 import type { ProjectRow } from "../types/project";
+import type { PhotoLogRow } from "../types/photoLog";
+import { loadCsv } from "../utils/csv";
 import PropertyFinancials from "./PropertyFinancials";
 
 interface Props {
@@ -48,11 +50,24 @@ function DetailRow({ label, value }: { label: string; value?: string | null }) {
 }
 
 export default function ProjectDetailsModal({ project: row, onClose, onViewFullPnL }: Props) {
+  const [photos, setPhotos] = useState<PhotoLogRow[]>([]);
+  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
+
+  const isLightboxOpen = lightboxIndex !== null;
+
+  const closeLightbox = useCallback(() => setLightboxIndex(null), []);
+
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
+      if (isLightboxOpen) {
+        if (e.key === "Escape") { closeLightbox(); return; }
+        if (e.key === "ArrowRight") { setLightboxIndex((i: number | null) => (i === null ? 0 : (i + 1) % photos.length)); return; }
+        if (e.key === "ArrowLeft") { setLightboxIndex((i: number | null) => (i === null ? 0 : (i - 1 + photos.length) % photos.length)); return; }
+      } else {
+        if (e.key === "Escape") onClose();
+      }
     },
-    [onClose]
+    [isLightboxOpen, onClose, closeLightbox, photos.length]
   );
 
   useEffect(() => {
@@ -63,6 +78,22 @@ export default function ProjectDetailsModal({ project: row, onClose, onViewFullP
       document.body.style.overflow = "";
     };
   }, [handleKeyDown]);
+
+  useEffect(() => {
+    async function fetchPhotos() {
+      try {
+        const all = await loadCsv<PhotoLogRow>("/data/project_photo_log_v2.csv");
+        const projectName = (row.name ?? "").trim().toLowerCase();
+        const filtered = all.filter(
+          (p) => (p.project_name ?? "").trim().toLowerCase() === projectName && p.photo_url
+        );
+        setPhotos(filtered);
+      } catch {
+        // silently ignore — section simply won't render
+      }
+    }
+    if (row.name) fetchPhotos();
+  }, [row.name]);
 
   const overlayStyle: CSSProperties = {
     position: "fixed",
@@ -141,6 +172,8 @@ export default function ProjectDetailsModal({ project: row, onClose, onViewFullP
         @keyframes fadeIn { from { opacity: 0 } to { opacity: 1 } }
         @keyframes slideUp { from { opacity: 0; transform: translateY(24px) } to { opacity: 1; transform: translateY(0) } }
         .modal-close-btn:hover { background: #d4e8d8 !important; color: #1a7a3c !important; }
+        .photo-thumb:hover { transform: scale(1.03); box-shadow: 0 4px 18px rgba(26,122,60,0.18); }
+        .lightbox-nav-btn:hover { background: rgba(255,255,255,0.25) !important; }
       `}</style>
       <div style={overlayStyle} onClick={onClose} role="dialog" aria-modal="true" aria-label={row.name ?? "Project details"}>
         <div style={modalStyle} onClick={(e) => e.stopPropagation()}>
@@ -282,6 +315,75 @@ export default function ProjectDetailsModal({ project: row, onClose, onViewFullP
               </>
             )}
 
+            {/* Photos section */}
+            {photos.length > 0 && (
+              <>
+                <div style={dividerStyle} />
+                <div style={sectionLabelStyle}>📸 Photos</div>
+                <div
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: "repeat(auto-fill, minmax(140px, 1fr))",
+                    gap: 10,
+                    marginBottom: 4,
+                  }}
+                >
+                  {photos.map((photo, idx) => (
+                    <div
+                      key={idx}
+                      className="photo-thumb"
+                      onClick={() => setLightboxIndex(idx)}
+                      style={{
+                        position: "relative",
+                        borderRadius: 12,
+                        overflow: "hidden",
+                        cursor: "pointer",
+                        border: "1px solid #d4e8d8",
+                        background: "#f0f7f1",
+                        aspectRatio: "4/3",
+                        transition: "transform 0.18s, box-shadow 0.18s",
+                      }}
+                    >
+                      <img
+                        src={photo.photo_url}
+                        alt={photo.description ?? photo.category ?? "photo"}
+                        style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+                        onError={(e) => {
+                          (e.currentTarget as HTMLImageElement).parentElement!.style.display = "none";
+                        }}
+                      />
+                      {(photo.category || photo.photo_date) && (
+                        <div
+                          style={{
+                            position: "absolute",
+                            bottom: 0,
+                            left: 0,
+                            right: 0,
+                            padding: "4px 8px",
+                            background: "linear-gradient(transparent, rgba(0,0,0,0.55))",
+                            color: "#fff",
+                            fontSize: 10,
+                            lineHeight: 1.3,
+                          }}
+                        >
+                          {photo.category && (
+                            <div style={{ fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.06em" }}>
+                              {photo.category}
+                            </div>
+                          )}
+                          {photo.photo_date && (
+                            <div style={{ opacity: 0.85 }}>
+                              {photo.photo_date.slice(0, 10)}
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </>
+            )}
+
             {/* Financials section */}
             {row.name && (
               <>
@@ -300,6 +402,138 @@ export default function ProjectDetailsModal({ project: row, onClose, onViewFullP
           </div>
         </div>
       </div>
+
+      {/* Lightbox overlay */}
+      {isLightboxOpen && lightboxIndex !== null && photos[lightboxIndex] && (
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            background: "rgba(0,0,0,0.88)",
+            backdropFilter: "blur(6px)",
+            zIndex: 1100,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            animation: "fadeIn 0.18s ease",
+          }}
+          onClick={closeLightbox}
+        >
+          <div
+            style={{ position: "relative", maxWidth: "90vw", maxHeight: "90vh", display: "flex", flexDirection: "column", alignItems: "center" }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Close */}
+            <button
+              onClick={closeLightbox}
+              aria-label="Close lightbox"
+              style={{
+                position: "absolute",
+                top: -40,
+                right: 0,
+                width: 36,
+                height: 36,
+                borderRadius: "50%",
+                border: "1px solid rgba(255,255,255,0.3)",
+                background: "rgba(255,255,255,0.12)",
+                color: "#fff",
+                fontSize: 20,
+                cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              ×
+            </button>
+
+            {/* Image */}
+            <img
+              src={photos[lightboxIndex].photo_url}
+              alt={photos[lightboxIndex].description ?? photos[lightboxIndex].category ?? "photo"}
+              style={{ maxWidth: "85vw", maxHeight: "72vh", borderRadius: 14, objectFit: "contain", boxShadow: "0 8px 48px rgba(0,0,0,0.5)" }}
+            />
+
+            {/* Caption */}
+            {(photos[lightboxIndex].category || photos[lightboxIndex].description || photos[lightboxIndex].photo_date) && (
+              <div style={{ marginTop: 14, textAlign: "center", color: "#fff" }}>
+                {photos[lightboxIndex].category && (
+                  <div style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", color: "#7de0a0", marginBottom: 4 }}>
+                    {photos[lightboxIndex].category}
+                  </div>
+                )}
+                {photos[lightboxIndex].description && (
+                  <div style={{ fontSize: 14, marginBottom: 4 }}>{photos[lightboxIndex].description}</div>
+                )}
+                {photos[lightboxIndex].photo_date && (
+                  <div style={{ fontSize: 12, opacity: 0.7 }}>{photos[lightboxIndex].photo_date.slice(0, 10)}</div>
+                )}
+              </div>
+            )}
+
+            {/* Counter */}
+            <div style={{ marginTop: 10, fontSize: 12, color: "rgba(255,255,255,0.55)" }}>
+              {lightboxIndex + 1} / {photos.length}
+            </div>
+          </div>
+
+          {/* Prev / Next buttons */}
+          {photos.length > 1 && (
+            <>
+              <button
+                className="lightbox-nav-btn"
+                onClick={(e) => { e.stopPropagation(); setLightboxIndex((i: number | null) => (i === null ? 0 : (i - 1 + photos.length) % photos.length)); }}
+                aria-label="Previous photo"
+                style={{
+                  position: "fixed",
+                  left: 16,
+                  top: "50%",
+                  transform: "translateY(-50%)",
+                  width: 44,
+                  height: 44,
+                  borderRadius: "50%",
+                  border: "1px solid rgba(255,255,255,0.25)",
+                  background: "rgba(255,255,255,0.12)",
+                  color: "#fff",
+                  fontSize: 22,
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  transition: "background 0.15s",
+                }}
+              >
+                ‹
+              </button>
+              <button
+                className="lightbox-nav-btn"
+                onClick={(e) => { e.stopPropagation(); setLightboxIndex((i: number | null) => (i === null ? 0 : (i + 1) % photos.length)); }}
+                aria-label="Next photo"
+                style={{
+                  position: "fixed",
+                  right: 16,
+                  top: "50%",
+                  transform: "translateY(-50%)",
+                  width: 44,
+                  height: 44,
+                  borderRadius: "50%",
+                  border: "1px solid rgba(255,255,255,0.25)",
+                  background: "rgba(255,255,255,0.12)",
+                  color: "#fff",
+                  fontSize: 22,
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  transition: "background 0.15s",
+                }}
+              >
+                ›
+              </button>
+            </>
+          )}
+        </div>
+      )}
     </>
   );
 }
