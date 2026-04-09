@@ -83,17 +83,17 @@ export default function ProjectDetailsModal({ project: row, onClose, onViewFullP
     async function fetchPhotos() {
       try {
         const all = await loadCsv<PhotoLogRow>("/data/project_photo_log_v2.csv");
-        const projectName = (row.name ?? "").trim().toLowerCase();
+        const projectId = (row.project_uuid ?? "").trim().toLowerCase();
         const filtered = all.filter(
-          (p) => (p.project_name ?? "").trim().toLowerCase() === projectName && p.photo_url
+          (p) => (p.project_uuid ?? "").trim().toLowerCase() === projectId && p.source_view_url
         );
         setPhotos(filtered);
       } catch {
         // silently ignore — section simply won't render
       }
     }
-    if (row.name) fetchPhotos();
-  }, [row.name]);
+    if (row.project_uuid) fetchPhotos();
+  }, [row.project_uuid]);
 
   const overlayStyle: CSSProperties = {
     position: "fixed",
@@ -345,8 +345,8 @@ export default function ProjectDetailsModal({ project: row, onClose, onViewFullP
                       }}
                     >
                       <img
-                        src={photo.photo_url}
-                        alt={photo.description ?? photo.category ?? "photo"}
+                        src={photo.source_view_url}
+                        alt={photo.photo_description ?? photo.description ?? photo.category ?? "photo"}
                         style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
                         onError={(e) => {
                           (e.currentTarget as HTMLImageElement).parentElement!.style.display = "none";
@@ -449,8 +449,8 @@ export default function ProjectDetailsModal({ project: row, onClose, onViewFullP
 
             {/* Image */}
             <img
-              src={photos[lightboxIndex].photo_url}
-              alt={photos[lightboxIndex].description ?? photos[lightboxIndex].category ?? "photo"}
+              src={photos[lightboxIndex].source_view_url}
+              alt={photos[lightboxIndex].photo_description ?? photos[lightboxIndex].description ?? photos[lightboxIndex].category ?? "photo"}
               style={{ maxWidth: "85vw", maxHeight: "72vh", borderRadius: 14, objectFit: "contain", boxShadow: "0 8px 48px rgba(0,0,0,0.5)" }}
             />
 
