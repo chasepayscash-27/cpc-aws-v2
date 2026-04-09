@@ -26,7 +26,7 @@ export default function PhotoLogTimelineChart() {
     async function fetchData() {
       try {
         setLoading(true);
-        const rows = await loadCsv<PhotoLogRow>("/data/project_photo_log.csv");
+        const rows = await loadCsv<PhotoLogRow>("/data/project_photo_log_v2.csv");
 
         const grouped = rows.reduce<Record<string, number>>((acc, row) => {
           const rawDate = row.photo_date || row.uploaded_at || "Unknown";
