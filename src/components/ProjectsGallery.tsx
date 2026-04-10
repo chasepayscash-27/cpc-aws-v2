@@ -8,15 +8,15 @@ interface Props {
 }
 
 const STAGE_COLORS: Record<string, string> = {
-  under_construction: "rgba(251,146,60,0.30)",
-  planning_permitting: "rgba(59,130,246,0.30)",
-  completed: "rgba(34,197,94,0.30)",
-  sold: "rgba(168,85,247,0.30)",
+  under_construction: "rgba(251,146,60,0.85)",
+  planning_permitting: "rgba(59,130,246,0.85)",
+  completed: "rgba(34,197,94,0.85)",
+  sold: "rgba(168,85,247,0.85)",
 };
 
 const STRATEGY_COLORS: Record<string, string> = {
-  fix_and_flip: "rgba(124,58,237,0.30)",
-  new_construction: "rgba(59,130,246,0.30)",
+  fix_and_flip: "rgba(124,58,237,0.85)",
+  new_construction: "rgba(59,130,246,0.85)",
 };
 
 function badgeStyle(value: string | undefined, colorMap: Record<string, string>): CSSProperties {
@@ -26,10 +26,10 @@ function badgeStyle(value: string | undefined, colorMap: Record<string, string>)
     borderRadius: 10,
     fontSize: 11,
     fontWeight: 600,
-    background: value ? (colorMap[value] ?? "rgba(26,122,60,0.10)") : "rgba(26,122,60,0.10)",
+    background: value ? (colorMap[value] ?? "rgba(26,122,60,0.85)") : "rgba(26,122,60,0.85)",
     textTransform: "capitalize",
     whiteSpace: "nowrap",
-    color: "#1a2e1a",
+    color: "#fff",
   };
 }
 
@@ -107,7 +107,7 @@ export default function ProjectsGallery({ rows, onViewFullPnL }: Props) {
                   right: 8,
                   ...badgeStyle(row.stage, STAGE_COLORS),
                   backdropFilter: "blur(4px)",
-                  border: "1px solid rgba(26,122,60,0.15)",
+                  border: "1px solid rgba(255,255,255,0.3)",
                 }}
               >
                 {row.stage.replace(/_/g, " ")}
