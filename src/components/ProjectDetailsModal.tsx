@@ -11,15 +11,15 @@ interface Props {
 }
 
 const STAGE_COLORS: Record<string, string> = {
-  under_construction: "rgba(251,146,60,0.35)",
-  planning_permitting: "rgba(59,130,246,0.35)",
-  completed: "rgba(34,197,94,0.35)",
-  sold: "rgba(168,85,247,0.35)",
+  under_construction: "rgba(251,146,60,0.85)",
+  planning_permitting: "rgba(59,130,246,0.85)",
+  completed: "rgba(34,197,94,0.85)",
+  sold: "rgba(168,85,247,0.85)",
 };
 
 const STRATEGY_COLORS: Record<string, string> = {
-  fix_and_flip: "rgba(124,58,237,0.35)",
-  new_construction: "rgba(59,130,246,0.35)",
+  fix_and_flip: "rgba(124,58,237,0.85)",
+  new_construction: "rgba(59,130,246,0.85)",
 };
 
 function badgeStyle(value: string | undefined, colorMap: Record<string, string>): CSSProperties {
@@ -29,11 +29,11 @@ function badgeStyle(value: string | undefined, colorMap: Record<string, string>)
     borderRadius: 12,
     fontSize: 12,
     fontWeight: 600,
-    background: value ? (colorMap[value] ?? "rgba(26,122,60,0.10)") : "rgba(26,122,60,0.10)",
-    border: "1px solid rgba(26,122,60,0.15)",
+    background: value ? (colorMap[value] ?? "rgba(26,122,60,0.85)") : "rgba(26,122,60,0.85)",
+    border: "1px solid rgba(255,255,255,0.3)",
     textTransform: "capitalize",
     whiteSpace: "nowrap",
-    color: "#1a2e1a",
+    color: "#fff",
   };
 }
 

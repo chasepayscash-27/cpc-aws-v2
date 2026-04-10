@@ -8,20 +8,20 @@ interface Props {
 }
 
 const STAGE_COLORS: Record<string, string> = {
-  under_construction: "rgba(251,146,60,0.25)",
-  planning_permitting: "rgba(59,130,246,0.25)",
-  completed: "rgba(34,197,94,0.25)",
-  sold: "rgba(168,85,247,0.25)",
+  under_construction: "rgba(251,146,60,0.85)",
+  planning_permitting: "rgba(59,130,246,0.85)",
+  completed: "rgba(34,197,94,0.85)",
+  sold: "rgba(168,85,247,0.85)",
 };
 
 const STRATEGY_COLORS: Record<string, string> = {
-  fix_and_flip: "rgba(124,58,237,0.25)",
-  new_construction: "rgba(59,130,246,0.25)",
+  fix_and_flip: "rgba(124,58,237,0.85)",
+  new_construction: "rgba(59,130,246,0.85)",
 };
 
 function badge(value: string | undefined, colorMap: Record<string, string>) {
   const label = value ? value.replace(/_/g, " ") : "—";
-  const bg = value ? (colorMap[value] ?? "rgba(26,122,60,0.10)") : "rgba(26,122,60,0.10)";
+  const bg = value ? (colorMap[value] ?? "rgba(26,122,60,0.85)") : "rgba(26,122,60,0.85)";
   const style: CSSProperties = {
     display: "inline-block",
     padding: "2px 8px",
@@ -31,6 +31,7 @@ function badge(value: string | undefined, colorMap: Record<string, string>) {
     background: bg,
     textTransform: "capitalize",
     whiteSpace: "nowrap",
+    color: "#fff",
   };
   return <span style={style}>{label}</span>;
 }
