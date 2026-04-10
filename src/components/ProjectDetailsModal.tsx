@@ -3,6 +3,7 @@ import type { ProjectRow } from "../types/project";
 import type { PhotoLogRow } from "../types/photoLog";
 import { loadCsv } from "../utils/csv";
 import PropertyFinancials from "./PropertyFinancials";
+import { generatePropertyPdf } from "../utils/generatePropertyPdf";
 
 interface Props {
   project: ProjectRow;
@@ -230,6 +231,37 @@ export default function ProjectDetailsModal({ project: row, onClose, onViewFullP
                 )}
               </div>
             )}
+
+            {/* Download PDF button */}
+            <button
+              onClick={() => generatePropertyPdf(row)}
+              style={{
+                marginBottom: 20,
+                padding: "8px 18px",
+                borderRadius: 12,
+                border: "1px solid #1a7a3c",
+                background: "#f0f7f1",
+                color: "#1a7a3c",
+                fontSize: 13,
+                fontWeight: 600,
+                cursor: "pointer",
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 6,
+                transition: "background 0.15s, color 0.15s",
+              }}
+              onMouseEnter={(e) => {
+                (e.currentTarget as HTMLButtonElement).style.background = "#1a7a3c";
+                (e.currentTarget as HTMLButtonElement).style.color = "#ffffff";
+              }}
+              onMouseLeave={(e) => {
+                (e.currentTarget as HTMLButtonElement).style.background = "#f0f7f1";
+                (e.currentTarget as HTMLButtonElement).style.color = "#1a7a3c";
+              }}
+              aria-label="Download PDF report"
+            >
+              📄 Download PDF
+            </button>
 
             {/* Quick stats */}
             {(row.beds || row.baths || sqft || row.year_built) && (
