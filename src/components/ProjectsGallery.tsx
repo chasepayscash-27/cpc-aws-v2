@@ -1,6 +1,7 @@
 import { CSSProperties, useState } from "react";
 import type { ProjectRow } from "../types/project";
 import ProjectDetailsModal from "./ProjectDetailsModal";
+import { generatePropertyPdf } from "../utils/generatePropertyPdf";
 
 interface Props {
   rows: ProjectRow[];
@@ -161,6 +162,42 @@ export default function ProjectsGallery({ rows, onViewFullPnL }: Props) {
                 </div>
               </div>
             </div>
+
+            {/* PDF Download button */}
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                generatePropertyPdf(row);
+              }}
+              style={{
+                marginTop: 10,
+                width: "100%",
+                padding: "7px 0",
+                borderRadius: 10,
+                border: "1px solid #1a7a3c",
+                background: "#f0f7f1",
+                color: "#1a7a3c",
+                fontSize: 12,
+                fontWeight: 600,
+                cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: 5,
+                transition: "background 0.15s, color 0.15s",
+              }}
+              onMouseEnter={(e) => {
+                (e.currentTarget as HTMLButtonElement).style.background = "#1a7a3c";
+                (e.currentTarget as HTMLButtonElement).style.color = "#ffffff";
+              }}
+              onMouseLeave={(e) => {
+                (e.currentTarget as HTMLButtonElement).style.background = "#f0f7f1";
+                (e.currentTarget as HTMLButtonElement).style.color = "#1a7a3c";
+              }}
+              aria-label="Download PDF report"
+            >
+              📄 Download PDF
+            </button>
           </div>
         </div>
       ))}
