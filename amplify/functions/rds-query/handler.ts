@@ -3,6 +3,28 @@ import * as mysql from "mysql2/promise";
 
 declare const process: any;
 
+// Module-level pool: created once per Lambda execution context and reused
+// across warm invocations, eliminating a new TCP + TLS + auth handshake on
+// every request.  connectionLimit:1 is appropriate because a single Lambda
+// instance handles one request at a time.
+let pool: mysql.Pool | null = null;
+
+function getPool(): mysql.Pool {
+  if (!pool) {
+    pool = mysql.createPool({
+      host: process.env.DB_HOST!,
+      user: process.env.DB_USER!,
+      password: process.env.DB_PASS!,
+      database: process.env.DB_NAME!,
+      port: Number(process.env.DB_PORT || 3306),
+      waitForConnections: true,
+      connectionLimit: 1,
+      queueLimit: 0,
+    });
+  }
+  return pool;
+}
+
 export const handler: APIGatewayProxyHandlerV2 = async (event) => {
   const headers: Record<string, string> = {
     "Access-Control-Allow-Origin": "*",
@@ -34,17 +56,7 @@ export const handler: APIGatewayProxyHandlerV2 = async (event) => {
   const params: any[] = body.params ?? [];
 
   try {
-    const conn: any = await mysql.createConnection({
-      host: process.env.DB_HOST!,
-      user: process.env.DB_USER!,
-      password: process.env.DB_PASS!,
-      database: process.env.DB_NAME!,
-      port: Number(process.env.DB_PORT || 3306),
-    });
-
-    const [rows] = await conn.execute(sql, params);
-    await conn.end();
-
+    const [rows] = await getPool().execute(sql, params);
     return { statusCode: 200, headers, body: JSON.stringify(rows) };
   } catch (err: any) {
     return {

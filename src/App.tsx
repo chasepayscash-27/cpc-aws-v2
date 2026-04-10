@@ -1,10 +1,14 @@
+import { lazy, Suspense } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import Navigation from './components/Navigation';
-import ProjectsPage from './pages/ProjectsPage';
-import FinancialsPage from './pages/FinancialsPage';
-import ResourcesPage from './pages/ResourcesPage';
-import YTDSummaryPage from './pages/YTDSummaryPage';
 import './App.css';
+
+// Lazy-load each page so Vite emits a separate chunk per route.
+// The browser only downloads a page's chunk when the user navigates to it.
+const YTDSummaryPage = lazy(() => import('./pages/YTDSummaryPage'));
+const ProjectsPage   = lazy(() => import('./pages/ProjectsPage'));
+const FinancialsPage = lazy(() => import('./pages/FinancialsPage'));
+const ResourcesPage  = lazy(() => import('./pages/ResourcesPage'));
 
 const App = () => {
   return (
@@ -21,13 +25,15 @@ const App = () => {
       <div className="body">
         <Navigation />
         <main className="content">
-          <Routes>
-            <Route path="/" element={<YTDSummaryPage />} />
-            <Route path="/projects" element={<ProjectsPage />} />
-            <Route path="/financials" element={<FinancialsPage />} />
-            <Route path="/resources" element={<ResourcesPage />} />
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
+          <Suspense fallback={<div className="pageHeader" role="status" aria-live="polite"><p className="muted">Loading…</p></div>}>
+            <Routes>
+              <Route path="/" element={<YTDSummaryPage />} />
+              <Route path="/projects" element={<ProjectsPage />} />
+              <Route path="/financials" element={<FinancialsPage />} />
+              <Route path="/resources" element={<ResourcesPage />} />
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+          </Suspense>
         </main>
       </div>
     </div>

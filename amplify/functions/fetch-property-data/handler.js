@@ -1,4 +1,27 @@
 import * as mysql from "mysql2/promise";
+
+// Module-level pool: created once per Lambda execution context and reused
+// across warm invocations, eliminating a new TCP + TLS + auth handshake on
+// every request.  connectionLimit:1 is appropriate because a single Lambda
+// instance handles one request at a time.
+let pool = null;
+
+function getPool() {
+    if (!pool) {
+        pool = mysql.createPool({
+            host: process.env.DB_HOST,
+            user: process.env.DB_USER,
+            password: process.env.DB_PASS,
+            database: process.env.DB_NAME,
+            port: Number(process.env.DB_PORT || 3306),
+            waitForConnections: true,
+            connectionLimit: 1,
+            queueLimit: 0,
+        });
+    }
+    return pool;
+}
+
 export const handler = async (event) => {
     const headers = {
         "Access-Control-Allow-Origin": "*",
@@ -24,15 +47,7 @@ export const handler = async (event) => {
         body = {};
     }
     const limit = body.limit ?? 100;
-    let conn = null;
     try {
-        conn = await mysql.createConnection({
-            host: process.env.DB_HOST,
-            user: process.env.DB_USER,
-            password: process.env.DB_PASS,
-            database: process.env.DB_NAME,
-            port: Number(process.env.DB_PORT || 3306),
-        });
         const sql = `
       SELECT 
         sold_year,
@@ -52,7 +67,7 @@ export const handler = async (event) => {
       ORDER BY closed_date_dt DESC
       LIMIT ?
     `;
-        const [rows] = await conn.execute(sql, [limit]);
+        const [rows] = await getPool().execute(sql, [limit]);
         const properties = rows.map((row) => ({
             sold_year: row.sold_year,
             property_id: row.property_id,
@@ -87,10 +102,5 @@ export const handler = async (event) => {
                 error: err?.message || "Failed to fetch data from RDS",
             }),
         };
-    }
-    finally {
-        if (conn) {
-            await conn.end();
-        }
     }
 };
