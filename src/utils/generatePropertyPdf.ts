@@ -59,20 +59,19 @@ export function generatePropertyPdf(row: ProjectRow): void {
 
   // ── Metrics grid (2 columns) ─────────────────────────────────────────────────
   const metrics: Array<{ label: string; value: string }> = [
-    { label: "Listing Agent",    value: "—" },
-    { label: "Buyers Agent",     value: "—" },
-    { label: "Latitude",         value: row.lat ?? "—" },
-    { label: "Longitude",        value: row.lng ?? "—" },
-    { label: "Property Address", value: propertyAddress },
-    { label: "Asking Price",     value: "—" },
-    { label: "Offer Price",      value: "—" },
-    { label: "Status",           value: row.stage?.replace(/_/g, " ") ?? "—" },
-    { label: "Date",             value: new Date().toLocaleDateString() },
-    { label: "Funding Source",   value: "—" },
-    { label: "Bedrooms",         value: row.beds ?? "—" },
-    { label: "Bathrooms",        value: row.baths ?? "—" },
-    { label: "Square Footage",   value: row.square_feet ?? "—" },
-    { label: "Year Built",       value: row.year_built ?? "—" },
+    { label: "Property Address",                    value: propertyAddress },
+    { label: "List Price/Asking Price",             value: "—" },
+    { label: "Year Built",                          value: row.year_built ?? "—" },
+    { label: "Square Footage",                      value: row.square_feet ?? "—" },
+    { label: "Water Heater (New or Age)",           value: "—" },
+    { label: "Roof (New or Age)",                   value: "—" },
+    { label: "Appliances (New or Age)",             value: "—" },
+    { label: "Gas Appliances",                      value: "—" },
+    { label: "Electric Appliances",                 value: "—" },
+    { label: "Fireplace (Gas Logs or Wood Burning)", value: "—" },
+    { label: "Lot Size (Acres)",                    value: "—" },
+    { label: "Bedrooms",                            value: row.beds ?? "—" },
+    { label: "Bathrooms",                           value: row.baths ?? "—" },
   ];
 
   const colWidth = contentWidth / 2;
