@@ -135,7 +135,7 @@ export function generatePropertyPdf(row: ProjectRow): void {
   const noteLineSpacing = 24;
   const notesSectionHeight = notesLabelHeight + notesInstructionHeight + noteLineCount * noteLineSpacing + 12;
 
-  if (y + notesSectionHeight > pageHeight - 80) {
+  if (y + notesSectionHeight > doc.internal.pageSize.getHeight() - 80) {
     doc.addPage();
     y = 48;
   }
@@ -166,15 +166,15 @@ export function generatePropertyPdf(row: ProjectRow): void {
   y += 12;
 
   // ── Footer ──────────────────────────────────────────────────────────────────
-  const currentPageHeight = doc.internal.pageSize.getHeight();
+  const lastPageHeight = doc.internal.pageSize.getHeight();
   doc.setFillColor(240, 247, 241);
-  doc.rect(0, currentPageHeight - 36, pageWidth, 36, "F");
+  doc.rect(0, lastPageHeight - 36, pageWidth, 36, "F");
 
   doc.setTextColor(90, 112, 96);
   doc.setFont("helvetica", "italic");
   doc.setFontSize(9);
   const footerText = `Generated on ${new Date().toLocaleDateString()} — Shell Report (No Data Linked)`;
-  doc.text(footerText, marginLeft, currentPageHeight - 15);
+  doc.text(footerText, marginLeft, lastPageHeight - 15);
 
   // ── Save ────────────────────────────────────────────────────────────────────
   const safeName = (row.name ?? "Property").replace(/[^a-zA-Z0-9_\- ]/g, "_");
