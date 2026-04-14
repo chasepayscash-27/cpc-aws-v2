@@ -72,6 +72,18 @@ export function generatePropertyPdf(row: ProjectRow): void {
     { label: "Lot Size (Acres)",                    value: "—" },
     { label: "Bedrooms",                            value: row.beds ?? "—" },
     { label: "Bathrooms",                           value: row.baths ?? "—" },
+    { label: "Sewer / Septic",                      value: "—" },
+    { label: "HVAC (New or Age)",                   value: "—" },
+    { label: "Plumbing (New or Partial Update)",    value: "—" },
+    { label: "Electrical Panel Update",             value: "—" },
+    { label: "Electrical Wiring Update",            value: "—" },
+    { label: "Deck Update Front",                   value: "—" },
+    { label: "Deck Update Back",                    value: "—" },
+    { label: "Garage Door Motors Update",           value: "—" },
+    { label: "Garage Doors Update",                 value: "—" },
+    { label: "Foundation Work Completed",           value: "—" },
+    { label: "Counter Top (Granite or Quartz)",     value: "—" },
+    { label: "Windows Update",                      value: "—" },
   ];
 
   const colWidth = contentWidth / 2;
@@ -103,7 +115,7 @@ export function generatePropertyPdf(row: ProjectRow): void {
     doc.setTextColor(90, 112, 96);
     doc.setFont("helvetica", "bold");
     doc.setFontSize(8);
-    doc.text(metric.label.toUpperCase(), x + cellPadX, cellY + cellPadY + 1);
+    doc.text(`${idx + 1}. ${metric.label.toUpperCase()}`, x + cellPadX, cellY + cellPadY + 1);
 
     // Value
     doc.setTextColor(26, 46, 26);
@@ -116,15 +128,53 @@ export function generatePropertyPdf(row: ProjectRow): void {
   const gridRows = Math.ceil(metrics.length / 2);
   y += gridRows * rowHeight + 20;
 
+  // ── Notes section (add page if needed) ──────────────────────────────────────
+  const notesLabelHeight = 20;
+  const notesInstructionHeight = 16;
+  const noteLineCount = 7;
+  const noteLineSpacing = 24;
+  const notesSectionHeight = notesLabelHeight + notesInstructionHeight + noteLineCount * noteLineSpacing + 12;
+
+  if (y + notesSectionHeight > pageHeight - 80) {
+    doc.addPage();
+    y = 48;
+  }
+
+  doc.setTextColor(26, 122, 60);
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(9);
+  doc.text("NOTES", marginLeft, y);
+  y += notesLabelHeight;
+
+  doc.setTextColor(90, 112, 96);
+  doc.setFont("helvetica", "italic");
+  doc.setFontSize(8);
+  doc.text(
+    "Reference metrics by number (e.g., #5 — Water heater replaced in 2022)",
+    marginLeft,
+    y,
+  );
+  y += notesInstructionHeight;
+
+  doc.setDrawColor(212, 232, 216);
+  doc.setLineWidth(0.5);
+  for (let i = 0; i < noteLineCount; i++) {
+    doc.line(marginLeft, y, pageWidth - marginRight, y);
+    y += noteLineSpacing;
+  }
+
+  y += 12;
+
   // ── Footer ──────────────────────────────────────────────────────────────────
+  const currentPageHeight = doc.internal.pageSize.getHeight();
   doc.setFillColor(240, 247, 241);
-  doc.rect(0, pageHeight - 36, pageWidth, 36, "F");
+  doc.rect(0, currentPageHeight - 36, pageWidth, 36, "F");
 
   doc.setTextColor(90, 112, 96);
   doc.setFont("helvetica", "italic");
   doc.setFontSize(9);
   const footerText = `Generated on ${new Date().toLocaleDateString()} — Shell Report (No Data Linked)`;
-  doc.text(footerText, marginLeft, pageHeight - 15);
+  doc.text(footerText, marginLeft, currentPageHeight - 15);
 
   // ── Save ────────────────────────────────────────────────────────────────────
   const safeName = (row.name ?? "Property").replace(/[^a-zA-Z0-9_\- ]/g, "_");
