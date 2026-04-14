@@ -135,7 +135,7 @@ export function generatePropertyPdf(row: ProjectRow): void {
   const noteLineSpacing = 24;
   const notesSectionHeight = notesLabelHeight + notesInstructionHeight + noteLineCount * noteLineSpacing + 12;
 
-  if (y + notesSectionHeight > doc.internal.pageSize.getHeight() - 80) {
+  if (y + notesSectionHeight > pageHeight - 80) {
     doc.addPage();
     y = 48;
   }
@@ -166,7 +166,7 @@ export function generatePropertyPdf(row: ProjectRow): void {
   y += 12;
 
   // ── Footer ──────────────────────────────────────────────────────────────────
-  const lastPageHeight = doc.internal.pageSize.getHeight();
+  const lastPageHeight = pageHeight;
   doc.setFillColor(240, 247, 241);
   doc.rect(0, lastPageHeight - 36, pageWidth, 36, "F");
 
