@@ -19,6 +19,8 @@ const STAGE_COLORS: Record<string, string> = {
 function getProjectLabel(p: ProjectRow): string {
   return p.name ?? p.full_address ?? p.address_1 ?? '—';
 }
+
+function formatStage(stage: string): string {
   return stage
     .replace(/_/g, ' ')
     .replace(/\b\w/g, (c) => c.toUpperCase());
