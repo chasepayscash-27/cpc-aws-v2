@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { loadCsv } from '../utils/csv';
 import type { ProjectRow } from '../types/project';
+import PipelineTracker, { ACTIVE_STAGE_ORDER } from '../components/PipelineTracker';
 import '../App.css';
 
 interface YTDRow {
@@ -17,32 +18,6 @@ interface YTDRow {
   'YTD Profit % Obtained': string;
 }
 
-const STAGE_COLORS: Record<string, string> = {
-  under_construction: 'rgba(251,146,60,0.85)',
-  planning_permitting: 'rgba(59,130,246,0.85)',
-  completed: 'rgba(34,197,94,0.85)',
-  sold: 'rgba(168,85,247,0.85)',
-  active_listing: 'rgba(236,72,153,0.85)',
-  negotiation: 'rgba(234,179,8,0.85)',
-  pending_purchase: 'rgba(20,184,166,0.85)',
-};
-
-const STAGE_ORDER = [
-  'negotiation',
-  'pending_purchase',
-  'planning_permitting',
-  'under_construction',
-  'active_listing',
-  'completed',
-  'sold',
-];
-
-function formatStage(stage: string): string {
-  return stage
-    .replace(/_/g, ' ')
-    .replace(/\b\w/g, (c) => c.toUpperCase());
-}
-
 function parsePercent(value: string): number {
   return parseFloat(value.replace('%', '')) || 0;
 }
@@ -51,7 +26,7 @@ export default function YTDSummaryPage() {
   const [data, setData] = useState<YTDRow | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [stageCounts, setStageCounts] = useState<Record<string, number>>({});
+  const [projectRows, setProjectRows] = useState<ProjectRow[]>([]);
   const [stagesLoading, setStagesLoading] = useState(true);
 
   useEffect(() => {
@@ -69,14 +44,7 @@ export default function YTDSummaryPage() {
   useEffect(() => {
     loadCsv<ProjectRow>('/data/projects_v2.csv')
       .then((rows) => {
-        const counts: Record<string, number> = {};
-        for (const row of rows) {
-          const stage = row.stage?.trim();
-          if (stage) {
-            counts[stage] = (counts[stage] ?? 0) + 1;
-          }
-        }
-        setStageCounts(counts);
+        setProjectRows(rows);
         setStagesLoading(false);
       })
       .catch(() => {
@@ -126,6 +94,10 @@ export default function YTDSummaryPage() {
     },
   ];
 
+  const totalPipelineCount = projectRows.filter(
+    (r: ProjectRow) => r.stage && ACTIVE_STAGE_ORDER.includes(r.stage.trim().toLowerCase())
+  ).length;
+
   return (
     <div>
       <div className="pageHeader">
@@ -133,8 +105,8 @@ export default function YTDSummaryPage() {
         <p className="muted">Year-to-date performance summary of properties flipped.</p>
       </div>
 
-      {/* KPI Summary Cards — 4-column grid */}
-      <section style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', gap: '12px', margin: '12px 0 14px' }}>
+      {/* KPI Summary Cards — 5-column grid */}
+      <section style={{ display: 'grid', gridTemplateColumns: 'repeat(5, minmax(0, 1fr))', gap: '12px', margin: '12px 0 14px' }}>
         <div className="card">
           <div className="cardLabel">Houses Sold</div>
           <div className="cardValue">{data['Number of Houses Sold']}</div>
@@ -155,47 +127,24 @@ export default function YTDSummaryPage() {
           <div className="cardValue">{data['Average Profit']}</div>
           <div className="cardSub" style={{ color: 'var(--muted)' }}>Goal: {data['Average Profit Goal']}</div>
         </div>
+        <div className="card" style={{ borderTop: '3px solid #1a7a3c' }}>
+          <div className="cardLabel">Total in Pipeline</div>
+          <div className="cardValue">{stagesLoading ? '—' : totalPipelineCount}</div>
+          <div className="cardSub" style={{ color: 'var(--muted)' }}>Active projects</div>
+        </div>
       </section>
 
-      {/* Pipeline by Stage tiles */}
+      {/* Pipeline by Stage — horizontal tracker */}
       <section style={{ margin: '0 0 14px' }}>
         <h2 style={{ fontSize: 14, fontWeight: 700, color: '#1a7a3c', marginBottom: 10, letterSpacing: '0.04em', textTransform: 'uppercase' }}>
           Pipeline by Stage
         </h2>
         {stagesLoading ? (
           <p className="muted" style={{ fontSize: 13 }}>Loading stage data…</p>
-        ) : Object.keys(stageCounts).length === 0 ? (
+        ) : projectRows.length === 0 ? (
           <p className="muted" style={{ fontSize: 13 }}>No stage data available.</p>
         ) : (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', gap: 10 }}>
-            {Object.entries(stageCounts)
-              .sort(([a], [b]) => {
-                const ai = STAGE_ORDER.indexOf(a);
-                const bi = STAGE_ORDER.indexOf(b);
-                if (ai !== -1 && bi !== -1) return ai - bi;
-                if (ai !== -1) return -1;
-                if (bi !== -1) return 1;
-                return a.localeCompare(b);
-              })
-              .map(([stage, count]) => {
-                const color = STAGE_COLORS[stage] ?? '#1a7a3c';
-                return (
-                  <div
-                    key={stage}
-                    className="card"
-                    style={{ padding: '14px 16px', borderTop: `3px solid ${color}`, minWidth: 0 }}
-                  >
-                    <div
-                      className="cardLabel"
-                      style={{ fontSize: 11, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
-                    >
-                      {formatStage(stage)}
-                    </div>
-                    <div className="cardValue" style={{ fontSize: 28, lineHeight: 1.2 }}>{count}</div>
-                  </div>
-                );
-              })}
-          </div>
+          <PipelineTracker rows={projectRows} />
         )}
       </section>
 
