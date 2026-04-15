@@ -27,6 +27,16 @@ const STAGE_COLORS: Record<string, string> = {
   pending_purchase: 'rgba(20,184,166,0.85)',
 };
 
+const STAGE_ORDER = [
+  'negotiation',
+  'pending_purchase',
+  'planning_permitting',
+  'under_construction',
+  'active_listing',
+  'completed',
+  'sold',
+];
+
 function formatStage(stage: string): string {
   return stage
     .replace(/_/g, ' ')
@@ -159,7 +169,14 @@ export default function YTDSummaryPage() {
         ) : (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', gap: 10 }}>
             {Object.entries(stageCounts)
-              .sort(([a], [b]) => a.localeCompare(b))
+              .sort(([a], [b]) => {
+                const ai = STAGE_ORDER.indexOf(a);
+                const bi = STAGE_ORDER.indexOf(b);
+                if (ai !== -1 && bi !== -1) return ai - bi;
+                if (ai !== -1) return -1;
+                if (bi !== -1) return 1;
+                return a.localeCompare(b);
+              })
               .map(([stage, count]) => {
                 const color = STAGE_COLORS[stage] ?? '#1a7a3c';
                 return (
