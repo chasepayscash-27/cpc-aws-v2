@@ -11,7 +11,7 @@ export default function PullManifestTable() {
     async function fetchData() {
       try {
         setLoading(true);
-        const data = await loadCsv<PullManifestRow>("/data/pull_manifest.csv");
+        const data = await loadCsv<PullManifestRow>("/data/pull_manifest_v2.csv");
         setRows(data);
       } catch (err) {
         setError(err instanceof Error ? err.message : "Failed to load manifest");
