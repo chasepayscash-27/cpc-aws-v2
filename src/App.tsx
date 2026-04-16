@@ -9,6 +9,7 @@ const YTDSummaryPage = lazy(() => import('./pages/YTDSummaryPage'));
 const ProjectsPage   = lazy(() => import('./pages/ProjectsPage'));
 const FinancialsPage = lazy(() => import('./pages/FinancialsPage'));
 const ResourcesPage  = lazy(() => import('./pages/ResourcesPage'));
+const TeamPage  = lazy(() => import('./pages/TeamPage'));
 
 const App = () => {
   return (
@@ -31,6 +32,7 @@ const App = () => {
               <Route path="/projects" element={<ProjectsPage />} />
               <Route path="/financials" element={<FinancialsPage />} />
               <Route path="/resources" element={<ResourcesPage />} />
+              <Route path="/team" element={<TeamPage />} />
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </Suspense>
