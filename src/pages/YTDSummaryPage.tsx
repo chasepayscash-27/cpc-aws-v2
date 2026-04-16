@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { loadCsv } from '../utils/csv';
 import type { ProjectRow } from '../types/project';
 import PipelineTracker, { ACTIVE_STAGE_ORDER } from '../components/PipelineTracker';
+import ProjectDetailsModal from '../components/ProjectDetailsModal';
 import '../App.css';
 
 interface YTDRow {
@@ -28,6 +29,7 @@ export default function YTDSummaryPage() {
   const [error, setError] = useState('');
   const [projectRows, setProjectRows] = useState<ProjectRow[]>([]);
   const [stagesLoading, setStagesLoading] = useState(true);
+  const [selectedProject, setSelectedProject] = useState<ProjectRow | null>(null);
 
   useEffect(() => {
     loadCsv<YTDRow>('/data/ytd_csv_looker.csv')
@@ -100,6 +102,12 @@ export default function YTDSummaryPage() {
 
   return (
     <div>
+      {selectedProject && (
+        <ProjectDetailsModal
+          project={selectedProject}
+          onClose={() => setSelectedProject(null)}
+        />
+      )}
       <div className="pageHeader">
         <h1 className="h1">YTD Summary</h1>
         <p className="muted">Year-to-date performance summary of properties flipped.</p>
@@ -144,7 +152,7 @@ export default function YTDSummaryPage() {
         ) : projectRows.length === 0 ? (
           <p className="muted" style={{ fontSize: 13 }}>No stage data available.</p>
         ) : (
-          <PipelineTracker rows={projectRows} />
+          <PipelineTracker rows={projectRows} onProjectClick={setSelectedProject} />
         )}
       </section>
 

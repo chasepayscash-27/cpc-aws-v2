@@ -26,11 +26,17 @@ function formatStage(stage: string): string {
     .replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
+const TILE_DEFAULT_BG = '#f0f7f1';
+const TILE_HOVER_BG = '#d4e8d8';
+const TILE_DEFAULT_BORDER = '#d4e8d8';
+const TILE_HOVER_BORDER = 'rgba(26,122,60,0.50)';
+
 interface PipelineTrackerProps {
   rows: ProjectRow[];
+  onProjectClick?: (project: ProjectRow) => void;
 }
 
-export default function PipelineTracker({ rows }: PipelineTrackerProps) {
+export default function PipelineTracker({ rows, onProjectClick }: PipelineTrackerProps) {
   // Group active projects by stage
   const grouped: Record<string, ProjectRow[]> = {};
   for (const stage of ACTIVE_STAGE_ORDER) {
@@ -149,12 +155,26 @@ export default function PipelineTracker({ rows }: PipelineTrackerProps) {
                   return (
                     <div
                       key={p.project_uuid ?? i}
+                      role={onProjectClick ? 'button' : undefined}
+                      tabIndex={onProjectClick ? 0 : undefined}
+                      onClick={onProjectClick ? () => onProjectClick(p) : undefined}
+                      onKeyDown={onProjectClick ? (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onProjectClick(p); } } : undefined}
                       style={{
                         background: '#f0f7f1',
                         border: '1px solid #d4e8d8',
                         borderRadius: 8,
                         padding: '6px 8px',
+                        cursor: onProjectClick ? 'pointer' : 'default',
+                        transition: onProjectClick ? 'background 0.15s, border-color 0.15s' : undefined,
                       }}
+                      onMouseEnter={onProjectClick ? (e) => {
+                        (e.currentTarget as HTMLDivElement).style.background = TILE_HOVER_BG;
+                        (e.currentTarget as HTMLDivElement).style.borderColor = TILE_HOVER_BORDER;
+                      } : undefined}
+                      onMouseLeave={onProjectClick ? (e) => {
+                        (e.currentTarget as HTMLDivElement).style.background = TILE_DEFAULT_BG;
+                        (e.currentTarget as HTMLDivElement).style.borderColor = TILE_DEFAULT_BORDER;
+                      } : undefined}
                     >
                       <div
                         style={{
