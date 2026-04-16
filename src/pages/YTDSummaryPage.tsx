@@ -142,20 +142,6 @@ export default function YTDSummaryPage() {
         </div>
       </section>
 
-      {/* Pipeline by Stage — horizontal tracker */}
-      <section style={{ margin: '0 0 14px' }}>
-        <h2 style={{ fontSize: 14, fontWeight: 700, color: '#1a7a3c', marginBottom: 10, letterSpacing: '0.04em', textTransform: 'uppercase' }}>
-          Pipeline by Stage
-        </h2>
-        {stagesLoading ? (
-          <p className="muted" style={{ fontSize: 13 }}>Loading stage data…</p>
-        ) : projectRows.length === 0 ? (
-          <p className="muted" style={{ fontSize: 13 }}>No stage data available.</p>
-        ) : (
-          <PipelineTracker rows={projectRows} onProjectClick={setSelectedProject} />
-        )}
-      </section>
-
       {/* Goal Progress Cards */}
       <section className="grid">
         {progressMetrics.map((metric) => (
@@ -178,6 +164,20 @@ export default function YTDSummaryPage() {
             </div>
           </div>
         ))}
+      </section>
+
+      {/* Pipeline by Stage — horizontal tracker */}
+      <section style={{ margin: '0 0 14px' }}>
+        <h2 style={{ fontSize: 14, fontWeight: 700, color: '#1a7a3c', marginBottom: 10, letterSpacing: '0.04em', textTransform: 'uppercase' }}>
+          Pipeline by Stage
+        </h2>
+        {stagesLoading ? (
+          <p className="muted" style={{ fontSize: 13 }}>Loading stage data…</p>
+        ) : projectRows.length === 0 ? (
+          <p className="muted" style={{ fontSize: 13 }}>No stage data available.</p>
+        ) : (
+          <PipelineTracker rows={projectRows} onProjectClick={setSelectedProject} />
+        )}
       </section>
     </div>
   );
