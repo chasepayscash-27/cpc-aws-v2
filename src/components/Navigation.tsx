@@ -6,6 +6,7 @@ const navItems = [
   { label: '🏗️ Projects', path: '/projects' },
   { label: '💰 Financials', path: '/financials' },
   { label: '🔧 Resources', path: '/resources' },
+  { label: '👥 Team', path: '/team' },
 ];
 
 const Navigation: React.FC = () => {
