@@ -8,6 +8,13 @@ interface TeamMember {
   Email?: string;
 }
 
+interface TeamCsvRow {
+  employee_name?: string;
+  '\uFEFFemployee_name'?: string;
+  employee_job_title?: string;
+  employee_email?: string;
+}
+
 const TeamPage = () => {
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -16,14 +23,14 @@ const TeamPage = () => {
   useEffect(() => {
     let isMounted = true;
 
-    loadCsv<TeamMember>('/data/cpc_job_titles.csv')
+    loadCsv<TeamCsvRow>('/data/cpc_job_titles.csv')
       .then((rows) => {
         if (!isMounted) return;
         const cleaned = rows
           .map((row) => ({
-            Name: row.Name?.trim(),
-            Position: row.Position?.trim(),
-            Email: row.Email?.trim(),
+            Name: (row.employee_name ?? row['\uFEFFemployee_name'])?.trim(),
+            Position: row.employee_job_title?.trim(),
+            Email: row.employee_email?.trim(),
           }))
           .filter((row) => row.Name || row.Position || row.Email);
         setTeamMembers(cleaned);
