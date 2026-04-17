@@ -2,11 +2,12 @@ import { defineBackend } from "@aws-amplify/backend";
 import { CorsHttpMethod, HttpApi, HttpMethod } from "aws-cdk-lib/aws-apigatewayv2";
 import { HttpLambdaIntegration } from "aws-cdk-lib/aws-apigatewayv2-integrations";
 
+import { auth } from "./auth/resource";
 import { data } from "./data/resource";
 import { rdsQuery } from "./functions/rds-query/resource";
 
 const backend = defineBackend({
-  /* auth, */
+  auth,
   data,
   rdsQuery,
 });
