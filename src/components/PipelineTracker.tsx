@@ -5,6 +5,7 @@ export const ACTIVE_STAGE_ORDER = [
   'pending_purchase',
   'planning_permitting',
   'under_construction',
+  'punch_list',
   'active_listing',
 ];
 
@@ -13,6 +14,7 @@ const STAGE_COLORS: Record<string, string> = {
   pending_purchase: 'rgba(20,184,166,0.85)',
   planning_permitting: 'rgba(59,130,246,0.85)',
   under_construction: 'rgba(251,146,60,0.85)',
+  punch_list: 'rgba(245,158,11,0.85)',
   active_listing: 'rgba(236,72,153,0.85)',
 };
 
