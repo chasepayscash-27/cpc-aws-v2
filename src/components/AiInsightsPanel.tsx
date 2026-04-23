@@ -88,6 +88,16 @@ export function AiInsightsPanel({ properties }: Props) {
     setOutput("");
     setError("");
     try {
+      if (typeof client.generations?.generateRecipe !== "function") {
+        console.error(
+          "[AiInsightsPanel] client.generations.generateRecipe is not available. " +
+            "Ensure Amplify outputs are up-to-date and include the generateRecipe generation route."
+        );
+        throw new Error(
+          "AI Insights are not available right now. Please try again later or contact support."
+        );
+      }
+
       const prompt = `
 You are an analytics assistant for a real estate investment business called Chase Pays Cash.
 Given the following portfolio metrics, provide:
