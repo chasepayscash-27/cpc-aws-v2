@@ -41,6 +41,16 @@ export function PublicChatWidget() {
     setLoading(true);
 
     try {
+      if (typeof client.generations?.generateRecipe !== "function") {
+        console.error(
+          "[PublicChatWidget] client.generations.generateRecipe is not available. " +
+            "Ensure Amplify outputs are up-to-date and include the generateRecipe generation route."
+        );
+        throw new Error(
+          "AI assistant is not available right now. Please try again later or contact support."
+        );
+      }
+
       // Build a conversation transcript to pass as context
       const historyPrompt = updatedHistory
         .map((m) => `${m.role === "user" ? "User" : "Assistant"}: ${m.text}`)

@@ -104,7 +104,53 @@
         }
       },
       "enums": {},
-      "nonModels": {}
+      "nonModels": {
+        "GenerateRecipeReturnType": {
+          "name": "GenerateRecipeReturnType",
+          "fields": {
+            "name": {
+              "name": "name",
+              "isArray": false,
+              "type": "String",
+              "isRequired": false,
+              "attributes": []
+            },
+            "ingredients": {
+              "name": "ingredients",
+              "isArray": true,
+              "type": "String",
+              "isRequired": false,
+              "attributes": [],
+              "isArrayNullable": true
+            },
+            "instructions": {
+              "name": "instructions",
+              "isArray": false,
+              "type": "String",
+              "isRequired": false,
+              "attributes": []
+            }
+          }
+        }
+      },
+      "generations": {
+        "generateRecipe": {
+          "name": "generateRecipe",
+          "isArray": false,
+          "type": {
+            "nonModel": "GenerateRecipeReturnType"
+          },
+          "isRequired": false,
+          "arguments": {
+            "description": {
+              "name": "description",
+              "isArray": false,
+              "type": "String",
+              "isRequired": false
+            }
+          }
+        }
+      }
     }
   },
   "custom": {
