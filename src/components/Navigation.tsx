@@ -5,6 +5,8 @@ const navItems = [
   { label: '🏠 Home', path: '/' },
   { label: '🏗️ Projects', path: '/projects' },
   { label: '💰 Financials', path: '/financials' },
+  { label: '📊 Analytics', path: '/analytics' },
+  { label: '🤖 AI Chat', path: '/chat' },
   { label: '🔧 Resources', path: '/resources' },
   { label: '👥 Team', path: '/team' },
 ];
