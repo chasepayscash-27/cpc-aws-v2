@@ -15,21 +15,10 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
+import { AiInsightsPanel } from "./AiInsightsPanel";
+import type { PropertyData } from "./AiInsightsPanel";
 
-interface PropertyData {
-  sold_year: number;
-  property_id: number;
-  property_address: string;
-  closed_date_dt: string;
-  status: string;
-  sold_amount_num: number;
-  purchase_price_num: number;
-  rehab_amount_num: number;
-  gross_profit_num: number;
-  days_on_market_num: number;
-  lead_source: string;
-  agent: string;
-}
+export type { PropertyData };
 
 const COLORS = ["#1a7a3c", "#28a852", "#3dbd68", "#52d27e", "#67e794"];
 
@@ -457,6 +446,9 @@ export function AnalyticsDashboard({ refreshKey = 0 }: { refreshKey?: number }) 
             </table>
           </div>
         </div>
+
+        {/* AI Insights Panel */}
+        <AiInsightsPanel properties={properties} />
       </div>
     </div>
   );

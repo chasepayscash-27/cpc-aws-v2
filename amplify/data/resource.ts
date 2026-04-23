@@ -7,6 +7,8 @@ const schema = a.schema({
     })
     .authorization((allow) => [allow.publicApiKey()]),
 
+  // Conversation routes only support owner() auth in Amplify Gen 2.
+  // The public chat widget uses generateRecipe with in-context history instead.
   chat: a
     .conversation({
       aiModel: a.ai.model("Claude 3.5 Haiku"),
@@ -17,7 +19,9 @@ const schema = a.schema({
   generateRecipe: a
     .generation({
       aiModel: a.ai.model("Claude 3.5 Haiku"),
-      systemPrompt: "You are a helpful assistant that generates recipes.",
+      systemPrompt:
+        "You are an analytics assistant for a real estate investment business. " +
+        "Analyse the provided metrics and return structured insights.",
     })
     .arguments({
       description: a.string(),
@@ -29,7 +33,7 @@ const schema = a.schema({
         instructions: a.string(),
       })
     )
-    .authorization((allow) => allow.authenticated()),
+    .authorization((allow) => allow.publicApiKey()),
 });
 
 export type Schema = ClientSchema<typeof schema>;
