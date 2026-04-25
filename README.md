@@ -30,9 +30,22 @@ The AI chat widget (`PublicChatWidget`) and AI insights panel (`AiInsightsPanel`
 
 ### Environment variables
 
-No additional environment variables are required in the frontend for the AI feature — the Amplify outputs file (`amplify/amplify_outputs.json`) provides the AppSync endpoint and API key automatically.
+The Amplify outputs file (`amplify/amplify_outputs.json`) provides the AppSync endpoint and API key automatically — no extra frontend env vars are needed under normal operation.
 
-For the backend Lambda functions that connect to the RDS database, the following secrets must be set in Amplify:
+`amplify_outputs.json` is regenerated on every CI/CD build by `npx ampx pipeline-deploy`, so the deployed app always uses the current API key.  For local development, run `npx ampx sandbox` to regenerate the file.
+
+**Optional override variables** — set these in the AWS Amplify Console (App settings → Environment variables) or in a local `.env.local` file when `amplify_outputs.json` has a stale key (e.g. if CI/CD has not yet run after a backend change):
+
+| Variable | Description |
+|---|---|
+| `VITE_APPSYNC_URL` | Override the AppSync GraphQL endpoint URL |
+| `VITE_APPSYNC_API_KEY` | Override the AppSync API key |
+
+See `.env.example` for a template.
+
+The AppSync API key is provisioned with a 365-day lifetime and is automatically rotated on each backend deployment.
+
+For the backend Lambda functions that connect to the RDS database, the following secrets must be set in Amplify (App settings → Secrets):
 
 | Secret name | Description              |
 |-------------|--------------------------|
