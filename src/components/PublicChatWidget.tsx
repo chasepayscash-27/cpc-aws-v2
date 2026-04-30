@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { generateClient } from "aws-amplify/data";
 import type { Schema } from "../../amplify/data/resource";
+import { parseAmplifyErrors, formatCaughtError } from "../utils/amplifyErrors";
 
 const client = generateClient<Schema>({ authMode: "apiKey" });
 
@@ -20,6 +21,7 @@ export function PublicChatWidget() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string>("");
   const [isAuthError, setIsAuthError] = useState(false);
+  const [isModelAccessError, setIsModelAccessError] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
 
   // Scroll to latest message
@@ -39,6 +41,7 @@ export function PublicChatWidget() {
     setInput("");
     setError("");
     setIsAuthError(false);
+    setIsModelAccessError(false);
     setMessages(updatedHistory);
     setLoading(true);
 
@@ -65,25 +68,20 @@ export function PublicChatWidget() {
       });
 
       if (errors?.length) {
-        throw new Error(errors.map((e) => e.message).join("\n"));
+        const parsed = parseAmplifyErrors("PublicChatWidget", errors);
+        setIsAuthError(parsed.isAuthError);
+        setIsModelAccessError(parsed.isModelAccessError);
+        setError(parsed.userMessage);
+        return;
       }
 
       const reply = data?.instructions ?? "Sorry, I couldn't generate a response.";
       setMessages([...updatedHistory, { role: "assistant", text: reply }]);
     } catch (e: unknown) {
-      const msg = e instanceof Error ? e.message : "Failed to send message.";
-      if (/unauthorized|UnauthorizedException|access denied|not authorized/i.test(msg)) {
-        console.error("[PublicChatWidget] Authorization error in AI chat operation:", msg);
-        setIsAuthError(true);
-        setError(
-          "The AI assistant is temporarily unavailable due to an authorization error. " +
-            "If a new deployment has just completed, refresh the page to pick up the updated credentials. " +
-            "Otherwise, please contact support."
-        );
-      } else {
-        setIsAuthError(false);
-        setError(msg);
-      }
+      const parsed = formatCaughtError("PublicChatWidget", e);
+      setIsAuthError(parsed.isAuthError);
+      setIsModelAccessError(parsed.isModelAccessError);
+      setError(parsed.userMessage);
     } finally {
       setLoading(false);
     }
@@ -94,6 +92,7 @@ export function PublicChatWidget() {
     setInput("");
     setError("");
     setIsAuthError(false);
+    setIsModelAccessError(false);
     setLoading(false);
   }
 
@@ -229,6 +228,17 @@ export function PublicChatWidget() {
             >
               🔄 Refresh page
             </button>
+          )}
+          {isModelAccessError && (
+            <a
+              href="https://console.aws.amazon.com/bedrock/home#/modelaccess"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn"
+              style={{ fontSize: "12px", display: "inline-block" }}
+            >
+              🔗 Open Bedrock Model Access
+            </a>
           )}
         </div>
       )}

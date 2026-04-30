@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { generateClient } from "aws-amplify/data";
 import type { Schema } from "../../amplify/data/resource";
+import { parseAmplifyErrors, formatCaughtError } from "../utils/amplifyErrors";
 
 const client = generateClient<Schema>({ authMode: "apiKey" });
 
@@ -27,6 +28,7 @@ export function AiInsightsPanel({ properties }: Props) {
   const [loading, setLoading] = useState(false);
   const [output, setOutput] = useState<string>("");
   const [error, setError] = useState<string>("");
+  const [isModelAccessError, setIsModelAccessError] = useState(false);
 
   const metrics = useMemo(() => {
     const n = properties.length;
@@ -87,6 +89,7 @@ export function AiInsightsPanel({ properties }: Props) {
     setLoading(true);
     setOutput("");
     setError("");
+    setIsModelAccessError(false);
     try {
       if (typeof client.generations?.generateRecipe !== "function") {
         console.error(
@@ -114,21 +117,17 @@ ${JSON.stringify(metrics, null, 2)}
       });
 
       if (errors?.length) {
-        throw new Error(errors.map((e) => e.message).join("\n"));
+        const parsed = parseAmplifyErrors("AiInsightsPanel", errors);
+        setIsModelAccessError(parsed.isModelAccessError);
+        setError(parsed.userMessage);
+        return;
       }
 
       setOutput(data?.instructions ?? "No insights returned.");
     } catch (e: unknown) {
-      const msg = e instanceof Error ? e.message : "Failed to generate insights.";
-      if (/unauthorized|UnauthorizedException|access denied|not authorized/i.test(msg)) {
-        console.error("[AiInsightsPanel] Authorization error generating insights:", msg);
-        setError(
-          "AI Insights are temporarily unavailable due to an authorization error. " +
-            "The API key may have expired — please refresh the page or contact support."
-        );
-      } else {
-        setError(msg);
-      }
+      const parsed = formatCaughtError("AiInsightsPanel", e);
+      setIsModelAccessError(parsed.isModelAccessError);
+      setError(parsed.userMessage);
     } finally {
       setLoading(false);
     }
@@ -168,9 +167,22 @@ ${JSON.stringify(metrics, null, 2)}
       </div>
 
       {error && (
-        <p style={{ color: "#dc2626", fontSize: "13px", marginTop: "8px" }}>
-          {error}
-        </p>
+        <div style={{ marginTop: "8px" }}>
+          <p style={{ color: "#dc2626", fontSize: "13px", margin: "0 0 6px" }}>
+            {error}
+          </p>
+          {isModelAccessError && (
+            <a
+              href="https://console.aws.amazon.com/bedrock/home#/modelaccess"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn"
+              style={{ fontSize: "12px", display: "inline-block" }}
+            >
+              🔗 Open Bedrock Model Access
+            </a>
+          )}
+        </div>
       )}
 
       {output && !loading && (
