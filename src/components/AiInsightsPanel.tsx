@@ -119,7 +119,16 @@ ${JSON.stringify(metrics, null, 2)}
 
       setOutput(data?.instructions ?? "No insights returned.");
     } catch (e: unknown) {
-      setError(e instanceof Error ? e.message : "Failed to generate insights.");
+      const msg = e instanceof Error ? e.message : "Failed to generate insights.";
+      if (/unauthorized|UnauthorizedException|access denied|not authorized/i.test(msg)) {
+        console.error("[AiInsightsPanel] Authorization error generating insights:", msg);
+        setError(
+          "AI Insights are temporarily unavailable due to an authorization error. " +
+            "The API key may have expired — please refresh the page or contact support."
+        );
+      } else {
+        setError(msg);
+      }
     } finally {
       setLoading(false);
     }
