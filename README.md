@@ -32,7 +32,9 @@ The AI chat widget (`PublicChatWidget`) and AI insights panel (`AiInsightsPanel`
 
 The Amplify outputs file (`amplify/amplify_outputs.json`) provides the AppSync endpoint and API key automatically — no extra frontend env vars are needed under normal operation.
 
-`amplify_outputs.json` is regenerated on every CI/CD build by `npx ampx pipeline-deploy`, so the deployed app always uses the current API key.  For local development, run `npx ampx sandbox` to regenerate the file.
+`amplify_outputs.json` is regenerated on every CI/CD build: `npx ampx pipeline-deploy --outputs-out-dir amplify` writes a fresh copy to `amplify/amplify_outputs.json` before the frontend build (`npm run build`) runs, so the deployed app always uses the current API key.  For local development, run `npx ampx sandbox` or `npx ampx generate outputs --outputs-out-dir amplify` to regenerate the file.
+
+> **Important — common auth error cause**: If `amplify.yml` runs `npx ampx pipeline-deploy` *without* the `--outputs-out-dir amplify` flag, the outputs file is written to the project root (`./amplify_outputs.json`) instead of `amplify/amplify_outputs.json`.  Because `src/main.tsx` imports from `amplify/amplify_outputs.json`, the frontend build then uses the stale, git-committed key and every user sees the "authorization error" message.  The fix is already applied in `amplify.yml`.
 
 **Optional override variables** — set these in the AWS Amplify Console (App settings → Environment variables) or in a local `.env.local` file when `amplify_outputs.json` has a stale key (e.g. if CI/CD has not yet run after a backend change):
 
