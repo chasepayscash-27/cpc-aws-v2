@@ -7,6 +7,7 @@ backend:
         - npm ci --legacy-peer-deps
         - cd amplify && npx tsc && cd ..
         - npx ampx pipeline-deploy --branch $AWS_BRANCH --app-id $AWS_APP_ID
+        - cp -f amplify_outputs.json amplify/amplify_outputs.json || exit 1
 frontend:
   phases:
     build:

@@ -19,6 +19,7 @@ export function PublicChatWidget() {
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string>("");
+  const [isAuthError, setIsAuthError] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
 
   // Scroll to latest message
@@ -37,6 +38,7 @@ export function PublicChatWidget() {
 
     setInput("");
     setError("");
+    setIsAuthError(false);
     setMessages(updatedHistory);
     setLoading(true);
 
@@ -72,11 +74,14 @@ export function PublicChatWidget() {
       const msg = e instanceof Error ? e.message : "Failed to send message.";
       if (/unauthorized|UnauthorizedException|access denied|not authorized/i.test(msg)) {
         console.error("[PublicChatWidget] Authorization error in AI chat operation:", msg);
+        setIsAuthError(true);
         setError(
           "The AI assistant is temporarily unavailable due to an authorization error. " +
-            "The API key may have expired — please refresh the page or contact support."
+            "If a new deployment has just completed, refresh the page to pick up the updated credentials. " +
+            "Otherwise, please contact support."
         );
       } else {
+        setIsAuthError(false);
         setError(msg);
       }
     } finally {
@@ -88,6 +93,7 @@ export function PublicChatWidget() {
     setMessages([]);
     setInput("");
     setError("");
+    setIsAuthError(false);
     setLoading(false);
   }
 
@@ -211,9 +217,20 @@ export function PublicChatWidget() {
       </div>
 
       {error && (
-        <p style={{ color: "#dc2626", fontSize: "13px", margin: "8px 0" }}>
-          {error}
-        </p>
+        <div style={{ margin: "8px 0" }}>
+          <p style={{ color: "#dc2626", fontSize: "13px", margin: "0 0 6px" }}>
+            {error}
+          </p>
+          {isAuthError && (
+            <button
+              className="btn"
+              onClick={() => window.location.reload()}
+              style={{ fontSize: "12px" }}
+            >
+              🔄 Refresh page
+            </button>
+          )}
+        </div>
       )}
 
       {/* Input area */}

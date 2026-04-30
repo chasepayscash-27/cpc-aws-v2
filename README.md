@@ -32,7 +32,21 @@ The AI chat widget (`PublicChatWidget`) and AI insights panel (`AiInsightsPanel`
 
 The Amplify outputs file (`amplify/amplify_outputs.json`) provides the AppSync endpoint and API key automatically — no extra frontend env vars are needed under normal operation.
 
-`amplify_outputs.json` is regenerated on every CI/CD build by `npx ampx pipeline-deploy`, so the deployed app always uses the current API key.  For local development, run `npx ampx sandbox` to regenerate the file.
+During CI/CD, `npx ampx pipeline-deploy` generates a fresh `amplify_outputs.json` at the **project root**. The `amplify.yml` build script then copies this file into `amplify/amplify_outputs.json` (the path imported by the frontend) so the deployed app always uses the current, non-expired API key:
+
+```yaml
+- npx ampx pipeline-deploy --branch $AWS_BRANCH --app-id $AWS_APP_ID
+- cp -f amplify_outputs.json amplify/amplify_outputs.json  # copies fresh key into frontend path
+```
+
+For local development, run `npx ampx sandbox` to generate a fresh `amplify_outputs.json` at the project root, then copy it manually if needed:
+
+```bash
+npx ampx sandbox
+cp amplify_outputs.json amplify/amplify_outputs.json
+```
+
+> **Note:** The `amplify/amplify_outputs.json` committed to this repo is a placeholder. It may contain a stale API key. Every CI/CD deployment overwrites it with a fresh key via the copy step above.
 
 **Optional override variables** — set these in the AWS Amplify Console (App settings → Environment variables) or in a local `.env.local` file when `amplify_outputs.json` has a stale key (e.g. if CI/CD has not yet run after a backend change):
 
