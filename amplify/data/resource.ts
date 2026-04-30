@@ -21,7 +21,7 @@ const schema = a.schema({
       aiModel: a.ai.model("Claude 3.5 Haiku"),
       systemPrompt:
         "You are an analytics assistant for a real estate investment business. " +
-        "Analyse the provided metrics and return structured insights.",
+        "Analyze the provided metrics and return structured insights.",
     })
     .arguments({
       description: a.string(),

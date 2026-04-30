@@ -69,7 +69,16 @@ export function PublicChatWidget() {
       const reply = data?.instructions ?? "Sorry, I couldn't generate a response.";
       setMessages([...updatedHistory, { role: "assistant", text: reply }]);
     } catch (e: unknown) {
-      setError(e instanceof Error ? e.message : "Failed to send message.");
+      const msg = e instanceof Error ? e.message : "Failed to send message.";
+      if (/unauthorized|UnauthorizedException|access denied|not authorized/i.test(msg)) {
+        console.error("[PublicChatWidget] Authorization error in AI chat operation:", msg);
+        setError(
+          "The AI assistant is temporarily unavailable due to an authorization error. " +
+            "The API key may have expired — please refresh the page or contact support."
+        );
+      } else {
+        setError(msg);
+      }
     } finally {
       setLoading(false);
     }
