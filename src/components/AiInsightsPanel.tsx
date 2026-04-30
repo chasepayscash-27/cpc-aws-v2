@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { generateClient } from "aws-amplify/data";
 import type { Schema } from "../../amplify/data/resource";
+import { isUnauthorizedError, logAuthError, unauthorizedMessage } from "../utils/aiErrors";
 
 const client = generateClient<Schema>({ authMode: "apiKey" });
 
@@ -114,12 +115,18 @@ ${JSON.stringify(metrics, null, 2)}
       });
 
       if (errors?.length) {
-        throw new Error(errors.map((e) => e.message).join("\n"));
+        const combinedMessage = errors.map((e) => e.message).join("\n");
+        throw new Error(combinedMessage);
       }
 
       setOutput(data?.instructions ?? "No insights returned.");
     } catch (e: unknown) {
-      setError(e instanceof Error ? e.message : "Failed to generate insights.");
+      if (isUnauthorizedError(e)) {
+        logAuthError("AiInsightsPanel", e);
+        setError(unauthorizedMessage());
+      } else {
+        setError(e instanceof Error ? e.message : "Failed to generate insights.");
+      }
     } finally {
       setLoading(false);
     }

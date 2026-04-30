@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { generateClient } from "aws-amplify/data";
 import type { Schema } from "../../amplify/data/resource";
+import { isUnauthorizedError, logAuthError, unauthorizedMessage } from "../utils/aiErrors";
 
 const client = generateClient<Schema>({ authMode: "apiKey" });
 
@@ -63,13 +64,19 @@ export function PublicChatWidget() {
       });
 
       if (errors?.length) {
-        throw new Error(errors.map((e) => e.message).join("\n"));
+        const combinedMessage = errors.map((e) => e.message).join("\n");
+        throw new Error(combinedMessage);
       }
 
       const reply = data?.instructions ?? "Sorry, I couldn't generate a response.";
       setMessages([...updatedHistory, { role: "assistant", text: reply }]);
     } catch (e: unknown) {
-      setError(e instanceof Error ? e.message : "Failed to send message.");
+      if (isUnauthorizedError(e)) {
+        logAuthError("PublicChatWidget", e);
+        setError(unauthorizedMessage());
+      } else {
+        setError(e instanceof Error ? e.message : "Failed to send message.");
+      }
     } finally {
       setLoading(false);
     }
