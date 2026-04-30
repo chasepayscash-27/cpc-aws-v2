@@ -26,6 +26,35 @@ export function PublicChatWidget() {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, loading]);
 
+  async function generateReply(history: ChatMessage[]) {
+    if (typeof client.generations?.generateRecipe !== "function") {
+      console.error(
+        "[PublicChatWidget] client.generations.generateRecipe is not available. " +
+          "Ensure Amplify outputs are up-to-date and include the generateRecipe generation route."
+      );
+      throw new Error(
+        "AI assistant is not available right now. Please try again later or contact support."
+      );
+    }
+
+    // Build a conversation transcript to pass as context
+    const historyPrompt = history
+      .map((m) => `${m.role === "user" ? "User" : "Assistant"}: ${m.text}`)
+      .join("\n");
+
+    const prompt = `${SYSTEM_CONTEXT}\n\nConversation so far:\n${historyPrompt}\n\nRespond as the Assistant:`;
+
+    const { data, errors } = await client.generations.generateRecipe({
+      description: prompt,
+    });
+
+    if (errors?.length) {
+      throw new Error(errors.map((e) => e.message).join("\n"));
+    }
+
+    return data?.instructions ?? "Sorry, I couldn't generate a response.";
+  }
+
   async function sendMessage() {
     const text = input.trim();
     if (!text || loading) return;
@@ -41,40 +70,46 @@ export function PublicChatWidget() {
     setLoading(true);
 
     try {
-      if (typeof client.generations?.generateRecipe !== "function") {
-        console.error(
-          "[PublicChatWidget] client.generations.generateRecipe is not available. " +
-            "Ensure Amplify outputs are up-to-date and include the generateRecipe generation route."
-        );
-        throw new Error(
-          "AI assistant is not available right now. Please try again later or contact support."
-        );
-      }
-
-      // Build a conversation transcript to pass as context
-      const historyPrompt = updatedHistory
-        .map((m) => `${m.role === "user" ? "User" : "Assistant"}: ${m.text}`)
-        .join("\n");
-
-      const prompt = `${SYSTEM_CONTEXT}\n\nConversation so far:\n${historyPrompt}\n\nRespond as the Assistant:`;
-
-      const { data, errors } = await client.generations.generateRecipe({
-        description: prompt,
-      });
-
-      if (errors?.length) {
-        throw new Error(errors.map((e) => e.message).join("\n"));
-      }
-
-      const reply = data?.instructions ?? "Sorry, I couldn't generate a response.";
+      const reply = await generateReply(updatedHistory);
       setMessages([...updatedHistory, { role: "assistant", text: reply }]);
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : "Failed to send message.";
       if (/unauthorized|UnauthorizedException|access denied|not authorized/i.test(msg)) {
-        console.error("[PublicChatWidget] Authorization error in AI chat operation:", msg);
+        console.error(
+          "[PublicChatWidget] Authorization error — AppSync API key may be stale or expired.",
+          "Ensure VITE_APPSYNC_API_KEY is set in Amplify Console env variables,",
+          "or trigger a backend redeploy to rotate the key. Raw error:", msg
+        );
         setError(
           "The AI assistant is temporarily unavailable due to an authorization error. " +
-            "The API key may have expired — please refresh the page or contact support."
+            "Please try again in a moment, or contact support if this persists."
+        );
+      } else {
+        setError(msg);
+      }
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function retryLastMessage() {
+    if (loading) return;
+    setError("");
+    setLoading(true);
+    try {
+      const reply = await generateReply(messages);
+      setMessages([...messages, { role: "assistant", text: reply }]);
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : "Failed to send message.";
+      if (/unauthorized|UnauthorizedException|access denied|not authorized/i.test(msg)) {
+        console.error(
+          "[PublicChatWidget] Authorization error on retry — AppSync API key may be stale or expired.",
+          "Ensure VITE_APPSYNC_API_KEY is set in Amplify Console env variables,",
+          "or trigger a backend redeploy to rotate the key. Raw error:", msg
+        );
+        setError(
+          "The AI assistant is temporarily unavailable due to an authorization error. " +
+            "Please try again in a moment, or contact support if this persists."
         );
       } else {
         setError(msg);
@@ -211,9 +246,21 @@ export function PublicChatWidget() {
       </div>
 
       {error && (
-        <p style={{ color: "#dc2626", fontSize: "13px", margin: "8px 0" }}>
-          {error}
-        </p>
+        <div style={{ margin: "8px 0" }}>
+          <p style={{ color: "#dc2626", fontSize: "13px", margin: "0 0 6px" }}>
+            {error}
+          </p>
+          {messages.length > 0 && messages[messages.length - 1].role === "user" && (
+            <button
+              className="btn"
+              onClick={retryLastMessage}
+              disabled={loading}
+              style={{ fontSize: "12px" }}
+            >
+              🔄 Retry
+            </button>
+          )}
+        </div>
       )}
 
       {/* Input area */}

@@ -6,7 +6,7 @@ backend:
         - rm -rf node_modules
         - npm ci --legacy-peer-deps
         - cd amplify && npx tsc && cd ..
-        - npx ampx pipeline-deploy --branch $AWS_BRANCH --app-id $AWS_APP_ID
+        - npx ampx pipeline-deploy --branch $AWS_BRANCH --app-id $AWS_APP_ID --outputs-out-dir amplify
 frontend:
   phases:
     build:
