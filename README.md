@@ -77,6 +77,53 @@ For detailed instructions on deploying your application, refer to the [deploymen
 
 See [CONTRIBUTING](CONTRIBUTING.md#security-issue-notifications) for more information.
 
+## Troubleshooting AI Chat / AI Insights
+
+### "A custom error was thrown from a mapping template."
+
+This AppSync error message means the backend resolver for the `generateRecipe` generation route failed before it could reach Claude. The most common causes are:
+
+| Cause | How to check | Fix |
+|---|---|---|
+| **Bedrock model access not enabled** | AWS Console → Amazon Bedrock → Model access | Enable **Claude 3.5 Haiku** (Anthropic) in the deployment region |
+| **Wrong region** | Check `amplify_outputs.json` → `data.aws_region` | Ensure Bedrock model access is enabled in that region (default: `us-east-1`) |
+| **Stale backend deployment** | AWS Amplify Console → last build date | Push a new commit or manually trigger a build to redeploy the backend |
+| **AppSync resolver IAM missing `bedrock:InvokeModel`** | AWS IAM → search for roles with "Bedrock" or "generateRecipe" | The `amplify/backend.ts` now adds this explicitly; redeploy after merging |
+
+### Step-by-step diagnosis
+
+1. **Enable AppSync request/response logging**
+   - AWS Console → AppSync → your API → Settings → Logging → Enable (Field-level)
+   - Reproduce the error; check CloudWatch Logs for the `generateRecipe` resolver
+   - The log usually shows the real error (e.g. `AccessDeniedException`, `ResourceNotFoundException`)
+
+2. **Validate Bedrock model access**
+   - AWS Console → Amazon Bedrock → Model access
+   - Ensure **Anthropic Claude 3.5 Haiku** shows status **Access granted**
+   - Changes take a few minutes to propagate
+
+3. **Validate locally with sandbox**
+   ```bash
+   npx ampx sandbox
+   # Wait for "Deployment complete"
+   cp amplify_outputs.json amplify/amplify_outputs.json
+   npm run dev
+   # Open http://localhost:5173 → AI Chat tab → send a message
+   ```
+
+4. **Refresh the API key** (for auth/key-expiry errors)
+   - Every Amplify backend deployment regenerates the API key
+   - The `amplify.yml` copies the fresh `amplify_outputs.json` automatically
+   - If you see an auth error locally, re-run `npx ampx sandbox` and copy the new outputs file
+
+### Error messages and what they mean
+
+| Message shown in UI | Root cause |
+|---|---|
+| "The AI request failed in the backend resolver…" | `AccessDeniedException` from Bedrock — model access not enabled or IAM missing `bedrock:InvokeModel` |
+| "Authorization error — the AI service is not accessible…" | Expired API key — refresh the page or redeploy |
+| "AI assistant is not available right now…" | `amplify_outputs.json` is missing the `generations.generateRecipe` introspection entry — redeploy the backend |
+
 ## License
 
 This library is licensed under the MIT-0 License. See the LICENSE file.
