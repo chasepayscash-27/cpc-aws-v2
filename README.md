@@ -89,6 +89,11 @@ This AppSync error message means the backend resolver for the `generateRecipe` g
 | **Wrong region** | Check `amplify_outputs.json` → `data.aws_region` | Ensure Bedrock model access is enabled in that region (default: `us-east-1`) |
 | **Stale backend deployment** | AWS Amplify Console → last build date | Push a new commit or manually trigger a build to redeploy the backend |
 | **AppSync resolver IAM missing `bedrock:InvokeModel`** | AWS IAM → search for roles with "Bedrock" or "generateRecipe" | The `amplify/backend.ts` now adds this explicitly; redeploy after merging |
+| **Cross-region inference profile not covered by IAM policy** | CloudWatch Logs for the `generateRecipe` resolver → look for `inference-profile` in the error | Redeploy — `amplify/backend.ts` now includes inference-profile ARNs in the policy |
+
+#### About cross-region inference profiles
+
+Amplify Gen 2 (≥ 1.x) invokes Claude through an **inference profile** in us-* regions rather than the foundation model directly. The IAM policy must allow `bedrock:InvokeModel` on *both* the foundation-model ARN (`arn:aws:bedrock:REGION::foundation-model/MODEL_ID`) **and** the inference-profile ARN (`arn:aws:bedrock:REGION:ACCOUNT:inference-profile/PROFILE_ID`). `amplify/backend.ts` now covers both. If your deployment fails with `AccessDeniedException` referencing `inference-profile/`, redeploy after pulling the latest changes.
 
 ### Step-by-step diagnosis
 
@@ -116,11 +121,21 @@ This AppSync error message means the backend resolver for the `generateRecipe` g
    - The `amplify.yml` copies the fresh `amplify_outputs.json` automatically
    - If you see an auth error locally, re-run `npx ampx sandbox` and copy the new outputs file
 
+5. **Redeploy the Amplify backend**
+   ```bash
+   # Via CI/CD (recommended):
+   git push origin main          # triggers the Amplify build pipeline
+
+   # Or manually trigger from the AWS Console:
+   # Amplify Console → your app → Hosting → Deployments → Redeploy this version
+   ```
+
 ### Error messages and what they mean
 
 | Message shown in UI | Root cause |
 |---|---|
-| "The AI request failed in the backend resolver…" | `AccessDeniedException` from Bedrock — model access not enabled or IAM missing `bedrock:InvokeModel` |
+| "The AI request failed in the backend resolver…" | `AccessDeniedException` / `ResourceNotFoundException` / `ValidationException` from Bedrock — model access not enabled, IAM missing `bedrock:InvokeModel`, or incorrect model/inference-profile ARN |
+| "The AI service is currently rate-limited…" | `ThrottlingException` from Bedrock — wait a few seconds and retry |
 | "Authorization error — the AI service is not accessible…" | Expired API key — refresh the page or redeploy |
 | "AI assistant is not available right now…" | `amplify_outputs.json` is missing the `generations.generateRecipe` introspection entry — redeploy the backend |
 
