@@ -89,6 +89,7 @@ This AppSync error message means the backend resolver for the `generateRecipe` g
 | **Wrong region** | Check `amplify_outputs.json` → `data.aws_region` | Ensure Bedrock model access is enabled in that region (default: `us-east-1`) |
 | **Stale backend deployment** | AWS Amplify Console → last build date | Push a new commit or manually trigger a build to redeploy the backend |
 | **AppSync resolver IAM missing `bedrock:InvokeModel`** | AWS IAM → search for roles with "Bedrock" or "generateRecipe" | The `amplify/backend.ts` now adds this explicitly; redeploy after merging |
+| **Cross-region inference profile not covered** | CloudWatch Logs for the `generateRecipe` resolver → look for `ResourceNotFoundException` with an `inference-profile/us.*` ARN | The `amplify/backend.ts` now grants access to both foundation-model and inference-profile ARNs; redeploy after merging |
 
 ### Step-by-step diagnosis
 
@@ -121,6 +122,8 @@ This AppSync error message means the backend resolver for the `generateRecipe` g
 | Message shown in UI | Root cause |
 |---|---|
 | "The AI request failed in the backend resolver…" | `AccessDeniedException` from Bedrock — model access not enabled or IAM missing `bedrock:InvokeModel` |
+| "The AI request was rejected by the backend (ValidationException)…" | `ValidationException` — the model ID is wrong or unsupported in the region; check and redeploy |
+| "The AI service is temporarily busy (ThrottlingException)…" | `ThrottlingException` — too many requests; wait and retry |
 | "Authorization error — the AI service is not accessible…" | Expired API key — refresh the page or redeploy |
 | "AI assistant is not available right now…" | `amplify_outputs.json` is missing the `generations.generateRecipe` introspection entry — redeploy the backend |
 
