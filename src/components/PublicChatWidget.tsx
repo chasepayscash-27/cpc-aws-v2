@@ -1,9 +1,15 @@
 import { useEffect, useRef, useState } from "react";
 import { generateClient } from "aws-amplify/data";
 import type { Schema } from "../../amplify/data/resource";
+import outputs from "../../amplify/amplify_outputs.json";
 import { parseAmplifyErrors, formatCaughtError } from "../utils/amplifyErrors";
 
 const client = generateClient<Schema>({ authMode: "apiKey" });
+
+// Deployment region — surfaced in error messages so the user knows which
+// AWS Console region to check for Bedrock model access.
+const DEPLOYMENT_REGION: string | undefined =
+  (outputs as { data?: { aws_region?: string } })?.data?.aws_region;
 
 interface ChatMessage {
   role: "user" | "assistant";
@@ -22,6 +28,7 @@ export function PublicChatWidget() {
   const [error, setError] = useState<string>("");
   const [isAuthError, setIsAuthError] = useState(false);
   const [isModelAccessError, setIsModelAccessError] = useState(false);
+  const [isThrottleError, setIsThrottleError] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
 
   // Scroll to latest message
@@ -42,6 +49,7 @@ export function PublicChatWidget() {
     setError("");
     setIsAuthError(false);
     setIsModelAccessError(false);
+    setIsThrottleError(false);
     setMessages(updatedHistory);
     setLoading(true);
 
@@ -68,9 +76,10 @@ export function PublicChatWidget() {
       });
 
       if (errors?.length) {
-        const parsed = parseAmplifyErrors("PublicChatWidget", errors);
+        const parsed = parseAmplifyErrors("PublicChatWidget", errors, DEPLOYMENT_REGION);
         setIsAuthError(parsed.isAuthError);
         setIsModelAccessError(parsed.isModelAccessError);
+        setIsThrottleError(parsed.isThrottleError);
         setError(parsed.userMessage);
         return;
       }
@@ -78,9 +87,10 @@ export function PublicChatWidget() {
       const reply = data?.instructions ?? "Sorry, I couldn't generate a response.";
       setMessages([...updatedHistory, { role: "assistant", text: reply }]);
     } catch (e: unknown) {
-      const parsed = formatCaughtError("PublicChatWidget", e);
+      const parsed = formatCaughtError("PublicChatWidget", e, DEPLOYMENT_REGION);
       setIsAuthError(parsed.isAuthError);
       setIsModelAccessError(parsed.isModelAccessError);
+      setIsThrottleError(parsed.isThrottleError);
       setError(parsed.userMessage);
     } finally {
       setLoading(false);
@@ -93,6 +103,7 @@ export function PublicChatWidget() {
     setError("");
     setIsAuthError(false);
     setIsModelAccessError(false);
+    setIsThrottleError(false);
     setLoading(false);
   }
 
@@ -231,7 +242,7 @@ export function PublicChatWidget() {
           )}
           {isModelAccessError && (
             <a
-              href="https://console.aws.amazon.com/bedrock/home#/modelaccess"
+              href={`https://console.aws.amazon.com/bedrock/home${DEPLOYMENT_REGION ? `?region=${DEPLOYMENT_REGION}` : ""}#/modelaccess`}
               target="_blank"
               rel="noopener noreferrer"
               className="btn"
@@ -239,6 +250,15 @@ export function PublicChatWidget() {
             >
               🔗 Open Bedrock Model Access
             </a>
+          )}
+          {isThrottleError && (
+            <button
+              className="btn"
+              onClick={sendMessage}
+              style={{ fontSize: "12px" }}
+            >
+              🔁 Retry
+            </button>
           )}
         </div>
       )}
