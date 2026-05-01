@@ -2,7 +2,7 @@ import { defineBackend } from "@aws-amplify/backend";
 import { CorsHttpMethod, HttpApi, HttpMethod } from "aws-cdk-lib/aws-apigatewayv2";
 import { HttpLambdaIntegration } from "aws-cdk-lib/aws-apigatewayv2-integrations";
 import { Stack } from "aws-cdk-lib";
-import { PolicyStatement, Effect } from "aws-cdk-lib/aws-iam";
+import { PolicyStatement, Effect, Role } from "aws-cdk-lib/aws-iam";
 import { CfnDataSource } from "aws-cdk-lib/aws-appsync";
 
 import { auth } from "./auth/resource";
@@ -28,12 +28,17 @@ const bedrockPolicy = new PolicyStatement({
   effect: Effect.ALLOW,
   actions: ["bedrock:InvokeModel", "bedrock:InvokeModelWithResponseStream"],
   resources: [
-    // Claude 3.5 Haiku foundation model (current version)
+    // Claude 3.5 Haiku foundation model ARNs (standard invocation)
     `arn:aws:bedrock:${region}::foundation-model/anthropic.claude-3-5-haiku-20241022-v1:0`,
-    // Cross-region inference profiles (us.*) that Amplify Gen 2 may resolve to
+    // Cross-region foundation model ARNs for common US regions
     `arn:aws:bedrock:us-east-1::foundation-model/anthropic.claude-3-5-haiku-20241022-v1:0`,
     `arn:aws:bedrock:us-east-2::foundation-model/anthropic.claude-3-5-haiku-20241022-v1:0`,
     `arn:aws:bedrock:us-west-2::foundation-model/anthropic.claude-3-5-haiku-20241022-v1:0`,
+    // Cross-region inference profile ARNs — Amplify Gen 2 may route through
+    // these when using a.ai.model("Claude 3.5 Haiku") with a US deployment region.
+    `arn:aws:bedrock:us-east-1:*:inference-profile/us.anthropic.claude-3-5-haiku-20241022-v1:0`,
+    `arn:aws:bedrock:us-east-2:*:inference-profile/us.anthropic.claude-3-5-haiku-20241022-v1:0`,
+    `arn:aws:bedrock:us-west-2:*:inference-profile/us.anthropic.claude-3-5-haiku-20241022-v1:0`,
   ],
 });
 
@@ -46,21 +51,16 @@ backend.data.resources.graphqlApi.node.findAll().forEach((construct) => {
     construct.type === "HTTP" &&
     typeof construct.serviceRoleArn === "string"
   ) {
-    // The CDK L1 CfnDataSource holds the role ARN as a string; find the
-    // corresponding L2 Role via the construct tree so we can attach the policy.
-    const role = construct.node.scope?.node
-      .findAll()
-      .find(
-        (c) =>
-          "addToPrincipalPolicy" in c &&
-          typeof (c as { addToPrincipalPolicy: unknown }).addToPrincipalPolicy === "function" &&
-          c.node.path.includes(construct.node.id)
-      );
-    if (role && "addToPrincipalPolicy" in role) {
-      (role as { addToPrincipalPolicy: (s: PolicyStatement) => void }).addToPrincipalPolicy(
-        bedrockPolicy
-      );
-    }
+    // The L2 HttpDataSource construct (the parent/scope of the L1 CfnDataSource)
+    // creates the service role as a direct child named "ServiceRole".  Check
+    // both `instanceof Role` (type guard) and `node.id === "ServiceRole"`
+    // (precise targeting) so only the intended service role receives the policy
+    // and not any other Role that might exist in the same scope.
+    construct.node.scope?.node.findAll().forEach((c) => {
+      if (c instanceof Role && c.node.id === "ServiceRole") {
+        c.addToPrincipalPolicy(bedrockPolicy);
+      }
+    });
   }
 });
 // ─────────────────────────────────────────────────────────────────────────────
