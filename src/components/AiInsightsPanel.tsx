@@ -1,7 +1,13 @@
 import { useMemo, useState } from "react";
 import { generateClient } from "aws-amplify/data";
 import type { Schema } from "../../amplify/data/resource";
+import outputs from "../../amplify/amplify_outputs.json";
 import { parseAmplifyErrors, formatCaughtError } from "../utils/amplifyErrors";
+
+// Deployment region — surfaced in error messages so the user knows which
+// AWS Console region to check for Bedrock model access.
+const DEPLOYMENT_REGION: string | undefined =
+  (outputs as { data?: { aws_region?: string } })?.data?.aws_region;
 
 const client = generateClient<Schema>({ authMode: "apiKey" });
 
@@ -117,7 +123,7 @@ ${JSON.stringify(metrics, null, 2)}
       });
 
       if (errors?.length) {
-        const parsed = parseAmplifyErrors("AiInsightsPanel", errors);
+        const parsed = parseAmplifyErrors("AiInsightsPanel", errors, DEPLOYMENT_REGION);
         setIsModelAccessError(parsed.isModelAccessError);
         setError(parsed.userMessage);
         return;
@@ -125,7 +131,7 @@ ${JSON.stringify(metrics, null, 2)}
 
       setOutput(data?.instructions ?? "No insights returned.");
     } catch (e: unknown) {
-      const parsed = formatCaughtError("AiInsightsPanel", e);
+      const parsed = formatCaughtError("AiInsightsPanel", e, DEPLOYMENT_REGION);
       setIsModelAccessError(parsed.isModelAccessError);
       setError(parsed.userMessage);
     } finally {
@@ -173,7 +179,7 @@ ${JSON.stringify(metrics, null, 2)}
           </p>
           {isModelAccessError && (
             <a
-              href="https://console.aws.amazon.com/bedrock/home#/modelaccess"
+              href={`https://console.aws.amazon.com/bedrock/home${DEPLOYMENT_REGION ? `?region=${DEPLOYMENT_REGION}` : ""}#/modelaccess`}
               target="_blank"
               rel="noopener noreferrer"
               className="btn"
