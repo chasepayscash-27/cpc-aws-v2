@@ -10,6 +10,11 @@
  * without leaking secrets or raw stack traces.
  */
 
+import {
+  getBedrockModelAccessRegions,
+  usesBedrockUsCrossRegionProfile,
+} from "./bedrockModelAccess";
+
 /** Minimal shape of one GraphQL error returned by the Amplify Data client. */
 export interface AmplifyGraphQLError {
   message: string;
@@ -30,7 +35,7 @@ export interface ParsedAmplifyError {
    * enabled (or the resolver IAM role lacking bedrock:InvokeModel), or when
    * the model ID / inference-profile ARN is wrong (ResourceNotFoundException /
    * ValidationException from Bedrock).
-   * Refresh will NOT help — the admin must enable model access in the console.
+   * Refresh will NOT help — the admin must fix Bedrock/model configuration.
    */
   isModelAccessError: boolean;
   /**
@@ -38,6 +43,17 @@ export interface ParsedAmplifyError {
    * limited.  Waiting a few seconds and retrying usually resolves this.
    */
   isThrottleError: boolean;
+  /**
+   * True when opening the Bedrock console is a useful next step, including
+   * resolver errors that often trace back to IAM/model-access configuration.
+   */
+  showBedrockConsoleLink: boolean;
+}
+
+function formatRegionList(regions: string[]): string {
+  if (regions.length <= 1) return regions[0] ?? "your deployment region";
+  if (regions.length === 2) return `${regions[0]} and ${regions[1]}`;
+  return `${regions.slice(0, -1).join(", ")}, and ${regions[regions.length - 1]}`;
 }
 
 /**
@@ -45,7 +61,19 @@ export interface ParsedAmplifyError {
  * region so users know exactly which AWS Console region to check.
  */
 function buildBedrockHint(region?: string): string {
-  const regionNote = region ? ` (region: **${region}**)` : "";
+  const accessRegions = getBedrockModelAccessRegions(region);
+
+  if (region && usesBedrockUsCrossRegionProfile(region)) {
+    return (
+      "Amplify routes Claude 3.5 Haiku through the US cross-region inference " +
+      `profile for deployments in ${region}. Check AWS Console → Amazon Bedrock → ` +
+      `Model access in ${formatRegionList(accessRegions)} and ensure Claude 3.5 ` +
+      "Haiku (Anthropic) is enabled in each region. If access was recently granted, " +
+      "redeploy the Amplify backend (`npx ampx pipeline-deploy` or push to the CI branch)."
+    );
+  }
+
+  const regionNote = region ? ` (region: ${region})` : "";
   return (
     `Check AWS Console → Amazon Bedrock → Model access${regionNote} and ensure ` +
     "Claude 3.5 Haiku (Anthropic) is enabled in your deployment region. " +
@@ -54,11 +82,22 @@ function buildBedrockHint(region?: string): string {
   );
 }
 
+function buildResolverHint(region?: string): string {
+  return (
+    "This usually means the Amplify backend has not been redeployed since the AI " +
+    "resolver changed, the AppSync resolver IAM role is still missing " +
+    "`bedrock:InvokeModel` for the Claude 3.5 Haiku inference profile, or the " +
+    "Bedrock model/profile access is incomplete. " +
+    buildBedrockHint(region)
+  );
+}
+
 const MAPPING_TEMPLATE_RE = /custom error.*mapping template/i;
 const ACCESS_DENIED_RE = /accessdenied|not authorized|unauthorized/i;
 const RESOURCE_NOT_FOUND_RE = /resourcenotfound|resource.*not.*found/i;
 const THROTTLE_RE = /throttlingexception|throttled|rate.*exceed|too many requests/i;
 const VALIDATION_RE = /validationexception|invalid.*model|model.*invalid/i;
+const BEDROCK_RE = /bedrock|anthropic|claude|inference-profile|invokemodel/i;
 
 /**
  * Parse an array of Amplify/AppSync GraphQL errors into a single
@@ -104,6 +143,7 @@ export function parseAmplifyErrors(
   const isValidation =
     VALIDATION_RE.test(combined) ||
     errorTypes.some((t) => /ValidationException/i.test(t));
+  const hasBedrockSignal = BEDROCK_RE.test(combined);
 
   // ThrottlingException — surface before the model-access check so the user
   // gets an actionable "wait and retry" message rather than the access hint.
@@ -114,18 +154,16 @@ export function parseAmplifyErrors(
       isAuthError: false,
       isModelAccessError: false,
       isThrottleError: true,
+      showBedrockConsoleLink: false,
     };
   }
 
-  // Mapping-template errors almost always wrap a Bedrock access failure.
   // ResourceNotFoundException means the model ID or inference-profile ARN is
-  // wrong / not available in the region — also a "model access" problem from
-  // the user POV.
+  // wrong / not available in the region — a Bedrock configuration problem.
   // ValidationException on a Bedrock invocation can also mean the model ID
   // format is rejected, which is a configuration issue.
   const isModelAccessError =
-    isMappingTemplate ||
-    (isAccessDenied && /bedrock/i.test(combined)) ||
+    (isAccessDenied && hasBedrockSignal) ||
     isResourceNotFound ||
     isValidation;
 
@@ -138,6 +176,20 @@ export function parseAmplifyErrors(
       isAuthError: false,
       isModelAccessError: true,
       isThrottleError: false,
+      showBedrockConsoleLink: true,
+    };
+  }
+
+  if (isMappingTemplate) {
+    return {
+      userMessage:
+        "The AI request failed in the backend resolver before Amazon Bedrock " +
+        "returned a response. " +
+        buildResolverHint(region),
+      isAuthError: false,
+      isModelAccessError: false,
+      isThrottleError: false,
+      showBedrockConsoleLink: true,
     };
   }
 
@@ -150,6 +202,7 @@ export function parseAmplifyErrors(
       isAuthError: true,
       isModelAccessError: false,
       isThrottleError: false,
+      showBedrockConsoleLink: false,
     };
   }
 
@@ -158,6 +211,7 @@ export function parseAmplifyErrors(
     isAuthError: false,
     isModelAccessError: false,
     isThrottleError: false,
+    showBedrockConsoleLink: false,
   };
 }
 
@@ -180,10 +234,11 @@ export function formatCaughtError(context: string, e: unknown, region?: string):
       isAuthError: false,
       isModelAccessError: false,
       isThrottleError: true,
+      showBedrockConsoleLink: false,
     };
   }
 
-  if (MAPPING_TEMPLATE_RE.test(msg) || RESOURCE_NOT_FOUND_RE.test(msg) || VALIDATION_RE.test(msg)) {
+  if (RESOURCE_NOT_FOUND_RE.test(msg) || VALIDATION_RE.test(msg)) {
     return {
       userMessage:
         "The AI request failed in the backend resolver — this typically means " +
@@ -192,6 +247,20 @@ export function formatCaughtError(context: string, e: unknown, region?: string):
       isAuthError: false,
       isModelAccessError: true,
       isThrottleError: false,
+      showBedrockConsoleLink: true,
+    };
+  }
+
+  if (MAPPING_TEMPLATE_RE.test(msg)) {
+    return {
+      userMessage:
+        "The AI request failed in the backend resolver before Amazon Bedrock " +
+        "returned a response. " +
+        buildResolverHint(region),
+      isAuthError: false,
+      isModelAccessError: false,
+      isThrottleError: false,
+      showBedrockConsoleLink: true,
     };
   }
 
@@ -204,6 +273,7 @@ export function formatCaughtError(context: string, e: unknown, region?: string):
       isAuthError: true,
       isModelAccessError: false,
       isThrottleError: false,
+      showBedrockConsoleLink: false,
     };
   }
 
@@ -212,5 +282,6 @@ export function formatCaughtError(context: string, e: unknown, region?: string):
     isAuthError: false,
     isModelAccessError: false,
     isThrottleError: false,
+    showBedrockConsoleLink: false,
   };
 }
