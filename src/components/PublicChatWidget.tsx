@@ -2,14 +2,19 @@ import { useEffect, useRef, useState } from "react";
 import { generateClient } from "aws-amplify/data";
 import type { Schema } from "../../amplify/data/resource";
 import outputs from "../../amplify/amplify_outputs.json";
+import {
+  getBedrockModelAccessRegions,
+  getBedrockModelAccessUrl,
+} from "../utils/bedrockModelAccess";
 import { parseAmplifyErrors, formatCaughtError } from "../utils/amplifyErrors";
 
 const client = generateClient<Schema>({ authMode: "apiKey" });
 
-// Deployment region — surfaced in error messages so the user knows which
-// AWS Console region to check for Bedrock model access.
+// Deployment region — surfaced in error messages and console links so the user
+// knows which AWS Console region(s) to check for Bedrock model access.
 const DEPLOYMENT_REGION: string | undefined =
   (outputs as { data?: { aws_region?: string } })?.data?.aws_region;
+const BEDROCK_MODEL_ACCESS_REGIONS = getBedrockModelAccessRegions(DEPLOYMENT_REGION);
 
 interface ChatMessage {
   role: "user" | "assistant";
@@ -27,8 +32,8 @@ export function PublicChatWidget() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string>("");
   const [isAuthError, setIsAuthError] = useState(false);
-  const [isModelAccessError, setIsModelAccessError] = useState(false);
   const [isThrottleError, setIsThrottleError] = useState(false);
+  const [showBedrockConsoleLink, setShowBedrockConsoleLink] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
 
   // Scroll to latest message
@@ -48,8 +53,8 @@ export function PublicChatWidget() {
     setInput("");
     setError("");
     setIsAuthError(false);
-    setIsModelAccessError(false);
     setIsThrottleError(false);
+    setShowBedrockConsoleLink(false);
     setMessages(updatedHistory);
     setLoading(true);
 
@@ -78,8 +83,8 @@ export function PublicChatWidget() {
       if (errors?.length) {
         const parsed = parseAmplifyErrors("PublicChatWidget", errors, DEPLOYMENT_REGION);
         setIsAuthError(parsed.isAuthError);
-        setIsModelAccessError(parsed.isModelAccessError);
         setIsThrottleError(parsed.isThrottleError);
+        setShowBedrockConsoleLink(parsed.showBedrockConsoleLink);
         setError(parsed.userMessage);
         return;
       }
@@ -89,8 +94,8 @@ export function PublicChatWidget() {
     } catch (e: unknown) {
       const parsed = formatCaughtError("PublicChatWidget", e, DEPLOYMENT_REGION);
       setIsAuthError(parsed.isAuthError);
-      setIsModelAccessError(parsed.isModelAccessError);
       setIsThrottleError(parsed.isThrottleError);
+      setShowBedrockConsoleLink(parsed.showBedrockConsoleLink);
       setError(parsed.userMessage);
     } finally {
       setLoading(false);
@@ -102,8 +107,8 @@ export function PublicChatWidget() {
     setInput("");
     setError("");
     setIsAuthError(false);
-    setIsModelAccessError(false);
     setIsThrottleError(false);
+    setShowBedrockConsoleLink(false);
     setLoading(false);
   }
 
@@ -240,16 +245,24 @@ export function PublicChatWidget() {
               🔄 Refresh page
             </button>
           )}
-          {isModelAccessError && (
-            <a
-              href={`https://console.aws.amazon.com/bedrock/home${DEPLOYMENT_REGION ? `?region=${DEPLOYMENT_REGION}` : ""}#/modelaccess`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn"
-              style={{ fontSize: "12px", display: "inline-block" }}
-            >
-              🔗 Open Bedrock Model Access
-            </a>
+          {showBedrockConsoleLink && (
+            <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
+              {(BEDROCK_MODEL_ACCESS_REGIONS.length > 0
+                ? BEDROCK_MODEL_ACCESS_REGIONS
+                : [undefined]
+              ).map((region) => (
+                <a
+                  key={region ?? "default"}
+                  href={getBedrockModelAccessUrl(region)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn"
+                  style={{ fontSize: "12px", display: "inline-block" }}
+                >
+                  🔗 Bedrock Model Access{region ? ` (${region})` : ""}
+                </a>
+              ))}
+            </div>
           )}
           {isThrottleError && (
             <button

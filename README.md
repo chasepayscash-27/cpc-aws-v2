@@ -19,8 +19,9 @@ The AI chat widget (`PublicChatWidget`) and AI insights panel (`AiInsightsPanel`
 
 ### Required setup before deploying the AI features
 
-1. **Enable Amazon Bedrock model access** in the AWS Console for the region you deploy to (default: `us-east-1`):
-   - Go to **Amazon Bedrock → Model access** and enable **Claude 3.5 Haiku** (Anthropic).
+1. **Enable Amazon Bedrock model access** in the AWS Console for the region you deploy to:
+   - For deployments in `us-east-1`, `us-east-2`, or `us-west-2`, Amplify routes **Claude 3.5 Haiku** through the US cross-region inference profile. Enable model access in **all three US profile regions**: `us-east-1`, `us-east-2`, and `us-west-2`.
+   - For deployments outside those US regions, go to **Amazon Bedrock → Model access** in your deployment region and enable **Claude 3.5 Haiku** (Anthropic).
 2. **Deploy or sandbox the Amplify backend** so the `generateRecipe` AppSync mutation and the Bedrock Lambda resolver are provisioned:
    ```bash
    npx ampx sandbox          # for local development
@@ -85,7 +86,7 @@ This AppSync error message means the backend resolver for the `generateRecipe` g
 
 | Cause | How to check | Fix |
 |---|---|---|
-| **Bedrock model access not enabled** | AWS Console → Amazon Bedrock → Model access | Enable **Claude 3.5 Haiku** (Anthropic) in the deployment region |
+| **Bedrock model access not enabled** | AWS Console → Amazon Bedrock → Model access | For `us-east-1` / `us-east-2` / `us-west-2` deployments, enable **Claude 3.5 Haiku** (Anthropic) in **all three US profile regions**. For other regions, enable it in the deployment region. |
 | **Wrong region** | Check `amplify_outputs.json` → `data.aws_region` | Ensure Bedrock model access is enabled in that region (default: `us-east-1`) |
 | **Stale backend deployment** | AWS Amplify Console → last build date | Push a new commit or manually trigger a build to redeploy the backend |
 | **AppSync resolver IAM missing `bedrock:InvokeModel`** | AWS IAM → search for roles with "Bedrock" or "generateRecipe" | The `amplify/backend.ts` now adds this explicitly; redeploy after merging |
@@ -93,7 +94,7 @@ This AppSync error message means the backend resolver for the `generateRecipe` g
 
 #### About cross-region inference profiles
 
-Amplify Gen 2 (≥ 1.x) invokes Claude through an **inference profile** in us-* regions rather than the foundation model directly. The IAM policy must allow `bedrock:InvokeModel` on *both* the foundation-model ARN (`arn:aws:bedrock:REGION::foundation-model/MODEL_ID`) **and** the inference-profile ARN (`arn:aws:bedrock:REGION:ACCOUNT:inference-profile/PROFILE_ID`). `amplify/backend.ts` now covers both. If your deployment fails with `AccessDeniedException` referencing `inference-profile/`, redeploy after pulling the latest changes.
+Amplify Gen 2 (≥ 1.x) invokes Claude through an **inference profile** in `us-east-1`, `us-east-2`, and `us-west-2` rather than the foundation model directly. The IAM policy must allow `bedrock:InvokeModel` on *both* the foundation-model ARN (`arn:aws:bedrock:REGION::foundation-model/MODEL_ID`) **and** the inference-profile ARN (`arn:aws:bedrock:REGION:ACCOUNT:inference-profile/PROFILE_ID`). `amplify/backend.ts` now covers both. Bedrock model access must also be enabled in **each region used by that US cross-region profile**, not only the single Amplify deployment region. If your deployment fails with `AccessDeniedException` referencing `inference-profile/`, redeploy after pulling the latest changes.
 
 ### Step-by-step diagnosis
 

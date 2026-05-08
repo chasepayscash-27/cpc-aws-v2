@@ -2,14 +2,19 @@ import { useMemo, useState } from "react";
 import { generateClient } from "aws-amplify/data";
 import type { Schema } from "../../amplify/data/resource";
 import outputs from "../../amplify/amplify_outputs.json";
+import {
+  getBedrockModelAccessRegions,
+  getBedrockModelAccessUrl,
+} from "../utils/bedrockModelAccess";
 import { parseAmplifyErrors, formatCaughtError } from "../utils/amplifyErrors";
 
 const client = generateClient<Schema>({ authMode: "apiKey" });
 
-// Deployment region — surfaced in error messages so the user knows which
-// AWS Console region to check for Bedrock model access.
+// Deployment region — surfaced in error messages and console links so the user
+// knows which AWS Console region(s) to check for Bedrock model access.
 const DEPLOYMENT_REGION: string | undefined =
   (outputs as { data?: { aws_region?: string } })?.data?.aws_region;
+const BEDROCK_MODEL_ACCESS_REGIONS = getBedrockModelAccessRegions(DEPLOYMENT_REGION);
 
 export interface PropertyData {
   sold_year: number;
@@ -34,7 +39,7 @@ export function AiInsightsPanel({ properties }: Props) {
   const [loading, setLoading] = useState(false);
   const [output, setOutput] = useState<string>("");
   const [error, setError] = useState<string>("");
-  const [isModelAccessError, setIsModelAccessError] = useState(false);
+  const [showBedrockConsoleLink, setShowBedrockConsoleLink] = useState(false);
 
   const metrics = useMemo(() => {
     const n = properties.length;
@@ -95,7 +100,7 @@ export function AiInsightsPanel({ properties }: Props) {
     setLoading(true);
     setOutput("");
     setError("");
-    setIsModelAccessError(false);
+    setShowBedrockConsoleLink(false);
     try {
       if (typeof client.generations?.generateRecipe !== "function") {
         console.error(
@@ -124,7 +129,7 @@ ${JSON.stringify(metrics, null, 2)}
 
       if (errors?.length) {
         const parsed = parseAmplifyErrors("AiInsightsPanel", errors, DEPLOYMENT_REGION);
-        setIsModelAccessError(parsed.isModelAccessError);
+        setShowBedrockConsoleLink(parsed.showBedrockConsoleLink);
         setError(parsed.userMessage);
         return;
       }
@@ -132,7 +137,7 @@ ${JSON.stringify(metrics, null, 2)}
       setOutput(data?.instructions ?? "No insights returned.");
     } catch (e: unknown) {
       const parsed = formatCaughtError("AiInsightsPanel", e, DEPLOYMENT_REGION);
-      setIsModelAccessError(parsed.isModelAccessError);
+      setShowBedrockConsoleLink(parsed.showBedrockConsoleLink);
       setError(parsed.userMessage);
     } finally {
       setLoading(false);
@@ -177,16 +182,24 @@ ${JSON.stringify(metrics, null, 2)}
           <p style={{ color: "#dc2626", fontSize: "13px", margin: "0 0 6px" }}>
             {error}
           </p>
-          {isModelAccessError && (
-            <a
-              href={`https://console.aws.amazon.com/bedrock/home${DEPLOYMENT_REGION ? `?region=${DEPLOYMENT_REGION}` : ""}#/modelaccess`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn"
-              style={{ fontSize: "12px", display: "inline-block" }}
-            >
-              🔗 Open Bedrock Model Access
-            </a>
+          {showBedrockConsoleLink && (
+            <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
+              {(BEDROCK_MODEL_ACCESS_REGIONS.length > 0
+                ? BEDROCK_MODEL_ACCESS_REGIONS
+                : [undefined]
+              ).map((region) => (
+                <a
+                  key={region ?? "default"}
+                  href={getBedrockModelAccessUrl(region)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn"
+                  style={{ fontSize: "12px", display: "inline-block" }}
+                >
+                  🔗 Bedrock Model Access{region ? ` (${region})` : ""}
+                </a>
+              ))}
+            </div>
           )}
         </div>
       )}
