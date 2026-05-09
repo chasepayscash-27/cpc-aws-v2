@@ -120,110 +120,55 @@ export function PublicChatWidget() {
   }
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", height: "100%" }}>
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          marginBottom: "12px",
-        }}
-      >
-        <div>
-          <div className="cardLabel">💬 AI Assistant</div>
-          <p className="muted" style={{ margin: "4px 0 0", fontSize: "13px" }}>
-            Ask anything about real estate investing, deal analysis, or your
-            portfolio — no login required.
-          </p>
+    <div className="chatWrap">
+      {/* Header */}
+      <div className="chatHeader">
+        <div className="chatHeaderLeft">
+          <div className="chatAvatar">🤖</div>
+          <div>
+            <p className="chatHeaderTitle">AI Assistant</p>
+            <p className="chatHeaderSub">
+              Ask anything about real estate investing, deal analysis, or your portfolio.
+            </p>
+            <span className="chatOnlineBadge">
+              <span className="chatOnlineDot" />
+              Online — no login required
+            </span>
+          </div>
         </div>
         {messages.length > 0 && (
-          <button
-            className="btn"
-            onClick={resetChat}
-            style={{ fontSize: "12px" }}
-          >
+          <button className="btn" onClick={resetChat} style={{ fontSize: "12px", flexShrink: 0 }}>
             🔄 New chat
           </button>
         )}
       </div>
 
       {/* Message thread */}
-      <div
-        style={{
-          flex: 1,
-          overflowY: "auto",
-          minHeight: "300px",
-          maxHeight: "480px",
-          padding: "8px 4px",
-          display: "flex",
-          flexDirection: "column",
-          gap: "10px",
-        }}
-      >
+      <div className="chatMessages">
         {messages.length === 0 && (
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              height: "100%",
-              color: "var(--muted)",
-              fontSize: "14px",
-              fontStyle: "italic",
-            }}
-          >
-            Ask a question to get started…
+          <div className="chatEmptyState">
+            <div className="chatEmptyIcon">💬</div>
+            <p className="chatEmptyTitle">Ask me anything</p>
+            <p className="chatEmptyHint">Try: "What makes a good fix-and-flip deal?"</p>
           </div>
         )}
 
         {messages.map((msg, idx) => (
-          <div
-            key={idx}
-            style={{
-              display: "flex",
-              justifyContent:
-                msg.role === "user" ? "flex-end" : "flex-start",
-            }}
-          >
-            <div
-              style={{
-                maxWidth: "80%",
-                padding: "10px 14px",
-                borderRadius:
-                  msg.role === "user"
-                    ? "18px 18px 4px 18px"
-                    : "18px 18px 18px 4px",
-                background:
-                  msg.role === "user"
-                    ? "linear-gradient(135deg, var(--accent) 0%, var(--accent-light) 100%)"
-                    : "var(--panel2)",
-                color: msg.role === "user" ? "#fff" : "var(--text)",
-                border:
-                  msg.role === "user" ? "none" : "1px solid var(--border)",
-                fontSize: "14px",
-                lineHeight: "1.5",
-                whiteSpace: "pre-wrap",
-                wordBreak: "break-word",
-              }}
-            >
+          <div key={idx} className={`chatRow ${msg.role}`}>
+            <div className={`chatBubble ${msg.role}`}>
               {msg.text}
             </div>
           </div>
         ))}
 
         {loading && (
-          <div style={{ display: "flex", justifyContent: "flex-start" }}>
-            <div
-              style={{
-                padding: "10px 14px",
-                borderRadius: "18px 18px 18px 4px",
-                background: "var(--panel2)",
-                border: "1px solid var(--border)",
-                fontSize: "14px",
-                color: "var(--muted)",
-              }}
-            >
-              ▌
+          <div className="chatRow assistant">
+            <div className="chatBubble assistant">
+              <div className="chatTypingDots">
+                <span />
+                <span />
+                <span />
+              </div>
             </div>
           </div>
         )}
@@ -232,22 +177,16 @@ export function PublicChatWidget() {
       </div>
 
       {error && (
-        <div style={{ margin: "8px 0" }}>
-          <p style={{ color: "#dc2626", fontSize: "13px", margin: "0 0 6px" }}>
-            {error}
-          </p>
-          {isAuthError && (
-            <button
-              className="btn"
-              onClick={() => window.location.reload()}
-              style={{ fontSize: "12px" }}
-            >
-              🔄 Refresh page
-            </button>
-          )}
-          {showBedrockConsoleLink && (
-            <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
-              {(BEDROCK_MODEL_ACCESS_REGIONS.length > 0
+        <div className="chatError">
+          <p className="chatErrorText">{error}</p>
+          <div className="chatErrorActions">
+            {isAuthError && (
+              <button className="btn" onClick={() => window.location.reload()} style={{ fontSize: "12px" }}>
+                🔄 Refresh page
+              </button>
+            )}
+            {showBedrockConsoleLink &&
+              (BEDROCK_MODEL_ACCESS_REGIONS.length > 0
                 ? BEDROCK_MODEL_ACCESS_REGIONS
                 : [undefined]
               ).map((region) => (
@@ -261,57 +200,35 @@ export function PublicChatWidget() {
                 >
                   🔗 Bedrock Model Access{region ? ` (${region})` : ""}
                 </a>
-              ))}
-            </div>
-          )}
-          {isThrottleError && (
-            <button
-              className="btn"
-              onClick={sendMessage}
-              style={{ fontSize: "12px" }}
-            >
-              🔁 Retry
-            </button>
-          )}
+              ))
+            }
+            {isThrottleError && (
+              <button className="btn" onClick={sendMessage} style={{ fontSize: "12px" }}>
+                🔁 Retry
+              </button>
+            )}
+          </div>
         </div>
       )}
 
       {/* Input area */}
-      <div
-        style={{
-          display: "flex",
-          gap: "8px",
-          marginTop: "12px",
-          alignItems: "flex-end",
-        }}
-      >
+      <div className="chatInputWrap">
         <textarea
+          className="chatTextarea"
           rows={2}
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={handleKeyDown}
           placeholder="Type a message… (Enter to send, Shift+Enter for new line)"
           disabled={loading}
-          style={{
-            flex: 1,
-            padding: "10px 12px",
-            borderRadius: "12px",
-            border: "1px solid var(--border)",
-            background: "var(--panel2)",
-            color: "var(--text)",
-            fontSize: "14px",
-            resize: "none",
-            outline: "none",
-            fontFamily: "inherit",
-          }}
         />
         <button
-          className="btnPrimary"
+          className="chatSendBtn"
           onClick={sendMessage}
           disabled={loading || !input.trim()}
-          style={{ alignSelf: "flex-end", padding: "10px 18px" }}
+          aria-label="Send message"
         >
-          {loading ? "…" : "Send"}
+          {loading ? "…" : "Send →"}
         </button>
       </div>
     </div>
