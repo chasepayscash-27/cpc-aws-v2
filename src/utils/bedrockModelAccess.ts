@@ -15,7 +15,7 @@ function isUsCrossRegionProfileRegion(
 export function getBedrockModelAccessRegions(
   deploymentRegion?: string
 ): string[] {
-  if (!deploymentRegion) return [];
+  if (!deploymentRegion) return [...US_CROSS_REGION_PROFILE_REGIONS];
 
   return isUsCrossRegionProfileRegion(deploymentRegion)
     ? [...US_CROSS_REGION_PROFILE_REGIONS]
