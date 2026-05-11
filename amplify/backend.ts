@@ -37,8 +37,8 @@ const dataStack = Stack.of(backend.data.resources.graphqlApi);
 const region = dataStack.region;
 const account = dataStack.account;
 
-const MODEL_ID = "anthropic.claude-3-5-haiku-20241022-v1:0";
-const INFERENCE_PROFILE_ID = "us.anthropic.claude-3-5-haiku-20241022-v1:0";
+const MODEL_ID = "anthropic.claude-3-5-haiku-20250110-v1:0";
+const INFERENCE_PROFILE_ID = "us.anthropic.claude-3-5-haiku-20250110-v1:0";
 // These three regions are the only ones where Amazon Bedrock currently provides
 // the "us.*" cross-region inference profile for Claude.  If AWS adds more
 // us-* regions to the inference-profile program, extend this list accordingly.
