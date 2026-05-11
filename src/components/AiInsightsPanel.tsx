@@ -15,6 +15,11 @@ const client = generateClient<Schema>({ authMode: "apiKey" });
 const DEPLOYMENT_REGION: string | undefined =
   (outputs as { data?: { aws_region?: string } })?.data?.aws_region;
 const BEDROCK_MODEL_ACCESS_REGIONS = getBedrockModelAccessRegions(DEPLOYMENT_REGION);
+const MAX_AI_RETRIES = 3;
+
+function delay(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
 
 export interface PropertyData {
   sold_year: number;
@@ -123,22 +128,52 @@ Metrics:
 ${JSON.stringify(metrics, null, 2)}
 `.trim();
 
-      const { data, errors } = await client.generations.generateRecipe({
-        description: prompt,
-      });
+      for (let attempt = 0; attempt < MAX_AI_RETRIES; attempt += 1) {
+        const isLastAttempt = attempt === MAX_AI_RETRIES - 1;
 
-      if (errors?.length) {
-        const parsed = parseAmplifyErrors("AiInsightsPanel", errors, DEPLOYMENT_REGION);
-        setShowBedrockConsoleLink(parsed.showBedrockConsoleLink);
-        setError(parsed.userMessage);
-        return;
+        try {
+          const { data, errors } = await client.generations.generateRecipe({
+            description: prompt,
+          });
+
+          if (errors?.length) {
+            const parsed = parseAmplifyErrors("AiInsightsPanel", errors, DEPLOYMENT_REGION);
+
+            if (parsed.isRetryable && !isLastAttempt) {
+              const retryDelayMs = parsed.retryAfterMs * 2 ** attempt;
+              console.warn(
+                `[AiInsightsPanel] Retrying AI request in ${retryDelayMs}ms due to transient Bedrock error.`,
+                errors
+              );
+              await delay(retryDelayMs);
+              continue;
+            }
+
+            setShowBedrockConsoleLink(parsed.showBedrockConsoleLink);
+            setError(parsed.userMessage);
+            return;
+          }
+
+          setOutput(data?.instructions ?? "No insights returned.");
+          return;
+        } catch (e: unknown) {
+          const parsed = formatCaughtError("AiInsightsPanel", e, DEPLOYMENT_REGION);
+
+          if (parsed.isRetryable && !isLastAttempt) {
+            const retryDelayMs = parsed.retryAfterMs * 2 ** attempt;
+            console.warn(
+              `[AiInsightsPanel] Retrying AI request in ${retryDelayMs}ms due to transient caught error.`,
+              e
+            );
+            await delay(retryDelayMs);
+            continue;
+          }
+
+          setShowBedrockConsoleLink(parsed.showBedrockConsoleLink);
+          setError(parsed.userMessage);
+          return;
+        }
       }
-
-      setOutput(data?.instructions ?? "No insights returned.");
-    } catch (e: unknown) {
-      const parsed = formatCaughtError("AiInsightsPanel", e, DEPLOYMENT_REGION);
-      setShowBedrockConsoleLink(parsed.showBedrockConsoleLink);
-      setError(parsed.userMessage);
     } finally {
       setLoading(false);
     }

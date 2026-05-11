@@ -48,6 +48,10 @@ export interface ParsedAmplifyError {
    * resolver errors that often trace back to IAM/model-access configuration.
    */
   showBedrockConsoleLink: boolean;
+  /** Whether retrying the request may resolve the problem. */
+  isRetryable: boolean;
+  /** Recommended wait time before the next retry attempt. */
+  retryAfterMs: number;
 }
 
 function formatRegionList(regions: string[]): string {
@@ -63,10 +67,13 @@ function formatRegionList(regions: string[]): string {
 function buildBedrockHint(region?: string): string {
   const accessRegions = getBedrockModelAccessRegions(region);
 
-  if (region && usesBedrockUsCrossRegionProfile(region)) {
+  if (usesBedrockUsCrossRegionProfile(region)) {
+    const deploymentRegionNote = region
+      ? `for deployments in ${region}`
+      : "for US deployments";
     return (
       "Amplify routes Claude 3.5 Haiku through the US cross-region inference " +
-      `profile for deployments in ${region}. Check AWS Console → Amazon Bedrock → ` +
+      `${deploymentRegionNote}. Check AWS Console → Amazon Bedrock → ` +
       `Model access in ${formatRegionList(accessRegions)} and ensure Claude 3.5 ` +
       "Haiku (Anthropic) is enabled in each region. If access was recently granted, " +
       "redeploy the Amplify backend (`npx ampx pipeline-deploy` or push to the CI branch)."
@@ -155,6 +162,8 @@ export function parseAmplifyErrors(
       isModelAccessError: false,
       isThrottleError: true,
       showBedrockConsoleLink: false,
+      isRetryable: true,
+      retryAfterMs: 1500,
     };
   }
 
@@ -177,6 +186,8 @@ export function parseAmplifyErrors(
       isModelAccessError: true,
       isThrottleError: false,
       showBedrockConsoleLink: true,
+      isRetryable: isAccessDenied,
+      retryAfterMs: isAccessDenied ? 2500 : 0,
     };
   }
 
@@ -190,6 +201,8 @@ export function parseAmplifyErrors(
       isModelAccessError: false,
       isThrottleError: false,
       showBedrockConsoleLink: true,
+      isRetryable: false,
+      retryAfterMs: 0,
     };
   }
 
@@ -203,6 +216,8 @@ export function parseAmplifyErrors(
       isModelAccessError: false,
       isThrottleError: false,
       showBedrockConsoleLink: false,
+      isRetryable: false,
+      retryAfterMs: 0,
     };
   }
 
@@ -212,6 +227,8 @@ export function parseAmplifyErrors(
     isModelAccessError: false,
     isThrottleError: false,
     showBedrockConsoleLink: false,
+    isRetryable: false,
+    retryAfterMs: 0,
   };
 }
 
@@ -235,10 +252,14 @@ export function formatCaughtError(context: string, e: unknown, region?: string):
       isModelAccessError: false,
       isThrottleError: true,
       showBedrockConsoleLink: false,
+      isRetryable: true,
+      retryAfterMs: 1500,
     };
   }
 
-  if (RESOURCE_NOT_FOUND_RE.test(msg) || VALIDATION_RE.test(msg)) {
+  const isAccessDenied = ACCESS_DENIED_RE.test(msg);
+
+  if (RESOURCE_NOT_FOUND_RE.test(msg) || VALIDATION_RE.test(msg) || (isAccessDenied && BEDROCK_RE.test(msg))) {
     return {
       userMessage:
         "The AI request failed in the backend resolver — this typically means " +
@@ -248,6 +269,8 @@ export function formatCaughtError(context: string, e: unknown, region?: string):
       isModelAccessError: true,
       isThrottleError: false,
       showBedrockConsoleLink: true,
+      isRetryable: isAccessDenied,
+      retryAfterMs: isAccessDenied ? 2500 : 0,
     };
   }
 
@@ -261,10 +284,12 @@ export function formatCaughtError(context: string, e: unknown, region?: string):
       isModelAccessError: false,
       isThrottleError: false,
       showBedrockConsoleLink: true,
+      isRetryable: false,
+      retryAfterMs: 0,
     };
   }
 
-  if (ACCESS_DENIED_RE.test(msg)) {
+  if (isAccessDenied) {
     return {
       userMessage:
         "Authorization error — the AI service is not accessible with the current " +
@@ -274,6 +299,8 @@ export function formatCaughtError(context: string, e: unknown, region?: string):
       isModelAccessError: false,
       isThrottleError: false,
       showBedrockConsoleLink: false,
+      isRetryable: false,
+      retryAfterMs: 0,
     };
   }
 
@@ -283,5 +310,7 @@ export function formatCaughtError(context: string, e: unknown, region?: string):
     isModelAccessError: false,
     isThrottleError: false,
     showBedrockConsoleLink: false,
+    isRetryable: false,
+    retryAfterMs: 0,
   };
 }

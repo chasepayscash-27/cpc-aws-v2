@@ -41,6 +41,20 @@ const INFERENCE_PROFILE_ID = "us.anthropic.claude-3-5-haiku-20250110-v1:0";
 // the "us.*" cross-region inference profile for Claude.  If AWS adds more
 // us-* regions to the inference-profile program, extend this list accordingly.
 const US_REGIONS = ["us-east-1", "us-east-2", "us-west-2"];
+function validateBedrockConfig() {
+    if (!/^anthropic\.claude-3-5-haiku-[\w-]+:0$/.test(MODEL_ID)) {
+        throw new Error(`[amplify/backend] Invalid Claude 3.5 Haiku model id: ${MODEL_ID}. ` +
+            "Expected format: anthropic.claude-3-5-haiku-<date>-v1:0");
+    }
+    if (!/^us\.anthropic\.claude-3-5-haiku-[\w-]+:0$/.test(INFERENCE_PROFILE_ID)) {
+        throw new Error(`[amplify/backend] Invalid US cross-region inference profile id: ${INFERENCE_PROFILE_ID}. ` +
+            "Expected format: us.anthropic.claude-3-5-haiku-<date>-v1:0");
+    }
+    if (!US_REGIONS.includes("us-east-1")) {
+        throw new Error("[amplify/backend] Misconfigured US Bedrock profile regions: us-east-1 must be included.");
+    }
+}
+validateBedrockConfig();
 
 const bedrockPolicy = new PolicyStatement({
     effect: Effect.ALLOW,
@@ -70,6 +84,8 @@ backend.data.resources.graphqlApi.node.findAll().forEach((construct) => {
         attachedRolePaths.add(construct.node.path);
     }
 });
+console.log(`[amplify/backend] Bedrock policy configured for model=${MODEL_ID}, profile=${INFERENCE_PROFILE_ID}, ` +
+    `deployRegion=${region}, profileRegions=${US_REGIONS.join(",")}`);
 // ─────────────────────────────────────────────────────────────────────────────
 
 const apiStack = backend.createStack("api-stack");

@@ -21,6 +21,10 @@ The AI chat widget (`PublicChatWidget`) and AI insights panel (`AiInsightsPanel`
 
 1. **Enable Amazon Bedrock model access** in the AWS Console for the region you deploy to:
    - For deployments in `us-east-1`, `us-east-2`, or `us-west-2`, Amplify routes **Claude 3.5 Haiku** through the US cross-region inference profile. Enable model access in **all three US profile regions**: `us-east-1`, `us-east-2`, and `us-west-2`.
+   - Direct links:
+     - us-east-1: https://console.aws.amazon.com/bedrock/home?region=us-east-1#/modelaccess
+     - us-east-2: https://console.aws.amazon.com/bedrock/home?region=us-east-2#/modelaccess
+     - us-west-2: https://console.aws.amazon.com/bedrock/home?region=us-west-2#/modelaccess
    - For deployments outside those US regions, go to **Amazon Bedrock → Model access** in your deployment region and enable **Claude 3.5 Haiku** (Anthropic).
 2. **Deploy or sandbox the Amplify backend** so the `generateRecipe` AppSync mutation and the Bedrock Lambda resolver are provisioned:
    ```bash
@@ -105,6 +109,10 @@ Amplify Gen 2 (≥ 1.x) invokes Claude through an **inference profile** in `us-e
 
 2. **Validate Bedrock model access**
    - AWS Console → Amazon Bedrock → Model access
+   - Direct links for US cross-region profile checks:
+     - us-east-1: https://console.aws.amazon.com/bedrock/home?region=us-east-1#/modelaccess
+     - us-east-2: https://console.aws.amazon.com/bedrock/home?region=us-east-2#/modelaccess
+     - us-west-2: https://console.aws.amazon.com/bedrock/home?region=us-west-2#/modelaccess
    - Ensure **Anthropic Claude 3.5 Haiku** shows status **Access granted**
    - Changes take a few minutes to propagate
 
@@ -124,6 +132,9 @@ Amplify Gen 2 (≥ 1.x) invokes Claude through an **inference profile** in `us-e
 
 5. **Redeploy the Amplify backend**
    ```bash
+   # From your deployment runner or local environment with Amplify credentials:
+   npx ampx pipeline-deploy
+
    # Via CI/CD (recommended):
    git push origin main          # triggers the Amplify build pipeline
 

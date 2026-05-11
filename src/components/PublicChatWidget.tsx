@@ -25,6 +25,11 @@ const SYSTEM_CONTEXT =
   "You are a helpful assistant for Chase Pays Cash, a real estate investment company. " +
   "Answer questions about real estate investing, deal analysis, and property management. " +
   "Be concise, friendly, and practical.";
+const MAX_AI_RETRIES = 3;
+
+function delay(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
 
 export function PublicChatWidget() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -76,27 +81,57 @@ export function PublicChatWidget() {
 
       const prompt = `${SYSTEM_CONTEXT}\n\nConversation so far:\n${historyPrompt}\n\nRespond as the Assistant:`;
 
-      const { data, errors } = await client.generations.generateRecipe({
-        description: prompt,
-      });
+      for (let attempt = 0; attempt < MAX_AI_RETRIES; attempt += 1) {
+        const isLastAttempt = attempt === MAX_AI_RETRIES - 1;
 
-      if (errors?.length) {
-        const parsed = parseAmplifyErrors("PublicChatWidget", errors, DEPLOYMENT_REGION);
-        setIsAuthError(parsed.isAuthError);
-        setIsThrottleError(parsed.isThrottleError);
-        setShowBedrockConsoleLink(parsed.showBedrockConsoleLink);
-        setError(parsed.userMessage);
-        return;
+        try {
+          const { data, errors } = await client.generations.generateRecipe({
+            description: prompt,
+          });
+
+          if (errors?.length) {
+            const parsed = parseAmplifyErrors("PublicChatWidget", errors, DEPLOYMENT_REGION);
+
+            if (parsed.isRetryable && !isLastAttempt) {
+              const retryDelayMs = parsed.retryAfterMs * 2 ** attempt;
+              console.warn(
+                `[PublicChatWidget] Retrying AI request in ${retryDelayMs}ms due to transient Bedrock error.`,
+                errors
+              );
+              await delay(retryDelayMs);
+              continue;
+            }
+
+            setIsAuthError(parsed.isAuthError);
+            setIsThrottleError(parsed.isThrottleError);
+            setShowBedrockConsoleLink(parsed.showBedrockConsoleLink);
+            setError(parsed.userMessage);
+            return;
+          }
+
+          const reply = data?.instructions ?? "Sorry, I couldn't generate a response.";
+          setMessages([...updatedHistory, { role: "assistant", text: reply }]);
+          return;
+        } catch (e: unknown) {
+          const parsed = formatCaughtError("PublicChatWidget", e, DEPLOYMENT_REGION);
+
+          if (parsed.isRetryable && !isLastAttempt) {
+            const retryDelayMs = parsed.retryAfterMs * 2 ** attempt;
+            console.warn(
+              `[PublicChatWidget] Retrying AI request in ${retryDelayMs}ms due to transient caught error.`,
+              e
+            );
+            await delay(retryDelayMs);
+            continue;
+          }
+
+          setIsAuthError(parsed.isAuthError);
+          setIsThrottleError(parsed.isThrottleError);
+          setShowBedrockConsoleLink(parsed.showBedrockConsoleLink);
+          setError(parsed.userMessage);
+          return;
+        }
       }
-
-      const reply = data?.instructions ?? "Sorry, I couldn't generate a response.";
-      setMessages([...updatedHistory, { role: "assistant", text: reply }]);
-    } catch (e: unknown) {
-      const parsed = formatCaughtError("PublicChatWidget", e, DEPLOYMENT_REGION);
-      setIsAuthError(parsed.isAuthError);
-      setIsThrottleError(parsed.isThrottleError);
-      setShowBedrockConsoleLink(parsed.showBedrockConsoleLink);
-      setError(parsed.userMessage);
     } finally {
       setLoading(false);
     }
