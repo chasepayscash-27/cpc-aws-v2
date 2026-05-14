@@ -10,11 +10,6 @@
  * without leaking secrets or raw stack traces.
  */
 
-import {
-  getBedrockModelAccessRegions,
-  usesBedrockUsCrossRegionProfile,
-} from "./bedrockModelAccess";
-
 /** Minimal shape of one GraphQL error returned by the Amplify Data client. */
 export interface AmplifyGraphQLError {
   message: string;
@@ -54,36 +49,15 @@ export interface ParsedAmplifyError {
   retryAfterMs: number;
 }
 
-function formatRegionList(regions: string[]): string {
-  if (regions.length <= 1) return regions[0] ?? "your deployment region";
-  if (regions.length === 2) return `${regions[0]} and ${regions[1]}`;
-  return `${regions.slice(0, -1).join(", ")}, and ${regions[regions.length - 1]}`;
-}
-
 /**
  * Build the Bedrock "how to fix" hint, optionally including the deployment
  * region so users know exactly which AWS Console region to check.
  */
 function buildBedrockHint(region?: string): string {
-  const accessRegions = getBedrockModelAccessRegions(region);
-
-  if (usesBedrockUsCrossRegionProfile(region)) {
-    const deploymentRegionNote = region
-      ? `for deployments in ${region}`
-      : "for US deployments";
-    return (
-      "Amplify routes Claude 3.5 Haiku through the US cross-region inference " +
-      `${deploymentRegionNote}. Check AWS Console → Amazon Bedrock → ` +
-      `Model access in ${formatRegionList(accessRegions)} and ensure Claude 3.5 ` +
-      "Haiku (Anthropic) is enabled in each region. If access was recently granted, " +
-      "redeploy the Amplify backend (`npx ampx pipeline-deploy` or push to the CI branch)."
-    );
-  }
-
   const regionNote = region ? ` (region: ${region})` : "";
   return (
     `Check AWS Console → Amazon Bedrock → Model access${regionNote} and ensure ` +
-    "Claude 3.5 Haiku (Anthropic) is enabled in your deployment region. " +
+    "Claude 3 Haiku (Anthropic) is enabled in your deployment region. " +
     "If access was recently granted, redeploy the Amplify backend " +
     "(`npx ampx pipeline-deploy` or push to the CI branch)."
   );
@@ -93,8 +67,8 @@ function buildResolverHint(region?: string): string {
   return (
     "This usually means the Amplify backend has not been redeployed since the AI " +
     "resolver changed, the AppSync resolver IAM role is still missing " +
-    "`bedrock:InvokeModel` for the Claude 3.5 Haiku inference profile, or the " +
-    "Bedrock model/profile access is incomplete. " +
+    "`bedrock:InvokeModel` for the Claude 3 Haiku model, or the " +
+    "Bedrock model access is incomplete. " +
     buildBedrockHint(region)
   );
 }
@@ -180,7 +154,7 @@ export function parseAmplifyErrors(
     return {
       userMessage:
         "The AI request failed in the backend resolver — this typically means " +
-        "Amazon Bedrock model access has not been enabled for Claude 3.5 Haiku. " +
+        "Amazon Bedrock model access has not been enabled for Claude 3 Haiku. " +
         buildBedrockHint(region),
       isAuthError: false,
       isModelAccessError: true,
@@ -263,7 +237,7 @@ export function formatCaughtError(context: string, e: unknown, region?: string):
     return {
       userMessage:
         "The AI request failed in the backend resolver — this typically means " +
-        "Amazon Bedrock model access has not been enabled for Claude 3.5 Haiku. " +
+        "Amazon Bedrock model access has not been enabled for Claude 3 Haiku. " +
         buildBedrockHint(region),
       isAuthError: false,
       isModelAccessError: true,
