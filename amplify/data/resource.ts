@@ -9,16 +9,18 @@ const schema = a.schema({
 
   // Conversation routes only support owner() auth in Amplify Gen 2.
   // The public chat widget can use generateRecipe with in-context history.
+  // Claude 3 Haiku is available directly in us-east-1 without cross-region
+  // inference profiles, making it the most reliable choice for this deployment.
   chat: a
     .conversation({
-      aiModel: a.ai.model("Claude 3.5 Haiku"),
+      aiModel: a.ai.model("Claude 3 Haiku"),
       systemPrompt: "You are a helpful assistant",
     })
     .authorization((allow) => allow.owner()),
 
   generateRecipe: a
     .generation({
-      aiModel: a.ai.model("Claude 3.5 Haiku"),
+      aiModel: a.ai.model("Claude 3 Haiku"),
       systemPrompt:
         "You are an analytics assistant for a real estate investment business. " +
         "Analyze the provided metrics and return structured insights.",

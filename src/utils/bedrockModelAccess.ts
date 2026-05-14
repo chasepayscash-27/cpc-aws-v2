@@ -1,31 +1,13 @@
-const US_CROSS_REGION_PROFILE_REGIONS = [
-  "us-east-1",
-  "us-east-2",
-  "us-west-2",
-] as const;
-
-type SupportedUsRegion = (typeof US_CROSS_REGION_PROFILE_REGIONS)[number];
-
-function isUsCrossRegionProfileRegion(
-  region: string
-): region is SupportedUsRegion {
-  return (US_CROSS_REGION_PROFILE_REGIONS as readonly string[]).includes(region);
-}
-
+// Claude 3 Haiku is available directly in the deployment region without
+// cross-region inference profiles, so only one region needs model access.
 export function getBedrockModelAccessRegions(
   deploymentRegion?: string
 ): string[] {
-  if (!deploymentRegion) return [...US_CROSS_REGION_PROFILE_REGIONS];
-
-  return isUsCrossRegionProfileRegion(deploymentRegion)
-    ? [...US_CROSS_REGION_PROFILE_REGIONS]
-    : [deploymentRegion];
+  return deploymentRegion ? [deploymentRegion] : ["us-east-1"];
 }
 
-export function usesBedrockUsCrossRegionProfile(
-  deploymentRegion?: string
-): boolean {
-  return getBedrockModelAccessRegions(deploymentRegion).length > 1;
+export function usesBedrockUsCrossRegionProfile(): boolean {
+  return false;
 }
 
 export function getBedrockModelAccessUrl(region?: string): string {

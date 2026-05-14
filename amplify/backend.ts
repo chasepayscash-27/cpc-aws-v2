@@ -18,41 +18,29 @@ const backend = defineBackend({
 // BEDROCK PERMISSIONS FOR AMPLIFY AI ROUTES
 // ─────────────────────────────────────────────────────────────────────────────
 //
-// Claude 4.5 Haiku uses Bedrock inference-profile style routing.
-// This policy intentionally includes both the foundation model ID and
-// the geo/global inference profile IDs so Amplify/AppSync can invoke the model.
+// Claude 3 Haiku is used because it is available as a direct foundation model
+// in us-east-1 without requiring cross-region inference profiles.
+// Cross-region inference profiles (needed by Claude 3.5/4.x) require Bedrock
+// model access to be enabled in us-east-1, us-east-2, AND us-west-2
+// simultaneously — a common source of deployment failures.
+//
+// Model ID: anthropic.claude-3-haiku-20240307-v1:0
+// This matches the a.ai.model("Claude 3 Haiku") declaration in data/resource.ts.
 
 const dataStack = Stack.of(backend.data.resources.graphqlApi);
 const region = dataStack.region;
-const account = dataStack.account;
 
-const MODEL_ID = "anthropic.claude-haiku-4-5-20251001-v1:0";
-
-const INFERENCE_PROFILE_IDS = [
-  "us.anthropic.claude-haiku-4-5-20251001-v1:0",
-  "global.anthropic.claude-haiku-4-5-20251001-v1:0",
-];
-
-const BEDROCK_REGIONS = ["us-east-1", "us-east-2", "us-west-2"];
+// Claude 3 Haiku — stable, widely available, no cross-region inference needed.
+const MODEL_ID = "anthropic.claude-3-haiku-20240307-v1:0";
 
 const bedrockPolicy = new PolicyStatement({
   effect: Effect.ALLOW,
   actions: [
     "bedrock:InvokeModel",
     "bedrock:InvokeModelWithResponseStream",
-    "bedrock:Converse",
-    "bedrock:ConverseStream",
   ],
   resources: [
     `arn:aws:bedrock:${region}::foundation-model/${MODEL_ID}`,
-    ...BEDROCK_REGIONS.map(
-      (r) => `arn:aws:bedrock:${r}::foundation-model/${MODEL_ID}`
-    ),
-    ...BEDROCK_REGIONS.flatMap((r) =>
-      INFERENCE_PROFILE_IDS.map(
-        (profileId) => `arn:aws:bedrock:${r}:${account}:inference-profile/${profileId}`
-      )
-    ),
   ],
 });
 
@@ -67,8 +55,7 @@ backend.data.resources.graphqlApi.node.findAll().forEach((construct) => {
 });
 
 console.log(
-  `[amplify/backend] Bedrock policy configured for model=${MODEL_ID}, ` +
-    `deployRegion=${region}, bedrockRegions=${BEDROCK_REGIONS.join(",")}`
+  `[amplify/backend] Bedrock policy configured for model=${MODEL_ID}, deployRegion=${region}`
 );
 
 // ─────────────────────────────────────────────────────────────────────────────
