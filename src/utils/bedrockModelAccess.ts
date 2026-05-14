@@ -6,10 +6,6 @@ export function getBedrockModelAccessRegions(
   return deploymentRegion ? [deploymentRegion] : ["us-east-1"];
 }
 
-export function usesBedrockUsCrossRegionProfile(): boolean {
-  return false;
-}
-
 export function getBedrockModelAccessUrl(region?: string): string {
   return `https://console.aws.amazon.com/bedrock/home${
     region ? `?region=${region}` : ""
