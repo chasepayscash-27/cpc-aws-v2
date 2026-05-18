@@ -13,6 +13,15 @@ frontend:
     build:
       commands:
         - npm run build
+  customHeaders:
+    - pattern: "/index.html"
+      headers:
+        - key: "Cache-Control"
+          value: "no-cache, no-store, must-revalidate"
+    - pattern: "/"
+      headers:
+        - key: "Cache-Control"
+          value: "no-cache, no-store, must-revalidate"
   artifacts:
     baseDirectory: dist
     files:

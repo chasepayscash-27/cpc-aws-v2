@@ -35,9 +35,9 @@ The AI chat widget (`PublicChatWidget`) and AI insights panel (`AiInsightsPanel`
 
 ### Environment variables
 
-The Amplify outputs file (`amplify/amplify_outputs.json`) provides the AppSync endpoint and API key automatically — no extra frontend env vars are needed under normal operation.
+The Amplify outputs file (`amplify/amplify_outputs.json`) provides the AppSync endpoint and Cognito Identity Pool details automatically — no extra frontend env vars are needed under normal operation.
 
-During CI/CD, `npx ampx pipeline-deploy` generates a fresh `amplify_outputs.json` at the **project root**. The `amplify.yml` build script then copies this file into `amplify/amplify_outputs.json` (the path imported by the frontend) so the deployed app always uses the current, non-expired API key:
+During CI/CD, `npx ampx pipeline-deploy` generates a fresh `amplify_outputs.json` at the **project root**. The `amplify.yml` build script then copies this file into `amplify/amplify_outputs.json` (the path imported by the frontend) so the deployed app always uses current backend outputs:
 
 ```yaml
 - npx ampx pipeline-deploy --branch $AWS_BRANCH --app-id $AWS_APP_ID
@@ -51,7 +51,7 @@ npx ampx sandbox
 cp amplify_outputs.json amplify/amplify_outputs.json
 ```
 
-> **Note:** The `amplify/amplify_outputs.json` committed to this repo is a placeholder. It may contain a stale API key. Every CI/CD deployment overwrites it with a fresh key via the copy step above.
+> **Note:** The `amplify/amplify_outputs.json` committed to this repo is a placeholder. Every CI/CD deployment overwrites it with fresh backend outputs via the copy step above.
 
 **Optional override variables** — set these in the AWS Amplify Console (App settings → Environment variables) or in a local `.env.local` file when `amplify_outputs.json` has a stale key (e.g. if CI/CD has not yet run after a backend change):
 
@@ -125,10 +125,10 @@ Amplify Gen 2 (≥ 1.x) invokes Claude through an **inference profile** in `us-e
    # Open http://localhost:5173 → AI Chat tab → send a message
    ```
 
-4. **Refresh the API key** (for auth/key-expiry errors)
-   - Every Amplify backend deployment regenerates the API key
-   - The `amplify.yml` copies the fresh `amplify_outputs.json` automatically
-   - If you see an auth error locally, re-run `npx ampx sandbox` and copy the new outputs file
+4. **Check guest Identity Pool configuration** (for authorization errors)
+   - Public AI routes now use Cognito Identity Pool **guest** credentials (`identityPool`) rather than API key auth
+   - Ensure `allowUnauthenticatedIdentities` is enabled in the backend and redeploy after pulling latest changes
+   - If running locally, re-run `npx ampx sandbox` so `amplify_outputs.json` includes `aws_cognito_identity_pool_id`, then copy it into `amplify/amplify_outputs.json`
 
 5. **Redeploy the Amplify backend**
    ```bash
@@ -148,7 +148,7 @@ Amplify Gen 2 (≥ 1.x) invokes Claude through an **inference profile** in `us-e
 |---|---|
 | "The AI request failed in the backend resolver…" | `AccessDeniedException` / `ResourceNotFoundException` / `ValidationException` from Bedrock — model access not enabled, IAM missing `bedrock:InvokeModel`, or incorrect model/inference-profile ARN |
 | "The AI service is currently rate-limited…" | `ThrottlingException` from Bedrock — wait a few seconds and retry |
-| "Authorization error — the AI service is not accessible…" | Expired API key — refresh the page or redeploy |
+| "Authorization error — the AI service is not accessible…" | Cognito Identity Pool unauthenticated role missing AppSync permission, or `allowUnauthenticatedIdentities` not enabled — redeploy the backend after pulling latest |
 | "AI assistant is not available right now…" | `amplify_outputs.json` is missing the `generations.generateRecipe` introspection entry — redeploy the backend |
 
 ## License
