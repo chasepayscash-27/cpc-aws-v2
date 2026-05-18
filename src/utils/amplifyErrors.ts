@@ -75,10 +75,73 @@ function buildResolverHint(region?: string): string {
 
 const MAPPING_TEMPLATE_RE = /custom error.*mapping template/i;
 const ACCESS_DENIED_RE = /accessdenied|not authorized|unauthorized/i;
+const NO_CREDENTIALS_RE =
+  /nocredentials|no credentials|missing credentials|credentials?.*(not|unavailable|missing)/i;
 const RESOURCE_NOT_FOUND_RE = /resourcenotfound|resource.*not.*found/i;
 const THROTTLE_RE = /throttlingexception|throttled|rate.*exceed|too many requests/i;
 const VALIDATION_RE = /validationexception|invalid.*model|model.*invalid/i;
 const BEDROCK_RE = /bedrock|anthropic|claude|inference-profile|invokemodel/i;
+const AUTH_EXCEPTION_TYPE_RE = /AccessDeniedException|UnauthorizedException/i;
+const AUTHORIZATION_ERROR_MESSAGE =
+  "Authorization error — the AI service rejected the request. The site uses " +
+  "Cognito guest credentials (with API key as a fallback) to reach AppSync; " +
+  "this usually means a backend deploy is still in progress or the Identity " +
+  "Pool unauth role hasn't propagated yet. Wait about a minute and try again, " +
+  "or refresh the page to pick up the latest bundle.";
+
+function hasAuthSignal(combined: string, errorTypes: ReadonlyArray<string> = []): boolean {
+  return (
+    ACCESS_DENIED_RE.test(combined) ||
+    NO_CREDENTIALS_RE.test(combined) ||
+    errorTypes.some((t) => AUTH_EXCEPTION_TYPE_RE.test(t))
+  );
+}
+
+function collectErrorText(e: unknown): string {
+  if (typeof e === "string") return e;
+  if (e instanceof Error) return [e.name, e.message].filter(Boolean).join(" ");
+
+  if (e && typeof e === "object") {
+    const record = e as {
+      name?: unknown;
+      message?: unknown;
+      errorType?: unknown;
+      code?: unknown;
+      errors?: unknown;
+    };
+
+    const parts = [record.name, record.message, record.errorType, record.code]
+      .filter((value): value is string => typeof value === "string" && value.length > 0);
+
+    if (Array.isArray(record.errors)) {
+      parts.push(
+        ...record.errors.flatMap((error) =>
+          error && typeof error === "object"
+            ? [error.message, error.errorType].filter(
+                (value): value is string => typeof value === "string" && value.length > 0
+              )
+            : []
+        )
+      );
+    }
+
+    if (parts.length) return parts.join(" ");
+  }
+
+  return String(e);
+}
+
+export function hasAmplifyAuthError(errors?: ReadonlyArray<AmplifyGraphQLError>): boolean {
+  if (!errors?.length) return false;
+
+  const messages = errors.map((e) => e.message);
+  const errorTypes = errors.map((e) => e.errorType ?? "").filter(Boolean);
+  return hasAuthSignal([...messages, ...errorTypes].join(" "), errorTypes);
+}
+
+export function isAuthErrorLike(e: unknown): boolean {
+  return hasAuthSignal(collectErrorText(e));
+}
 
 /**
  * Parse an array of Amplify/AppSync GraphQL errors into a single
@@ -112,9 +175,7 @@ export function parseAmplifyErrors(
   const combined = [...messages, ...errorTypes].join(" ");
 
   const isMappingTemplate = messages.some((m) => MAPPING_TEMPLATE_RE.test(m));
-  const isAccessDenied =
-    ACCESS_DENIED_RE.test(combined) ||
-    errorTypes.some((t) => /AccessDeniedException|UnauthorizedException/i.test(t));
+  const isAccessDenied = hasAuthSignal(combined, errorTypes);
   const isResourceNotFound =
     RESOURCE_NOT_FOUND_RE.test(combined) ||
     errorTypes.some((t) => /ResourceNotFoundException/i.test(t));
@@ -182,10 +243,7 @@ export function parseAmplifyErrors(
 
   if (isAccessDenied) {
     return {
-      userMessage:
-        "Authorization error — the AI service is not accessible with the current " +
-        "API key. If a new deployment has just completed, refresh the page to pick " +
-        "up updated credentials.",
+      userMessage: AUTHORIZATION_ERROR_MESSAGE,
       isAuthError: true,
       isModelAccessError: false,
       isThrottleError: false,
@@ -215,7 +273,7 @@ export function parseAmplifyErrors(
  * @param region   Optional AWS deployment region included in the Bedrock hint.
  */
 export function formatCaughtError(context: string, e: unknown, region?: string): ParsedAmplifyError {
-  const msg = e instanceof Error ? e.message : String(e);
+  const msg = collectErrorText(e);
   console.error(`[${context}] Caught error (region=${region ?? "unknown"}):`, e);
 
   if (THROTTLE_RE.test(msg)) {
@@ -231,7 +289,7 @@ export function formatCaughtError(context: string, e: unknown, region?: string):
     };
   }
 
-  const isAccessDenied = ACCESS_DENIED_RE.test(msg);
+  const isAccessDenied = isAuthErrorLike(e);
 
   if (RESOURCE_NOT_FOUND_RE.test(msg) || VALIDATION_RE.test(msg) || (isAccessDenied && BEDROCK_RE.test(msg))) {
     return {
@@ -265,10 +323,7 @@ export function formatCaughtError(context: string, e: unknown, region?: string):
 
   if (isAccessDenied) {
     return {
-      userMessage:
-        "Authorization error — the AI service is not accessible with the current " +
-        "API key. If a new deployment has just completed, refresh the page to pick " +
-        "up updated credentials.",
+      userMessage: AUTHORIZATION_ERROR_MESSAGE,
       isAuthError: true,
       isModelAccessError: false,
       isThrottleError: false,

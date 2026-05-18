@@ -126,7 +126,7 @@ Amplify Gen 2 (≥ 1.x) invokes Claude through an **inference profile** in `us-e
    ```
 
 4. **Check guest Identity Pool configuration** (for authorization errors)
-   - Public AI routes now use Cognito Identity Pool **guest** credentials (`identityPool`) rather than API key auth
+   - Public AI routes now use Cognito Identity Pool **guest** credentials (`identityPool`) first and automatically fall back to API key auth during rollout
    - Ensure `allowUnauthenticatedIdentities` is enabled in the backend and redeploy after pulling latest changes
    - If running locally, re-run `npx ampx sandbox` so `amplify_outputs.json` includes `aws_cognito_identity_pool_id`, then copy it into `amplify/amplify_outputs.json`
 
@@ -148,7 +148,7 @@ Amplify Gen 2 (≥ 1.x) invokes Claude through an **inference profile** in `us-e
 |---|---|
 | "The AI request failed in the backend resolver…" | `AccessDeniedException` / `ResourceNotFoundException` / `ValidationException` from Bedrock — model access not enabled, IAM missing `bedrock:InvokeModel`, or incorrect model/inference-profile ARN |
 | "The AI service is currently rate-limited…" | `ThrottlingException` from Bedrock — wait a few seconds and retry |
-| "Authorization error — the AI service is not accessible…" | Cognito Identity Pool unauthenticated role missing AppSync permission, or `allowUnauthenticatedIdentities` not enabled — redeploy the backend after pulling latest |
+| "Authorization error — the AI service rejected the request…" | Guest IAM auth is still propagating, the Identity Pool unauthenticated role is missing AppSync permission, or the frontend bundle is still stale; the app now retries with API key automatically, so wait about a minute, refresh, and redeploy the backend if it persists |
 | "AI assistant is not available right now…" | `amplify_outputs.json` is missing the `generations.generateRecipe` introspection entry — redeploy the backend |
 
 ## License
