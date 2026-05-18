@@ -6,11 +6,17 @@ import {
   getBedrockModelAccessRegions,
   getBedrockModelAccessUrl,
 } from "../utils/bedrockModelAccess";
-import { parseAmplifyErrors, formatCaughtError } from "../utils/amplifyErrors";
+import {
+  parseAmplifyErrors,
+  formatCaughtError,
+  hasAmplifyAuthError,
+  isAuthErrorLike,
+} from "../utils/amplifyErrors";
 
-// Use Cognito Identity Pool guest credentials (SigV4) instead of a build-time
-// API key to avoid stale bundled credentials after backend key rotation.
-const client = generateClient<Schema>({ authMode: "identityPool" });
+// Prefer Cognito Identity Pool guest credentials (SigV4), but keep API key
+// available as a rollout fallback if guest auth has not propagated yet.
+const guestClient = generateClient<Schema>({ authMode: "identityPool" });
+const apiKeyClient = generateClient<Schema>({ authMode: "apiKey" });
 
 // Deployment region — surfaced in error messages and console links so the user
 // knows which AWS Console region(s) to check for Bedrock model access.
@@ -31,6 +37,28 @@ const MAX_AI_RETRIES = 3;
 
 function delay(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+async function generateRecipeWithFallback(description: string) {
+  const args = { description };
+
+  try {
+    const result = await guestClient.generations.generateRecipe(args);
+
+    if (!hasAmplifyAuthError(result.errors)) {
+      return result;
+    }
+
+    console.warn("[PublicChatWidget] Guest auth failed, retrying with apiKey.", result.errors);
+  } catch (e: unknown) {
+    if (!isAuthErrorLike(e)) {
+      throw e;
+    }
+
+    console.warn("[PublicChatWidget] Guest auth threw, retrying with apiKey.", e);
+  }
+
+  return apiKeyClient.generations.generateRecipe(args);
 }
 
 export function PublicChatWidget() {
@@ -66,9 +94,9 @@ export function PublicChatWidget() {
     setLoading(true);
 
     try {
-      if (typeof client.generations?.generateRecipe !== "function") {
+      if (typeof guestClient.generations?.generateRecipe !== "function") {
         console.error(
-          "[PublicChatWidget] client.generations.generateRecipe is not available. " +
+          "[PublicChatWidget] guestClient.generations.generateRecipe is not available. " +
             "Ensure Amplify outputs are up-to-date and include the generateRecipe generation route."
         );
         throw new Error(
@@ -87,9 +115,7 @@ export function PublicChatWidget() {
         const isLastAttempt = attempt === MAX_AI_RETRIES - 1;
 
         try {
-          const { data, errors } = await client.generations.generateRecipe({
-            description: prompt,
-          });
+          const { data, errors } = await generateRecipeWithFallback(prompt);
 
           if (errors?.length) {
             const parsed = parseAmplifyErrors("PublicChatWidget", errors, DEPLOYMENT_REGION);

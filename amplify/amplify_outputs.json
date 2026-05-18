@@ -29,10 +29,11 @@
     "url": "https://rf24g25v65cttol22ex5pp4t2q.appsync-api.us-east-1.amazonaws.com/graphql",
     "aws_region": "us-east-1",
     "api_key": "da2-fa5s7jmdvzhqrnjaop6j75oaeu",
-    "default_authorization_type": "API_KEY",
+    "default_authorization_type": "AWS_IAM",
     "authorization_types": [
       "AMAZON_COGNITO_USER_POOLS",
-      "AWS_IAM"
+      "AWS_IAM",
+      "API_KEY"
     ],
     "model_introspection": {
       "version": 1,
@@ -82,6 +83,16 @@
               "type": "auth",
               "properties": {
                 "rules": [
+                  {
+                    "allow": "public",
+                    "provider": "iam",
+                    "operations": [
+                      "create",
+                      "update",
+                      "delete",
+                      "read"
+                    ]
+                  },
                   {
                     "allow": "public",
                     "provider": "apiKey",
