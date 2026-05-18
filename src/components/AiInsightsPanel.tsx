@@ -8,7 +8,9 @@ import {
 } from "../utils/bedrockModelAccess";
 import { parseAmplifyErrors, formatCaughtError } from "../utils/amplifyErrors";
 
-const client = generateClient<Schema>({ authMode: "apiKey" });
+// Use Cognito Identity Pool guest credentials (SigV4) instead of a build-time
+// API key to avoid stale bundled credentials after backend key rotation.
+const client = generateClient<Schema>({ authMode: "identityPool" });
 
 // Deployment region — surfaced in error messages and console links so the user
 // knows which AWS Console region(s) to check for Bedrock model access.

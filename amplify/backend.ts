@@ -14,6 +14,14 @@ const backend = defineBackend({
   rdsQuery,
 });
 
+// Enable unauthenticated (guest) Identity Pool access so the public AI chat
+// widget can call AppSync via IAM-signed requests instead of a build-time
+// API key. This eliminates the API-key rotation race that produces recurring
+// authorization errors after backend redeploys with cached frontend bundles.
+backend.auth.resources.cfnResources.cfnIdentityPool.allowUnauthenticatedIdentities = true;
+// Amplify wires guest() authorization into AppSync IAM permissions when
+// unauthenticated identities are enabled and the data schema uses allow.guest().
+
 // ─────────────────────────────────────────────────────────────────────────────
 // BEDROCK PERMISSIONS FOR AMPLIFY AI ROUTES
 // ─────────────────────────────────────────────────────────────────────────────
