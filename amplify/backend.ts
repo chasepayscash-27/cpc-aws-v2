@@ -19,8 +19,45 @@ const backend = defineBackend({
 // API key. This eliminates the API-key rotation race that produces recurring
 // authorization errors after backend redeploys with cached frontend bundles.
 backend.auth.resources.cfnResources.cfnIdentityPool.allowUnauthenticatedIdentities = true;
-// Amplify wires guest() authorization into AppSync IAM permissions when
-// unauthenticated identities are enabled and the data schema uses allow.guest().
+
+// ─────────────────────────────────────────────────────────────────────────────
+// EXPLICIT APPSYNC IAM GRANTS FOR PUBLIC AI ROUTES
+// ─────────────────────────────────────────────────────────────────────────────
+//
+// Amplify Gen 2 wires allow.guest() into AppSync IAM permissions for a.model()
+// routes, but does NOT reliably do so for a.generation() routes. We therefore
+// grant appsync:GraphQL on Mutation.generateRecipe explicitly to both the
+// unauthenticated (guest) and authenticated IAM roles so the public AI chat
+// widget always has access regardless of Amplify Gen 2 auto-wiring behaviour.
+
+const dataStack = Stack.of(backend.data.resources.graphqlApi);
+const region = dataStack.region;
+const apiId = backend.data.resources.graphqlApi.apiId;
+// Use Stack.formatArn for safe ARN construction (handles GovCloud / China partitions).
+const apiArn = dataStack.formatArn({
+  service: "appsync",
+  resource: "apis",
+  resourceName: apiId,
+});
+
+const appSyncGenerateRecipePolicy = new PolicyStatement({
+  effect: Effect.ALLOW,
+  actions: ["appsync:GraphQL"],
+  resources: [
+    `${apiArn}/types/Mutation/fields/generateRecipe`,
+  ],
+});
+
+backend.auth.resources.unauthenticatedUserIamRole.addToPrincipalPolicy(
+  appSyncGenerateRecipePolicy
+);
+backend.auth.resources.authenticatedUserIamRole.addToPrincipalPolicy(
+  appSyncGenerateRecipePolicy
+);
+
+console.log(
+  `[amplify/backend] AppSync appsync:GraphQL grant added to unauth+auth roles for Mutation.generateRecipe (apiId=${apiId})`
+);
 
 // ─────────────────────────────────────────────────────────────────────────────
 // BEDROCK PERMISSIONS FOR AMPLIFY AI ROUTES
@@ -34,9 +71,6 @@ backend.auth.resources.cfnResources.cfnIdentityPool.allowUnauthenticatedIdentiti
 //
 // Model ID: anthropic.claude-3-haiku-20240307-v1:0
 // This matches the a.ai.model("Claude 3 Haiku") declaration in data/resource.ts.
-
-const dataStack = Stack.of(backend.data.resources.graphqlApi);
-const region = dataStack.region;
 
 // Claude 3 Haiku — stable, widely available, no cross-region inference needed.
 const MODEL_ID = "anthropic.claude-3-haiku-20240307-v1:0";
@@ -52,18 +86,21 @@ const bedrockPolicy = new PolicyStatement({
   ],
 });
 
-// Attach policy to AppSync/Amplify-generated IAM roles under the GraphQL API.
+// Walk the entire data stack (not just graphqlApi.node) so we also reach the
+// AppSync JS resolver / data source service role created in child stacks that
+// actually calls Bedrock for a.generation() routes.
 const attachedRolePaths = new Set<string>();
 
-backend.data.resources.graphqlApi.node.findAll().forEach((construct) => {
+dataStack.node.findAll().forEach((construct) => {
   if (construct instanceof Role && !attachedRolePaths.has(construct.node.path)) {
     construct.addToPrincipalPolicy(bedrockPolicy);
     attachedRolePaths.add(construct.node.path);
+    console.log(`[amplify/backend] Bedrock policy attached to role: ${construct.node.path}`);
   }
 });
 
 console.log(
-  `[amplify/backend] Bedrock policy configured for model=${MODEL_ID}, deployRegion=${region}`
+  `[amplify/backend] Bedrock policy configured for model=${MODEL_ID}, deployRegion=${region}, rolesPatched=${attachedRolePaths.size}`
 );
 
 // ─────────────────────────────────────────────────────────────────────────────
