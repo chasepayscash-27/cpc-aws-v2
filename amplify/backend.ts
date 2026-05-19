@@ -88,9 +88,8 @@ const bedrockPolicy = new PolicyStatement({
     "bedrock:InvokeModel",
     "bedrock:InvokeModelWithResponseStream",
   ],
-  resources: [
-    `arn:aws:bedrock:${region}::foundation-model/${MODEL_ID}`,
-  ],
+resources: ["*"],
+  
 });
 
 // Walk the entire data stack (not just graphqlApi.node) so we also reach the
