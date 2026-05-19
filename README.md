@@ -84,6 +84,27 @@ See [CONTRIBUTING](CONTRIBUTING.md#security-issue-notifications) for more inform
 
 ## Troubleshooting AI Chat / AI Insights
 
+### "Authorization error — the AI service rejected the request"
+
+This message is shown when both the Cognito guest-credentials client and the API-key fallback client receive an AppSync auth error (`AccessDeniedException` / `UnauthorizedException`). The most common causes are:
+
+| Cause | How to check | Fix |
+|---|---|---|
+| **Identity Pool unauth role missing `appsync:GraphQL` on `generateRecipe`** | AWS Console → IAM → Roles → search `amplify-*-unauthRole*` → Permissions → look for `appsync:GraphQL` | `amplify/backend.ts` now adds this explicitly; redeploy after merging |
+| **Identity Pool or pool ID is stale** | Compare `identity_pool_id` in `amplify/amplify_outputs.json` vs. Amplify Console → Backend environments | Retrigger the Amplify build so `cp -f amplify_outputs.json amplify/amplify_outputs.json` runs |
+| **API key in `amplify_outputs.json` is expired or wrong** | Compare `api_key` in the file vs. AppSync Console → API keys | Push a new commit to regenerate, or set `VITE_APPSYNC_API_KEY` in Amplify Console env vars |
+
+#### Verifying the explicit IAM grant in the AWS Console
+
+After deploying, confirm the fix is in place:
+
+1. **AWS Console → IAM → Roles**
+2. Search for `amplify-*-unauthRole*` (the Cognito Identity Pool unauthenticated role)
+3. Click the role → **Permissions** tab
+4. Look for an inline policy containing `Action: appsync:GraphQL` and a `Resource` ending in `/types/Mutation/fields/generateRecipe`
+
+If it is missing, the `allow.guest()` auto-wiring from Amplify Gen 2 did not fire for this `a.generation()` route. The explicit grant in `amplify/backend.ts` (`unauthenticatedUserIamRole.addToPrincipalPolicy(...)`) is the fix — trigger a fresh deploy.
+
 ### "A custom error was thrown from a mapping template."
 
 This AppSync error message means the backend resolver for the `generateRecipe` generation route failed before it could reach Claude. The most common causes are:
@@ -128,6 +149,8 @@ Amplify Gen 2 (≥ 1.x) invokes Claude through an **inference profile** in `us-e
 4. **Check guest Identity Pool configuration** (for authorization errors)
    - Public AI routes now use Cognito Identity Pool **guest** credentials (`identityPool`) first and automatically fall back to API key auth during rollout
    - Ensure `allowUnauthenticatedIdentities` is enabled in the backend and redeploy after pulling latest changes
+   - `amplify/backend.ts` now **explicitly** adds `appsync:GraphQL` on `Mutation.generateRecipe` to the `unauthenticatedUserIamRole` — Amplify Gen 2 does not auto-wire this for `a.generation()` routes
+   - After deploying, verify in AWS Console: IAM → Roles → `amplify-*-unauthRole*` → Permissions → search for `appsync:GraphQL` on `generateRecipe`
    - If running locally, re-run `npx ampx sandbox` so `amplify_outputs.json` includes `aws_cognito_identity_pool_id`, then copy it into `amplify/amplify_outputs.json`
 
 5. **Redeploy the Amplify backend**
@@ -148,6 +171,7 @@ Amplify Gen 2 (≥ 1.x) invokes Claude through an **inference profile** in `us-e
 |---|---|
 | "The AI request failed in the backend resolver…" | `AccessDeniedException` / `ResourceNotFoundException` / `ValidationException` from Bedrock — model access not enabled, IAM missing `bedrock:InvokeModel`, or incorrect model/inference-profile ARN |
 | "The AI service is currently rate-limited…" | `ThrottlingException` from Bedrock — wait a few seconds and retry |
+| "Authorization error (UnauthorizedException on Mutation.generateRecipe) — …" | Identity Pool unauthenticated role is missing `appsync:GraphQL` on `generateRecipe`; the explicit grant in `amplify/backend.ts` fixes this — redeploy |
 | "Authorization error — the AI service rejected the request…" | Guest IAM auth is still propagating, the Identity Pool unauthenticated role is missing AppSync permission, or the frontend bundle is still stale; the app now retries with API key automatically, so wait about a minute, refresh, and redeploy the backend if it persists |
 | "AI assistant is not available right now…" | `amplify_outputs.json` is missing the `generations.generateRecipe` introspection entry — redeploy the backend |
 

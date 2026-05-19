@@ -242,8 +242,18 @@ export function parseAmplifyErrors(
   }
 
   if (isAccessDenied) {
+    // Include the AppSync errorType and field path so the next fix targets the
+    // correct layer (e.g. "UnauthorizedException on Mutation.generateRecipe").
+    const firstError = errors.find((e) => e.errorType || e.path);
+    const errorType = firstError?.errorType ?? errorTypes[0] ?? "";
+    const fieldPath = firstError?.path?.join(".") ?? "";
+    const detail = [errorType, fieldPath].filter(Boolean).join(" on ");
+    const detailSuffix = detail ? ` (${detail})` : "";
     return {
-      userMessage: AUTHORIZATION_ERROR_MESSAGE,
+      userMessage: AUTHORIZATION_ERROR_MESSAGE.replace(
+        "Authorization error —",
+        `Authorization error${detailSuffix} —`
+      ),
       isAuthError: true,
       isModelAccessError: false,
       isThrottleError: false,
@@ -322,8 +332,20 @@ export function formatCaughtError(context: string, e: unknown, region?: string):
   }
 
   if (isAccessDenied) {
+    // Extract any errorType/path detail from the caught object if available.
+    const errorObj = e && typeof e === "object" ? (e as Record<string, unknown>) : null;
+    const catchErrors: Array<{ errorType?: string; path?: Array<string | number> }> =
+      Array.isArray(errorObj?.errors) ? errorObj!.errors as Array<{ errorType?: string; path?: Array<string | number> }> : [];
+    const firstErr = catchErrors.find((ce) => ce.errorType || ce.path);
+    const catchErrorType = firstErr?.errorType ?? (typeof errorObj?.errorType === "string" ? errorObj.errorType : "") ?? "";
+    const catchFieldPath = firstErr?.path?.join(".") ?? "";
+    const detail = [catchErrorType, catchFieldPath].filter(Boolean).join(" on ");
+    const detailSuffix = detail ? ` (${detail})` : "";
     return {
-      userMessage: AUTHORIZATION_ERROR_MESSAGE,
+      userMessage: AUTHORIZATION_ERROR_MESSAGE.replace(
+        "Authorization error —",
+        `Authorization error${detailSuffix} —`
+      ),
       isAuthError: true,
       isModelAccessError: false,
       isThrottleError: false,
