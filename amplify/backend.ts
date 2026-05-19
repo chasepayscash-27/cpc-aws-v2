@@ -2,7 +2,7 @@ import { defineBackend } from "@aws-amplify/backend";
 import { CorsHttpMethod, HttpApi, HttpMethod } from "aws-cdk-lib/aws-apigatewayv2";
 import { HttpLambdaIntegration } from "aws-cdk-lib/aws-apigatewayv2-integrations";
 import { Stack } from "aws-cdk-lib";
-import { PolicyStatement, Effect, Role } from "aws-cdk-lib/aws-iam";
+import { Policy, PolicyStatement, Effect, Role } from "aws-cdk-lib/aws-iam";
 
 import { auth } from "./auth/resource";
 import { data } from "./data/resource";
@@ -40,7 +40,7 @@ const apiArn = dataStack.formatArn({
   resourceName: apiId,
 });
 
-const appSyncGenerateRecipePolicy = new PolicyStatement({
+const appSyncGenerateRecipeStatement = new PolicyStatement({
   effect: Effect.ALLOW,
   actions: ["appsync:GraphQL"],
   resources: [
@@ -48,12 +48,19 @@ const appSyncGenerateRecipePolicy = new PolicyStatement({
   ],
 });
 
-backend.auth.resources.unauthenticatedUserIamRole.addToPrincipalPolicy(
-  appSyncGenerateRecipePolicy
-);
-backend.auth.resources.authenticatedUserIamRole.addToPrincipalPolicy(
-  appSyncGenerateRecipePolicy
-);
+// Define the Policy resource in the data stack so it can freely reference
+// data-stack tokens (apiId/apiArn) without introducing an auth→data edge.
+// The roles live in the auth stack and are attached by ARN/name, which does
+// NOT move them into the data stack. Dependency direction: data → auth
+// (same as the existing dependency), so no circular dependency is created.
+new Policy(dataStack, "PublicGenerateRecipeAppSyncGrant", {
+  policyName: "PublicGenerateRecipeAppSyncGrant",
+  statements: [appSyncGenerateRecipeStatement],
+  roles: [
+    backend.auth.resources.unauthenticatedUserIamRole,
+    backend.auth.resources.authenticatedUserIamRole,
+  ],
+});
 
 console.log(
   `[amplify/backend] AppSync appsync:GraphQL grant added to unauth+auth roles for Mutation.generateRecipe (apiId=${apiId})`
