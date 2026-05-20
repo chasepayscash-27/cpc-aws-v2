@@ -15,23 +15,19 @@ This template equips you with a foundational React application integrated with A
 
 ## AI Feature Requirements
 
-The AI chat widget (`PublicChatWidget`) and AI insights panel (`AiInsightsPanel`) use the `generateRecipe` generation route defined in `amplify/data/resource.ts`. This route calls **Claude 3.5 Haiku** via Amazon Bedrock.
+The AI chat widget (`PublicChatWidget`) and AI insights panel (`AiInsightsPanel`) use the `generateRecipe` generation route defined in `amplify/data/resource.ts`. This route calls **Amazon Titan Text Lite** (`amazon.titan-text-lite-v1`) via Amazon Bedrock.
 
 ### Required setup before deploying the AI features
 
-1. **Enable Amazon Bedrock model access** in the AWS Console for the region you deploy to:
-   - For deployments in `us-east-1`, `us-east-2`, or `us-west-2`, Amplify routes **Claude 3.5 Haiku** through the US cross-region inference profile. Enable model access in **all three US profile regions**: `us-east-1`, `us-east-2`, and `us-west-2`.
-   - Direct links:
-     - us-east-1: https://console.aws.amazon.com/bedrock/home?region=us-east-1#/modelaccess
-     - us-east-2: https://console.aws.amazon.com/bedrock/home?region=us-east-2#/modelaccess
-     - us-west-2: https://console.aws.amazon.com/bedrock/home?region=us-west-2#/modelaccess
-   - For deployments outside those US regions, go to **Amazon Bedrock → Model access** in your deployment region and enable **Claude 3.5 Haiku** (Anthropic).
-2. **Deploy or sandbox the Amplify backend** so the `generateRecipe` AppSync mutation and the Bedrock Lambda resolver are provisioned:
+1. **Deploy or sandbox the Amplify backend** so the `generateRecipe` AppSync mutation and resolver IAM role are provisioned:
    ```bash
    npx ampx sandbox          # for local development
    # or push via CI/CD for production
    ```
+2. No manual Bedrock "model access" approval step is required for Amazon-owned Titan models. The deployment step is what updates the resolver role with `bedrock:InvokeModel` on:
+   - `arn:aws:bedrock:<region>::foundation-model/amazon.titan-text-lite-v1`
 3. After a successful deployment, Amplify CLI regenerates `amplify/amplify_outputs.json`. This file **must** contain a `generations.generateRecipe` entry inside `data.model_introspection`. Without it, the frontend Amplify client cannot expose `client.generations.generateRecipe` and will display a user-friendly error in the UI instead of crashing.
+4. Titan output style can differ from Claude. If responses are terse or formatted oddly, tune the `systemPrompt` in `amplify/data/resource.ts` in a follow-up change.
 
 ### Environment variables
 
@@ -107,19 +103,14 @@ If it is missing, the `allow.guest()` auto-wiring from Amplify Gen 2 did not fir
 
 ### "A custom error was thrown from a mapping template."
 
-This AppSync error message means the backend resolver for the `generateRecipe` generation route failed before it could reach Claude. The most common causes are:
+This AppSync error message means the backend resolver for the `generateRecipe` generation route failed before Bedrock returned a successful response. The most common causes are:
 
 | Cause | How to check | Fix |
 |---|---|---|
-| **Bedrock model access not enabled** | AWS Console → Amazon Bedrock → Model access | For `us-east-1` / `us-east-2` / `us-west-2` deployments, enable **Claude 3.5 Haiku** (Anthropic) in **all three US profile regions**. For other regions, enable it in the deployment region. |
-| **Wrong region** | Check `amplify_outputs.json` → `data.aws_region` | Ensure Bedrock model access is enabled in that region (default: `us-east-1`) |
+| **Resolver IAM missing `bedrock:InvokeModel` for Titan** | AWS IAM → search for roles with "Bedrock" or "generateRecipe" | Redeploy backend so the resolver role is refreshed |
+| **Wrong region** | Check `amplify_outputs.json` → `data.aws_region` | Ensure Bedrock invocation is happening in that region (default: `us-east-1`) |
 | **Stale backend deployment** | AWS Amplify Console → last build date | Push a new commit or manually trigger a build to redeploy the backend |
-| **AppSync resolver IAM missing `bedrock:InvokeModel`** | AWS IAM → search for roles with "Bedrock" or "generateRecipe" | The `amplify/backend.ts` now adds this explicitly; redeploy after merging |
-| **Cross-region inference profile not covered by IAM policy** | CloudWatch Logs for the `generateRecipe` resolver → look for `inference-profile` in the error | Redeploy — `amplify/backend.ts` now includes inference-profile ARNs in the policy |
-
-#### About cross-region inference profiles
-
-Amplify Gen 2 (≥ 1.x) invokes Claude through an **inference profile** in `us-east-1`, `us-east-2`, and `us-west-2` rather than the foundation model directly. The IAM policy must allow `bedrock:InvokeModel` on *both* the foundation-model ARN (`arn:aws:bedrock:REGION::foundation-model/MODEL_ID`) **and** the inference-profile ARN (`arn:aws:bedrock:REGION:ACCOUNT:inference-profile/PROFILE_ID`). `amplify/backend.ts` now covers both. Bedrock model access must also be enabled in **each region used by that US cross-region profile**, not only the single Amplify deployment region. If your deployment fails with `AccessDeniedException` referencing `inference-profile/`, redeploy after pulling the latest changes.
+| **Wrong model ID in generation route** | Check `amplify/data/resource.ts` | Keep `resourcePath: "amazon.titan-text-lite-v1"` and redeploy |
 
 ### Step-by-step diagnosis
 
@@ -128,14 +119,10 @@ Amplify Gen 2 (≥ 1.x) invokes Claude through an **inference profile** in `us-e
    - Reproduce the error; check CloudWatch Logs for the `generateRecipe` resolver
    - The log usually shows the real error (e.g. `AccessDeniedException`, `ResourceNotFoundException`)
 
-2. **Validate Bedrock model access**
-   - AWS Console → Amazon Bedrock → Model access
-   - Direct links for US cross-region profile checks:
-     - us-east-1: https://console.aws.amazon.com/bedrock/home?region=us-east-1#/modelaccess
-     - us-east-2: https://console.aws.amazon.com/bedrock/home?region=us-east-2#/modelaccess
-     - us-west-2: https://console.aws.amazon.com/bedrock/home?region=us-west-2#/modelaccess
-   - Ensure **Anthropic Claude 3.5 Haiku** shows status **Access granted**
-   - Changes take a few minutes to propagate
+2. **Validate Bedrock setup**
+   - AWS Console → Amazon Bedrock (deployment region)
+   - Confirm `amplify/data/resource.ts` uses `resourcePath: "amazon.titan-text-lite-v1"`
+   - Confirm the resolver IAM role includes `bedrock:InvokeModel` for `amazon.titan-text-lite-v1`
 
 3. **Validate locally with sandbox**
    ```bash
@@ -169,7 +156,7 @@ Amplify Gen 2 (≥ 1.x) invokes Claude through an **inference profile** in `us-e
 
 | Message shown in UI | Root cause |
 |---|---|
-| "The AI request failed in the backend resolver…" | `AccessDeniedException` / `ResourceNotFoundException` / `ValidationException` from Bedrock — model access not enabled, IAM missing `bedrock:InvokeModel`, or incorrect model/inference-profile ARN |
+| "The AI request failed in the backend resolver…" | `AccessDeniedException` / `ResourceNotFoundException` / `ValidationException` from Bedrock — resolver IAM missing `bedrock:InvokeModel` or incorrect Titan model configuration |
 | "The AI service is currently rate-limited…" | `ThrottlingException` from Bedrock — wait a few seconds and retry |
 | "Authorization error (UnauthorizedException on Mutation.generateRecipe) — …" | Identity Pool unauthenticated role is missing `appsync:GraphQL` on `generateRecipe`; the explicit grant in `amplify/backend.ts` fixes this — redeploy |
 | "Authorization error — the AI service rejected the request…" | Guest IAM auth is still propagating, the Identity Pool unauthenticated role is missing AppSync permission, or the frontend bundle is still stale; the app now retries auth failures automatically (guest + API key), so wait about a minute, refresh, and redeploy the backend if it persists |

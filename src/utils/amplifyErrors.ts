@@ -56,8 +56,9 @@ export interface ParsedAmplifyError {
 function buildBedrockHint(region?: string): string {
   const regionNote = region ? ` (region: ${region})` : "";
   return (
-    `Check AWS Console → Amazon Bedrock → Model access${regionNote} and ensure ` +
-    "Claude 3 Haiku (Anthropic) is enabled in your deployment region. " +
+    `Check AWS Console → Amazon Bedrock${regionNote} and confirm the backend has ` +
+    "`bedrock:InvokeModel` access to Amazon Titan Text Lite " +
+    "(`amazon.titan-text-lite-v1`) in your deployment region. " +
     "If access was recently granted, redeploy the Amplify backend " +
     "(`npx ampx pipeline-deploy` or push to the CI branch)."
   );
@@ -67,7 +68,7 @@ function buildResolverHint(region?: string): string {
   return (
     "This usually means the Amplify backend has not been redeployed since the AI " +
     "resolver changed, the AppSync resolver IAM role is still missing " +
-    "`bedrock:InvokeModel` for the Claude 3 Haiku model, or the " +
+    "`bedrock:InvokeModel` for the Amazon Titan Text Lite model, or the " +
     "Bedrock model access is incomplete. " +
     buildBedrockHint(region)
   );
@@ -80,7 +81,8 @@ const NO_CREDENTIALS_RE =
 const RESOURCE_NOT_FOUND_RE = /resourcenotfound|resource.*not.*found/i;
 const THROTTLE_RE = /throttlingexception|throttled|rate.*exceed|too many requests/i;
 const VALIDATION_RE = /validationexception|invalid.*model|model.*invalid/i;
-const BEDROCK_RE = /bedrock|anthropic|claude|inference-profile|invokemodel/i;
+const BEDROCK_RE =
+  /bedrock|anthropic|claude|titan|inference-profile|invokemodel|model is disabled|generation route|identity-based policy/i;
 const AUTH_EXCEPTION_TYPE_RE = /AccessDeniedException|UnauthorizedException/i;
 const AUTHORIZATION_ERROR_MESSAGE =
   "Authorization error — the AI service rejected the request. The site uses " +
@@ -216,7 +218,7 @@ export function parseAmplifyErrors(
     return {
       userMessage:
         "The AI request failed in the backend resolver — this typically means " +
-        "Amazon Bedrock model access has not been enabled for Claude 3 Haiku. " +
+        "Amazon Bedrock access for Amazon Titan Text Lite is not configured correctly. " +
         buildBedrockHint(region),
       isAuthError: false,
       isModelAccessError: true,
@@ -306,7 +308,7 @@ export function formatCaughtError(context: string, e: unknown, region?: string):
     return {
       userMessage:
         "The AI request failed in the backend resolver — this typically means " +
-        "Amazon Bedrock model access has not been enabled for Claude 3 Haiku. " +
+        "Amazon Bedrock access for Amazon Titan Text Lite is not configured correctly. " +
         buildBedrockHint(region),
       isAuthError: false,
       isModelAccessError: true,
