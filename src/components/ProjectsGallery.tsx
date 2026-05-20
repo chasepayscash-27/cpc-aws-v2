@@ -194,9 +194,9 @@ export default function ProjectsGallery({ rows, onViewFullPnL }: Props) {
                 (e.currentTarget as HTMLButtonElement).style.background = "#f0f7f1";
                 (e.currentTarget as HTMLButtonElement).style.color = "#1a7a3c";
               }}
-              aria-label="Download PDF report"
+              aria-label="Download editable PDF report"
             >
-              📄 Download PDF
+              📄 Download Editable PDF
             </button>
           </div>
         </div>
