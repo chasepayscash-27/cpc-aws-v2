@@ -1,64 +1,28 @@
 import { useEffect, useRef, useState } from "react";
-import { generateClient } from "aws-amplify/data";
-import type { Schema } from "../../amplify/data/resource";
 import outputs from "../../amplify/amplify_outputs.json";
-import {
-  getBedrockModelAccessRegions,
-  getBedrockModelAccessUrl,
-} from "../utils/bedrockModelAccess";
-import {
-  parseAmplifyErrors,
-  formatCaughtError,
-  hasAmplifyAuthError,
-  isAuthErrorLike,
-} from "../utils/amplifyErrors";
 
-// Prefer Cognito Identity Pool guest credentials (SigV4), but keep API key
-// available as a rollout fallback if guest auth has not propagated yet.
-const guestClient = generateClient<Schema>({ authMode: "identityPool" });
-const apiKeyClient = generateClient<Schema>({ authMode: "apiKey" });
-
-// Deployment region — surfaced in error messages and console links so the user
-// knows which AWS Console region(s) to check for Bedrock model access.
-const DEPLOYMENT_REGION: string | undefined =
-  (outputs as { data?: { aws_region?: string } })?.data?.aws_region;
-const BEDROCK_MODEL_ACCESS_REGIONS = getBedrockModelAccessRegions(DEPLOYMENT_REGION);
+const HTTP_API_URL =
+  (outputs as { custom?: { cpcHttpApi?: { url?: string } } })?.custom?.cpcHttpApi?.url ?? "";
+const CHAT_ENDPOINT = HTTP_API_URL ? `${HTTP_API_URL.replace(/\/?$/, "/")}chat` : "";
 
 interface ChatMessage {
   role: "user" | "assistant";
   text: string;
 }
 
-const SYSTEM_CONTEXT =
-  "You are a helpful assistant for Chase Pays Cash, a real estate investment company. " +
-  "Answer questions about real estate investing, deal analysis, and property management. " +
-  "Be concise, friendly, and practical.";
 const MAX_AI_RETRIES = 3;
 
 function delay(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-async function generateRecipeWithFallback(description: string) {
-  const args = { description };
-
-  try {
-    const result = await guestClient.generations.generateRecipe(args);
-
-    if (!hasAmplifyAuthError(result.errors)) {
-      return result;
-    }
-
-    console.warn("[PublicChatWidget] Guest auth failed, retrying with apiKey.", result.errors);
-  } catch (e: unknown) {
-    if (!isAuthErrorLike(e)) {
-      throw e;
-    }
-
-    console.warn("[PublicChatWidget] Guest auth threw, retrying with apiKey.", e);
+function getErrorMessage(payload: unknown, fallback: string): string {
+  if (payload && typeof payload === "object") {
+    const record = payload as { error?: unknown; detail?: unknown };
+    if (typeof record.error === "string" && record.error.trim()) return record.error;
+    if (typeof record.detail === "string" && record.detail.trim()) return record.detail;
   }
-
-  return apiKeyClient.generations.generateRecipe(args);
+  return fallback;
 }
 
 export function PublicChatWidget() {
@@ -68,7 +32,6 @@ export function PublicChatWidget() {
   const [error, setError] = useState<string>("");
   const [isAuthError, setIsAuthError] = useState(false);
   const [isThrottleError, setIsThrottleError] = useState(false);
-  const [showBedrockConsoleLink, setShowBedrockConsoleLink] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
 
   // Scroll to latest message
@@ -89,77 +52,56 @@ export function PublicChatWidget() {
     setError("");
     setIsAuthError(false);
     setIsThrottleError(false);
-    setShowBedrockConsoleLink(false);
     setMessages(updatedHistory);
     setLoading(true);
 
     try {
-      if (typeof guestClient.generations?.generateRecipe !== "function") {
-        console.error(
-          "[PublicChatWidget] guestClient.generations.generateRecipe is not available. " +
-            "Ensure Amplify outputs are up-to-date and include the generateRecipe generation route."
-        );
-        throw new Error(
-          "AI assistant is not available right now. Please try again later or contact support."
-        );
+      if (!CHAT_ENDPOINT) {
+        throw new Error("AI assistant endpoint is unavailable. Please try again later.");
       }
-
-      // Build a conversation transcript to pass as context
-      const historyPrompt = updatedHistory
-        .map((m) => `${m.role === "user" ? "User" : "Assistant"}: ${m.text}`)
-        .join("\n");
-
-      const prompt = `${SYSTEM_CONTEXT}\n\nConversation so far:\n${historyPrompt}\n\nRespond as the Assistant:`;
 
       for (let attempt = 0; attempt < MAX_AI_RETRIES; attempt += 1) {
         const isLastAttempt = attempt === MAX_AI_RETRIES - 1;
+        const res = await fetch(CHAT_ENDPOINT, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            message: text,
+            history: messages,
+          }),
+        });
+        const json = await res.json().catch(() => ({}));
 
-        try {
-          const { data, errors } = await generateRecipeWithFallback(prompt);
+        if (!res.ok) {
+          const isRetryable = res.status === 429 || res.status >= 500;
 
-          if (errors?.length) {
-            const parsed = parseAmplifyErrors("PublicChatWidget", errors, DEPLOYMENT_REGION);
-
-            if (parsed.isRetryable && !isLastAttempt) {
-              const retryDelayMs = parsed.retryAfterMs * 2 ** attempt;
-              console.warn(
-                `[PublicChatWidget] Retrying AI request in ${retryDelayMs}ms due to transient Bedrock error.`,
-                errors
-              );
-              await delay(retryDelayMs);
-              continue;
-            }
-
-            setIsAuthError(parsed.isAuthError);
-            setIsThrottleError(parsed.isThrottleError);
-            setShowBedrockConsoleLink(parsed.showBedrockConsoleLink);
-            setError(parsed.userMessage);
-            return;
-          }
-
-          const reply = data?.instructions ?? "Sorry, I couldn't generate a response.";
-          setMessages([...updatedHistory, { role: "assistant", text: reply }]);
-          return;
-        } catch (e: unknown) {
-          const parsed = formatCaughtError("PublicChatWidget", e, DEPLOYMENT_REGION);
-
-          if (parsed.isRetryable && !isLastAttempt) {
-            const retryDelayMs = parsed.retryAfterMs * 2 ** attempt;
+          if (isRetryable && !isLastAttempt) {
+            const retryDelayMs = (res.status === 429 ? 1500 : 2000) * 2 ** attempt;
             console.warn(
-              `[PublicChatWidget] Retrying AI request in ${retryDelayMs}ms due to transient caught error.`,
-              e
+              `[PublicChatWidget] Retrying AI request in ${retryDelayMs}ms after ${res.status}.`
             );
             await delay(retryDelayMs);
             continue;
           }
 
-          setIsAuthError(parsed.isAuthError);
-          setIsThrottleError(parsed.isThrottleError);
-          setShowBedrockConsoleLink(parsed.showBedrockConsoleLink);
-          setError(parsed.userMessage);
+          setIsAuthError(res.status === 401 || res.status === 403);
+          setIsThrottleError(res.status === 429);
+          setError(
+            getErrorMessage(json, `AI assistant request failed (${res.status}). Please try again.`)
+          );
           return;
         }
+
+        const reply =
+          json && typeof json === "object" && typeof (json as { reply?: unknown }).reply === "string"
+            ? ((json as { reply: string }).reply || "Sorry, I couldn't generate a response.")
+            : "Sorry, I couldn't generate a response.";
+        setMessages([...updatedHistory, { role: "assistant", text: reply }]);
+        return;
       }
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : "An unexpected error occurred.";
+      setError(msg);
     } finally {
       setLoading(false);
     }
@@ -171,7 +113,6 @@ export function PublicChatWidget() {
     setError("");
     setIsAuthError(false);
     setIsThrottleError(false);
-    setShowBedrockConsoleLink(false);
     setLoading(false);
   }
 
@@ -248,23 +189,6 @@ export function PublicChatWidget() {
                 🔄 Refresh page
               </button>
             )}
-            {showBedrockConsoleLink &&
-              (BEDROCK_MODEL_ACCESS_REGIONS.length > 0
-                ? BEDROCK_MODEL_ACCESS_REGIONS
-                : [undefined]
-              ).map((region) => (
-                <a
-                  key={region ?? "default"}
-                  href={getBedrockModelAccessUrl(region)}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="btn"
-                  style={{ fontSize: "12px", display: "inline-block" }}
-                >
-                  🔗 Open Bedrock Console{region ? ` (${region})` : ""}
-                </a>
-              ))
-            }
             {isThrottleError && (
               <button className="btn" onClick={sendMessage} style={{ fontSize: "12px" }}>
                 🔁 Retry
