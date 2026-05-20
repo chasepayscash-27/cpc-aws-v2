@@ -7,6 +7,7 @@ const navItems = [
   { label: '💰 Financials', path: '/financials' },
   { label: '📊 Analytics', path: '/analytics' },
   { label: '🤖 AI Chat', path: '/chat' },
+  { label: '🧭 Workflow', path: '/workflow' },
   { label: '🔧 Resources', path: '/resources' },
   { label: '👥 Team', path: '/team' },
 ];
