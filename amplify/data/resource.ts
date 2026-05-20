@@ -11,18 +11,14 @@ const schema = a.schema({
   // The public chat widget can use generateRecipe with in-context history.
   chat: a
     .conversation({
-      aiModel: {
-        resourcePath: "amazon.titan-text-lite-v1",
-      },
+      aiModel: a.ai.model("Claude 3 Haiku"),
       systemPrompt: "You are a helpful assistant",
     })
     .authorization((allow) => allow.owner()),
 
   generateRecipe: a
     .generation({
-      aiModel: {
-        resourcePath: "amazon.titan-text-lite-v1",
-      },
+      aiModel: a.ai.model("Claude 3 Haiku"),
       systemPrompt:
         "You are an analytics assistant for a real estate investment business. " +
         "Analyze the provided metrics and return structured insights.",
