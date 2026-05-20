@@ -1,54 +1,22 @@
 import { useMemo, useState } from "react";
-import { generateClient } from "aws-amplify/data";
-import type { Schema } from "../../amplify/data/resource";
 import outputs from "../../amplify/amplify_outputs.json";
-import {
-  getBedrockModelAccessRegions,
-  getBedrockModelAccessUrl,
-} from "../utils/bedrockModelAccess";
-import {
-  parseAmplifyErrors,
-  formatCaughtError,
-  hasAmplifyAuthError,
-  isAuthErrorLike,
-} from "../utils/amplifyErrors";
 
-// Prefer Cognito Identity Pool guest credentials (SigV4), but keep API key
-// available as a rollout fallback if guest auth has not propagated yet.
-const guestClient = generateClient<Schema>({ authMode: "identityPool" });
-const apiKeyClient = generateClient<Schema>({ authMode: "apiKey" });
-
-// Deployment region — surfaced in error messages and console links so the user
-// knows which AWS Console region(s) to check for Bedrock model access.
-const DEPLOYMENT_REGION: string | undefined =
-  (outputs as { data?: { aws_region?: string } })?.data?.aws_region;
-const BEDROCK_MODEL_ACCESS_REGIONS = getBedrockModelAccessRegions(DEPLOYMENT_REGION);
+const HTTP_API_URL =
+  (outputs as { custom?: { cpcHttpApi?: { url?: string } } })?.custom?.cpcHttpApi?.url ?? "";
+const CHAT_ENDPOINT = HTTP_API_URL ? `${HTTP_API_URL.replace(/\/?$/, "/")}chat` : "";
 const MAX_AI_RETRIES = 3;
 
 function delay(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-async function generateRecipeWithFallback(description: string) {
-  const args = { description };
-
-  try {
-    const result = await guestClient.generations.generateRecipe(args);
-
-    if (!hasAmplifyAuthError(result.errors)) {
-      return result;
-    }
-
-    console.warn("[AiInsightsPanel] Guest auth failed, retrying with apiKey.", result.errors);
-  } catch (e: unknown) {
-    if (!isAuthErrorLike(e)) {
-      throw e;
-    }
-
-    console.warn("[AiInsightsPanel] Guest auth threw, retrying with apiKey.", e);
+function getErrorMessage(payload: unknown, fallback: string): string {
+  if (payload && typeof payload === "object") {
+    const record = payload as { error?: unknown; detail?: unknown };
+    if (typeof record.error === "string" && record.error.trim()) return record.error;
+    if (typeof record.detail === "string" && record.detail.trim()) return record.detail;
   }
-
-  return apiKeyClient.generations.generateRecipe(args);
+  return fallback;
 }
 
 export interface PropertyData {
@@ -74,7 +42,6 @@ export function AiInsightsPanel({ properties }: Props) {
   const [loading, setLoading] = useState(false);
   const [output, setOutput] = useState<string>("");
   const [error, setError] = useState<string>("");
-  const [showBedrockConsoleLink, setShowBedrockConsoleLink] = useState(false);
 
   const metrics = useMemo(() => {
     const n = properties.length;
@@ -135,16 +102,9 @@ export function AiInsightsPanel({ properties }: Props) {
     setLoading(true);
     setOutput("");
     setError("");
-    setShowBedrockConsoleLink(false);
     try {
-      if (typeof guestClient.generations?.generateRecipe !== "function") {
-        console.error(
-          "[AiInsightsPanel] guestClient.generations.generateRecipe is not available. " +
-            "Ensure Amplify outputs are up-to-date and include the generateRecipe generation route."
-        );
-        throw new Error(
-          "AI Insights are not available right now. Please try again later or contact support."
-        );
+      if (!CHAT_ENDPOINT) {
+        throw new Error("AI Insights endpoint is unavailable. Please try again later.");
       }
 
       const prompt = `
@@ -161,47 +121,39 @@ ${JSON.stringify(metrics, null, 2)}
       for (let attempt = 0; attempt < MAX_AI_RETRIES; attempt += 1) {
         const isLastAttempt = attempt === MAX_AI_RETRIES - 1;
 
-        try {
-          const { data, errors } = await generateRecipeWithFallback(prompt);
+        const res = await fetch(CHAT_ENDPOINT, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ message: prompt }),
+        });
+        const json = await res.json().catch(() => ({}));
 
-          if (errors?.length) {
-            const parsed = parseAmplifyErrors("AiInsightsPanel", errors, DEPLOYMENT_REGION);
+        if (!res.ok) {
+          const isRetryable = res.status === 429 || res.status >= 500;
 
-            if (parsed.isRetryable && !isLastAttempt) {
-              const retryDelayMs = parsed.retryAfterMs * 2 ** attempt;
-              console.warn(
-                `[AiInsightsPanel] Retrying AI request in ${retryDelayMs}ms due to transient Bedrock error.`,
-                errors
-              );
-              await delay(retryDelayMs);
-              continue;
-            }
-
-            setShowBedrockConsoleLink(parsed.showBedrockConsoleLink);
-            setError(parsed.userMessage);
-            return;
-          }
-
-          setOutput(data?.instructions ?? "No insights returned.");
-          return;
-        } catch (e: unknown) {
-          const parsed = formatCaughtError("AiInsightsPanel", e, DEPLOYMENT_REGION);
-
-          if (parsed.isRetryable && !isLastAttempt) {
-            const retryDelayMs = parsed.retryAfterMs * 2 ** attempt;
+          if (isRetryable && !isLastAttempt) {
+            const retryDelayMs = (res.status === 429 ? 1500 : 2000) * 2 ** attempt;
             console.warn(
-              `[AiInsightsPanel] Retrying AI request in ${retryDelayMs}ms due to transient caught error.`,
-              e
+              `[AiInsightsPanel] Retrying AI request in ${retryDelayMs}ms after ${res.status}.`
             );
             await delay(retryDelayMs);
             continue;
           }
 
-          setShowBedrockConsoleLink(parsed.showBedrockConsoleLink);
-          setError(parsed.userMessage);
+          setError(getErrorMessage(json, `AI request failed (${res.status}). Please try again.`));
           return;
         }
+
+        const reply =
+          json && typeof json === "object" && typeof (json as { reply?: unknown }).reply === "string"
+            ? ((json as { reply: string }).reply || "No insights returned.")
+            : "No insights returned.";
+        setOutput(reply);
+        return;
       }
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : "An unexpected error occurred.";
+      setError(msg);
     } finally {
       setLoading(false);
     }
@@ -245,25 +197,6 @@ ${JSON.stringify(metrics, null, 2)}
           <p style={{ color: "#dc2626", fontSize: "13px", margin: "0 0 6px" }}>
             {error}
           </p>
-          {showBedrockConsoleLink && (
-            <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
-              {(BEDROCK_MODEL_ACCESS_REGIONS.length > 0
-                ? BEDROCK_MODEL_ACCESS_REGIONS
-                : [undefined]
-              ).map((region) => (
-                <a
-                  key={region ?? "default"}
-                  href={getBedrockModelAccessUrl(region)}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="btn"
-                  style={{ fontSize: "12px", display: "inline-block" }}
-                >
-                  🔗 Open Bedrock Console{region ? ` (${region})` : ""}
-                </a>
-              ))}
-            </div>
-          )}
         </div>
       )}
 
@@ -298,7 +231,7 @@ ${JSON.stringify(metrics, null, 2)}
             textAlign: "center",
           }}
         >
-          Amazon Titan Text Lite is analysing your portfolio data…
+          Claude is analysing your portfolio data…
         </div>
       )}
     </div>

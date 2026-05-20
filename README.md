@@ -11,23 +11,24 @@ This template equips you with a foundational React application integrated with A
 - **Authentication**: Setup with Amazon Cognito for secure user authentication.
 - **API**: Ready-to-use GraphQL endpoint with AWS AppSync.
 - **Database**: Real-time database powered by Amazon DynamoDB.
-- **AI Chat & Insights**: Public chat widget and AI insights panel powered by Amazon Bedrock via Amplify Gen 2 generation routes.
+- **AI Chat & Insights**: Public chat widget and AI insights panel call a Lambda-backed HTTP API (`POST /chat`) that invokes Claude 3 Haiku in Bedrock.
 
 ## AI Feature Requirements
 
-The AI chat widget (`PublicChatWidget`) and AI insights panel (`AiInsightsPanel`) use the `generateRecipe` generation route defined in `amplify/data/resource.ts`. This route calls **Amazon Titan Text Lite** (`amazon.titan-text-lite-v1`) via Amazon Bedrock.
+The AI chat widget (`PublicChatWidget`) and AI insights panel (`AiInsightsPanel`) call the custom HTTP API output at `custom.cpcHttpApi.url` and send `POST /chat` to the `ai-chat` Lambda.
 
 ### Required setup before deploying the AI features
 
-1. **Deploy or sandbox the Amplify backend** so the `generateRecipe` AppSync mutation and resolver IAM role are provisioned:
+1. **Deploy or sandbox the Amplify backend** so the HTTP API and Lambda route are provisioned:
    ```bash
    npx ampx sandbox          # for local development
    # or push via CI/CD for production
    ```
-2. No manual Bedrock "model access" approval step is required for Amazon-owned Titan models. The deployment step is what updates the resolver role with `bedrock:InvokeModel` on:
-   - `arn:aws:bedrock:<region>::foundation-model/amazon.titan-text-lite-v1`
-3. After a successful deployment, Amplify CLI regenerates `amplify/amplify_outputs.json`. This file **must** contain a `generations.generateRecipe` entry inside `data.model_introspection`. Without it, the frontend Amplify client cannot expose `client.generations.generateRecipe` and will display a user-friendly error in the UI instead of crashing.
-4. Titan output style can differ from Claude. If responses are terse or formatted oddly, tune the `systemPrompt` in `amplify/data/resource.ts` in a follow-up change.
+2. The `ai-chat` Lambda invokes Claude 3 Haiku in `us-east-1` using:
+   - Primary model ID: `anthropic.claude-3-haiku-20240307-v1:0`
+   - Fallback inference profile: `us.anthropic.claude-3-haiku-20240307-v1:0`
+3. No manual Bedrock model-access approval step is required for this flow. The Lambda execution role policy in `amplify/backend.ts` is the permission source for `bedrock:InvokeModel`.
+4. After deployment, `amplify/amplify_outputs.json` must include `custom.cpcHttpApi.url`; the frontend reads that value to call `/chat`.
 
 ### Environment variables
 
@@ -80,49 +81,26 @@ See [CONTRIBUTING](CONTRIBUTING.md#security-issue-notifications) for more inform
 
 ## Troubleshooting AI Chat / AI Insights
 
-### "Authorization error — the AI service rejected the request"
+### `/chat` returns 4xx/5xx
 
-This message is shown when both the Cognito guest-credentials client and the API-key fallback client keep receiving an AppSync auth error (`AccessDeniedException` / `UnauthorizedException`) even after automatic short retries. The most common causes are:
+The frontend now calls API Gateway directly. Check browser network logs for `POST /chat` response JSON (`error` / `detail`) and Lambda CloudWatch logs for `ai-chat`.
 
-| Cause | How to check | Fix |
+| Symptom | Cause | Fix |
 |---|---|---|
-| **Identity Pool unauth role missing `appsync:GraphQL` on `generateRecipe`** | AWS Console → IAM → Roles → search `amplify-*-unauthRole*` → Permissions → look for `appsync:GraphQL` | `amplify/backend.ts` now adds this explicitly; redeploy after merging |
-| **Identity Pool or pool ID is stale** | Compare `identity_pool_id` in `amplify/amplify_outputs.json` vs. Amplify Console → Backend environments | Retrigger the Amplify build so `cp -f amplify_outputs.json amplify/amplify_outputs.json` runs |
-| **API key in `amplify_outputs.json` is expired or wrong** | Compare `api_key` in the file vs. AppSync Console → API keys | Push a new commit to regenerate, or set `VITE_APPSYNC_API_KEY` in Amplify Console env vars |
-
-#### Verifying the explicit IAM grant in the AWS Console
-
-After deploying, confirm the fix is in place:
-
-1. **AWS Console → IAM → Roles**
-2. Search for `amplify-*-unauthRole*` (the Cognito Identity Pool unauthenticated role)
-3. Click the role → **Permissions** tab
-4. Look for an inline policy containing `Action: appsync:GraphQL` and a `Resource` ending in `/types/Mutation/fields/generateRecipe`
-
-If it is missing, the `allow.guest()` auto-wiring from Amplify Gen 2 did not fire for this `a.generation()` route. The explicit grant in `amplify/backend.ts` (`unauthenticatedUserIamRole.addToPrincipalPolicy(...)`) is the fix — trigger a fresh deploy.
-
-### "A custom error was thrown from a mapping template."
-
-This AppSync error message means the backend resolver for the `generateRecipe` generation route failed before Bedrock returned a successful response. The most common causes are:
-
-| Cause | How to check | Fix |
-|---|---|---|
-| **Resolver IAM missing `bedrock:InvokeModel` for Titan** | AWS IAM → search for roles with "Bedrock" or "generateRecipe" | Redeploy backend so the resolver role is refreshed |
-| **Wrong region** | Check `amplify_outputs.json` → `data.aws_region` | Ensure Bedrock invocation is happening in that region (default: `us-east-1`) |
-| **Stale backend deployment** | AWS Amplify Console → last build date | Push a new commit or manually trigger a build to redeploy the backend |
-| **Wrong model ID in generation route** | Check `amplify/data/resource.ts` | Keep `resourcePath: "amazon.titan-text-lite-v1"` and redeploy |
+| `400 Message is required.` | Request payload missing `message` | Ensure frontend sends `{ message }` JSON |
+| `429` | Bedrock throttling | Client retries automatically with backoff |
+| `500 AI chat failed` + Bedrock access message | Primary model invocation denied | Lambda retries with `us.anthropic.claude-3-haiku-20240307-v1:0` inference profile |
+| `500 AI chat failed` persists | Lambda role or Bedrock issue | Confirm Lambda role has `bedrock:InvokeModel` and redeploy |
 
 ### Step-by-step diagnosis
 
-1. **Enable AppSync request/response logging**
-   - AWS Console → AppSync → your API → Settings → Logging → Enable (Field-level)
-   - Reproduce the error; check CloudWatch Logs for the `generateRecipe` resolver
-   - The log usually shows the real error (e.g. `AccessDeniedException`, `ResourceNotFoundException`)
+1. **Verify backend output wiring**
+   - Confirm `amplify/amplify_outputs.json` contains `custom.cpcHttpApi.url`
+   - Confirm requests are sent to `${custom.cpcHttpApi.url}chat`
 
-2. **Validate Bedrock setup**
-   - AWS Console → Amazon Bedrock (deployment region)
-   - Confirm `amplify/data/resource.ts` uses `resourcePath: "amazon.titan-text-lite-v1"`
-   - Confirm the resolver IAM role includes `bedrock:InvokeModel` for `amazon.titan-text-lite-v1`
+2. **Check Lambda logs**
+   - AWS Console → CloudWatch Logs → `/aws/lambda/*ai-chat*`
+   - Reproduce the error and inspect the logged Bedrock exception and fallback path
 
 3. **Validate locally with sandbox**
    ```bash
@@ -133,12 +111,10 @@ This AppSync error message means the backend resolver for the `generateRecipe` g
    # Open http://localhost:5173 → AI Chat tab → send a message
    ```
 
-4. **Check guest Identity Pool configuration** (for authorization errors)
-   - Public AI routes now use Cognito Identity Pool **guest** credentials (`identityPool`) first and automatically fall back to API key auth during rollout
-   - Ensure `allowUnauthenticatedIdentities` is enabled in the backend and redeploy after pulling latest changes
-   - `amplify/backend.ts` now **explicitly** adds `appsync:GraphQL` on `Mutation.generateRecipe` to the `unauthenticatedUserIamRole` — Amplify Gen 2 does not auto-wire this for `a.generation()` routes
-   - After deploying, verify in AWS Console: IAM → Roles → `amplify-*-unauthRole*` → Permissions → search for `appsync:GraphQL` on `generateRecipe`
-   - If running locally, re-run `npx ampx sandbox` so `amplify_outputs.json` includes `aws_cognito_identity_pool_id`, then copy it into `amplify/amplify_outputs.json`
+4. **Validate Bedrock permissions and region**
+   - Deployment region remains `us-east-1`
+   - Confirm `ai-chat` Lambda execution role includes `bedrock:InvokeModel` and `bedrock:InvokeModelWithResponseStream`
+   - If Bedrock rejects the base model with inference-profile guidance, the Lambda fallback should automatically handle it
 
 5. **Redeploy the Amplify backend**
    ```bash
@@ -156,11 +132,9 @@ This AppSync error message means the backend resolver for the `generateRecipe` g
 
 | Message shown in UI | Root cause |
 |---|---|
-| "The AI request failed in the backend resolver…" | `AccessDeniedException` / `ResourceNotFoundException` / `ValidationException` from Bedrock — resolver IAM missing `bedrock:InvokeModel` or incorrect Titan model configuration |
+| "AI assistant request failed (4xx/5xx)" | API Gateway/Lambda returned an HTTP error; inspect response `error`/`detail` and CloudWatch logs |
 | "The AI service is currently rate-limited…" | `ThrottlingException` from Bedrock — wait a few seconds and retry |
-| "Authorization error (UnauthorizedException on Mutation.generateRecipe) — …" | Identity Pool unauthenticated role is missing `appsync:GraphQL` on `generateRecipe`; the explicit grant in `amplify/backend.ts` fixes this — redeploy |
-| "Authorization error — the AI service rejected the request…" | Guest IAM auth is still propagating, the Identity Pool unauthenticated role is missing AppSync permission, or the frontend bundle is still stale; the app now retries auth failures automatically (guest + API key), so wait about a minute, refresh, and redeploy the backend if it persists |
-| "AI assistant is not available right now…" | `amplify_outputs.json` is missing the `generations.generateRecipe` introspection entry — redeploy the backend |
+| "AI assistant endpoint is unavailable…" | `custom.cpcHttpApi.url` is missing from `amplify_outputs.json`; regenerate outputs during deploy |
 
 ## License
 
