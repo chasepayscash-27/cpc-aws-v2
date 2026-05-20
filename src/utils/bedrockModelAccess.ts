@@ -1,5 +1,5 @@
-// Claude 3 Haiku is available directly in the deployment region without
-// cross-region inference profiles, so only one region needs model access.
+// Titan Text Lite is invoked in the deployment region, so surface that region
+// in the Bedrock console link when available.
 export function getBedrockModelAccessRegions(
   deploymentRegion?: string
 ): string[] {
@@ -7,7 +7,5 @@ export function getBedrockModelAccessRegions(
 }
 
 export function getBedrockModelAccessUrl(region?: string): string {
-  return `https://console.aws.amazon.com/bedrock/home${
-    region ? `?region=${region}` : ""
-  }#/modelaccess`;
+  return `https://console.aws.amazon.com/bedrock/home${region ? `?region=${region}` : ""}`;
 }

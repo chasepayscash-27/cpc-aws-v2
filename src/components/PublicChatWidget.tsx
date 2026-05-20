@@ -261,7 +261,7 @@ export function PublicChatWidget() {
                   className="btn"
                   style={{ fontSize: "12px", display: "inline-block" }}
                 >
-                  🔗 Bedrock Model Access{region ? ` (${region})` : ""}
+                  🔗 Open Bedrock Console{region ? ` (${region})` : ""}
                 </a>
               ))
             }

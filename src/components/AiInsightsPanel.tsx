@@ -259,7 +259,7 @@ ${JSON.stringify(metrics, null, 2)}
                   className="btn"
                   style={{ fontSize: "12px", display: "inline-block" }}
                 >
-                  🔗 Bedrock Model Access{region ? ` (${region})` : ""}
+                  🔗 Open Bedrock Console{region ? ` (${region})` : ""}
                 </a>
               ))}
             </div>
@@ -298,7 +298,7 @@ ${JSON.stringify(metrics, null, 2)}
             textAlign: "center",
           }}
         >
-          Claude is analysing your portfolio data…
+          Amazon Titan Text Lite is analysing your portfolio data…
         </div>
       )}
     </div>
