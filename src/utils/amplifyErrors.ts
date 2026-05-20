@@ -86,8 +86,9 @@ const AUTHORIZATION_ERROR_MESSAGE =
   "Authorization error — the AI service rejected the request. The site uses " +
   "Cognito guest credentials (with API key as a fallback) to reach AppSync; " +
   "this usually means a backend deploy is still in progress or the Identity " +
-  "Pool unauth role hasn't propagated yet. Wait about a minute and try again, " +
-  "or refresh the page to pick up the latest bundle.";
+  "Pool unauth role hasn't propagated yet. The app retries this automatically " +
+  "for a few seconds; if it still fails, wait about a minute and try again, or " +
+  "refresh the page to pick up the latest bundle.";
 
 function hasAuthSignal(combined: string, errorTypes: ReadonlyArray<string> = []): boolean {
   return (
@@ -258,8 +259,8 @@ export function parseAmplifyErrors(
       isModelAccessError: false,
       isThrottleError: false,
       showBedrockConsoleLink: false,
-      isRetryable: false,
-      retryAfterMs: 0,
+      isRetryable: true,
+      retryAfterMs: 2000,
     };
   }
 
@@ -350,8 +351,8 @@ export function formatCaughtError(context: string, e: unknown, region?: string):
       isModelAccessError: false,
       isThrottleError: false,
       showBedrockConsoleLink: false,
-      isRetryable: false,
-      retryAfterMs: 0,
+      isRetryable: true,
+      retryAfterMs: 2000,
     };
   }
 

@@ -86,7 +86,7 @@ See [CONTRIBUTING](CONTRIBUTING.md#security-issue-notifications) for more inform
 
 ### "Authorization error — the AI service rejected the request"
 
-This message is shown when both the Cognito guest-credentials client and the API-key fallback client receive an AppSync auth error (`AccessDeniedException` / `UnauthorizedException`). The most common causes are:
+This message is shown when both the Cognito guest-credentials client and the API-key fallback client keep receiving an AppSync auth error (`AccessDeniedException` / `UnauthorizedException`) even after automatic short retries. The most common causes are:
 
 | Cause | How to check | Fix |
 |---|---|---|
@@ -172,7 +172,7 @@ Amplify Gen 2 (≥ 1.x) invokes Claude through an **inference profile** in `us-e
 | "The AI request failed in the backend resolver…" | `AccessDeniedException` / `ResourceNotFoundException` / `ValidationException` from Bedrock — model access not enabled, IAM missing `bedrock:InvokeModel`, or incorrect model/inference-profile ARN |
 | "The AI service is currently rate-limited…" | `ThrottlingException` from Bedrock — wait a few seconds and retry |
 | "Authorization error (UnauthorizedException on Mutation.generateRecipe) — …" | Identity Pool unauthenticated role is missing `appsync:GraphQL` on `generateRecipe`; the explicit grant in `amplify/backend.ts` fixes this — redeploy |
-| "Authorization error — the AI service rejected the request…" | Guest IAM auth is still propagating, the Identity Pool unauthenticated role is missing AppSync permission, or the frontend bundle is still stale; the app now retries with API key automatically, so wait about a minute, refresh, and redeploy the backend if it persists |
+| "Authorization error — the AI service rejected the request…" | Guest IAM auth is still propagating, the Identity Pool unauthenticated role is missing AppSync permission, or the frontend bundle is still stale; the app now retries auth failures automatically (guest + API key), so wait about a minute, refresh, and redeploy the backend if it persists |
 | "AI assistant is not available right now…" | `amplify_outputs.json` is missing the `generations.generateRecipe` introspection entry — redeploy the backend |
 
 ## License
