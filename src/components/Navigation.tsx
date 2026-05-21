@@ -4,6 +4,7 @@ import { NavLink } from 'react-router-dom';
 const navItems = [
   { label: '🏠 Home', path: '/' },
   { label: '🏗️ Projects', path: '/projects' },
+  { label: '🗺️ Maps', path: '/maps' },
   { label: '💰 Financials', path: '/financials' },
   { label: '📊 Analytics', path: '/analytics' },
   { label: '🤖 AI Chat', path: '/chat' },

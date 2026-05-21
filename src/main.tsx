@@ -4,6 +4,7 @@ import { BrowserRouter } from "react-router-dom";
 import { Amplify } from "aws-amplify";
 import outputs from "../amplify/amplify_outputs.json";
 import App from "./App";
+import "leaflet/dist/leaflet.css";
 
 // Allow environment-variable overrides for the AppSync endpoint and API key.
 // Set VITE_APPSYNC_API_KEY (and optionally VITE_APPSYNC_URL) in the AWS Amplify
