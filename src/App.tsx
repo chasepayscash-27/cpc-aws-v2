@@ -7,6 +7,7 @@ import './App.css';
 // The browser only downloads a page's chunk when the user navigates to it.
 const YTDSummaryPage = lazy(() => import('./pages/YTDSummaryPage'));
 const ProjectsPage   = lazy(() => import('./pages/ProjectsPage'));
+const MapsPage       = lazy(() => import('./pages/MapsPage'));
 const FinancialsPage = lazy(() => import('./pages/FinancialsPage'));
 const ResourcesPage  = lazy(() => import('./pages/ResourcesPage'));
 const TeamPage       = lazy(() => import('./pages/TeamPage'));
@@ -33,6 +34,7 @@ const App = () => {
             <Routes>
               <Route path="/" element={<YTDSummaryPage />} />
               <Route path="/projects" element={<ProjectsPage />} />
+              <Route path="/maps" element={<MapsPage />} />
               <Route path="/financials" element={<FinancialsPage />} />
               <Route path="/resources" element={<ResourcesPage />} />
               <Route path="/team" element={<TeamPage />} />
