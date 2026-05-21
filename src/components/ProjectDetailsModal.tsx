@@ -3,7 +3,7 @@ import type { ProjectRow } from "../types/project";
 import type { PhotoLogRow } from "../types/photoLog";
 import { loadCsv } from "../utils/csv";
 import PropertyFinancials from "./PropertyFinancials";
-import { generatePropertyPdf } from "../utils/generatePropertyPdf";
+import PropertyWorksheet from "./PropertyWorksheet";
 
 interface Props {
   project: ProjectRow;
@@ -53,6 +53,7 @@ function DetailRow({ label, value }: { label: string; value?: string | null }) {
 export default function ProjectDetailsModal({ project: row, onClose, onViewFullPnL }: Props) {
   const [photos, setPhotos] = useState<PhotoLogRow[]>([]);
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
+  const [worksheetOpen, setWorksheetOpen] = useState(false);
 
   const isLightboxOpen = lightboxIndex !== null;
 
@@ -232,16 +233,16 @@ export default function ProjectDetailsModal({ project: row, onClose, onViewFullP
               </div>
             )}
 
-            {/* Download PDF button */}
+            {/* Worksheet toggle button */}
             <button
-              onClick={() => generatePropertyPdf(row)}
+              onClick={() => setWorksheetOpen((v) => !v)}
               style={{
-                marginBottom: 20,
+                marginBottom: worksheetOpen ? 12 : 20,
                 padding: "8px 18px",
                 borderRadius: 12,
                 border: "1px solid #1a7a3c",
-                background: "#f0f7f1",
-                color: "#1a7a3c",
+                background: worksheetOpen ? "#1a7a3c" : "#f0f7f1",
+                color: worksheetOpen ? "#ffffff" : "#1a7a3c",
                 fontSize: 13,
                 fontWeight: 600,
                 cursor: "pointer",
@@ -251,17 +252,29 @@ export default function ProjectDetailsModal({ project: row, onClose, onViewFullP
                 transition: "background 0.15s, color 0.15s",
               }}
               onMouseEnter={(e) => {
-                (e.currentTarget as HTMLButtonElement).style.background = "#1a7a3c";
-                (e.currentTarget as HTMLButtonElement).style.color = "#ffffff";
+                if (!worksheetOpen) {
+                  (e.currentTarget as HTMLButtonElement).style.background = "#1a7a3c";
+                  (e.currentTarget as HTMLButtonElement).style.color = "#ffffff";
+                }
               }}
               onMouseLeave={(e) => {
-                (e.currentTarget as HTMLButtonElement).style.background = "#f0f7f1";
-                (e.currentTarget as HTMLButtonElement).style.color = "#1a7a3c";
+                if (!worksheetOpen) {
+                  (e.currentTarget as HTMLButtonElement).style.background = "#f0f7f1";
+                  (e.currentTarget as HTMLButtonElement).style.color = "#1a7a3c";
+                }
               }}
-              aria-label="Download editable PDF report"
+              aria-expanded={worksheetOpen}
+              aria-label={worksheetOpen ? "Close property worksheet" : "Open property worksheet"}
             >
-              📄 Download Editable PDF
+              📋 {worksheetOpen ? "Close Worksheet" : "Edit Worksheet"}
             </button>
+
+            {/* Inline editable worksheet */}
+            {worksheetOpen && (
+              <div style={{ marginBottom: 20 }}>
+                <PropertyWorksheet row={row} />
+              </div>
+            )}
 
             {/* Quick stats */}
             {(row.beds || row.baths || sqft || row.year_built) && (

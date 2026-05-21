@@ -1,7 +1,10 @@
 import { AcroFormTextField, jsPDF } from "jspdf";
 import type { ProjectRow } from "../types/project";
 
-export function generatePropertyPdf(row: ProjectRow): void {
+export function generatePropertyPdf(
+  row: ProjectRow,
+  savedFields?: Record<string, string>,
+): void {
   const doc = new jsPDF({ orientation: "portrait", unit: "pt", format: "letter" });
 
   const pageWidth = doc.internal.pageSize.getWidth();
@@ -19,36 +22,38 @@ export function generatePropertyPdf(row: ProjectRow): void {
     [row.address_1, row.address_2].filter(Boolean).join(" ") ??
     "—";
 
+  const sv = savedFields ?? {};
+
   const metrics: Array<{ label: string; value: string; fieldName: string }> = [
-    { label: "Property Address", value: propertyAddress, fieldName: "property_address" },
-    { label: "List Price/Asking Price", value: "", fieldName: "list_price" },
-    { label: "Year Built", value: row.year_built ?? "", fieldName: "year_built" },
+    { label: "Property Address", value: sv["property_address"] ?? propertyAddress, fieldName: "property_address" },
+    { label: "List Price/Asking Price", value: sv["list_price"] ?? "", fieldName: "list_price" },
+    { label: "Year Built", value: sv["year_built"] ?? row.year_built ?? "", fieldName: "year_built" },
     {
       label: "Square Footage",
-      value: row.square_feet && !isNaN(Number(row.square_feet)) ? Number(row.square_feet).toLocaleString() : row.square_feet ?? "",
+      value: sv["square_footage"] ?? (row.square_feet && !isNaN(Number(row.square_feet)) ? Number(row.square_feet).toLocaleString() : row.square_feet ?? ""),
       fieldName: "square_footage",
     },
-    { label: "Water Heater (New or Age)", value: "", fieldName: "water_heater" },
-    { label: "Roof (New or Age)", value: "", fieldName: "roof" },
-    { label: "Appliances (New or Age)", value: "", fieldName: "appliances" },
-    { label: "Gas Appliances", value: "", fieldName: "gas_appliances" },
-    { label: "Electric Appliances", value: "", fieldName: "electric_appliances" },
-    { label: "Fireplace (Gas Logs or Wood Burning)", value: "", fieldName: "fireplace" },
-    { label: "Lot Size (Acres)", value: "", fieldName: "lot_size_acres" },
-    { label: "Bedrooms", value: row.beds ?? "", fieldName: "bedrooms" },
-    { label: "Bathrooms", value: row.baths ?? "", fieldName: "bathrooms" },
-    { label: "Sewer / Septic", value: "", fieldName: "sewer_septic" },
-    { label: "HVAC (New or Age)", value: "", fieldName: "hvac" },
-    { label: "Plumbing (New or Partial Update)", value: "", fieldName: "plumbing" },
-    { label: "Electrical Panel Update", value: "", fieldName: "electrical_panel" },
-    { label: "Electrical Wiring Update", value: "", fieldName: "electrical_wiring" },
-    { label: "Deck Update Front", value: "", fieldName: "deck_front" },
-    { label: "Deck Update Back", value: "", fieldName: "deck_back" },
-    { label: "Garage Door Motors Update", value: "", fieldName: "garage_door_motors" },
-    { label: "Garage Doors Update", value: "", fieldName: "garage_doors" },
-    { label: "Foundation Work Completed", value: "", fieldName: "foundation_work" },
-    { label: "Counter Top (Granite or Quartz)", value: "", fieldName: "counter_top" },
-    { label: "Windows Update", value: "", fieldName: "windows_update" },
+    { label: "Water Heater (New or Age)", value: sv["water_heater"] ?? "", fieldName: "water_heater" },
+    { label: "Roof (New or Age)", value: sv["roof"] ?? "", fieldName: "roof" },
+    { label: "Appliances (New or Age)", value: sv["appliances"] ?? "", fieldName: "appliances" },
+    { label: "Gas Appliances", value: sv["gas_appliances"] ?? "", fieldName: "gas_appliances" },
+    { label: "Electric Appliances", value: sv["electric_appliances"] ?? "", fieldName: "electric_appliances" },
+    { label: "Fireplace (Gas Logs or Wood Burning)", value: sv["fireplace"] ?? "", fieldName: "fireplace" },
+    { label: "Lot Size (Acres)", value: sv["lot_size_acres"] ?? "", fieldName: "lot_size_acres" },
+    { label: "Bedrooms", value: sv["bedrooms"] ?? row.beds ?? "", fieldName: "bedrooms" },
+    { label: "Bathrooms", value: sv["bathrooms"] ?? row.baths ?? "", fieldName: "bathrooms" },
+    { label: "Sewer / Septic", value: sv["sewer_septic"] ?? "", fieldName: "sewer_septic" },
+    { label: "HVAC (New or Age)", value: sv["hvac"] ?? "", fieldName: "hvac" },
+    { label: "Plumbing (New or Partial Update)", value: sv["plumbing"] ?? "", fieldName: "plumbing" },
+    { label: "Electrical Panel Update", value: sv["electrical_panel"] ?? "", fieldName: "electrical_panel" },
+    { label: "Electrical Wiring Update", value: sv["electrical_wiring"] ?? "", fieldName: "electrical_wiring" },
+    { label: "Deck Update Front", value: sv["deck_front"] ?? "", fieldName: "deck_front" },
+    { label: "Deck Update Back", value: sv["deck_back"] ?? "", fieldName: "deck_back" },
+    { label: "Garage Door Motors Update", value: sv["garage_door_motors"] ?? "", fieldName: "garage_door_motors" },
+    { label: "Garage Doors Update", value: sv["garage_doors"] ?? "", fieldName: "garage_doors" },
+    { label: "Foundation Work Completed", value: sv["foundation_work"] ?? "", fieldName: "foundation_work" },
+    { label: "Counter Top (Granite or Quartz)", value: sv["counter_top"] ?? "", fieldName: "counter_top" },
+    { label: "Windows Update", value: sv["windows_update"] ?? "", fieldName: "windows_update" },
   ];
 
   const colWidth = contentWidth / 2;
@@ -233,7 +238,7 @@ export function generatePropertyPdf(row: ProjectRow): void {
 
   addTextField({
     fieldName: "notes",
-    value: "",
+    value: sv["notes"] ?? "",
     x: marginLeft + 8,
     y: y + 8,
     width: contentWidth - 16,

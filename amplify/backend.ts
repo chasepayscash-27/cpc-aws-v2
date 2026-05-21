@@ -8,12 +8,14 @@ import { PolicyStatement, Effect } from "aws-cdk-lib/aws-iam";
 import { auth } from "./auth/resource";
 import { data } from "./data/resource";
 import { rdsQuery } from "./functions/rds-query/resource";
+import { worksheet } from "./functions/worksheet/resource";
 
 const backend = defineBackend({
   auth,
   data,
   rdsQuery,
   aiChat,
+  worksheet,
 });
 
 backend.auth.resources.cfnResources.cfnIdentityPool.allowUnauthenticatedIdentities = true;
@@ -54,6 +56,11 @@ const chatIntegration = new HttpLambdaIntegration(
   backend.aiChat.resources.lambda
 );
 
+const worksheetIntegration = new HttpLambdaIntegration(
+  "WorksheetIntegration",
+  backend.worksheet.resources.lambda
+);
+
 const httpApi = new HttpApi(apiStack, "HttpApi", {
   apiName: "cpcHttpApi",
 
@@ -80,6 +87,12 @@ httpApi.addRoutes({
   path: "/chat",
   methods: [HttpMethod.POST, HttpMethod.OPTIONS],
   integration: chatIntegration,
+});
+
+httpApi.addRoutes({
+  path: "/worksheet",
+  methods: [HttpMethod.GET, HttpMethod.POST, HttpMethod.OPTIONS],
+  integration: worksheetIntegration,
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
