@@ -4,6 +4,7 @@ import { CorsHttpMethod, HttpApi, HttpMethod } from "aws-cdk-lib/aws-apigatewayv
 import { HttpLambdaIntegration } from "aws-cdk-lib/aws-apigatewayv2-integrations";
 import { Stack } from "aws-cdk-lib";
 import { PolicyStatement, Effect } from "aws-cdk-lib/aws-iam";
+import { Bucket, BucketEncryption, BlockPublicAccess } from "aws-cdk-lib/aws-s3";
 
 import { auth } from "./auth/resource";
 import { data } from "./data/resource";
@@ -45,6 +46,18 @@ console.log(
 // ─────────────────────────────────────────────────────────────────────────────
 
 const apiStack = backend.createStack("api-stack");
+const chatLogsBucket = new Bucket(apiStack, "AiChatLogsBucket", {
+  encryption: BucketEncryption.S3_MANAGED,
+  blockPublicAccess: BlockPublicAccess.BLOCK_ALL,
+  enforceSSL: true,
+});
+
+chatLogsBucket.grantPut(backend.aiChat.resources.lambda);
+backend.aiChat.resources.lambda.addEnvironment(
+  "CHAT_LOG_BUCKET_NAME",
+  chatLogsBucket.bucketName
+);
+backend.aiChat.resources.lambda.addEnvironment("CHAT_LOG_PREFIX", "chat-logs");
 
 const rdsIntegration = new HttpLambdaIntegration(
   "RdsQueryIntegration",
@@ -103,6 +116,10 @@ backend.addOutput({
   custom: {
     cpcHttpApi: {
       url: httpApi.url,
+    },
+    aiChatLogs: {
+      bucketName: chatLogsBucket.bucketName,
+      prefix: "chat-logs",
     },
   },
 });
