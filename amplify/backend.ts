@@ -48,7 +48,9 @@ console.log(
 
 const apiStack = backend.createStack("api-stack");
 const aiChatLambda = backend.aiChat.resources.lambda as LambdaFunction;
-const chatLogsBucket = new Bucket(apiStack, "AiChatLogsBucket", {
+// Keep the chat-logs bucket in the same nested stack as the ai-chat Lambda
+// to avoid a circular dependency between api-stack and the function stack.
+const chatLogsBucket = new Bucket(Stack.of(aiChatLambda), "AiChatLogsBucket", {
   encryption: BucketEncryption.S3_MANAGED,
   blockPublicAccess: BlockPublicAccess.BLOCK_ALL,
   enforceSSL: true,
