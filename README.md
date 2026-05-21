@@ -24,9 +24,9 @@ The AI chat widget (`PublicChatWidget`) and AI insights panel (`AiInsightsPanel`
    npx ampx sandbox          # for local development
    # or push via CI/CD for production
    ```
-2. The `ai-chat` Lambda invokes Claude 3 Haiku in `us-east-1` using:
-   - Primary model ID: `anthropic.claude-3-haiku-20240307-v1:0`
-   - Fallback inference profile: `us.anthropic.claude-3-haiku-20240307-v1:0`
+2. The `ai-chat` Lambda invokes Claude Haiku 4.5 in `us-east-1` using:
+   - Primary model ID: `anthropic.claude-haiku-4-5-20251001-v1:0`
+   - Fallback inference profile: `us.anthropic.claude-haiku-4-5-20251001-v1:0`
 3. No manual Bedrock model-access approval step is required for this flow. The Lambda execution role policy in `amplify/backend.ts` is the permission source for `bedrock:InvokeModel`.
 4. After deployment, `amplify/amplify_outputs.json` must include `custom.cpcHttpApi.url`; the frontend reads that value to call `/chat`.
 
@@ -89,7 +89,7 @@ The frontend now calls API Gateway directly. Check browser network logs for `POS
 |---|---|---|
 | `400 Message is required.` | Request payload missing `message` | Ensure frontend sends `{ message }` JSON |
 | `429` | Bedrock throttling | Client retries automatically with backoff |
-| `500 AI chat failed` + Bedrock access message | Primary model invocation denied | Lambda retries with `us.anthropic.claude-3-haiku-20240307-v1:0` inference profile |
+| `500 AI chat failed` + Bedrock access message | Primary model invocation denied | Lambda retries with `us.anthropic.claude-haiku-4-5-20251001-v1:0` inference profile |
 | `500 AI chat failed` persists | Lambda role or Bedrock issue | Confirm Lambda role has `bedrock:InvokeModel` and redeploy |
 
 ### Step-by-step diagnosis
