@@ -3,6 +3,7 @@ import {
   InvokeModelCommand,
 } from "@aws-sdk/client-bedrock-runtime";
 import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
+import type { APIGatewayProxyEventV2, APIGatewayProxyResultV2 } from "aws-lambda";
 import { randomUUID } from "node:crypto";
 
 const client = new BedrockRuntimeClient({
@@ -58,7 +59,7 @@ async function invokeClaude(body: unknown, modelId: string): Promise<string> {
   return result?.content?.[0]?.text ?? "Sorry, I could not generate a response.";
 }
 
-function response(statusCode: number, body: unknown) {
+function response(statusCode: number, body: unknown): APIGatewayProxyResultV2 {
   return {
     statusCode,
     headers: {
@@ -69,6 +70,30 @@ function response(statusCode: number, body: unknown) {
     },
     body: JSON.stringify(body),
   };
+}
+
+function getHeader(
+  headers: APIGatewayProxyEventV2["headers"],
+  name: string
+): string | undefined {
+  const exactMatch = headers?.[name];
+  if (typeof exactMatch === "string") return exactMatch;
+
+  const lowerCaseMatch = headers?.[name.toLowerCase()];
+  return typeof lowerCaseMatch === "string" ? lowerCaseMatch : undefined;
+}
+
+function parseBody(event: APIGatewayProxyEventV2): Record<string, unknown> {
+  if (!event.body) return {};
+
+  const raw = event.isBase64Encoded
+    ? Buffer.from(event.body, "base64").toString("utf-8")
+    : event.body;
+
+  const parsed = JSON.parse(raw);
+  return parsed && typeof parsed === "object" && !Array.isArray(parsed)
+    ? (parsed as Record<string, unknown>)
+    : {};
 }
 
 function getContext(parsedContext: unknown): ChatContext | undefined {
@@ -95,9 +120,8 @@ function buildSystemPrompt(context?: ChatContext): string {
   ].join("\n");
 }
 
-function getSourceIp(event: any): string | null {
-  const forwardedFor =
-    event.headers?.["x-forwarded-for"] ?? event.headers?.["X-Forwarded-For"];
+function getSourceIp(event: APIGatewayProxyEventV2): string | null {
+  const forwardedFor = getHeader(event.headers, "x-forwarded-for");
   if (typeof forwardedFor === "string" && forwardedFor.trim()) {
     return forwardedFor.split(",")[0]?.trim() ?? null;
   }
@@ -106,7 +130,7 @@ function getSourceIp(event: any): string | null {
 }
 
 async function logChatInteraction(input: {
-  event: any;
+  event: APIGatewayProxyEventV2;
   message: string;
   reply?: string;
   error?: string;
@@ -149,7 +173,9 @@ async function logChatInteraction(input: {
   }
 }
 
-export const handler = async (event: any) => {
+export const handler = async (
+  event: APIGatewayProxyEventV2
+): Promise<APIGatewayProxyResultV2> => {
   let message = "";
   let history: ChatHistoryItem[] = [];
   let context: ChatContext | undefined;
@@ -159,7 +185,7 @@ export const handler = async (event: any) => {
       return response(200, { ok: true });
     }
 
-    const parsedBody = event.body ? JSON.parse(event.body) : {};
+    const parsedBody = parseBody(event);
     message = String(parsedBody.message ?? "").trim();
     const parsedHistory = Array.isArray(parsedBody.history)
       ? parsedBody.history
@@ -230,21 +256,22 @@ export const handler = async (event: any) => {
     await logChatInteraction({ event, message, reply, context });
 
     return response(200, { reply });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("AI chat error:", error);
+    const detail = error instanceof Error ? error.message : String(error);
 
     if (message) {
       await logChatInteraction({
         event,
         message,
-        error: error?.message ?? String(error),
+        error: detail,
         context,
       });
     }
 
     return response(500, {
       error: "AI chat failed.",
-      detail: error?.message ?? String(error),
+      detail,
     });
   }
 };

@@ -5,6 +5,7 @@ import { HttpLambdaIntegration } from "aws-cdk-lib/aws-apigatewayv2-integrations
 import { Stack } from "aws-cdk-lib";
 import { PolicyStatement, Effect } from "aws-cdk-lib/aws-iam";
 import { Bucket, BucketEncryption, BlockPublicAccess } from "aws-cdk-lib/aws-s3";
+import { Function as LambdaFunction } from "aws-cdk-lib/aws-lambda";
 
 import { auth } from "./auth/resource";
 import { data } from "./data/resource";
@@ -46,6 +47,7 @@ console.log(
 // ─────────────────────────────────────────────────────────────────────────────
 
 const apiStack = backend.createStack("api-stack");
+const aiChatLambda = backend.aiChat.resources.lambda as LambdaFunction;
 const chatLogsBucket = new Bucket(apiStack, "AiChatLogsBucket", {
   encryption: BucketEncryption.S3_MANAGED,
   blockPublicAccess: BlockPublicAccess.BLOCK_ALL,
@@ -53,11 +55,8 @@ const chatLogsBucket = new Bucket(apiStack, "AiChatLogsBucket", {
 });
 
 chatLogsBucket.grantPut(backend.aiChat.resources.lambda);
-backend.aiChat.resources.lambda.addEnvironment(
-  "CHAT_LOG_BUCKET_NAME",
-  chatLogsBucket.bucketName
-);
-backend.aiChat.resources.lambda.addEnvironment("CHAT_LOG_PREFIX", "chat-logs");
+aiChatLambda.addEnvironment("CHAT_LOG_BUCKET_NAME", chatLogsBucket.bucketName);
+aiChatLambda.addEnvironment("CHAT_LOG_PREFIX", "chat-logs");
 
 const rdsIntegration = new HttpLambdaIntegration(
   "RdsQueryIntegration",
