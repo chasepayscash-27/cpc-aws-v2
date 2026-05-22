@@ -228,7 +228,8 @@ export default function MapsPage() {
       {!loading && !error && mappedProjects.length > 0 && (
         <p className="muted" style={{ marginTop: 12, fontSize: 12 }}>
           Hover a pin for a quick preview, click to keep it open. Status colors follow{" "}
-          {getPipelineStatusLabel("completed")}, {getPipelineStatusLabel("active")}, and other pipeline stages.
+          {getPipelineStatusLabel("negotiation")}, {getPipelineStatusLabel("under_construction")},{" "}
+          {getPipelineStatusLabel("active_listing")}, and other pipeline stages.
         </p>
       )}
     </>
