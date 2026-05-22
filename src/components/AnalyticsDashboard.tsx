@@ -16,6 +16,7 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { AiInsightsPanel } from "./AiInsightsPanel";
+import { ErrorBoundary } from "./ErrorBoundary";
 import type { PropertyData } from "./AiInsightsPanel";
 
 export type { PropertyData };
@@ -448,7 +449,17 @@ export function AnalyticsDashboard({ refreshKey = 0 }: { refreshKey?: number }) 
         </div>
 
         {/* AI Insights Panel */}
-        <AiInsightsPanel properties={properties} />
+        <ErrorBoundary
+          fallback={
+            <div className="card" style={{ marginTop: "24px" }}>
+              <p className="muted" style={{ margin: 0 }}>
+                AI Insights are temporarily unavailable.
+              </p>
+            </div>
+          }
+        >
+          <AiInsightsPanel properties={properties} />
+        </ErrorBoundary>
       </div>
     </div>
   );
