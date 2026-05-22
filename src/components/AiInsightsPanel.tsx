@@ -35,67 +35,76 @@ export interface PropertyData {
 }
 
 interface Props {
-  properties: PropertyData[];
+  properties?: PropertyData[] | null;
 }
 
 export function AiInsightsPanel({ properties }: Props) {
   const [loading, setLoading] = useState(false);
   const [output, setOutput] = useState<string>("");
   const [error, setError] = useState<string>("");
+  const safeProperties = useMemo(
+    () => (Array.isArray(properties) ? properties : []),
+    [properties]
+  );
 
   const metrics = useMemo(() => {
-    const n = properties.length;
-    if (n === 0) return null;
+    try {
+      const n = safeProperties.length;
+      if (n === 0) return null;
 
-    const totalRevenue = properties.reduce(
-      (acc, p) => acc + (p.sold_amount_num || 0),
-      0
-    );
-    const totalProfit = properties.reduce(
-      (acc, p) => acc + (p.gross_profit_num || 0),
-      0
-    );
-    const totalRehab = properties.reduce(
-      (acc, p) => acc + (p.rehab_amount_num || 0),
-      0
-    );
-    const avgDaysOnMarket = Math.round(
-      properties.reduce((acc, p) => acc + (p.days_on_market_num || 0), 0) / n
-    );
-    const avgProfit = Math.round(totalProfit / n);
+      const totalRevenue = safeProperties.reduce(
+        (acc, p) => acc + (p.sold_amount_num || 0),
+        0
+      );
+      const totalProfit = safeProperties.reduce(
+        (acc, p) => acc + (p.gross_profit_num || 0),
+        0
+      );
+      const totalRehab = safeProperties.reduce(
+        (acc, p) => acc + (p.rehab_amount_num || 0),
+        0
+      );
+      const avgDaysOnMarket = Math.round(
+        safeProperties.reduce((acc, p) => acc + (p.days_on_market_num || 0), 0) / n
+      );
+      const avgProfit = Math.round(totalProfit / n);
 
-    const leadCounts: Record<string, number> = {};
-    for (const p of properties) {
-      const key = p.lead_source || "Unknown";
-      leadCounts[key] = (leadCounts[key] || 0) + 1;
-    }
-    const topLeadSources = Object.entries(leadCounts)
-      .sort((a, b) => b[1] - a[1])
-      .slice(0, 5)
-      .map(([source, count]) => ({ source, count }));
-
-    const agentProfits: Record<string, number> = {};
-    for (const p of properties) {
-      if (p.agent) {
-        agentProfits[p.agent] = (agentProfits[p.agent] || 0) + (p.gross_profit_num || 0);
+      const leadCounts: Record<string, number> = {};
+      for (const p of safeProperties) {
+        const key = p.lead_source || "Unknown";
+        leadCounts[key] = (leadCounts[key] || 0) + 1;
       }
-    }
-    const topAgents = Object.entries(agentProfits)
-      .sort((a, b) => b[1] - a[1])
-      .slice(0, 3)
-      .map(([agent, profit]) => ({ agent, profit }));
+      const topLeadSources = Object.entries(leadCounts)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 5)
+        .map(([source, count]) => ({ source, count }));
 
-    return {
-      count: n,
-      totalRevenue,
-      totalProfit,
-      totalRehab,
-      avgDaysOnMarket,
-      avgProfit,
-      topLeadSources,
-      topAgents,
-    };
-  }, [properties]);
+      const agentProfits: Record<string, number> = {};
+      for (const p of safeProperties) {
+        if (p.agent) {
+          agentProfits[p.agent] = (agentProfits[p.agent] || 0) + (p.gross_profit_num || 0);
+        }
+      }
+      const topAgents = Object.entries(agentProfits)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 3)
+        .map(([agent, profit]) => ({ agent, profit }));
+
+      return {
+        count: n,
+        totalRevenue,
+        totalProfit,
+        totalRehab,
+        avgDaysOnMarket,
+        avgProfit,
+        topLeadSources,
+        topAgents,
+      };
+    } catch (err) {
+      console.error("[AiInsightsPanel] Failed to calculate metrics:", err);
+      return null;
+    }
+  }, [safeProperties]);
 
   async function generate() {
     if (!metrics) return;
@@ -104,7 +113,8 @@ export function AiInsightsPanel({ properties }: Props) {
     setError("");
     try {
       if (!CHAT_ENDPOINT) {
-        throw new Error("AI Insights endpoint is unavailable. Please try again later.");
+        setError("AI Insights endpoint is unavailable. Please try again later.");
+        return;
       }
 
       const prompt = `
@@ -126,7 +136,16 @@ ${JSON.stringify(metrics, null, 2)}
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ message: prompt }),
         });
-        const json = await res.json().catch(() => ({}));
+        let json: unknown = null;
+        try {
+          json = await res.json();
+        } catch {
+          json = null;
+        }
+        const jsonObject =
+          json && typeof json === "object"
+            ? (json as { reply?: unknown; error?: unknown; detail?: unknown })
+            : null;
 
         if (!res.ok) {
           const isRetryable = res.status === 429 || res.status >= 500;
@@ -140,13 +159,18 @@ ${JSON.stringify(metrics, null, 2)}
             continue;
           }
 
-          setError(getErrorMessage(json, `AI request failed (${res.status}). Please try again.`));
+          setError(getErrorMessage(jsonObject, `AI request failed (${res.status}). Please try again.`));
+          return;
+        }
+
+        if (!jsonObject) {
+          setError("AI response was invalid. Please try again.");
           return;
         }
 
         const reply =
-          json && typeof json === "object" && typeof (json as { reply?: unknown }).reply === "string"
-            ? ((json as { reply: string }).reply || "No insights returned.")
+          typeof jsonObject.reply === "string"
+            ? (jsonObject.reply || "No insights returned.")
             : "No insights returned.";
         setOutput(reply);
         return;
@@ -185,12 +209,20 @@ ${JSON.stringify(metrics, null, 2)}
         <button
           className="btnPrimary"
           onClick={generate}
-          disabled={loading || !metrics}
+          disabled={loading || !metrics || !CHAT_ENDPOINT}
           style={{ whiteSpace: "nowrap" }}
         >
           {loading ? "Thinking…" : "✨ Generate Insights"}
         </button>
       </div>
+
+      {!CHAT_ENDPOINT && (
+        <div style={{ marginTop: "8px" }}>
+          <p style={{ color: "var(--muted)", fontSize: "13px", margin: 0 }}>
+            AI Insights are temporarily unavailable.
+          </p>
+        </div>
+      )}
 
       {error && (
         <div style={{ marginTop: "8px" }}>

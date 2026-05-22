@@ -397,7 +397,16 @@ export function PublicChatWidget() {
             context: portfolioContext,
           }),
         });
-        const json = await res.json().catch(() => ({}));
+        let json: unknown = null;
+        try {
+          json = await res.json();
+        } catch {
+          json = null;
+        }
+        const jsonObject =
+          json && typeof json === "object"
+            ? (json as { reply?: unknown; error?: unknown; detail?: unknown })
+            : null;
 
         if (!res.ok) {
           const isRetryable = res.status === 429 || res.status >= 500;
@@ -414,14 +423,22 @@ export function PublicChatWidget() {
           setIsAuthError(res.status === 401 || res.status === 403);
           setIsThrottleError(res.status === 429);
           setError(
-            getErrorMessage(json, `AI assistant request failed (${res.status}). Please try again.`)
+            getErrorMessage(
+              jsonObject,
+              `AI assistant request failed (${res.status}). Please try again.`
+            )
           );
           return;
         }
 
+        if (!jsonObject) {
+          setError("AI assistant returned an unexpected response. Please try again.");
+          return;
+        }
+
         const reply =
-          json && typeof json === "object" && typeof (json as { reply?: unknown }).reply === "string"
-            ? ((json as { reply: string }).reply || "Sorry, I couldn't generate a response.")
+          typeof jsonObject.reply === "string"
+            ? (jsonObject.reply || "Sorry, I couldn't generate a response.")
             : "Sorry, I couldn't generate a response.";
         setMessages([...updatedHistory, { role: "assistant", text: reply }]);
         return;
