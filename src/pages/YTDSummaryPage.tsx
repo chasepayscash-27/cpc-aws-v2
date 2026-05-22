@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { loadCsv } from '../utils/csv';
 import type { ProjectRow } from '../types/project';
-import PipelineTracker, { ACTIVE_STAGE_ORDER } from '../components/PipelineTracker';
+import PipelineTracker from '../components/PipelineTracker';
 import ProjectDetailsModal from '../components/ProjectDetailsModal';
 import '../App.css';
 
@@ -96,10 +96,6 @@ export default function YTDSummaryPage() {
     },
   ];
 
-  const totalPipelineCount = projectRows.filter(
-    (r: ProjectRow) => r.stage && ACTIVE_STAGE_ORDER.includes(r.stage.trim().toLowerCase())
-  ).length;
-
   return (
     <div>
       {selectedProject && (
@@ -113,7 +109,8 @@ export default function YTDSummaryPage() {
         <p className="muted">Year-to-date performance summary of properties flipped.</p>
       </div>
 
-      {/* KPI Summary Cards — 5-column grid */}
+      {/* Temporarily hidden: top financial summary cards can be re-enabled by restoring this section. */}
+      {/*
       <section style={{ display: 'grid', gridTemplateColumns: 'repeat(5, minmax(0, 1fr))', gap: '12px', margin: '12px 0 14px' }}>
         <div className="card">
           <div className="cardLabel">Houses Sold</div>
@@ -141,6 +138,7 @@ export default function YTDSummaryPage() {
           <div className="cardSub" style={{ color: 'var(--muted)' }}>Active projects</div>
         </div>
       </section>
+      */}
 
       {/* Goal Progress Cards */}
       <section className="grid">
