@@ -5,7 +5,8 @@ const navItems = [
   { label: '🏠 Home', path: '/' },
   { label: '🏗️ Projects', path: '/projects' },
   { label: '🗺️ Maps', path: '/maps' },
-  { label: '💰 Financials', path: '/financials' },
+  // Temporarily hidden: financials nav can be re-enabled by uncommenting this entry.
+  // { label: '💰 Financials', path: '/financials' },
   { label: '📊 Analytics', path: '/analytics' },
   { label: '🤖 AI Chat', path: '/chat' },
   { label: '🧭 Workflow', path: '/workflow' },
