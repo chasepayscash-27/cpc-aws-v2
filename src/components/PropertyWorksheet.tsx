@@ -25,6 +25,7 @@ const WORKSHEET_FIELDS: Array<{ label: string; fieldName: string; multiline?: bo
   { label: "Lot Size (Acres)", fieldName: "lot_size_acres" },
   { label: "Bedrooms", fieldName: "bedrooms" },
   { label: "Bathrooms", fieldName: "bathrooms" },
+  { label: "Number of Floors", fieldName: "number_of_floors" },
   { label: "Sewer / Septic", fieldName: "sewer_septic" },
   { label: "HVAC (New or Age)", fieldName: "hvac" },
   { label: "Plumbing (New or Partial Update)", fieldName: "plumbing" },
@@ -136,6 +137,7 @@ export default function PropertyWorksheet({ row }: Props) {
   // ── Derive initial default values from row ────────────────────────────────
   function initialValue(fieldName: string): string {
     if (fields[fieldName] !== undefined) return fields[fieldName];
+    const rowWithFloors = row as ProjectRow & { stories?: string; floors?: string };
     const addr =
       row.full_address ??
       [row.address_1, row.address_2].filter(Boolean).join(" ") ??
@@ -149,6 +151,7 @@ export default function PropertyWorksheet({ row }: Props) {
           : row.square_feet ?? "";
       case "bedrooms": return row.beds ?? "";
       case "bathrooms": return row.baths ?? "";
+      case "number_of_floors": return rowWithFloors.stories ?? rowWithFloors.floors ?? "";
       default: return "";
     }
   }
