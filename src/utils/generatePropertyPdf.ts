@@ -42,6 +42,7 @@ export function generatePropertyPdf(
     { label: "Lot Size (Acres)", value: sv["lot_size_acres"] ?? "", fieldName: "lot_size_acres" },
     { label: "Bedrooms", value: sv["bedrooms"] ?? row.beds ?? "", fieldName: "bedrooms" },
     { label: "Bathrooms", value: sv["bathrooms"] ?? row.baths ?? "", fieldName: "bathrooms" },
+    { label: "Number of Floors", value: sv["number_of_floors"] ?? "", fieldName: "number_of_floors" },
     { label: "Sewer / Septic", value: sv["sewer_septic"] ?? "", fieldName: "sewer_septic" },
     { label: "HVAC (New or Age)", value: sv["hvac"] ?? "", fieldName: "hvac" },
     { label: "Plumbing (New or Partial Update)", value: sv["plumbing"] ?? "", fieldName: "plumbing" },
