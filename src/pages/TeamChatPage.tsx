@@ -35,7 +35,7 @@ interface ChatRoomListProps {
   rooms: ChatRoom[];
   selectedRoomId: string | null;
   onSelect: (room: ChatRoom) => void;
-  onCreateRoom: (name: string, description: string) => Promise<void>;
+  onCreateRoom: (name: string, description: string) => Promise<ChatRoom | null | undefined>;
 }
 
 function ChatRoomList({ rooms, selectedRoomId, onSelect, onCreateRoom }: ChatRoomListProps) {
@@ -43,17 +43,21 @@ function ChatRoomList({ rooms, selectedRoomId, onSelect, onCreateRoom }: ChatRoo
   const [newName, setNewName] = useState("");
   const [newDesc, setNewDesc] = useState("");
   const [creating, setCreating] = useState(false);
+  const [createError, setCreateError] = useState("");
 
   async function handleCreate(e: React.FormEvent) {
     e.preventDefault();
     const name = newName.trim();
     if (!name) return;
     setCreating(true);
+    setCreateError("");
     try {
       await onCreateRoom(name, newDesc.trim());
       setNewName("");
       setNewDesc("");
       setShowForm(false);
+    } catch (err) {
+      setCreateError(err instanceof Error ? err.message : "Failed to create channel.");
     } finally {
       setCreating(false);
     }
@@ -93,6 +97,9 @@ function ChatRoomList({ rooms, selectedRoomId, onSelect, onCreateRoom }: ChatRoo
           <button className="chatSendBtn" type="submit" disabled={creating || !newName.trim()}>
             {creating ? "Creating…" : "Create"}
           </button>
+          {createError && (
+            <p className="chatErrorText" style={{ margin: "4px 0 0" }}>{createError}</p>
+          )}
         </form>
       )}
 
@@ -175,12 +182,15 @@ function ChatRoomView({ room, authorId, authorName }: ChatRoomViewProps) {
     setSending(true);
     setError("");
     try {
-      await client.models.ChatMessage.create({
+      const { errors } = await client.models.ChatMessage.create({
         roomId: room.id,
         authorId,
         authorName,
         content: text,
       });
+      if (errors?.length) {
+        throw new Error(errors.map((e) => e.message).join("; "));
+      }
     } catch (e) {
       console.error("[TeamChat] send error:", e);
       setError("Failed to send message. Please try again.");
@@ -334,6 +344,7 @@ function TeamChatInner() {
   const [roomsLoading, setRoomsLoading] = useState(true);
   const [authorId, setAuthorId] = useState("");
   const [authorName, setAuthorName] = useState("");
+  const didSeedRef = useRef(false);
 
   // Fetch current user's identity
   useEffect(() => {
@@ -364,7 +375,10 @@ function TeamChatInner() {
 
         // Seed default rooms once if empty
         if (sorted.length === 0) {
-          await seedDefaultRooms(sorted);
+          if (!didSeedRef.current) {
+            didSeedRef.current = true;
+            await seedDefaultRooms(sorted);
+          }
         } else {
           // Auto-select first room on initial load
           setSelectedRoom((prev) => prev ?? sorted[0] ?? null);
@@ -380,7 +394,17 @@ function TeamChatInner() {
   }, []);
 
   async function handleCreateRoom(name: string, description: string) {
-    await client.models.ChatRoom.create({ name, description });
+    const { data: created, errors } = await client.models.ChatRoom.create({
+      name,
+      description: description || undefined,
+    });
+    if (errors?.length) {
+      throw new Error(errors.map((e) => e.message).join("; "));
+    }
+    if (created) {
+      setSelectedRoom(created);
+    }
+    return created;
   }
 
   return (

@@ -15,7 +15,7 @@ const schema = a.schema({
       description: a.string(),
       messages: a.hasMany("ChatMessage", "roomId"),
     })
-    .authorization((allow) => [allow.authenticated()]),
+    .authorization((allow) => [allow.authenticated("identityPool")]),
 
   ChatMessage: a
     .model({
@@ -25,7 +25,7 @@ const schema = a.schema({
       authorName: a.string().required(),
       content: a.string().required(),
     })
-    .authorization((allow) => [allow.authenticated()]),
+    .authorization((allow) => [allow.authenticated("identityPool")]),
 });
 
 export type Schema = ClientSchema<typeof schema>;
