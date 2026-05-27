@@ -12,6 +12,7 @@ const navItems = [
   { label: '🧭 Workflow', path: '/workflow' },
   { label: '🔧 Resources', path: '/resources' },
   { label: '👥 Team', path: '/team' },
+  { label: '💬 Team Chat', path: '/team-chat' },
 ];
 
 const Navigation: React.FC = () => {
