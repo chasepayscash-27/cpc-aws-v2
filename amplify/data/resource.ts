@@ -34,7 +34,11 @@ const schema = a.schema({
       name: a.string(),
       propertyTasks: a.hasMany("PropertyTask", "propertyId"),
     })
-    .authorization((allow) => [allow.guest(), allow.publicApiKey()]),
+    .authorization((allow) => [
+      allow.authenticated(),
+      allow.guest(),
+      allow.publicApiKey(),
+    ]),
 
   WorkflowTask: a
     .model({
@@ -45,7 +49,11 @@ const schema = a.schema({
       order: a.integer().required(),
       isDefault: a.boolean().required(),
     })
-    .authorization((allow) => [allow.guest(), allow.publicApiKey()]),
+    .authorization((allow) => [
+      allow.authenticated(),
+      allow.guest(),
+      allow.publicApiKey(),
+    ]),
 
   PropertyTask: a
     .model({
@@ -60,7 +68,11 @@ const schema = a.schema({
       completedAt: a.datetime(),
       completedBy: a.string(),
     })
-    .authorization((allow) => [allow.guest(), allow.publicApiKey()]),
+    .authorization((allow) => [
+      allow.authenticated(),
+      allow.guest(),
+      allow.publicApiKey(),
+    ]),
 });
 
 export type Schema = ClientSchema<typeof schema>;
