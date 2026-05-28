@@ -1,0 +1,19 @@
+Order,Stage,Owner,Responsibilities,Notes / Dependencies
+1,Offer & Closing,Acquisition Team,Make offer and close property,Keys obtained from agents
+2,Key Handling,Unspecified,Put keys in lockbox and on desk,Trigger for operations
+3,Utility Activation,Devin,Turn on utilities and coordinate inspections,Alerts team if gas/water inspections needed
+4,Pre-Construction Utility Check,Kevin & Matt,"Verify water, gas, and power are active",Gas lock is critical blocker
+5,Initial Walkthrough,Kevin & Matt,Review layout changes and scope of work,Kevin creates initial material list
+6,Material Ordering,Kevin,Order materials and coordinate delivery,Based on initial walkthrough
+7,Contractor Walkthrough,Matt,Walk contractor through job scope and pricing,Contractor agrees on pricing
+8,Dumpster & Delivery Coordination,Kevin,Arrange dumpster and material delivery,Happens before work begins
+9,Construction Oversight,Matt,Visit job sites 2–3 times weekly,Quality control and contractor management
+10,Supplemental Oversight,Kevin,Weekly or biweekly visits,Sends feedback only to Matt
+11,Process Communication,Matt,Central communication hub,Avoids confusion with contractors
+12,Mid-Project Purchasing,Kevin,Order additional items like countertops,Triggered by Matt
+13,Final Walkthrough,Matt + Team,Ensure project completion quality,Possible future involvement from Chase
+14,Photography & Staging,Matt,Coordinate staging and listing photos,Pre-market preparation
+15,Listing Maintenance,Justin,Check homes weekly/biweekly after listing,"Grass, bugs, mold, cleanliness"
+16,Repair Addendums,Justin,Sole owner of repair addendum process,Prevents responsibility confusion
+17,Repair Documentation,Justin,Send invoices/photos to agents,Required for closing
+18,Final Closing Tasks,Justin,Retrieve lockbox after closing,Final operational step

@@ -26,6 +26,41 @@ const schema = a.schema({
       content: a.string().required(),
     })
     .authorization((allow) => [allow.authenticated("identityPool")]),
+
+  // ─── Property Workflow ───────────────────────────────────────────────────────
+
+  Property: a
+    .model({
+      name: a.string(),
+      propertyTasks: a.hasMany("PropertyTask", "propertyId"),
+    })
+    .authorization((allow) => [allow.guest(), allow.publicApiKey()]),
+
+  WorkflowTask: a
+    .model({
+      stage: a.string().required(),
+      owner: a.string(),
+      responsibilities: a.string(),
+      notes: a.string(),
+      order: a.integer().required(),
+      isDefault: a.boolean().required(),
+    })
+    .authorization((allow) => [allow.guest(), allow.publicApiKey()]),
+
+  PropertyTask: a
+    .model({
+      propertyId: a.id().required(),
+      property: a.belongsTo("Property", "propertyId"),
+      stage: a.string().required(),
+      owner: a.string(),
+      responsibilities: a.string(),
+      notes: a.string(),
+      order: a.integer().required(),
+      isComplete: a.boolean().default(false),
+      completedAt: a.datetime(),
+      completedBy: a.string(),
+    })
+    .authorization((allow) => [allow.guest(), allow.publicApiKey()]),
 });
 
 export type Schema = ClientSchema<typeof schema>;
