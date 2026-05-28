@@ -35,7 +35,7 @@ const schema = a.schema({
       propertyTasks: a.hasMany("PropertyTask", "propertyId"),
     })
     .authorization((allow) => [
-      allow.authenticated(),
+      allow.authenticated("identityPool"),
       allow.guest(),
       allow.publicApiKey(),
     ]),
@@ -50,7 +50,7 @@ const schema = a.schema({
       isDefault: a.boolean().required(),
     })
     .authorization((allow) => [
-      allow.authenticated(),
+      allow.authenticated("identityPool"),
       allow.guest(),
       allow.publicApiKey(),
     ]),
@@ -69,7 +69,7 @@ const schema = a.schema({
       completedBy: a.string(),
     })
     .authorization((allow) => [
-      allow.authenticated(),
+      allow.authenticated("identityPool"),
       allow.guest(),
       allow.publicApiKey(),
     ]),
