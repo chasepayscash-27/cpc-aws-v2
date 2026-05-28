@@ -4,6 +4,7 @@ import type { PhotoLogRow } from "../types/photoLog";
 import { loadCsv } from "../utils/csv";
 import PropertyFinancials from "./PropertyFinancials";
 import PropertyWorksheet from "./PropertyWorksheet";
+import PropertyWorkflow from "./PropertyWorkflow";
 
 interface Props {
   project: ProjectRow;
@@ -167,6 +168,11 @@ export default function ProjectDetailsModal({ project: row, onClose, onViewFullP
   const sqft = sqftFormatted ? sqftFormatted + " sq ft" : undefined;
   const createdDate = row.created_at ? new Date(row.created_at).toLocaleDateString() : undefined;
   const updatedDate = row.updated_at ? new Date(row.updated_at).toLocaleDateString() : undefined;
+  const propertyId =
+    row.project_uuid?.trim() ||
+    row.name?.trim() ||
+    row.full_address?.trim() ||
+    "";
 
   return (
     <>
@@ -275,6 +281,10 @@ export default function ProjectDetailsModal({ project: row, onClose, onViewFullP
                 <PropertyWorksheet row={row} />
               </div>
             )}
+
+            <div style={{ marginBottom: 20 }}>
+              <PropertyWorkflow propertyId={propertyId} />
+            </div>
 
             {/* Quick stats */}
             {(row.beds || row.baths || sqft || row.year_built) && (
