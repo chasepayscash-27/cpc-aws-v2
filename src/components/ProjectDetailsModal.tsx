@@ -51,6 +51,12 @@ function DetailRow({ label, value }: { label: string; value?: string | null }) {
   );
 }
 
+const COST_PLACEHOLDERS: Array<{ label: string; value: string }> = [
+  { label: "Labor", value: "$0" },
+  { label: "Materials", value: "$0" },
+  { label: "3rd Party", value: "$0" },
+];
+
 export default function ProjectDetailsModal({ project: row, onClose, onViewFullPnL }: Props) {
   const [photos, setPhotos] = useState<PhotoLogRow[]>([]);
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
@@ -211,6 +217,31 @@ export default function ProjectDetailsModal({ project: row, onClose, onViewFullP
 
           {/* Content */}
           <div style={{ padding: "22px 24px 28px" }}>
+            {/* Cost placeholders */}
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12, marginBottom: 20 }}>
+              {COST_PLACEHOLDERS.map(({ label, value }) => (
+                <div
+                  key={label}
+                  style={{
+                    background: "#f0f7f1",
+                    border: "1px solid #d4e8d8",
+                    borderRadius: 12,
+                    padding: "12px 14px",
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: 4,
+                  }}
+                >
+                  <span style={{ fontSize: 10, fontWeight: 600, color: "#5a7060", textTransform: "uppercase", letterSpacing: "0.06em" }}>
+                    {label}
+                  </span>
+                  <span style={{ fontSize: 18, fontWeight: 700, color: "#1a7a3c" }}>
+                    {value}
+                  </span>
+                </div>
+              ))}
+            </div>
+
             {/* Header */}
             <div style={{ marginBottom: 16 }}>
               <h2 style={{ margin: "0 0 6px", fontSize: 22, fontWeight: 700, lineHeight: 1.2, paddingRight: 36 }}>
