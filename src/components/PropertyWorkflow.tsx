@@ -28,6 +28,7 @@ export default function PropertyWorkflow({ propertyId }: Props) {
   const [completedByUser, setCompletedByUser] = useState<string | null>(null);
   const seedAttemptedRef = useRef(false);
   const seedingRef = useRef(false);
+  const reconcileAttemptedRef = useRef(false);
 
   const seedPropertyTasks = useCallback(async () => {
     if (!propertyId || seedingRef.current) return;
@@ -68,6 +69,36 @@ export default function PropertyWorkflow({ propertyId }: Props) {
     }
   }, [propertyId]);
 
+  const reconcilePropertyTasks = useCallback(async (currentTasks: PropertyTask[]) => {
+    if (!propertyId) return;
+    try {
+      const validStages = new Set(defaultWorkflow.map((t) => t.stage));
+      const orderByStage = new Map(defaultWorkflow.map((t) => [t.stage, t.order]));
+
+      for (const task of currentTasks) {
+        if (!validStages.has(task.stage ?? "")) {
+          const { errors } = await client.models.PropertyTask.delete({ id: task.id });
+          if (errors?.length) {
+            throw new Error(errors.map((item) => item.message).join("; "));
+          }
+        } else {
+          const expectedOrder = orderByStage.get(task.stage ?? "");
+          if (expectedOrder !== undefined && task.order !== expectedOrder) {
+            const { errors } = await client.models.PropertyTask.update({
+              id: task.id,
+              order: expectedOrder,
+            });
+            if (errors?.length) {
+              throw new Error(errors.map((item) => item.message).join("; "));
+            }
+          }
+        }
+      }
+    } catch (reconcileError) {
+      setError(reconcileError instanceof Error ? reconcileError.message : "Failed to reconcile workflow tasks.");
+    }
+  }, [propertyId]);
+
   useEffect(() => {
     getCurrentUser()
       .then((user) => {
@@ -81,6 +112,7 @@ export default function PropertyWorkflow({ propertyId }: Props) {
     if (!propertyId) return;
 
     seedAttemptedRef.current = false;
+    reconcileAttemptedRef.current = false;
     setLoading(true);
     setError("");
 
@@ -95,6 +127,9 @@ export default function PropertyWorkflow({ propertyId }: Props) {
         if (sorted.length === 0 && !seedAttemptedRef.current) {
           seedAttemptedRef.current = true;
           void seedPropertyTasks();
+        } else if (sorted.length > 0 && !reconcileAttemptedRef.current) {
+          reconcileAttemptedRef.current = true;
+          void reconcilePropertyTasks(sorted);
         }
       },
       error: (observeError) => {
@@ -104,7 +139,7 @@ export default function PropertyWorkflow({ propertyId }: Props) {
     });
 
     return () => subscription.unsubscribe();
-  }, [propertyId, seedPropertyTasks]);
+  }, [propertyId, seedPropertyTasks, reconcilePropertyTasks]);
 
   const totalCount = tasks.length;
   const completedCount = useMemo(
