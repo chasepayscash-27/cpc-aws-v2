@@ -1,19 +1,19 @@
 Order,Stage,Owner,Responsibilities,Notes / Dependencies
-1,Offer & Closing,Acquisition Team,Make offer and close property,Keys obtained from agents
-2,Key Handling,Unspecified,Put keys in lockbox and on desk,Trigger for operations
-3,Utility Activation,Devin,Turn on utilities and coordinate inspections,Alerts team if gas/water inspections needed
-4,Pre-Construction Utility Check,Kevin & Matt,"Verify water, gas, and power are active",Gas lock is critical blocker
-5,Initial Walkthrough,Kevin & Matt,Review layout changes and scope of work,Kevin creates initial material list
-6,Material Ordering,Kevin,Order materials and coordinate delivery,Based on initial walkthrough
-7,Contractor Walkthrough,Matt,Walk contractor through job scope and pricing,Contractor agrees on pricing
-8,Dumpster & Delivery Coordination,Kevin,Arrange dumpster and material delivery,Happens before work begins
-9,Construction Oversight,Matt,Visit job sites 2–3 times weekly,Quality control and contractor management
-10,Supplemental Oversight,Kevin,Weekly or biweekly visits,Sends feedback only to Matt
-11,Process Communication,Matt,Central communication hub,Avoids confusion with contractors
-12,Mid-Project Purchasing,Kevin,Order additional items like countertops,Triggered by Matt
-13,Final Walkthrough,Matt + Team,Ensure project completion quality,Possible future involvement from Chase
-14,Photography & Staging,Matt,Coordinate staging and listing photos,Pre-market preparation
-15,Listing Maintenance,Justin,Check homes weekly/biweekly after listing,"Grass, bugs, mold, cleanliness"
-16,Repair Addendums,Justin,Sole owner of repair addendum process,Prevents responsibility confusion
-17,Repair Documentation,Justin,Send invoices/photos to agents,Required for closing
-18,Final Closing Tasks,Justin,Retrieve lockbox after closing,Final operational step
+1,Offer placed,Justin,Place offer on the property,
+2,Closed on property,Devin,Close on the property,
+3,Got keys in lockbox,Justin,Obtain keys and place in lockbox,
+4,Utility activation,Devin,Activate all utilities for the property,
+5,Utilities check,Matt and Kevin,Verify water and gas and power are active,
+6,Initial walk through,Matt and Kevin,Walk through property and assess scope of work,
+7,Dumpster Ordered,,Order dumpster for construction debris,
+8,Initial material ordered,Kevin,Order initial materials needed for construction,
+9,Contractor walk through,Matt,Walk contractor through job scope and pricing,
+10,Construction finished,Matt,Oversee and confirm construction completion,
+11,Final walk through,Matt,Perform final walkthrough to ensure quality,
+12,Clean house,Matt,Coordinate house cleaning after construction,
+13,Staging,Matt,Coordinate property staging,
+14,Pictures,Matt,Coordinate listing photography,
+15,On market,Devin,List property on the market,
+16,Offer Accepted,Devin/Chase,Accept offer on the property,
+17,Repair addendum,Justin,Handle repair addendum process,
+18,Retrieve lock box after closing,Justin,Retrieve lockbox after property closes,
