@@ -51,16 +51,20 @@ function DetailRow({ label, value }: { label: string; value?: string | null }) {
   );
 }
 
-const COST_PLACEHOLDERS: Array<{ label: string; value: string }> = [
-  { label: "Labor", value: "$0" },
-  { label: "Materials", value: "$0" },
-  { label: "3rd Party", value: "$0" },
-];
+const COST_LABELS = ["Labor", "Materials", "3rd Party"] as const;
 
 export default function ProjectDetailsModal({ project: row, onClose, onViewFullPnL }: Props) {
   const [photos, setPhotos] = useState<PhotoLogRow[]>([]);
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
   const [worksheetOpen, setWorksheetOpen] = useState(false);
+  const [costSummary, setCostSummary] = useState<[number, number, number]>([0, 0, 0]);
+
+  const handleFinancialSummary = useCallback(
+    (labor: number, materials: number, thirdParty: number) => {
+      setCostSummary([labor, materials, thirdParty]);
+    },
+    []
+  );
 
   const isLightboxOpen = lightboxIndex !== null;
 
@@ -219,7 +223,7 @@ export default function ProjectDetailsModal({ project: row, onClose, onViewFullP
           <div style={{ padding: "22px 24px 28px" }}>
             {/* Cost placeholders */}
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12, marginBottom: 20 }}>
-              {COST_PLACEHOLDERS.map(({ label, value }) => (
+              {COST_LABELS.map((label, i) => (
                 <div
                   key={label}
                   style={{
@@ -236,7 +240,7 @@ export default function ProjectDetailsModal({ project: row, onClose, onViewFullP
                     {label}
                   </span>
                   <span style={{ fontSize: 18, fontWeight: 700, color: "#1a7a3c" }}>
-                    {value}
+                    ${costSummary[i].toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                   </span>
                 </div>
               ))}
@@ -482,6 +486,7 @@ export default function ProjectDetailsModal({ project: row, onClose, onViewFullP
                       ? () => { onViewFullPnL(row.name as string); onClose(); }
                       : undefined
                   }
+                  onSummary={handleFinancialSummary}
                 />
               </>
             )}
