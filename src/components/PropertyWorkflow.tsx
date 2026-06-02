@@ -9,7 +9,7 @@ import {
   normalizeAssignee,
   updateTask,
 } from "./propertyWorkflowTabs";
-import { getWorkflowProgressCounts, normalizeWorkflowOwner } from "./propertyWorkflowNormalization";
+import { dedupeTasksByCanonicalOrder, getWorkflowProgressCounts, normalizeWorkflowOwner } from "./propertyWorkflowNormalization";
 import "./PropertyWorkflow.css";
 
 type PropertyTask = Schema["PropertyTask"]["type"];
@@ -69,6 +69,15 @@ export default function PropertyWorkflow({ propertyId }: Props) {
           throw new Error(errors.map((item) => item.message).join("; "));
         }
       }
+
+      // Guard against concurrent seeds creating duplicate rows: re-list and dedup.
+      const afterSeed = await client.models.PropertyTask.list({
+        filter: { propertyId: { eq: propertyId } },
+      });
+      const { remove: seedDups } = dedupeTasksByCanonicalOrder(afterSeed.data ?? []);
+      for (const dup of seedDups) {
+        await client.models.PropertyTask.delete({ id: dup.id });
+      }
     } catch (seedError) {
       setError(seedError instanceof Error ? seedError.message : "Failed to seed workflow tasks.");
       seedAttemptedRef.current = false;
@@ -79,92 +88,66 @@ export default function PropertyWorkflow({ propertyId }: Props) {
 
   const reconcilePropertyTasks = useCallback(async (currentTasks: PropertyTask[]) => {
     if (!propertyId) return;
-    try {
-      const validStages = new Set(defaultWorkflow.map((t) => t.stage));
-      const orderByStage = new Map(defaultWorkflow.map((t) => [t.stage, t.order]));
-      const templateByOrder = new Map(defaultWorkflow.map((t) => [t.order, t]));
-      const groupedByExpectedOrder = new Map<number, PropertyTask[]>();
+    const reconcileErrors: string[] = [];
 
-      for (const task of currentTasks) {
-        const stage = task.stage ?? "";
-        const expectedOrder = orderByStage.get(stage);
+    const { keepByOrder, remove, missing } = dedupeTasksByCanonicalOrder(currentTasks);
 
-        if (!validStages.has(stage) || expectedOrder === undefined) {
-          const { errors } = await client.models.PropertyTask.delete({ id: task.id });
-          if (errors?.length) {
-            throw new Error(errors.map((item) => item.message).join("; "));
-          }
-          continue;
-        }
+    // Delete duplicates and unmappable tasks — collect errors instead of aborting.
+    for (const task of remove) {
+      const { errors } = await client.models.PropertyTask.delete({ id: task.id });
+      if (errors?.length) {
+        reconcileErrors.push(...errors.map((e) => e.message));
+      }
+    }
 
-        const group = groupedByExpectedOrder.get(expectedOrder) ?? [];
-        group.push(task);
-        groupedByExpectedOrder.set(expectedOrder, group);
+    // Create any canonical tasks that are missing entirely.
+    const templateByOrder = new Map(defaultWorkflow.map((t) => [t.order, t]));
+    for (const order of missing) {
+      const templateTask = templateByOrder.get(order)!;
+      const { errors } = await client.models.PropertyTask.create({
+        propertyId,
+        stage: templateTask.stage,
+        owner: normalizeWorkflowOwner(templateTask.owner),
+        responsibilities: templateTask.responsibilities,
+        notes: templateTask.notes,
+        order: templateTask.order,
+        isComplete: false,
+      });
+      if (errors?.length) {
+        reconcileErrors.push(...errors.map((e) => e.message));
+      }
+    }
+
+    // Patch any surviving primary tasks whose order, stage, or owner has drifted.
+    for (const [order, primary] of keepByOrder) {
+      const templateTask = templateByOrder.get(order)!;
+      const normalizedOwner = normalizeWorkflowOwner(primary.owner);
+      const updatePayload: { id: string; order?: number; stage?: string; owner?: string | null } = { id: primary.id };
+      let shouldUpdate = false;
+
+      if (primary.order !== templateTask.order) {
+        updatePayload.order = templateTask.order;
+        shouldUpdate = true;
+      }
+      if (primary.stage !== templateTask.stage) {
+        updatePayload.stage = templateTask.stage;
+        shouldUpdate = true;
+      }
+      if (normalizedOwner !== (primary.owner ?? null)) {
+        updatePayload.owner = normalizedOwner;
+        shouldUpdate = true;
       }
 
-      for (const templateTask of defaultWorkflow) {
-        const order = templateTask.order;
-        const group = groupedByExpectedOrder.get(order) ?? [];
-
-        if (group.length === 0) {
-          const { errors } = await client.models.PropertyTask.create({
-            propertyId,
-            stage: templateTask.stage,
-            owner: normalizeWorkflowOwner(templateTask.owner),
-            responsibilities: templateTask.responsibilities,
-            notes: templateTask.notes,
-            order: templateTask.order,
-            isComplete: false,
-          });
-          if (errors?.length) {
-            throw new Error(errors.map((item) => item.message).join("; "));
-          }
-          continue;
-        }
-
-        const primary = group.find((task) => task.isComplete) ?? group[0];
-        const duplicates = group.filter((task) => task.id !== primary.id);
-        for (const duplicate of duplicates) {
-          const { errors } = await client.models.PropertyTask.delete({ id: duplicate.id });
-          if (errors?.length) {
-            throw new Error(errors.map((item) => item.message).join("; "));
-          }
-        }
-
-        const normalizedOwner = normalizeWorkflowOwner(primary.owner);
-        const updatePayload: { id: string; order?: number; owner?: string | null } = { id: primary.id };
-        let shouldUpdate = false;
-
-        if (primary.order !== order) {
-          updatePayload.order = order;
-          shouldUpdate = true;
-        }
-
-        if (normalizedOwner !== (primary.owner ?? null)) {
-          updatePayload.owner = normalizedOwner;
-          shouldUpdate = true;
-        }
-
-        if (shouldUpdate) {
-          const { errors } = await client.models.PropertyTask.update(updatePayload);
-          if (errors?.length) {
-            throw new Error(errors.map((item) => item.message).join("; "));
-          }
+      if (shouldUpdate) {
+        const { errors } = await client.models.PropertyTask.update(updatePayload);
+        if (errors?.length) {
+          reconcileErrors.push(...errors.map((e) => e.message));
         }
       }
+    }
 
-      for (const [order, tasksForOrder] of groupedByExpectedOrder.entries()) {
-        if (!templateByOrder.has(order)) {
-          for (const task of tasksForOrder) {
-            const { errors } = await client.models.PropertyTask.delete({ id: task.id });
-            if (errors?.length) {
-              throw new Error(errors.map((item) => item.message).join("; "));
-            }
-          }
-        }
-      }
-    } catch (reconcileError) {
-      setError(reconcileError instanceof Error ? reconcileError.message : "Failed to reconcile workflow tasks.");
+    if (reconcileErrors.length > 0) {
+      setError(`Workflow reconcile issues (${reconcileErrors.length}): ${reconcileErrors.join("; ")}`);
     }
   }, [propertyId]);
 
@@ -213,6 +196,18 @@ export default function PropertyWorkflow({ propertyId }: Props) {
 
   const { totalCount, completedCount } = useMemo(() => getWorkflowProgressCounts(tasks), [tasks]);
   const percentComplete = totalCount === 0 ? 0 : Math.round((completedCount / totalCount) * 100);
+
+  // Render-time safety net: even if the backend momentarily returns duplicate rows
+  // (e.g., during an in-flight reconcile), only show one row per canonical order.
+  const dedupedTasks = useMemo(() => {
+    const { keepByOrder } = dedupeTasksByCanonicalOrder(tasks);
+    const result: PropertyTask[] = [];
+    for (const templateTask of defaultWorkflow) {
+      const primary = keepByOrder.get(templateTask.order);
+      if (primary) result.push(primary);
+    }
+    return result;
+  }, [tasks]);
 
   const handleToggle = useCallback(
     async (task: PropertyTask, checked: boolean) => {
@@ -263,12 +258,12 @@ export default function PropertyWorkflow({ propertyId }: Props) {
     }
   }, []);
 
-  const tabs = useMemo(() => getWorkflowTabs(tasks), [tasks]);
+  const tabs = useMemo(() => getWorkflowTabs(dedupedTasks), [dedupedTasks]);
   const activeTab = useMemo(
     () => tabs.find((tab) => tab.id === activeTabId) ?? tabs[0] ?? { id: "main", label: "Main Workflow", assigneeId: null },
     [tabs, activeTabId]
   );
-  const visibleTasks = useMemo(() => getTasksForTab(tasks, activeTab), [tasks, activeTab]);
+  const visibleTasks = useMemo(() => getTasksForTab(dedupedTasks, activeTab), [dedupedTasks, activeTab]);
 
   useEffect(() => {
     if (!tabs.some((tab) => tab.id === activeTabId)) {
@@ -278,14 +273,14 @@ export default function PropertyWorkflow({ propertyId }: Props) {
 
   const assigneeOptions = useMemo(() => {
     const options = new Set<string>();
-    for (const task of tasks) {
+    for (const task of dedupedTasks) {
       const assigneeId = normalizeAssignee(task.assigneeId);
       if (assigneeId) options.add(assigneeId);
       const owner = normalizeWorkflowOwner(task.owner);
       if (owner) options.add(owner);
     }
     return [...options].sort((a, b) => a.localeCompare(b));
-  }, [tasks]);
+  }, [dedupedTasks]);
 
   const handleTabKeyDown = useCallback(
     (event: KeyboardEvent<HTMLButtonElement>, currentIndex: number) => {
@@ -327,7 +322,7 @@ export default function PropertyWorkflow({ propertyId }: Props) {
         <span style={{ width: `${percentComplete}%` }} />
       </div>
 
-      {!loading && tasks.length > 0 && (
+      {!loading && dedupedTasks.length > 0 && (
         <div className="pwTabs" role="tablist" aria-label="Workflow tabs">
           {tabs.map((tab, index) => {
             const selected = tab.id === activeTab.id;
@@ -355,7 +350,7 @@ export default function PropertyWorkflow({ propertyId }: Props) {
       {!loading && tasks.length === 0 && <p className="pwMuted">Preparing default workflow…</p>}
       {error && <p className="pwError">⚠️ {error}</p>}
 
-      {!loading && tasks.length > 0 && (
+      {!loading && dedupedTasks.length > 0 && (
         <div className="pwChecklist" role="tabpanel" id={`workflow-panel-${activeTab.id}`} aria-labelledby={`workflow-tab-${activeTab.id}`}>
           {visibleTasks.map((task) => (
             <label className={`pwRow${task.isComplete ? " completed" : ""}`} key={task.id}>
