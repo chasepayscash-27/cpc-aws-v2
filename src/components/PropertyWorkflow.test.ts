@@ -71,6 +71,22 @@ describe("PropertyWorkflow tab helpers", () => {
     expect(aliceTask?.completedBy).toBe("Alice");
   });
 
+  it("moves a task between employee tabs when assignee changes", () => {
+    const tasks = [
+      buildTask({ id: "1", stage: "A", assigneeId: "Alice" }),
+      buildTask({ id: "2", stage: "B", assigneeId: "Bob" }),
+    ];
+
+    const afterReassign = updateTask(tasks, "1", { assigneeId: "Bob" });
+    const tabs = getWorkflowTabs(afterReassign);
+    const bobTab = tabs.find((tab) => tab.label === "Bob");
+    const aliceTab = tabs.find((tab) => tab.label === "Alice");
+
+    expect(aliceTab).toBeUndefined();
+    expect(bobTab).toBeDefined();
+    expect(getTasksForTab(afterReassign, bobTab!).map((task) => task.id)).toEqual(["1", "2"]);
+  });
+
   it("hides employee tabs when that employee has no assigned items", () => {
     const tasks = [buildTask({ id: "1", assigneeId: "Alice" }), buildTask({ id: "2", assigneeId: null })];
 
