@@ -68,6 +68,37 @@ const schema = a.schema({
       completedAt: a.datetime(),
       completedBy: a.string(),
       assigneeId: a.string(),
+      alertRecipientId: a.string(),
+    })
+    .authorization((allow) => [
+      allow.authenticated("identityPool"),
+      allow.guest(),
+      allow.publicApiKey(),
+    ]),
+
+  PropertyAlertPreference: a
+    .model({
+      propertyId: a.id().required(),
+      alertsEnabled: a.boolean().default(false),
+    })
+    .authorization((allow) => [
+      allow.authenticated("identityPool"),
+      allow.guest(),
+      allow.publicApiKey(),
+    ]),
+
+  WorkflowAlertEvent: a
+    .model({
+      propertyId: a.id().required(),
+      taskId: a.id().required(),
+      taskStage: a.string().required(),
+      recipientId: a.string().required(),
+      recipientEmail: a.email().required(),
+      recipientPhone: a.phone().required(),
+      channels: a.string().required(),
+      status: a.string().required(),
+      triggeredAt: a.datetime().required(),
+      triggeredBy: a.string(),
     })
     .authorization((allow) => [
       allow.authenticated("identityPool"),

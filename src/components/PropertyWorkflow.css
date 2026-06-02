@@ -40,6 +40,19 @@
   transition: width 0.2s ease;
 }
 
+.pwAlertToggleRow {
+  margin: 6px 0 10px;
+}
+
+.pwAlertToggleLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #1a2e1a;
+}
+
 .pwTabs {
   display: flex;
   gap: 8px;
@@ -156,5 +169,11 @@
 .pwError {
   margin: 0 0 8px;
   color: #c0392b;
+  font-size: 12px;
+}
+
+.pwSuccess {
+  margin: 0 0 8px;
+  color: #1a7a3c;
   font-size: 12px;
 }
