@@ -70,6 +70,7 @@ export default function PropertyWorkflow({ propertyId }: Props) {
           order: templateTask.order,
           isComplete: false,
           alertRecipientId: workflowAlertRecipients[0]?.id ?? null,
+          assigneeId: normalizeWorkflowOwner(templateTask.owner),
         });
         if (errors?.length) {
           throw new Error(errors.map((item) => item.message).join("; "));
@@ -119,6 +120,7 @@ export default function PropertyWorkflow({ propertyId }: Props) {
         order: templateTask.order,
         isComplete: false,
         alertRecipientId: workflowAlertRecipients[0]?.id ?? null,
+        assigneeId: normalizeWorkflowOwner(templateTask.owner),
       });
       if (errors?.length) {
         reconcileErrors.push(...errors.map((e) => e.message));
@@ -129,7 +131,7 @@ export default function PropertyWorkflow({ propertyId }: Props) {
     for (const [order, primary] of keepByOrder) {
       const templateTask = templateByOrder.get(order)!;
       const normalizedOwner = normalizeWorkflowOwner(primary.owner);
-      const updatePayload: { id: string; order?: number; stage?: string; owner?: string | null } = { id: primary.id };
+      const updatePayload: { id: string; order?: number; stage?: string; owner?: string | null; assigneeId?: string | null } = { id: primary.id };
       let shouldUpdate = false;
 
       if (primary.order !== templateTask.order) {
@@ -142,6 +144,10 @@ export default function PropertyWorkflow({ propertyId }: Props) {
       }
       if (normalizedOwner !== (primary.owner ?? null)) {
         updatePayload.owner = normalizedOwner;
+        shouldUpdate = true;
+      }
+      if (primary.assigneeId == null && normalizedOwner !== null) {
+        updatePayload.assigneeId = normalizedOwner;
         shouldUpdate = true;
       }
 
