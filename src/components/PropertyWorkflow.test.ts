@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { Schema } from "../../amplify/data/resource";
-import { getTasksForTab, getWorkflowTabs, updateTask } from "./propertyWorkflowTabs";
+import { getTasksForTab, getWorkflowTabs, normalizeAlertRecipient, updateTask, workflowAlertRecipients } from "./propertyWorkflowTabs";
 
 type PropertyTask = Schema["PropertyTask"]["type"];
 
@@ -17,6 +17,7 @@ function buildTask(overrides: Partial<PropertyTask>): PropertyTask {
     completedAt: overrides.completedAt ?? null,
     completedBy: overrides.completedBy ?? null,
     assigneeId: overrides.assigneeId ?? null,
+    alertRecipientId: overrides.alertRecipientId ?? null,
     createdAt: overrides.createdAt ?? new Date().toISOString(),
     updatedAt: overrides.updatedAt ?? new Date().toISOString(),
   } as PropertyTask;
@@ -94,5 +95,22 @@ describe("PropertyWorkflow tab helpers", () => {
 
     expect(tabs.some((tab) => tab.label === "Bob")).toBe(false);
     expect(tabs.map((tab) => tab.label)).toEqual(["Main Workflow", "Alice"]);
+  });
+
+  it("exposes Alex as the default alert recipient template", () => {
+    expect(workflowAlertRecipients).toEqual([
+      {
+        id: "alex",
+        label: "Alex",
+        email: "ahenderson@chasepayscash.com",
+        phone: "+12059141329",
+      },
+    ]);
+  });
+
+  it("normalizes alert recipient values", () => {
+    expect(normalizeAlertRecipient(" alex ")).toBe("alex");
+    expect(normalizeAlertRecipient("")).toBeNull();
+    expect(normalizeAlertRecipient(null)).toBeNull();
   });
 });

@@ -6,8 +6,10 @@ import { defaultWorkflow } from "../data/defaultWorkflow";
 import {
   getTasksForTab,
   getWorkflowTabs,
+  normalizeAlertRecipient,
   normalizeAssignee,
   updateTask,
+  workflowAlertRecipients,
 } from "./propertyWorkflowTabs";
 import { dedupeTasksByCanonicalOrder, getWorkflowProgressCounts, normalizeWorkflowOwner } from "./propertyWorkflowNormalization";
 import "./PropertyWorkflow.css";
@@ -32,6 +34,9 @@ export default function PropertyWorkflow({ propertyId }: Props) {
   const [tasks, setTasks] = useState<PropertyTask[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [alertStatus, setAlertStatus] = useState("");
+  const [alertsEnabled, setAlertsEnabled] = useState(false);
+  const [alertPreferenceId, setAlertPreferenceId] = useState<string | null>(null);
   const [completedByUser, setCompletedByUser] = useState<string | null>(null);
   const [activeTabId, setActiveTabId] = useState("main");
   const seedAttemptedRef = useRef(false);
@@ -64,6 +69,7 @@ export default function PropertyWorkflow({ propertyId }: Props) {
           notes: templateTask.notes,
           order: templateTask.order,
           isComplete: false,
+          alertRecipientId: workflowAlertRecipients[0]?.id ?? null,
         });
         if (errors?.length) {
           throw new Error(errors.map((item) => item.message).join("; "));
@@ -112,6 +118,7 @@ export default function PropertyWorkflow({ propertyId }: Props) {
         notes: templateTask.notes,
         order: templateTask.order,
         isComplete: false,
+        alertRecipientId: workflowAlertRecipients[0]?.id ?? null,
       });
       if (errors?.length) {
         reconcileErrors.push(...errors.map((e) => e.message));
@@ -168,6 +175,7 @@ export default function PropertyWorkflow({ propertyId }: Props) {
     reconcileAttemptedRef.current = false;
     setLoading(true);
     setError("");
+    setAlertStatus("");
 
     const subscription = client.models.PropertyTask.observeQuery({
       filter: { propertyId: { eq: propertyId } },
@@ -194,6 +202,30 @@ export default function PropertyWorkflow({ propertyId }: Props) {
     return () => subscription.unsubscribe();
   }, [propertyId, seedPropertyTasks, reconcilePropertyTasks]);
 
+  useEffect(() => {
+    if (!propertyId) return;
+    const subscription = client.models.PropertyAlertPreference.observeQuery({
+      filter: { propertyId: { eq: propertyId } },
+    }).subscribe({
+      next: ({ items }) => {
+        const preference = items[0];
+        if (preference) {
+          setAlertPreferenceId(preference.id);
+          setAlertsEnabled(!!preference.alertsEnabled);
+        } else {
+          setAlertPreferenceId(null);
+          setAlertsEnabled(false);
+        }
+      },
+      error: () => {
+        setAlertPreferenceId(null);
+        setAlertsEnabled(false);
+      },
+    });
+
+    return () => subscription.unsubscribe();
+  }, [propertyId]);
+
   const { totalCount, completedCount } = useMemo(() => getWorkflowProgressCounts(tasks), [tasks]);
   const percentComplete = totalCount === 0 ? 0 : Math.round((completedCount / totalCount) * 100);
 
@@ -212,6 +244,8 @@ export default function PropertyWorkflow({ propertyId }: Props) {
   const handleToggle = useCallback(
     async (task: PropertyTask, checked: boolean) => {
       setError("");
+      setAlertStatus("");
+      const wasComplete = !!task.isComplete;
       const previousCompletedAt = task.completedAt;
       const previousCompletedBy = task.completedBy;
       setTasks((currentTasks) =>
@@ -237,9 +271,36 @@ export default function PropertyWorkflow({ propertyId }: Props) {
           })
         );
         setError(errors.map((item) => item.message).join("; "));
+        return;
+      }
+
+      if (checked && !wasComplete && alertsEnabled) {
+        const recipientId = normalizeAlertRecipient(task.alertRecipientId) ?? workflowAlertRecipients[0]?.id ?? null;
+        const recipient = workflowAlertRecipients.find((option) => option.id === recipientId);
+        if (recipient) {
+          const { errors: alertErrors } = await client.models.WorkflowAlertEvent.create({
+            propertyId,
+            taskId: task.id,
+            taskStage: task.stage,
+            recipientId: recipient.id,
+            recipientEmail: recipient.email,
+            recipientPhone: recipient.phone,
+            channels: "email,sms",
+            status: "queued",
+            triggeredAt: new Date().toISOString(),
+            triggeredBy: completedByUser,
+          });
+
+          if (alertErrors?.length) {
+            setError(alertErrors.map((item) => item.message).join("; "));
+            return;
+          }
+
+          setAlertStatus(`Queued email + text alert to ${recipient.label} for “${task.stage}”.`);
+        }
       }
     },
-    [completedByUser]
+    [alertsEnabled, completedByUser, propertyId]
   );
 
   const handleAssigneeChange = useCallback(async (task: PropertyTask, assigneeId: string | null) => {
@@ -257,6 +318,53 @@ export default function PropertyWorkflow({ propertyId }: Props) {
       setError(errors.map((item) => item.message).join("; "));
     }
   }, []);
+
+  const handleAlertRecipientChange = useCallback(async (task: PropertyTask, recipientId: string | null) => {
+    setError("");
+    const normalizedRecipient = normalizeAlertRecipient(recipientId);
+    const previousRecipient = task.alertRecipientId ?? null;
+    setTasks((currentTasks) => updateTask(currentTasks, task.id, { alertRecipientId: normalizedRecipient }));
+
+    const { errors } = await client.models.PropertyTask.update({
+      id: task.id,
+      alertRecipientId: normalizedRecipient,
+    });
+    if (errors?.length) {
+      setTasks((currentTasks) => updateTask(currentTasks, task.id, { alertRecipientId: previousRecipient }));
+      setError(errors.map((item) => item.message).join("; "));
+    }
+  }, []);
+
+  const handleAlertsEnabledToggle = useCallback(async (enabled: boolean) => {
+    setError("");
+    setAlertStatus("");
+    const previousEnabled = alertsEnabled;
+    setAlertsEnabled(enabled);
+
+    if (alertPreferenceId) {
+      const { errors } = await client.models.PropertyAlertPreference.update({
+        id: alertPreferenceId,
+        propertyId,
+        alertsEnabled: enabled,
+      });
+      if (errors?.length) {
+        setAlertsEnabled(previousEnabled);
+        setError(errors.map((item) => item.message).join("; "));
+      }
+      return;
+    }
+
+    const { data, errors } = await client.models.PropertyAlertPreference.create({
+      propertyId,
+      alertsEnabled: enabled,
+    });
+    if (errors?.length) {
+      setAlertsEnabled(previousEnabled);
+      setError(errors.map((item) => item.message).join("; "));
+      return;
+    }
+    setAlertPreferenceId(data?.id ?? null);
+  }, [alertPreferenceId, alertsEnabled, propertyId]);
 
   const tabs = useMemo(() => getWorkflowTabs(dedupedTasks), [dedupedTasks]);
   const activeTab = useMemo(
@@ -322,6 +430,19 @@ export default function PropertyWorkflow({ propertyId }: Props) {
         <span style={{ width: `${percentComplete}%` }} />
       </div>
 
+      <div className="pwAlertToggleRow">
+        <label className="pwAlertToggleLabel">
+          <input
+            type="checkbox"
+            checked={alertsEnabled}
+            onChange={(event) => {
+              void handleAlertsEnabledToggle(event.currentTarget.checked);
+            }}
+          />
+          Enable workflow alerts for this property
+        </label>
+      </div>
+
       {!loading && dedupedTasks.length > 0 && (
         <div className="pwTabs" role="tablist" aria-label="Workflow tabs">
           {tabs.map((tab, index) => {
@@ -349,6 +470,7 @@ export default function PropertyWorkflow({ propertyId }: Props) {
       {loading && <p className="pwMuted">Loading workflow tasks…</p>}
       {!loading && tasks.length === 0 && <p className="pwMuted">Preparing default workflow…</p>}
       {error && <p className="pwError">⚠️ {error}</p>}
+      {alertStatus && <p className="pwSuccess">{alertStatus}</p>}
 
       {!loading && dedupedTasks.length > 0 && (
         <div className="pwChecklist" role="tabpanel" id={`workflow-panel-${activeTab.id}`} aria-labelledby={`workflow-tab-${activeTab.id}`}>
@@ -380,6 +502,23 @@ export default function PropertyWorkflow({ propertyId }: Props) {
                       {assigneeOptions.map((option) => (
                         <option key={option} value={option}>
                           {option}
+                        </option>
+                      ))}
+                    </select>
+                  </span>
+                  <span className="pwAssigneeWrap">
+                    <span className="pwAssigneeLabel">Alert</span>
+                    <select
+                      className="pwAssigneeSelect"
+                      value={normalizeAlertRecipient(task.alertRecipientId) ?? workflowAlertRecipients[0]?.id ?? ""}
+                      onChange={(event) => {
+                        void handleAlertRecipientChange(task, event.currentTarget.value || null);
+                      }}
+                      aria-label={`Alert recipient for ${task.stage}`}
+                    >
+                      {workflowAlertRecipients.map((recipient) => (
+                        <option key={recipient.id} value={recipient.id}>
+                          {recipient.label}
                         </option>
                       ))}
                     </select>
