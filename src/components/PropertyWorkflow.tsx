@@ -1,8 +1,14 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type KeyboardEvent } from "react";
 import { generateClient } from "aws-amplify/data";
 import { getCurrentUser } from "aws-amplify/auth";
 import type { Schema } from "../../amplify/data/resource";
 import { defaultWorkflow } from "../data/defaultWorkflow";
+import {
+  getTasksForTab,
+  getWorkflowTabs,
+  normalizeAssignee,
+  updateTask,
+} from "./propertyWorkflowTabs";
 import "./PropertyWorkflow.css";
 
 type PropertyTask = Schema["PropertyTask"]["type"];
@@ -26,6 +32,7 @@ export default function PropertyWorkflow({ propertyId }: Props) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [completedByUser, setCompletedByUser] = useState<string | null>(null);
+  const [activeTabId, setActiveTabId] = useState("main");
   const seedAttemptedRef = useRef(false);
   const seedingRef = useRef(false);
   const reconcileAttemptedRef = useRef(false);
@@ -111,6 +118,7 @@ export default function PropertyWorkflow({ propertyId }: Props) {
   useEffect(() => {
     if (!propertyId) return;
 
+    setActiveTabId("main");
     seedAttemptedRef.current = false;
     reconcileAttemptedRef.current = false;
     setLoading(true);
@@ -151,6 +159,16 @@ export default function PropertyWorkflow({ propertyId }: Props) {
   const handleToggle = useCallback(
     async (task: PropertyTask, checked: boolean) => {
       setError("");
+      const previousCompletedAt = task.completedAt;
+      const previousCompletedBy = task.completedBy;
+      setTasks((currentTasks) =>
+        updateTask(currentTasks, task.id, {
+          isComplete: checked,
+          completedAt: checked ? new Date().toISOString() : null,
+          completedBy: checked ? completedByUser : null,
+        })
+      );
+
       const { errors } = await client.models.PropertyTask.update({
         id: task.id,
         isComplete: checked,
@@ -158,10 +176,80 @@ export default function PropertyWorkflow({ propertyId }: Props) {
         completedBy: checked ? completedByUser : null,
       });
       if (errors?.length) {
+        setTasks((currentTasks) =>
+          updateTask(currentTasks, task.id, {
+            isComplete: !!task.isComplete,
+            completedAt: previousCompletedAt ?? null,
+            completedBy: previousCompletedBy ?? null,
+          })
+        );
         setError(errors.map((item) => item.message).join("; "));
       }
     },
     [completedByUser]
+  );
+
+  const handleAssigneeChange = useCallback(async (task: PropertyTask, assigneeId: string | null) => {
+    setError("");
+    const normalizedAssignee = normalizeAssignee(assigneeId);
+    const previousAssignee = task.assigneeId ?? null;
+    setTasks((currentTasks) => updateTask(currentTasks, task.id, { assigneeId: normalizedAssignee }));
+
+    const { errors } = await client.models.PropertyTask.update({
+      id: task.id,
+      assigneeId: normalizedAssignee,
+    });
+    if (errors?.length) {
+      setTasks((currentTasks) => updateTask(currentTasks, task.id, { assigneeId: previousAssignee }));
+      setError(errors.map((item) => item.message).join("; "));
+    }
+  }, []);
+
+  const tabs = useMemo(() => getWorkflowTabs(tasks), [tasks]);
+  const activeTab = useMemo(
+    () => tabs.find((tab) => tab.id === activeTabId) ?? tabs[0] ?? { id: "main", label: "Main Workflow", assigneeId: null },
+    [tabs, activeTabId]
+  );
+  const visibleTasks = useMemo(() => getTasksForTab(tasks, activeTab), [tasks, activeTab]);
+
+  useEffect(() => {
+    if (!tabs.some((tab) => tab.id === activeTabId)) {
+      setActiveTabId("main");
+    }
+  }, [tabs, activeTabId]);
+
+  const assigneeOptions = useMemo(() => {
+    const options = new Set<string>();
+    for (const task of tasks) {
+      const assigneeId = normalizeAssignee(task.assigneeId);
+      if (assigneeId) options.add(assigneeId);
+      const owner = normalizeAssignee(task.owner);
+      if (owner) options.add(owner);
+    }
+    return [...options].sort((a, b) => a.localeCompare(b));
+  }, [tasks]);
+
+  const handleTabKeyDown = useCallback(
+    (event: KeyboardEvent<HTMLButtonElement>, currentIndex: number) => {
+      if (!["ArrowRight", "ArrowLeft", "Home", "End"].includes(event.key)) {
+        return;
+      }
+      event.preventDefault();
+
+      if (event.key === "Home") {
+        setActiveTabId(tabs[0]?.id ?? "main");
+        return;
+      }
+      if (event.key === "End") {
+        setActiveTabId(tabs[tabs.length - 1]?.id ?? "main");
+        return;
+      }
+
+      const direction = event.key === "ArrowRight" ? 1 : -1;
+      const nextIndex = (currentIndex + direction + tabs.length) % tabs.length;
+      setActiveTabId(tabs[nextIndex]?.id ?? "main");
+    },
+    [tabs]
   );
 
   if (!propertyId) {
@@ -181,13 +269,37 @@ export default function PropertyWorkflow({ propertyId }: Props) {
         <span style={{ width: `${percentComplete}%` }} />
       </div>
 
+      {!loading && tasks.length > 0 && (
+        <div className="pwTabs" role="tablist" aria-label="Workflow tabs">
+          {tabs.map((tab, index) => {
+            const selected = tab.id === activeTab.id;
+            return (
+              <button
+                type="button"
+                key={tab.id}
+                id={`workflow-tab-${tab.id}`}
+                role="tab"
+                className={`pwTab${selected ? " active" : ""}`}
+                aria-selected={selected}
+                aria-controls={`workflow-panel-${tab.id}`}
+                tabIndex={selected ? 0 : -1}
+                onClick={() => setActiveTabId(tab.id)}
+                onKeyDown={(event) => handleTabKeyDown(event, index)}
+              >
+                {tab.label}
+              </button>
+            );
+          })}
+        </div>
+      )}
+
       {loading && <p className="pwMuted">Loading workflow tasks…</p>}
       {!loading && tasks.length === 0 && <p className="pwMuted">Preparing default workflow…</p>}
       {error && <p className="pwError">⚠️ {error}</p>}
 
       {!loading && tasks.length > 0 && (
-        <div className="pwChecklist">
-          {tasks.map((task) => (
+        <div className="pwChecklist" role="tabpanel" id={`workflow-panel-${activeTab.id}`} aria-labelledby={`workflow-tab-${activeTab.id}`}>
+          {visibleTasks.map((task) => (
             <label className={`pwRow${task.isComplete ? " completed" : ""}`} key={task.id}>
               <input
                 type="checkbox"
@@ -201,6 +313,26 @@ export default function PropertyWorkflow({ propertyId }: Props) {
                 <div className="pwTopLine">
                   <strong>{task.stage}</strong>
                   {task.owner && <span className="pwBadge">{task.owner}</span>}
+                  {activeTab.id === "main" && (
+                    <span className="pwAssigneeWrap">
+                      <span className="pwAssigneeLabel">Assignee</span>
+                      <select
+                        className="pwAssigneeSelect"
+                        value={normalizeAssignee(task.assigneeId) ?? ""}
+                        onChange={(event) => {
+                          void handleAssigneeChange(task, event.currentTarget.value || null);
+                        }}
+                        aria-label={`Assignee for ${task.stage}`}
+                      >
+                        <option value="">Unassigned</option>
+                        {assigneeOptions.map((option) => (
+                          <option key={option} value={option}>
+                            {option}
+                          </option>
+                        ))}
+                      </select>
+                    </span>
+                  )}
                 </div>
                 {task.responsibilities && <p>{task.responsibilities}</p>}
                 {task.notes && <p className="pwNotes">{task.notes}</p>}

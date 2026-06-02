@@ -67,6 +67,7 @@ const schema = a.schema({
       isComplete: a.boolean().default(false),
       completedAt: a.datetime(),
       completedBy: a.string(),
+      assigneeId: a.string(),
     })
     .authorization((allow) => [
       allow.authenticated("identityPool"),

@@ -40,6 +40,32 @@
   transition: width 0.2s ease;
 }
 
+.pwTabs {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+  margin-bottom: 8px;
+}
+
+.pwTab {
+  border: 1px solid #cde8d5;
+  background: #fff;
+  color: #1a7a3c;
+  border-radius: 999px;
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.pwTab.active {
+  background: #1a7a3c;
+  color: #fff;
+  border-color: #1a7a3c;
+}
+
 .pwChecklist {
   display: flex;
   flex-direction: column;
@@ -77,6 +103,26 @@
   align-items: center;
   flex-wrap: wrap;
   gap: 8px;
+}
+
+.pwAssigneeWrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.pwAssigneeLabel {
+  font-size: 11px;
+  color: #5a7060;
+}
+
+.pwAssigneeSelect {
+  border: 1px solid #cde8d5;
+  border-radius: 8px;
+  background: #fff;
+  color: #1a2e1a;
+  font-size: 12px;
+  padding: 2px 6px;
 }
 
 .pwBadge {
