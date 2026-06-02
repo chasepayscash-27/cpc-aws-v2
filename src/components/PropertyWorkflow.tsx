@@ -9,6 +9,7 @@ import {
   normalizeAssignee,
   updateTask,
 } from "./propertyWorkflowTabs";
+import { getWorkflowProgressCounts, normalizeWorkflowOwner } from "./propertyWorkflowNormalization";
 import "./PropertyWorkflow.css";
 
 type PropertyTask = Schema["PropertyTask"]["type"];
@@ -81,20 +82,81 @@ export default function PropertyWorkflow({ propertyId }: Props) {
     try {
       const validStages = new Set(defaultWorkflow.map((t) => t.stage));
       const orderByStage = new Map(defaultWorkflow.map((t) => [t.stage, t.order]));
+      const templateByOrder = new Map(defaultWorkflow.map((t) => [t.order, t]));
+      const groupedByExpectedOrder = new Map<number, PropertyTask[]>();
 
       for (const task of currentTasks) {
-        if (!validStages.has(task.stage ?? "")) {
+        const stage = task.stage ?? "";
+        const expectedOrder = orderByStage.get(stage);
+
+        if (!validStages.has(stage) || expectedOrder === undefined) {
           const { errors } = await client.models.PropertyTask.delete({ id: task.id });
           if (errors?.length) {
             throw new Error(errors.map((item) => item.message).join("; "));
           }
-        } else {
-          const expectedOrder = orderByStage.get(task.stage ?? "");
-          if (expectedOrder !== undefined && task.order !== expectedOrder) {
-            const { errors } = await client.models.PropertyTask.update({
-              id: task.id,
-              order: expectedOrder,
-            });
+          continue;
+        }
+
+        const group = groupedByExpectedOrder.get(expectedOrder) ?? [];
+        group.push(task);
+        groupedByExpectedOrder.set(expectedOrder, group);
+      }
+
+      for (const templateTask of defaultWorkflow) {
+        const order = templateTask.order;
+        const group = groupedByExpectedOrder.get(order) ?? [];
+
+        if (group.length === 0) {
+          const { errors } = await client.models.PropertyTask.create({
+            propertyId,
+            stage: templateTask.stage,
+            owner: normalizeWorkflowOwner(templateTask.owner),
+            responsibilities: templateTask.responsibilities,
+            notes: templateTask.notes,
+            order: templateTask.order,
+            isComplete: false,
+          });
+          if (errors?.length) {
+            throw new Error(errors.map((item) => item.message).join("; "));
+          }
+          continue;
+        }
+
+        const primary = group.find((task) => task.isComplete) ?? group[0];
+        const duplicates = group.filter((task) => task.id !== primary.id);
+        for (const duplicate of duplicates) {
+          const { errors } = await client.models.PropertyTask.delete({ id: duplicate.id });
+          if (errors?.length) {
+            throw new Error(errors.map((item) => item.message).join("; "));
+          }
+        }
+
+        const normalizedOwner = normalizeWorkflowOwner(primary.owner);
+        const updatePayload: { id: string; order?: number; owner?: string | null } = { id: primary.id };
+        let shouldUpdate = false;
+
+        if (primary.order !== order) {
+          updatePayload.order = order;
+          shouldUpdate = true;
+        }
+
+        if (normalizedOwner !== (primary.owner ?? null)) {
+          updatePayload.owner = normalizedOwner;
+          shouldUpdate = true;
+        }
+
+        if (shouldUpdate) {
+          const { errors } = await client.models.PropertyTask.update(updatePayload);
+          if (errors?.length) {
+            throw new Error(errors.map((item) => item.message).join("; "));
+          }
+        }
+      }
+
+      for (const [order, tasksForOrder] of groupedByExpectedOrder.entries()) {
+        if (!templateByOrder.has(order)) {
+          for (const task of tasksForOrder) {
+            const { errors } = await client.models.PropertyTask.delete({ id: task.id });
             if (errors?.length) {
               throw new Error(errors.map((item) => item.message).join("; "));
             }
@@ -149,11 +211,7 @@ export default function PropertyWorkflow({ propertyId }: Props) {
     return () => subscription.unsubscribe();
   }, [propertyId, seedPropertyTasks, reconcilePropertyTasks]);
 
-  const totalCount = tasks.length;
-  const completedCount = useMemo(
-    () => tasks.filter((task) => task.isComplete).length,
-    [tasks]
-  );
+  const { totalCount, completedCount } = useMemo(() => getWorkflowProgressCounts(tasks), [tasks]);
   const percentComplete = totalCount === 0 ? 0 : Math.round((completedCount / totalCount) * 100);
 
   const handleToggle = useCallback(
@@ -223,7 +281,7 @@ export default function PropertyWorkflow({ propertyId }: Props) {
     for (const task of tasks) {
       const assigneeId = normalizeAssignee(task.assigneeId);
       if (assigneeId) options.add(assigneeId);
-      const owner = normalizeAssignee(task.owner);
+      const owner = normalizeWorkflowOwner(task.owner);
       if (owner) options.add(owner);
     }
     return [...options].sort((a, b) => a.localeCompare(b));
@@ -312,7 +370,7 @@ export default function PropertyWorkflow({ propertyId }: Props) {
               <div className="pwContent">
                 <div className="pwTopLine">
                   <strong>{task.stage}</strong>
-                  {task.owner && <span className="pwBadge">{task.owner}</span>}
+                  {normalizeWorkflowOwner(task.owner) && <span className="pwBadge">{normalizeWorkflowOwner(task.owner)}</span>}
                   {activeTab.id === "main" && (
                     <span className="pwAssigneeWrap">
                       <span className="pwAssigneeLabel">Assignee</span>
