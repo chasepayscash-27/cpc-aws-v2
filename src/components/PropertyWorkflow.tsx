@@ -366,26 +366,24 @@ export default function PropertyWorkflow({ propertyId }: Props) {
                 <div className="pwTopLine">
                   <strong>{task.stage}</strong>
                   {normalizeWorkflowOwner(task.owner) && <span className="pwBadge">{normalizeWorkflowOwner(task.owner)}</span>}
-                  {activeTab.id === "main" && (
-                    <span className="pwAssigneeWrap">
-                      <span className="pwAssigneeLabel">Assignee</span>
-                      <select
-                        className="pwAssigneeSelect"
-                        value={normalizeAssignee(task.assigneeId) ?? ""}
-                        onChange={(event) => {
-                          void handleAssigneeChange(task, event.currentTarget.value || null);
-                        }}
-                        aria-label={`Assignee for ${task.stage}`}
-                      >
-                        <option value="">Unassigned</option>
-                        {assigneeOptions.map((option) => (
-                          <option key={option} value={option}>
-                            {option}
-                          </option>
-                        ))}
-                      </select>
-                    </span>
-                  )}
+                  <span className="pwAssigneeWrap">
+                    <span className="pwAssigneeLabel">Assignee</span>
+                    <select
+                      className="pwAssigneeSelect"
+                      value={normalizeAssignee(task.assigneeId) ?? ""}
+                      onChange={(event) => {
+                        void handleAssigneeChange(task, event.currentTarget.value || null);
+                      }}
+                      aria-label={`Assignee for ${task.stage}`}
+                    >
+                      <option value="">Unassigned</option>
+                      {assigneeOptions.map((option) => (
+                        <option key={option} value={option}>
+                          {option}
+                        </option>
+                      ))}
+                    </select>
+                  </span>
                 </div>
                 {task.responsibilities && <p>{task.responsibilities}</p>}
                 {task.notes && <p className="pwNotes">{task.notes}</p>}
