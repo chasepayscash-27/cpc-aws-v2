@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useMemo, useCallback } from 'react';
-import { normalizeAddress } from '../utils/normalizeAddress';
+import { addressesMatch } from '../utils/normalizeAddress';
 
 interface FinancialRecord {
   account: string;
@@ -48,7 +48,7 @@ const PropertyFinancials: React.FC<PropertyFinancialsProps> = ({ propertyName, o
 
 const propertyData = useMemo(
   () => data.filter(record =>
-    normalizeAddress(record.property_name) === normalizeAddress(propertyName)
+    addressesMatch(record.property_name, propertyName)
   ),
   [data, propertyName]
 );
