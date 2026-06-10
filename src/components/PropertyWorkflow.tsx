@@ -6,10 +6,11 @@ import { defaultWorkflow } from "../data/defaultWorkflow";
 import {
   getTasksForTab,
   getWorkflowTabs,
+  loadWorkflowAlertRecipients,
   normalizeAlertRecipient,
   normalizeAssignee,
   updateTask,
-  workflowAlertRecipients,
+  type WorkflowAlertRecipient,
 } from "./propertyWorkflowTabs";
 import { dedupeTasksByCanonicalOrder, getWorkflowProgressCounts, normalizeWorkflowOwner } from "./propertyWorkflowNormalization";
 import "./PropertyWorkflow.css";
@@ -35,13 +36,15 @@ export default function PropertyWorkflow({ propertyId }: Props) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [alertStatus, setAlertStatus] = useState("");
-  const [alertsEnabled, setAlertsEnabled] = useState(false);
+  const [alertsEnabled, setAlertsEnabled] = useState(true);
   const [alertPreferenceId, setAlertPreferenceId] = useState<string | null>(null);
   const [completedByUser, setCompletedByUser] = useState<string | null>(null);
   const [activeTabId, setActiveTabId] = useState("main");
+  const [recipients, setRecipients] = useState<WorkflowAlertRecipient[]>([]);
   const seedAttemptedRef = useRef(false);
   const seedingRef = useRef(false);
   const reconcileAttemptedRef = useRef(false);
+  const seedAlertPreferenceAttemptedRef = useRef(false);
 
   const seedPropertyTasks = useCallback(async () => {
     if (!propertyId || seedingRef.current) return;
@@ -69,7 +72,7 @@ export default function PropertyWorkflow({ propertyId }: Props) {
           notes: templateTask.notes,
           order: templateTask.order,
           isComplete: false,
-          alertRecipientId: workflowAlertRecipients[0]?.id ?? null,
+          alertRecipientId: recipients[0]?.id ?? null,
           assigneeId: normalizeWorkflowOwner(templateTask.owner),
         });
         if (errors?.length) {
@@ -91,7 +94,7 @@ export default function PropertyWorkflow({ propertyId }: Props) {
     } finally {
       seedingRef.current = false;
     }
-  }, [propertyId]);
+  }, [propertyId, recipients]);
 
   const reconcilePropertyTasks = useCallback(async (currentTasks: PropertyTask[]) => {
     if (!propertyId) return;
@@ -119,7 +122,7 @@ export default function PropertyWorkflow({ propertyId }: Props) {
         notes: templateTask.notes,
         order: templateTask.order,
         isComplete: false,
-        alertRecipientId: workflowAlertRecipients[0]?.id ?? null,
+        alertRecipientId: recipients[0]?.id ?? null,
         assigneeId: normalizeWorkflowOwner(templateTask.owner),
       });
       if (errors?.length) {
@@ -162,7 +165,16 @@ export default function PropertyWorkflow({ propertyId }: Props) {
     if (reconcileErrors.length > 0) {
       setError(`Workflow reconcile issues (${reconcileErrors.length}): ${reconcileErrors.join("; ")}`);
     }
-  }, [propertyId]);
+  }, [propertyId, recipients]);
+
+  useEffect(() => {
+    loadWorkflowAlertRecipients()
+      .then(setRecipients)
+      .catch((err) => {
+        console.error("Failed to load alert recipients:", err);
+        setRecipients([]);
+      });
+  }, []);
 
   useEffect(() => {
     getCurrentUser()
@@ -179,6 +191,7 @@ export default function PropertyWorkflow({ propertyId }: Props) {
     setActiveTabId("main");
     seedAttemptedRef.current = false;
     reconcileAttemptedRef.current = false;
+    seedAlertPreferenceAttemptedRef.current = false;
     setLoading(true);
     setError("");
     setAlertStatus("");
@@ -218,14 +231,20 @@ export default function PropertyWorkflow({ propertyId }: Props) {
         if (preference) {
           setAlertPreferenceId(preference.id);
           setAlertsEnabled(!!preference.alertsEnabled);
-        } else {
-          setAlertPreferenceId(null);
-          setAlertsEnabled(false);
+        } else if (!seedAlertPreferenceAttemptedRef.current) {
+          seedAlertPreferenceAttemptedRef.current = true;
+          setAlertsEnabled(true);
+          void client.models.PropertyAlertPreference.create({
+            propertyId,
+            alertsEnabled: true,
+          }).then(({ data }) => {
+            setAlertPreferenceId(data?.id ?? null);
+          });
         }
       },
       error: () => {
         setAlertPreferenceId(null);
-        setAlertsEnabled(false);
+        setAlertsEnabled(true);
       },
     });
 
@@ -281,8 +300,8 @@ export default function PropertyWorkflow({ propertyId }: Props) {
       }
 
       if (checked && !wasComplete && alertsEnabled) {
-        const recipientId = normalizeAlertRecipient(task.alertRecipientId) ?? workflowAlertRecipients[0]?.id ?? null;
-        const recipient = workflowAlertRecipients.find((option) => option.id === recipientId);
+        const recipientId = normalizeAlertRecipient(task.alertRecipientId) ?? recipients[0]?.id ?? null;
+        const recipient = recipients.find((option) => option.id === recipientId);
         if (recipient) {
           const { errors: alertErrors } = await client.models.WorkflowAlertEvent.create({
             propertyId,
@@ -306,7 +325,7 @@ export default function PropertyWorkflow({ propertyId }: Props) {
         }
       }
     },
-    [alertsEnabled, completedByUser, propertyId]
+    [alertsEnabled, completedByUser, propertyId, recipients]
   );
 
   const handleAssigneeChange = useCallback(async (task: PropertyTask, assigneeId: string | null) => {
@@ -516,13 +535,13 @@ export default function PropertyWorkflow({ propertyId }: Props) {
                     <span className="pwAssigneeLabel">Alert</span>
                     <select
                       className="pwAssigneeSelect"
-                      value={normalizeAlertRecipient(task.alertRecipientId) ?? workflowAlertRecipients[0]?.id ?? ""}
+                      value={normalizeAlertRecipient(task.alertRecipientId) ?? recipients[0]?.id ?? ""}
                       onChange={(event) => {
                         void handleAlertRecipientChange(task, event.currentTarget.value || null);
                       }}
                       aria-label={`Alert recipient for ${task.stage}`}
                     >
-                      {workflowAlertRecipients.map((recipient) => (
+                      {recipients.map((recipient) => (
                         <option key={recipient.id} value={recipient.id}>
                           {recipient.label}
                         </option>
