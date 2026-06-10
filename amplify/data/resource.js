@@ -79,7 +79,7 @@ const schema = a.schema({
     PropertyAlertPreference: a
         .model({
             propertyId: a.id().required(),
-            alertsEnabled: a.boolean().default(false),
+            alertsEnabled: a.boolean().default(true),
         })
         .authorization((allow) => [
             allow.authenticated("identityPool"),
