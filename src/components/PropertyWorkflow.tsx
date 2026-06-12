@@ -512,16 +512,15 @@ export default function PropertyWorkflow({ propertyId }: Props) {
               <div className="pwContent">
                 <div className="pwTopLine">
                   <strong>{task.stage}</strong>
-                  {normalizeWorkflowOwner(task.owner) && <span className="pwBadge">{normalizeWorkflowOwner(task.owner)}</span>}
                   <span className="pwAssigneeWrap">
-                    <span className="pwAssigneeLabel">Assignee</span>
+                    <span className="pwAssigneeLabel">Employee</span>
                     <select
                       className="pwAssigneeSelect"
-                      value={normalizeAssignee(task.assigneeId) ?? ""}
+                      value={normalizeAssignee(task.assigneeId) ?? normalizeWorkflowOwner(task.owner) ?? ""}
                       onChange={(event) => {
                         void handleAssigneeChange(task, event.currentTarget.value || null);
                       }}
-                      aria-label={`Assignee for ${task.stage}`}
+                      aria-label={`Employee for ${task.stage}`}
                     >
                       <option value="">Unassigned</option>
                       {assigneeOptions.map((option) => (
