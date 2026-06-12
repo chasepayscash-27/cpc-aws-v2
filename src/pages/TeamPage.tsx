@@ -344,6 +344,12 @@ const TeamPage = () => {
           background: #ffffff;
         }
 
+        .teamTaskModal:hover {
+          background: #ffffff;
+          border-color: var(--border);
+          box-shadow: none;
+        }
+
         .teamTaskModalHeader {
           display: flex;
           align-items: center;
