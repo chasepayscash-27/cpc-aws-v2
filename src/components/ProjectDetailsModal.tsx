@@ -5,6 +5,7 @@ import { loadCsv } from "../utils/csv";
 import PropertyFinancials from "./PropertyFinancials";
 import PropertyWorksheet from "./PropertyWorksheet";
 import PropertyWorkflow from "./PropertyWorkflow";
+import ConstructionWorkflowTemplate from "./ConstructionWorkflowTemplate";
 
 interface Props {
   project: ProjectRow;
@@ -57,6 +58,7 @@ export default function ProjectDetailsModal({ project: row, onClose, onViewFullP
   const [photos, setPhotos] = useState<PhotoLogRow[]>([]);
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
   const [worksheetOpen, setWorksheetOpen] = useState(false);
+  const [constructionWorkflowOpen, setConstructionWorkflowOpen] = useState(false);
   const [costSummary, setCostSummary] = useState<[number, number, number]>([0, 0, 0]);
 
   const handleFinancialSummary = useCallback(
@@ -274,46 +276,87 @@ export default function ProjectDetailsModal({ project: row, onClose, onViewFullP
               </div>
             )}
 
-            {/* Worksheet toggle button */}
-            <button
-              onClick={() => setWorksheetOpen((v) => !v)}
-              style={{
-                marginBottom: worksheetOpen ? 12 : 20,
-                padding: "8px 18px",
-                borderRadius: 12,
-                border: "1px solid #1a7a3c",
-                background: worksheetOpen ? "#1a7a3c" : "#f0f7f1",
-                color: worksheetOpen ? "#ffffff" : "#1a7a3c",
-                fontSize: 13,
-                fontWeight: 600,
-                cursor: "pointer",
-                display: "inline-flex",
-                alignItems: "center",
-                gap: 6,
-                transition: "background 0.15s, color 0.15s",
-              }}
-              onMouseEnter={(e) => {
-                if (!worksheetOpen) {
-                  (e.currentTarget as HTMLButtonElement).style.background = "#1a7a3c";
-                  (e.currentTarget as HTMLButtonElement).style.color = "#ffffff";
-                }
-              }}
-              onMouseLeave={(e) => {
-                if (!worksheetOpen) {
-                  (e.currentTarget as HTMLButtonElement).style.background = "#f0f7f1";
-                  (e.currentTarget as HTMLButtonElement).style.color = "#1a7a3c";
-                }
-              }}
-              aria-expanded={worksheetOpen}
-              aria-label={worksheetOpen ? "Close property worksheet" : "Open property worksheet"}
-            >
-              📋 {worksheetOpen ? "Close Worksheet" : "Edit Worksheet"}
-            </button>
+            {/* Worksheet / construction workflow toggle buttons */}
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: worksheetOpen || constructionWorkflowOpen ? 12 : 20 }}>
+              <button
+                onClick={() => setWorksheetOpen((v) => !v)}
+                style={{
+                  padding: "8px 18px",
+                  borderRadius: 12,
+                  border: "1px solid #1a7a3c",
+                  background: worksheetOpen ? "#1a7a3c" : "#f0f7f1",
+                  color: worksheetOpen ? "#ffffff" : "#1a7a3c",
+                  fontSize: 13,
+                  fontWeight: 600,
+                  cursor: "pointer",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 6,
+                  transition: "background 0.15s, color 0.15s",
+                }}
+                onMouseEnter={(e) => {
+                  if (!worksheetOpen) {
+                    (e.currentTarget as HTMLButtonElement).style.background = "#1a7a3c";
+                    (e.currentTarget as HTMLButtonElement).style.color = "#ffffff";
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (!worksheetOpen) {
+                    (e.currentTarget as HTMLButtonElement).style.background = "#f0f7f1";
+                    (e.currentTarget as HTMLButtonElement).style.color = "#1a7a3c";
+                  }
+                }}
+                aria-expanded={worksheetOpen}
+                aria-label={worksheetOpen ? "Close property worksheet" : "Open property worksheet"}
+              >
+                📋 {worksheetOpen ? "Close Worksheet" : "Edit Worksheet"}
+              </button>
+
+              <button
+                onClick={() => setConstructionWorkflowOpen((v) => !v)}
+                style={{
+                  padding: "8px 18px",
+                  borderRadius: 12,
+                  border: "1px solid #1a7a3c",
+                  background: constructionWorkflowOpen ? "#1a7a3c" : "#f0f7f1",
+                  color: constructionWorkflowOpen ? "#ffffff" : "#1a7a3c",
+                  fontSize: 13,
+                  fontWeight: 600,
+                  cursor: "pointer",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 6,
+                  transition: "background 0.15s, color 0.15s",
+                }}
+                onMouseEnter={(e) => {
+                  if (!constructionWorkflowOpen) {
+                    (e.currentTarget as HTMLButtonElement).style.background = "#1a7a3c";
+                    (e.currentTarget as HTMLButtonElement).style.color = "#ffffff";
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (!constructionWorkflowOpen) {
+                    (e.currentTarget as HTMLButtonElement).style.background = "#f0f7f1";
+                    (e.currentTarget as HTMLButtonElement).style.color = "#1a7a3c";
+                  }
+                }}
+                aria-expanded={constructionWorkflowOpen}
+                aria-label={constructionWorkflowOpen ? "Close construction workflow template" : "Open construction workflow template"}
+              >
+                🏗️ {constructionWorkflowOpen ? "Close Construction Workflow" : "Construction Workflow"}
+              </button>
+            </div>
 
             {/* Inline editable worksheet */}
             {worksheetOpen && (
               <div style={{ marginBottom: 20 }}>
                 <PropertyWorksheet row={row} />
+              </div>
+            )}
+
+            {constructionWorkflowOpen && (
+              <div style={{ marginBottom: 20 }}>
+                <ConstructionWorkflowTemplate propertyName={row.name} />
               </div>
             )}
 
