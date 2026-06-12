@@ -124,7 +124,18 @@ const TeamPage = () => {
         setIsLoading(false);
 
         const projectLookup = buildProjectLookup(projectRows);
-        const outstanding = propertyTasks
+
+        // Deduplicate tasks: for each (propertyId, order) pair keep only the first
+        // encountered task. This prevents duplicate DB rows from showing in the team list.
+        const seenTaskKeys = new Set<string>();
+        const dedupedTasks = propertyTasks.filter((task) => {
+          const key = `${task.propertyId?.trim() ?? ''}:${task.order ?? ''}`;
+          if (seenTaskKeys.has(key)) return false;
+          seenTaskKeys.add(key);
+          return true;
+        });
+
+        const outstanding = dedupedTasks
           .filter((task) => !task.isComplete)
           .map((task) => {
             const propertyId = task.propertyId?.trim() || '';
@@ -270,6 +281,12 @@ const TeamPage = () => {
           display: flex;
           flex-direction: column;
           gap: 8px;
+        }
+
+        .teamCard:hover {
+          background: linear-gradient(135deg, rgba(26, 122, 60, 0.14), rgba(40, 168, 82, 0.08));
+          border-color: rgba(26, 122, 60, 0.40);
+          box-shadow: 0 4px 12px rgba(26, 122, 60, 0.12);
         }
 
         .teamNameButton {
