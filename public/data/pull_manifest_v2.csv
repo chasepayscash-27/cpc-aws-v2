@@ -1,5 +1,4 @@
 ﻿project_uuid,project_name,photo_log_status,receipts_status
-<<<<<<< HEAD
 99aedea3-f37a-483a-8b2e-4b530599d7d2,901 Blackjack Road,200,200
 5cafacb0-98f7-4d27-aa9d-5f190ea98e61,3788 James Hill Circle,200,200
 c4abe550-57a9-4058-8cd6-0bf68dccd656,1118 Hale Circle,200,200
@@ -20,7 +19,6 @@ cac34cd4-906c-49fa-aa39-41bdb0174269,7624 Happy Hollow Road,200,200
 058497a2-f46c-4dc6-835b-20cef610d484,1125 Greystone Crest,200,200
 e97a92f4-8a67-4b2c-9667-a95505643b89,193 Rena Drive,200,200
 550a06ed-78e2-4a8a-8ced-40acc74f9d04,23185 Alabama 79,200,200
-=======
 765720e7-f5f2-447d-9fa2-9aaa16417bdc,1017 Burnt Pine Lane,200,200
 a38a8023-8a63-42ac-a38b-000f8c9e6587,533 River Crest Way,200,200
 058497a2-f46c-4dc6-835b-20cef610d484,1125 Greystone Crest,200,200
@@ -46,7 +44,6 @@ bd4d44a9-d742-405e-ae4a-e69c65754b5b,2513 7th Street Northeast,200,200
 e4555221-06cf-4140-b7f3-dade8f132060,2701 Eastern Valley Road,200,200
 85fd6677-7cea-424f-b056-30745971d96d,2308 Kala Street,200,200
 1df685fc-17ab-4eba-9c6f-b91ba65a0783,828 Jeffery Lane,200,200
->>>>>>> e66b07d634a315829d58257becd3dbd364bc267f
 f3d4431e-1cc1-4a5e-a0a4-fff4c330d49e,2157 Parsons Drive,200,200
 6ec24922-6e4d-4aa3-ad83-c83755ba691a,4320 Corinth Drive,200,200
 04f26529-dc7c-4231-a316-eb7dc0e7cda9,5337 Pineneedle Drive,200,200
@@ -74,10 +71,7 @@ b6ec211b-e780-4bf2-a086-46a75f8a8e74,700 Chase Brook Circle,200,200
 e07f7269-069d-40e9-8cbb-2ef30915ba80,1939 Westridge Drive,200,200
 3af74b60-84fb-4c6c-aa59-3d1fe38b096e,4793 Longmeadow Drive,200,200
 51508141-d2cf-46ca-8097-67da5dd31122,1006 Belcher Ferry Road,200,200
-<<<<<<< HEAD
 6e8086a1-e590-4320-a7e6-af2ffaf4c1a0,505 Sunhill Road Northwest,200,200
-=======
->>>>>>> e66b07d634a315829d58257becd3dbd364bc267f
 dc33447d-909d-4d5f-b413-2030271b08b6,2401 16th Street,200,200
 509a4d80-2357-4d84-947d-556d879df50e,4038 Ida Lane,200,200
 263820c5-5ee2-4638-a15b-5325ccf57ac2,601 Mermont Drive,200,200
@@ -86,10 +80,7 @@ dad13c43-c304-4e2c-997a-a4619fe92757,1792 Whitmire Street,200,200
 d2fc6494-9465-4056-a7df-049bd31db888,6094 Steeple Chase Drive,200,200
 0be6b39b-e996-4206-9fdd-22acf9f030c8,9311 Dunnavant Valley Road,200,200
 611ad975-5095-4001-b1f1-d195b71f9692,1557 Napoleon Drive,200,200
-<<<<<<< HEAD
 05df5cef-191e-4fd6-9d59-8be6afa1ea1e,82 County Road 874,200,200
-=======
->>>>>>> e66b07d634a315829d58257becd3dbd364bc267f
 f478feaa-830e-407b-aabe-31ec795ea050,150 Beaver Ridge Drive,200,200
 75ec9daf-e9c2-4734-965a-3fccb2a8db1b,2038 22nd Court South,200,200
 b3450833-466a-4ba9-bca3-6ab531f4d7d7,424 County Road 3150,200,200
@@ -97,8 +88,6 @@ b3450833-466a-4ba9-bca3-6ab531f4d7d7,424 County Road 3150,200,200
 f21c3d22-c271-4a16-8a49-026aa7534605,512 Tambay Drive,200,200
 5b68954c-7ff3-46b3-812e-27b82cad0d36,706 Berkley Drive,200,200
 8d1ed47e-b1e1-4efa-9de9-5aab791c8b4c,10 Anderson Mountain Drive,200,200
-<<<<<<< HEAD
-=======
 bd04cbf5-a042-4729-a8f9-6df34d23458d,294 Heritage Drive,200,200
 5736e77c-3e86-4274-9dac-c36059dedb7a,1504 8th Street Northwest,200,200
 8a766eac-361d-4d85-9568-f197c67cbf64,3618 Haven View Circle,200,200
@@ -123,4 +112,3 @@ c9b44bf5-ba37-4a21-b412-d0d0b3809810,3249 Wagon Gap Trail,200,200
 254b47a5-eeef-4cf7-9477-83947a0f04d1,2116 Lakeview Trace,200,200
 83d7e5ed-8e0b-4d7a-8f38-aa86d00d87c1,1037 Sharp Drive,200,200
 9ccb6b1f-1c46-416b-86df-27223b2e526e,2020 Rockland Drive,200,200
->>>>>>> e66b07d634a315829d58257becd3dbd364bc267f
