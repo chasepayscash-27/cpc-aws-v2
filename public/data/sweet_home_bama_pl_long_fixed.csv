@@ -1,2547 +1,1018 @@
-account,property_name,amount
-Accidental Deposit,Not specified,-1426.0
-Accidental Purchase,Morgan,760.0
-Accounting Fees,Office,500.0
-Accounting Fees,Not specified,4750.0
-Admin Services,1020 Legacy Cove,300.0
-Admin Services,109 Spring Glade Cir,300.0
-Admin Services,109 Westchester Dr.,250.0
-Admin Services,1118 Westridge Cir.,300.0
-Admin Services,1132 Martinwood Ln.,300.0
-Admin Services,115 Meadowgreen Rd,600.0
-Admin Services,1158 Holt Cir.,300.0
-Admin Services,120 Kay St.,250.0
-Admin Services,1221 Rumson Dr,300.0
-Admin Services,1265 Pine Tree Dr,300.0
-Admin Services,128 Maple Street,250.0
-Admin Services,12938 Ann Marie Dr,330.0
-Admin Services,1401 Oak Terr.,600.0
-Admin Services,1508 4th St. NW,300.0
-Admin Services,155 Treymoore Dr,300.0
-Admin Services,1604 Tahoe Rd,300.0
-Admin Services,1708 Molly Dr.,500.0
-Admin Services,1710 Greenbriar Dr,300.0
-Admin Services,1761 Cornwall Dr.,300.0
-Admin Services,1908 Heritage Rd,300.0
-Admin Services,1909 Thornhill Rd.,500.0
-Admin Services,20001 Rabbit Ridge Rd,300.0
-Admin Services,Total for 20001 Rabbit Ridge Rd,300.0
-Admin Services,212 Dexter Ct.,300.0
-Admin Services,214 Stone Ridge Trail,300.0
-Admin Services,245 Observatory Dr,300.0
-Admin Services,Total for 215 Observatory Dr,300.0
-Admin Services,216 Chestnut St,300.0
-Admin Services,216 Handley Rd.,250.0
-Admin Services,217 Kings Crest,330.0
-Admin Services,2200 Dogwood Trail,330.0
-Admin Services,232 Redstone way,300.0
-Admin Services,2512 October Dr,300.0
-Admin Services,2921 Florida Rd.,300.0
-Admin Services,300 42nd Ave.,600.0
-Admin Services,3032 Tersea Dr.,300.0
-Admin Services,308 Willow Glen ct,300.0
-Admin Services,39 Polly Ridge Rd,600.0
-Admin Services,396 Union Station Way,300.0
-Admin Services,411 Woodward Rd.,300.0
-Admin Services,413 Popler Ridge,300.0
-Admin Services,4433 Woodland Hills,330.0
-Admin Services,500 Lance Way,300.0
-Admin Services,5013 knollview cir,300.0
-Admin Services,509 Lansdowne Pl,300.0
-Admin Services,5130 Briarwood Cir,250.0
-Admin Services,517 10th Ave.,300.0
-Admin Services,521 Mountain Dr,300.0
-Admin Services,5536 Cheryl Dr.,300.0
-Admin Services,5755 Cheryl Dr,300.0
-Admin Services,620 Ridgefield Cove,250.0
-Admin Services,629 Shadywood Ln,300.0
-Admin Services,636 Mermont Dr.,300.0
-Admin Services,636 Paden Dr,330.0
-Admin Services,637 Vaughn Cir.,330.0
-Admin Services,645 Vaughn Cir,300.0
-Admin Services,6451 Freda Dr,300.0
-Admin Services,6602 Davidson Rd,250.0
-Admin Services,6750 Heaton Manor,250.0
-Admin Services,6765 Crossbrook Ln,300.0
-Admin Services,6816 Brittany Pl,300.0
-Admin Services,70 Sunset Strip,330.0
-Admin Services,7121 Goodner Mtn. Rd,300.0
-Admin Services,720 Darlene Dr,600.0
-Admin Services,7360 Old Acton Rd,250.0
-Admin Services,75 Starlite Dr,330.0
-Admin Services,808 Hillview Dr,300.0
-Admin Services,8304 5th Ave. S.,300.0
-Admin Services,832 Zellmark Dr,250.0
-Admin Services,8495 Clayton Cove,300.0
-Admin Services,911 Bagley Ln.,330.0
-Admin Services,915 Rose Dr.,600.0
-Admin Services,939 Gene Reed Rd,300.0
-Admin Services,Office,120.0
-Admin Services,Not specified,2600.0
-Advertising and Promotion,1457 4th Pl NW,150.0
-Advertising and Promotion,Buisness Cards,207.92
-Advertising and Promotion,Office,53326.78
-Advertising and Promotion,Post Cards,7016.47
-Advertising and Promotion,Trade Flow,3800.0
-Advertising and Promotion,Not specified,576278.68
-Attorney Fees,2720 Shoemaker St,1150.0
-Attorney Fees,915 Rose Dr.,343.75
-Auction,1409 High Point Terrace,151.75
-Auction,1609 Sonia Dr,5118.0
-Auction,auctions,5000.0
-Auction,Not specified,10036.0
-Auto Insurance,Not specified,16858.07
+giaccount,property_name,amount
+Rehab Reimbursement,1125 Greystone Crest,100000
+Rehab Reimbursement,Total,100000
+Rental Income,Not specified,46231.04
+Rental Income,Total,46231.04
+Sale of property,1008 Springhill Ln,901924.27
+Sale of property,13 Royal Coach Cir,218375.05
+Sale of property,1310 Old Cahaba Cove,88357.74
+Sale of property,1437 Ware Blvd,210490.85
+Sale of property,1504 8th St NW,117207.13
+Sale of property,205 Mashburn Dr,73740.78
+Sale of property,2123 28th Ave N,98214.2
+Sale of property,270 Myers Rd,85226.6
+Sale of property,294 Heritage Dr,293571.03
+Sale of property,3012 2nd St,245061.52
+Sale of property,312 Lehigh Rd,220353.18
+Sale of property,335 Co Rd 1130,185838.2
+Sale of property,3618 Haven View Cir,81185.68
+Sale of property,4461 Parkwood Cir,174091.1
+Sale of property,4924 Branch Mill Cir,828388.21
+Sale of property,5239 Old Springville Rd,374232.85
+Sale of property,5427 Reese Ln,225441.17
+Sale of property,5557 Dry Creek Rd,239107.47
+Sale of property,640 Griffin Rd,185051.52
+Sale of property,Total,4845858.55
+Total for Income,1008 Springhill Ln,901924.27
+Total for Income,1125 Greystone Crest,100000
+Total for Income,13 Royal Coach Cir,218375.05
+Total for Income,1310 Old Cahaba Cove,88357.74
+Total for Income,1437 Ware Blvd,210490.85
+Total for Income,1504 8th St NW,117207.13
+Total for Income,205 Mashburn Dr,73740.78
+Total for Income,2123 28th Ave N,98214.2
+Total for Income,270 Myers Rd,85226.6
+Total for Income,294 Heritage Dr,293571.03
+Total for Income,3012 2nd St,245061.52
+Total for Income,312 Lehigh Rd,220353.18
+Total for Income,335 Co Rd 1130,185838.2
+Total for Income,3618 Haven View Cir,81185.68
+Total for Income,4461 Parkwood Cir,174091.1
+Total for Income,4924 Branch Mill Cir,828388.21
+Total for Income,5239 Old Springville Rd,374232.85
+Total for Income,5427 Reese Ln,225441.17
+Total for Income,5557 Dry Creek Rd,239107.47
+Total for Income,640 Griffin Rd,185051.52
+Total for Income,Not specified,46231.04
+Total for Income,Total,4992089.59
+Gross Profit,1008 Springhill Ln,901924.27
+Gross Profit,1125 Greystone Crest,100000
+Gross Profit,13 Royal Coach Cir,218375.05
+Gross Profit,1310 Old Cahaba Cove,88357.74
+Gross Profit,1437 Ware Blvd,210490.85
+Gross Profit,1504 8th St NW,117207.13
+Gross Profit,205 Mashburn Dr,73740.78
+Gross Profit,2123 28th Ave N,98214.2
+Gross Profit,270 Myers Rd,85226.6
+Gross Profit,294 Heritage Dr,293571.03
+Gross Profit,3012 2nd St,245061.52
+Gross Profit,312 Lehigh Rd,220353.18
+Gross Profit,335 Co Rd 1130,185838.2
+Gross Profit,3618 Haven View Cir,81185.68
+Gross Profit,4461 Parkwood Cir,174091.1
+Gross Profit,4924 Branch Mill Cir,828388.21
+Gross Profit,5239 Old Springville Rd,374232.85
+Gross Profit,5427 Reese Ln,225441.17
+Gross Profit,5557 Dry Creek Rd,239107.47
+Gross Profit,640 Griffin Rd,185051.52
+Gross Profit,Not specified,46231.04
+Gross Profit,Total,4992089.59
+Accounting Fees,Office,500
+Accounting Fees,Total,500
+Advertising and Promotion,2513 7th St NE,456.95
+Advertising and Promotion,Office,18197.76
+Advertising and Promotion,Not specified,41301.93
+Advertising and Promotion,Total,59956.64
 Automobile Expense,1008 Springhill Ln,234.32
 Automobile Expense,424 Co Rd 3150,410.65
-Automobile Expense,637 Vaughn Cir.,142.98
-Automobile Expense,Car tags,3633.34
-Automobile Expense,Chase Smith,46.9
-Automobile Expense,Joe Mangione,1385.03
-Automobile Expense,Logan Pate,767.13
-Automobile Expense,Office,22927.56
-Automobile Expense,truck tag,1089.13
-Automobile Expense,work truck,2452.37
-Automobile Expense,Not specified,307194.45
-Bank Fees,Office,698.5
-Bank Fees,Not specified,12113.9
-Bank Service Charges,Not specified,325.0
-Builders License,Not specified,35.0
+Automobile Expense,Office,4114.31
+Automobile Expense,Not specified,113803.54
+Automobile Expense,Total,118562.82
+Bank Fees,Office,36
+Bank Fees,Not specified,516.12
+Bank Fees,Total,552.12
 Business License,1017 Burnt Pine Ln,139.34
-Business License,112 White Cap Cir,150.0
-Business License,116 34th St N,368.0
-Business License,149 Winterhaven Dr,136.75
+Business License,112 White Cap Cir,150
 Business License,1557 Napoleon Dr,139.34
-Business License,205 Mashburn Dr,324.99
-Business License,214 Stone Ridge Trail,64.0
-Business License,5872 Janet Dr.,162.0
-Business License,Not specified,2210.93
-Capital Redistribution,Not specified,50000.0
-Charitable Contributions,Not specified,56776.0
-Cleaning services,10 Anderson Mtn Dr,525.0
-Cleaning services,1008 Mtn. Oaks Dr.,200.0
-Cleaning services,1008 Springhill Ln,850.0
-Cleaning services,103 Kingstown Cir,290.0
-Cleaning services,106 Wildwood Dr.,200.0
-Cleaning services,108 Pine Tree Cir,310.0
-Cleaning services,108 Southview Dr,970.0
-Cleaning services,109 Westchester Dr.,150.0
-Cleaning services,1104 Tulip Cir,300.0
-Cleaning services,112 Portsouth Ln,170.0
-Cleaning services,1158 Holt Cir.,140.0
-Cleaning services,116 34th St N,210.0
-Cleaning services,120 Kay St.,130.0
-Cleaning services,128 Maple Street,160.0
-Cleaning services,12938 Ann Marie Dr,100.0
-Cleaning services,1309 Springville Rd,200.0
-Cleaning services,1310 Old Cahaba Cove,1553.6
-Cleaning services,1313 McCoy St,275.0
-Cleaning services,1409 High Point Terrace,200.0
+Business License,Not specified,154
+Business License,Total,582.68
+Charitable Contributions,Not specified,6750
+Charitable Contributions,Total,6750
+Cleaning services,10 Anderson Mtn Dr,250
+Cleaning services,1008 Springhill Ln,850
+Cleaning services,112 White Cap Cir,250
+Cleaning services,1309 Springville Rd,200
 Cleaning services,141 Deer Park Dr,233.34
-Cleaning services,1437 Ware Blvd,200.0
-Cleaning services,144 Lake Front Dr.,1865.0
-Cleaning services,1449 Paragon Prkwy,140.0
-Cleaning services,150 Beaver Ridge,250.0
-Cleaning services,1546 Lacie Dr,270.0
-Cleaning services,1604 Tahoe Rd,150.0
-Cleaning services,1608 Kestwick Dr,475.0
-Cleaning services,163 Sunrise Dr,190.0
+Cleaning services,150 Beaver Ridge,475
 Cleaning services,1645 Barrington Ln NE,233.33
-Cleaning services,1761 Cornwall Dr.,150.0
-Cleaning services,1766 Brookside Rd,600.0
-Cleaning services,1791 Vestaview Ln,300.0
-Cleaning services,1824 Otis Rd,165.0
-Cleaning services,1908 Heritage Rd,150.0
-Cleaning services,1929 11th St NW,170.0
-Cleaning services,201 Forest Dr,300.0
 Cleaning services,2038 22nd Ct S,433.33
-Cleaning services,205 Mashburn Dr,350.0
-Cleaning services,2050 Montreat Pkwy Unit A,100.0
-Cleaning services,206 Annetta Cir,370.0
-Cleaning services,2116 Lakeview Trace,850.0
-Cleaning services,216 Chestnut St,300.0
-Cleaning services,2173 Chapel Hill Rd,150.0
-Cleaning services,2234 Pup Run,410.0
-Cleaning services,2401 16th St,225.0
-Cleaning services,270 Myers Rd,200.0
-Cleaning services,2720 Shoemaker St,180.0
-Cleaning services,2755 Austin Ln,250.0
-Cleaning services,2928 Floyd Bradford Rd,150.0
-Cleaning services,294 Heritage Dr,700.0
-Cleaning services,3012 2nd St,350.0
-Cleaning services,3018 Old Stone Dr,400.0
-Cleaning services,3023 Massey Rd Unit F,200.0
-Cleaning services,312 Orchid Rd,170.0
-Cleaning services,316 Willow Glen Ct,425.0
-Cleaning services,3249 Wagon Gap Trail,380.0
-Cleaning services,3348 Overton Rd,487.5
-Cleaning services,335 Co Rd 1130,400.0
-Cleaning services,3535 Deerfield Dr,350.0
-Cleaning services,354 Highland Park Dr.,800.0
-Cleaning services,3618 Haven View Cir,200.0
-Cleaning services,4032 Middle Ave,150.0
-Cleaning services,4038 Ida Ln,275.0
-Cleaning services,4042 Jubille ln,175.0
-Cleaning services,411 Woodward Rd.,290.0
-Cleaning services,4358 Oak St,250.0
-Cleaning services,4461 Parkwood Cir,200.0
-Cleaning services,45 Ridgefield Ln,275.0
-Cleaning services,4533 Oak Dr,300.0
+Cleaning services,2401 16th St,225
+Cleaning services,294 Heritage Dr,700
+Cleaning services,3012 2nd St,200
+Cleaning services,316 Willow Glen Ct,425
+Cleaning services,3348 Overton Rd,237.5
+Cleaning services,335 Co Rd 1130,200
+Cleaning services,3618 Haven View Cir,200
+Cleaning services,4038 Ida Ln,275
+Cleaning services,4461 Parkwood Cir,200
 Cleaning services,4924 Branch Mill Cir,537.5
-Cleaning services,500 Lance Way,160.0
-Cleaning services,5013 knollview cir,160.0
-Cleaning services,510 Bennett Dr.,180.0
-Cleaning services,5150 Hickory Dr NE,175.0
-Cleaning services,517 10th Ave.,150.0
-Cleaning services,532 Hickory St,200.0
-Cleaning services,5381 Park Side Cir,800.0
-Cleaning services,5557 Dry Creek Rd,320.0
-Cleaning services,5720 33rd St. N,150.0
-Cleaning services,5755 Cheryl Dr,150.0
-Cleaning services,5872 Janet Dr.,130.0
-Cleaning services,609 Chesser Ct,350.0
-Cleaning services,6202 Waterford Pl,350.0
-Cleaning services,6212 Kestral View Rd,400.0
-Cleaning services,6269 Renda Cir,200.0
-Cleaning services,6279 Tyler Loop Rd,200.0
-Cleaning services,636 Mermont Dr.,150.0
-Cleaning services,636 Paden Dr,160.0
-Cleaning services,640 Griffin Rd,240.0
-Cleaning services,6451 Freda Dr,150.0
-Cleaning services,6790 Paradise Cir,170.0
-Cleaning services,6816 Brittany Pl,150.0
-Cleaning services,6928 Woodvale Ln,150.0
-Cleaning services,706 Berkley Dr,275.0
-Cleaning services,7104 Claymont Dr,200.0
-Cleaning services,7121 Goodner Mtn. Rd,425.0
-Cleaning services,75 Starlite Dr,150.0
-Cleaning services,7510 Arrowhead Ln,960.0
-Cleaning services,7541 Carriage Cove,200.0
-Cleaning services,7729 Shriner Dr.,130.0
-Cleaning services,8056 Carrington Dr,300.0
-Cleaning services,808 Hillview Dr,150.0
-Cleaning services,819 Sherwood Forest Dr,180.0
-Cleaning services,8313 Farley Ave.,280.0
-Cleaning services,832 Zellmark Dr,150.0
-Cleaning services,8491 Clayton Cove,150.0
-Cleaning services,8495 Clayton Cove,150.0
-Cleaning services,89 Lakshore Rd,330.0
-Cleaning services,90 Buddy Ln,150.0
-Cleaning services,909 Winchester Cir,200.0
-Cleaning services,9311 Dunnavant Valley Rd,250.0
-Cleaning services,Office,4570.0
-Cleaning services,Not specified,1460.0
-Client Appreciation,Not specified,202.29
-Client Lunch,Not specified,3344.07
-Closing Costs,1037 Sharp Dr,22117.44
-Closing Costs,105 Kingstown Rd,1925.7
-Closing Costs,106 Wildwood Dr.,1772.57
-Closing Costs,108 Pine Tree Cir,8505.0
-Closing Costs,1118 Westridge Cir.,5800.28
-Closing Costs,1132 Martinwood Ln.,214.5
-Closing Costs,122 Heather Ridge Dr.,1514.86
-Closing Costs,1221 Rumson Dr,86.33
-Closing Costs,1265 Pine Tree Dr,1129.88
-Closing Costs,128 Maple Street,1440.94
-Closing Costs,1337 Wilshire Dr.,711.5
-Closing Costs,1341 Winola Ln,25469.89
-Closing Costs,1401 Oak Terr.,2242.7
-Closing Costs,141 Deer Park Dr,8446.5
-Closing Costs,1449 Paragon Prkwy,24256.95
-Closing Costs,155 Treymoore Dr,52612.31
-Closing Costs,1604 Tahoe Rd,9032.2
-Closing Costs,1646 Roberta Ln,25894.5
-Closing Costs,1708 Molly Dr.,623.0
-Closing Costs,17502 HWY 174,717.75
-Closing Costs,1909 Thornhill Rd.,946.45
-Closing Costs,1946 Seven Bark Ln.,1054.2
-Closing Costs,1973 Chandaway Dr.,580.0
-Closing Costs,200 Saint John Dr.,1200.14
-Closing Costs,2073 Russet Woods Trl,229.22
-Closing Costs,2321 Royal Knoll Ln,1766.48
-Closing Costs,2422 Mallard dr,1911.76
-Closing Costs,2921 Florida Rd.,453.52
-Closing Costs,3050 Weatherford Dr,676.25
-Closing Costs,3512 Nazha Cir,2838.35
-Closing Costs,3926 Valley Bend Dr.,745.02
-Closing Costs,4004 Saddle Run Cir,762.5
-Closing Costs,411 Woodward Rd.,4655.0
-Closing Costs,413 Popler Ridge,46478.04
-Closing Costs,445 Annie Lee Rd,23249.23
-Closing Costs,4533 Oak Dr,1053.56
-Closing Costs,510 Bennett Dr.,662.58
-Closing Costs,5100 Rick Dr.,1536.02
-Closing Costs,5551 Timber Hills,10425.97
-Closing Costs,5719 Park Side Rd,703.32
-Closing Costs,5731 Hickory Ct.,712.31
-Closing Costs,5872 Janet Dr.,1235.24
-Closing Costs,588 Russet Bend Dr,1859.37
-Closing Costs,5912 Nuthatch Cir,985.73
-Closing Costs,606 Greenwood Dr,20180.86
-Closing Costs,636 Paden Dr,75074.95
-Closing Costs,6521 Happy Hollow Rd,255.0
-Closing Costs,7510 Arrowhead Ln,20173.38
-Closing Costs,832 Zellmark Dr,1528.6
-Closing Costs,8491 Clayton Cove,1868.68
-Closing Costs,909 Winchester Cir,1607.52
-Closing Costs,911 Bagley Ln.,87.0
-Closing Costs,9311 Dunnavant Valley Rd,5107.92
-Closing Costs,939 Gene Reed Rd,5000.0
-Closing Costs,Not specified,-69174.54
-Computer and Internet Expenses,Office,20305.31
-Computer and Internet Expenses,Not specified,14236.69
-Conference,Not specified,147.0
-Consulting fee,1008 Springhill Ln,3302.75
-Consulting fee,Not specified,20222.5
-Continuing Education,2364 Rocky Ridge Rd,620.0
-Continuing Education,Not specified,1352.1
-Deed Recording,1437 Ware Blvd,123.0
-Dumpsters,10 Anderson Mtn Dr,1978.32
-Dumpsters,1008 Mtn. Oaks Dr.,2017.47
-Dumpsters,1008 Springhill Ln,12546.8
-Dumpsters,1014 Mtn. Laurel Cir.,2291.75
-Dumpsters,103 Kingstown Cir,1501.64
-Dumpsters,103 Mack Roper Rd.,4367.36
-Dumpsters,1037 Sharp Dr,2086.04
-Dumpsters,1048 Gene Reed Rd,1068.18
-Dumpsters,105 Kingstown Rd,4786.14
-Dumpsters,106 Wildwood Dr.,4745.79
-Dumpsters,107 Kingstown Cir,4796.38
-Dumpsters,108 Pine Tree Cir,1918.89
-Dumpsters,108 Southview Dr,2578.89
-Dumpsters,109 Spring Glade Cir,1359.6
-Dumpsters,1104 Tulip Cir,4338.24
-Dumpsters,1118 Westridge Cir.,4118.82
-Dumpsters,112 Portsouth Ln,2827.67
+Cleaning services,505 Sunhill Rd,225
+Cleaning services,5609 Ridgeview Dr,275
+Cleaning services,6279 Tyler Loop Rd,200
+Cleaning services,706 Berkley Dr,275
+Cleaning services,9311 Dunnavant Valley Rd,250
+Cleaning services,Not specified,270
+Cleaning services,Total,7620
+Computer and Internet Expenses,Office,5525.79
+Computer and Internet Expenses,Not specified,508.44
+Computer and Internet Expenses,Total,6034.23
+Dumpsters,1008 Springhill Ln,702.03
 Dumpsters,112 White Cap Cir,3885.52
-Dumpsters,1125 Greystone Crest,4376.35
-Dumpsters,1132 Martinwood Ln.,2280.94
-Dumpsters,115 Meadowgreen Rd,1007.86
-Dumpsters,1158 Holt Cir.,556.97
-Dumpsters,116 34th St N,4698.91
-Dumpsters,117 Lynn Dr.,2214.5
-Dumpsters,120 Cahaba Forest Dr,3927.75
-Dumpsters,120 Kay St.,3072.6
-Dumpsters,122 Heather Ridge Dr.,2478.59
-Dumpsters,1221 Rumson Dr,1495.23
-Dumpsters,1265 Pine Tree Dr,556.97
-Dumpsters,128 Maple Street,3038.5
-Dumpsters,12938 Ann Marie Dr,1945.54
-Dumpsters,13 Royal Coach Cir,2064.83
+Dumpsters,1125 Greystone Crest,923.74
 Dumpsters,1309 Springville Rd,2998.17
-Dumpsters,131 Silver Ln,1012.75
-Dumpsters,1310 Old Cahaba Cove,1331.27
-Dumpsters,1313 McCoy St,2478.57
-Dumpsters,132 Rosebud Rd,3415.84
-Dumpsters,1324 Bardswood Terrace,4212.25
-Dumpsters,1337 Wilshire Dr.,1506.68
-Dumpsters,1341 Hillwood Dr.,1787.05
-Dumpsters,1341 Winola Ln,1465.82
-Dumpsters,1345 Winola Ln,1473.5
-Dumpsters,1359 Annie Lee Rd,1012.75
-Dumpsters,1401 Oak Terr.,983.87
-Dumpsters,1409 High Point Terrace,2738.38
-Dumpsters,141 Deer Park Dr,1956.15
-Dumpsters,1412 13th Terrace.,1024.26
-Dumpsters,1437 Ware Blvd,7499.45
-Dumpsters,1449 Paragon Prkwy,559.68
-Dumpsters,149 Winterhaven Dr,1501.64
-Dumpsters,150 Beaver Ridge,1494.28
-Dumpsters,1504 8th St NW,2771.21
-Dumpsters,151 2nd St. N,3439.72
-Dumpsters,1546 Lacie Dr,2516.94
-Dumpsters,155 Treymoore Dr,1918.89
-Dumpsters,157 Sweetgum Dr,4234.71
-Dumpsters,1604 Tahoe Rd,2015.7
-Dumpsters,1608 Kestwick Dr,6183.1
-Dumpsters,1609 Sonia Dr,3429.05
-Dumpsters,1612 Big Mtn. Dr.,1868.52
-Dumpsters,163 Sunrise Dr,2879.62
+Dumpsters,141 Deer Park Dr,923.74
+Dumpsters,1504 8th St NW,461.87
 Dumpsters,1645 Barrington Ln NE,1338.75
-Dumpsters,1646 Roberta Ln,1494.38
-Dumpsters,1703 Molly Cir.,932.15
-Dumpsters,170502 Hwy 174,1359.6
-Dumpsters,1708 Molly Dr.,2304.01
-Dumpsters,1710 Greenbriar Dr,2360.51
-Dumpsters,1713 Molly Dr.,1094.48
-Dumpsters,17502 HWY 174,3139.64
-Dumpsters,1761 Cornwall Dr.,2518.35
-Dumpsters,1766 Brookside Rd,1632.41
-Dumpsters,1788 Whitmire St,1930.83
-Dumpsters,1791 Vestaview Ln,2901.06
+Dumpsters,1676 Five Points Rd,1470
 Dumpsters,1792 Whitmire St,1062.41
-Dumpsters,1809 Tin Valley Cir,2469.25
-Dumpsters,1824 Otis Rd,1012.75
-Dumpsters,1831 Otis Cir.,547.14
-Dumpsters,1831 Satterwhite St.,1793.54
-Dumpsters,1908 Heritage Rd,2989.68
-Dumpsters,1909 Thornhill Rd.,662.0
-Dumpsters,1929 11th St NW,1484.58
+Dumpsters,1805 Tin Valley Cir,920.64
 Dumpsters,193 Rena Dr,1535.1
-Dumpsters,193 Woodland Dr.,1479.46
 Dumpsters,1939 Westridge,2386.78
-Dumpsters,1946 Seven Bark Ln.,1833.77
-Dumpsters,1973 Chandaway Dr.,1499.51
-Dumpsters,200 Saint John Dr.,932.15
-Dumpsters,20001 Rabbit Ridge Rd,1896.49
-Dumpsters,Total for 20001 Rabbit Ridge Rd,1896.49
-Dumpsters,201 Forest Dr,2371.96
-Dumpsters,2038 22nd Ct S,5542.43
-Dumpsters,205 Mashburn Dr,1012.75
-Dumpsters,2056 Self Ln.,932.15
-Dumpsters,206 Annetta Cir,2481.12
-Dumpsters,2073 Russet Woods Trl,566.07
-Dumpsters,2104 Carlisle Cir.,1787.05
-Dumpsters,2116 Lakeview Trace,1918.89
-Dumpsters,21164 Elizabeth Dr,1545.13
-Dumpsters,212 Dexter Ct.,1007.86
-Dumpsters,2123 28th Ave N,2879.89
-Dumpsters,214 Stone Ridge Trail,4307.91
-Dumpsters,245 Observatory Dr,1499.9
-Dumpsters,Total for 215 Observatory Dr,1499.9
-Dumpsters,216 Chestnut St,6528.89
-Dumpsters,216 Handley Rd.,1372.42
-Dumpsters,217 Kings Crest,1926.57
-Dumpsters,2173 Chapel Hill Rd,1529.28
-Dumpsters,2200 Dogwood Trail,1918.89
-Dumpsters,2232 Garland Dr,2950.31
-Dumpsters,2234 Pup Run,2446.58
-Dumpsters,2236 Carl Jones Rd,1465.82
 Dumpsters,2308 Kala St,1956.15
-Dumpsters,2321 Royal Knoll Ln,3809.68
-Dumpsters,2364 Rocky Ridge Rd,15068.95
-Dumpsters,239 Warwick Ln,556.97
-Dumpsters,2401 16th St,6047.55
-Dumpsters,2422 Mallard dr,1024.1
-Dumpsters,2512 October Dr,3010.95
 Dumpsters,2513 7th St NE,1689.2
-Dumpsters,2517 Galloway Dr.,504.7
-Dumpsters,2636 Dennise Rd.,519.84
-Dumpsters,2645 Laburnum Dr,1347.41
-Dumpsters,270 Myers Rd,1521.45
+Dumpsters,2645 Laburnum Dr,776.87
+Dumpsters,270 Myers Rd,950.91
 Dumpsters,2701 Eastern Valley Rd,2925.2
-Dumpsters,2720 Shoemaker St,1440.16
-Dumpsters,2736 Darlene Cir,2371.96
-Dumpsters,2755 Austin Ln,585.67
+Dumpsters,2720 Shoemaker St,422.3
 Dumpsters,2825 2nd Way NW,2677.5
-Dumpsters,2921 Florida Rd.,5619.67
-Dumpsters,2928 Floyd Bradford Rd,6618.46
-Dumpsters,294 Heritage Dr,4813.44
-Dumpsters,3009 Virginia Dr,1465.82
-Dumpsters,3012 2nd St,1603.39
-Dumpsters,3018 Old Stone Dr,543.38
-Dumpsters,3032 Tersea Dr.,1909.62
-Dumpsters,3050 Weatherford Dr,556.97
 Dumpsters,308 Killough Dr,2094.32
-Dumpsters,308 Willow Glen ct,2020.9
-Dumpsters,312 Lehigh Rd,4896.73
-Dumpsters,312 Orchid Rd,1918.89
+Dumpsters,312 Lehigh Rd,1023.75
 Dumpsters,316 Gemini Cir,1338.75
 Dumpsters,316 Willow Glen Ct,1223.96
-Dumpsters,322 Cherokee Dr.,4326.85
-Dumpsters,Total for 322 Cherokee Drive,4326.85
-Dumpsters,324 4th St. N,1360.28
-Dumpsters,3249 Wagon Gap Trail,2071.17
-Dumpsters,333 Orchid Rd,505.68
-Dumpsters,3348 Overton Rd,2833.83
-Dumpsters,3372 Wood Drive Cir.,932.15
-Dumpsters,3409 Crosscreek Cir,1012.75
-Dumpsters,3512 Nazha Cir,3857.35
-Dumpsters,3535 Deerfield Dr,2403.76
-Dumpsters,354 Highland Park Dr.,3060.77
-Dumpsters,3845 Nowlin Rd SW,1879.05
-Dumpsters,39 Polly Ridge Rd,556.97
-Dumpsters,3926 Valley Bend Dr.,2921.21
-Dumpsters,396 Union Station Way,940.68
-Dumpsters,40 Clearview Rd,1465.82
-Dumpsters,4004 Saddle Run Cir,2483.9
-Dumpsters,4032 Middle Ave,1925.71
 Dumpsters,4038 Ida Ln,832.3
-Dumpsters,4042 Jubille ln,1012.75
-Dumpsters,405 Art Hanes Blvd,1522.6
-Dumpsters,411 Woodward Rd.,4192.25
-Dumpsters,4358 Oak St,3626.11
-Dumpsters,4433 Woodland Hills,2557.97
-Dumpsters,445 Annie Lee Rd,2203.07
 Dumpsters,4461 Parkwood Cir,1141.85
 Dumpsters,450 Doss Ferry Pkwy,446.25
-Dumpsters,4533 Oak Dr,2186.25
-Dumpsters,4652 Clairmont Ave,1840.0
-Dumpsters,4924 Branch Mill Cir,4847.89
-Dumpsters,500 Lance Way,1840.65
-Dumpsters,501 Cheri Ln,559.68
-Dumpsters,5013 knollview cir,559.68
-Dumpsters,5039 Vernon St,1465.82
-Dumpsters,504 Lance Way,4759.42
-Dumpsters,505 Sunhill Rd,2940.0
-Dumpsters,510 Bennett Dr.,1541.29
-Dumpsters,5130 Briarwood Cir,1359.6
-Dumpsters,5136 Goldmar Dr,1012.75
-Dumpsters,517 10th Ave.,1009.61
-Dumpsters,521 Mountain Dr,3921.94
-Dumpsters,5230 willow Ridge Dr,2491.63
+Dumpsters,4924 Branch Mill Cir,2390.17
+Dumpsters,505 Sunhill Rd,2940
 Dumpsters,5245 Old Springville Rd,815.06
-Dumpsters,5278 Willow Ridge Ln,2526.7
-Dumpsters,532 Hickory St,3297.56
-Dumpsters,533 Rollingwood Rd,4593.6
-Dumpsters,5409 Nottinghill Dr,815.06
-Dumpsters,5427 Reese Ln,2418.02
-Dumpsters,5445 Nottinghill Dr,2418.02
-Dumpsters,5447 Nottinghill Dr,300.0
-Dumpsters,5536 Cheryl Dr.,1929.99
-Dumpsters,5551 Timber Hills,2409.04
-Dumpsters,5557 Dewey Heights Rd,2371.96
-Dumpsters,5557 Dry Creek Rd,6221.64
-Dumpsters,5609 Ridgeview Dr,10116.56
-Dumpsters,5719 Park Side Rd,1072.02
-Dumpsters,5720 33rd St. N,1465.82
-Dumpsters,5731 Hickory Ct.,906.14
-Dumpsters,5741 Oakhill Dr,1918.89
-Dumpsters,5751 Henry Black Dr.,1842.93
-Dumpsters,5755 Cheryl Dr,6670.22
-Dumpsters,580 Highland Ln.,643.75
-Dumpsters,5872 Janet Dr.,970.72
+Dumpsters,5278 Willow Ridge Ln,923.74
+Dumpsters,5445 Nottinghill Dr,407.53
+Dumpsters,5551 Timber Hills,1376.63
+Dumpsters,5609 Ridgeview Dr,2817.89
 Dumpsters,5874 Dogwood Cir,1580.88
-Dumpsters,588 Russet Bend Dr,3464.88
-Dumpsters,5912 Nuthatch Cir,439.5
-Dumpsters,5913 Southhall Rd,3304.98
-Dumpsters,5929 Cheryl Dr,1320.82
-Dumpsters,5956 Creekwood Rd,934.4
-Dumpsters,5970 Dewey Heights Rd,231.75
-Dumpsters,6005 Mockingbird Ln,559.68
-Dumpsters,606 Greenwood Dr,1550.89
-Dumpsters,6134 Townhee Dr,2371.96
-Dumpsters,6202 Waterford Pl,1935.52
-Dumpsters,6212 Kestral View Rd,1012.75
-Dumpsters,6251 Keith Rd,2711.16
-Dumpsters,6257 Roberts Dr.,932.15
-Dumpsters,6269 Renda Cir,1474.62
-Dumpsters,6279 Tyler Loop Rd,1470.0
-Dumpsters,629 Shadywood Ln,2448.29
-Dumpsters,63 Avery Hancock Dr,2454.97
-Dumpsters,636 Paden Dr,2865.54
-Dumpsters,637 Vaughn Cir.,1950.02
-Dumpsters,640 Griffin Rd,12401.51
-Dumpsters,6435 Freda Dr.,1359.6
-Dumpsters,645 Vaughn Cir,2025.47
-Dumpsters,6451 Freda Dr,1465.82
-Dumpsters,6521 Happy Hollow Rd,5110.42
-Dumpsters,6556 Murphree Cir,2931.64
-Dumpsters,6591 S Chalkville Rd,3743.97
-Dumpsters,6765 Crossbrook Ln,556.97
-Dumpsters,6790 Paradise Cir,2371.96
-Dumpsters,6801 Brittany Pl,1465.82
-Dumpsters,6816 Brittany Pl,1458.73
-Dumpsters,6928 Woodvale Ln,2478.56
-Dumpsters,6968 McFrancis Rd,863.19
+Dumpsters,6279 Tyler Loop Rd,1470
+Dumpsters,640 Griffin Rd,407.53
 Dumpsters,7012 Shady Oaks Ln,341.25
-Dumpsters,704 Truss Ferry Rd,2542.13
-Dumpsters,706 Berkley Dr,3341.76
-Dumpsters,7093 Old Dixiana Rd.,932.15
-Dumpsters,7104 Claymont Dr,2478.57
-Dumpsters,720 Darlene Dr,3368.36
-Dumpsters,7218 Highway 75,1054.1
-Dumpsters,75 Starlite Dr,1508.24
-Dumpsters,7504 Spencer Ln,2009.68
-Dumpsters,7510 Arrowhead Ln,989.66
+Dumpsters,706 Berkley Dr,1385.61
 Dumpsters,7514 Lake Vista Dr,407.53
-Dumpsters,7541 Carriage Cove,2965.82
-Dumpsters,7729 Shriner Dr.,1012.75
+Dumpsters,7624 Happy Hollow Rd,2808.75
 Dumpsters,8056 Carrington Dr,407.53
-Dumpsters,808 Hillview Dr,2835.77
-Dumpsters,819 Sherwood Forest Dr,2840.81
-Dumpsters,8304 5th Ave. S.,2333.99
-Dumpsters,8313 Farley Ave.,1436.85
-Dumpsters,832 Zellmark Dr,854.9
-Dumpsters,8491 Clayton Cove,2396.26
-Dumpsters,8495 Clayton Cove,1639.36
-Dumpsters,867 Sandlin Dr.,2929.67
-Dumpsters,89 Lakshore Rd,9106.94
-Dumpsters,90 Buddy Ln,1007.85
-Dumpsters,909 Winchester Cir,1920.6
-Dumpsters,911 Bagley Ln.,4285.73
-Dumpsters,915 Rose Dr.,3161.48
+Dumpsters,828 Jeffrey Ln,2250.99
 Dumpsters,920 Coupland Rd,541.59
-Dumpsters,920 Wear Dr,559.68
-Dumpsters,925 1st Ave,1706.75
-Dumpsters,9311 Dunnavant Valley Rd,5546.55
-Dumpsters,936 Kathryne Cir,1458.73
-Dumpsters,936 Pineview Rd,266.51
-Dumpsters,9389 Central Rd,3912.3
-Dumpsters,939 Gene Reed Rd,556.97
-Dumpsters,Not specified,5036.67
-Earnest money,10 Anderson Mtn Dr,3750.0
-Earnest money,1008 Mtn. Oaks Dr.,5000.0
-Earnest money,112 Portsouth Ln,1024.0
-Earnest money,120 Cahaba Forest Dr,496.76
-Earnest money,1221 Rumson Dr,2500.0
-Earnest money,13 Royal Coach Cir,1000.0
-Earnest money,1345 Winola Ln,500.0
-Earnest money,1409 High Point Terrace,5000.0
-Earnest money,1412 13th Terrace.,1000.0
-Earnest money,1437 Ware Blvd,8403.08
-Earnest money,1449 Paragon Prkwy,5000.0
-Earnest money,1546 Lacie Dr,1000.0
-Earnest money,157 Sweetgum Dr,5000.0
-Earnest money,1612 Big Mtn. Dr.,1500.0
-Earnest money,1761 Cornwall Dr.,10000.0
-Earnest money,180 Charleston Way,1000.0
-Earnest money,1824 Otis Rd,500.0
-Earnest money,1861 Cedar Crest Rd,1000.0
-Earnest money,1908 Heritage Rd,2500.0
-Earnest money,1973 Chandaway Dr.,2500.0
-Earnest money,2038 22nd Ct S,3000.0
-Earnest money,2056 Self Ln.,1000.0
-Earnest money,2073 Russet Woods Trl,1000.0
-Earnest money,2116 Lakeview Trace,10015.0
-Earnest money,214 Stone Ridge Trail,7500.0
-Earnest money,215 Observatory Dr,-1311.34
-Earnest money,215 Oberservatory Dr,2500.0
-Earnest money,Total for 215 Observatory Dr,1188.66
-Earnest money,2164 Elizabeth Dr,1000.0
-Earnest money,217 Kings Crest,1000.0
-Earnest money,2200 Dogwood Trail,1000.0
-Earnest money,2232 Garland Dr,5000.0
-Earnest money,2512 October Dr,1000.0
-Earnest money,2536 Hampstead Dr,5000.0
-Earnest money,2701 Eastern Valley Rd,5000.0
-Earnest money,2755 Austin Ln,2200.0
-Earnest money,2921 Florida Rd.,1000.0
-Earnest money,2928 Floyd Bradford Rd,1000.0
-Earnest money,300 Huntsville Ave,1000.0
-Earnest money,3009 Virginia Dr,1000.0
-Earnest money,308 Killough Dr,5000.0
-Earnest money,308 Willow Glen ct,5000.0
-Earnest money,324 4th St. N,2500.0
-Earnest money,354 Highland Park Dr.,5000.0
-Earnest money,396 Union Station Way,1000.0
-Earnest money,4004 Saddle Run Cir,1000.0
-Earnest money,4032 Middle Ave,2000.0
-Earnest money,413 Popler Ridge,2000.0
-Earnest money,424 Co Rd 3150,10000.0
-Earnest money,4320 Corinth Dr,10000.0
-Earnest money,4433 Woodland Hills,1000.0
-Earnest money,4624 Fairfax Ct.,1000.0
-Earnest money,5013 knollview cir,3000.0
-Earnest money,505 Sunhill Rd,2000.0
-Earnest money,5136 Goldmar Dr,5000.0
-Earnest money,5239 Old Springville Rd,7500.0
-Earnest money,5337 Pine Needle Dr,3000.0
-Earnest money,5551 Timber Hills,2000.0
-Earnest money,5719 Park Side Rd,5000.0
-Earnest money,578 Shades Crest Rd,3000.0
-Earnest money,5913 Southhall Rd,1000.0
-Earnest money,5970 Dewey Heights Rd,1000.0
-Earnest money,606 Greenwood Dr,1000.0
-Earnest money,6251 Keith Rd,960.29
-Earnest money,629 Shadywood Ln,2000.0
-Earnest money,636 Paden Dr,1000.0
-Earnest money,637 Vaughn Cir.,5000.0
-Earnest money,640 Griffin Rd,5000.0
-Earnest money,645 Vaughn Cir,1000.0
-Earnest money,6451 Freda Dr,2500.0
-Earnest money,6521 Happy Hollow Rd,1000.0
-Earnest money,704 Truss Ferry Rd,10000.0
-Earnest money,7093 Old Dixiana Rd.,1000.0
-Earnest money,7121 Goodner Mtn. Rd,1000.0
-Earnest money,720 Darlene Dr,5000.0
-Earnest money,75 Starlite Dr,1000.0
-Earnest money,7504 Spencer Ln,1000.0
-Earnest money,808 Hillview Dr,1000.0
-Earnest money,8313 Farley Ave.,1000.0
-Earnest money,915 Rose Dr.,1000.0
-Earnest money,920 Wear Dr,1500.0
-Employee Appreciation,Office,500.85
-Employee Appreciation,Not specified,2475.59
-Employee Insurance,3023 Massey Rd Unit F,1641.94
-Employee Insurance,Logan Pate,3370.34
-Employee Insurance,Office,3194.82
-Employee Insurance,Not specified,33046.46
-Equipment,1008 Mtn. Oaks Dr.,996.2
-Equipment,5755 Cheryl Dr,423.49
-Equipment,Office,34832.47
-Equipment,work truck,68746.74
-Equipment,Not specified,155082.7
-General Permits,Not specified,1130.26
-Gold Investment,Not specified,55831.0
+Dumpsters,9311 Dunnavant Valley Rd,461.87
+Dumpsters,Not specified,213.82
+Dumpsters,Total,62056.43
+Earnest money,2701 Eastern Valley Rd,5000
+Earnest money,300 Huntsville Ave,1000
+Earnest money,308 Killough Dr,5000
+Earnest money,4320 Corinth Dr,10000
+Earnest money,505 Sunhill Rd,2000
+Earnest money,5337 Pine Needle Dr,3000
+Earnest money,Total,26000
+Employee Insurance,Office,1558
+Employee Insurance,Not specified,2479.56
+Employee Insurance,Total,4037.56
+Equipment,Not specified,5057.92
+Equipment,Total,5057.92
+Gold Investment,Not specified,55831
+Gold Investment,Total,55831
 HOA Fees,1008 Springhill Ln,116.85
-HOA Fees,1125 Greystone Crest,2500.0
-HOA Fees,2360 Grayson Valley Dr,5580.0
-HOA Fees,3023 Massey Rd Unit F,605.83
-HOA Fees,354 Highland Park Dr.,2344.87
-HOA Fees,3618 Haven View Cir,6951.84
-HOA Fees,Not specified,360.0
-Independent Contractor,Joe Mangione,1202.0
-Independent Contractor,Not specified,24232.0
-Interest Payment,10 Anderson Mtn Dr,21922.91
-Interest Payment,1008 Springhill Ln,29894.86
-Interest Payment,103 Kingstown Cir,4500.0
-Interest Payment,103 Mack Roper Rd.,800.0
-Interest Payment,1037 Sharp Dr,2745.86
-Interest Payment,105 Kingstown Rd,9090.0
-Interest Payment,106 Wildwood Dr.,9709.82
-Interest Payment,107 Kingstown Cir,5400.0
-Interest Payment,108 Pine Tree Cir,8533.36
-Interest Payment,108 Southview Dr,19582.69
-Interest Payment,1104 Tulip Cir,4883.08
-Interest Payment,1118 Westridge Cir.,2300.01
-Interest Payment,112 Portsouth Ln,4565.55
-Interest Payment,112 White Cap Cir,2759.0
-Interest Payment,1132 Martinwood Ln.,1666.68
-Interest Payment,116 34th St N,5500.0
-Interest Payment,120 Cahaba Forest Dr,4000.0
-Interest Payment,1221 Rumson Dr,6800.0
-Interest Payment,1265 Pine Tree Dr,1600.0
-Interest Payment,128 Maple Street,5580.65
-Interest Payment,1309 Springville Rd,2500.0
-Interest Payment,131 Silver Ln,1798.74
-Interest Payment,1310 Old Cahaba Cove,6066.67
-Interest Payment,1324 Bardswood Terrace,4000.0
-Interest Payment,1337 Wilshire Dr.,10441.67
-Interest Payment,1341 Hillwood Dr.,2400.0
-Interest Payment,1341 Winola Ln,2951.99
-Interest Payment,1359 Annie Lee Rd,4198.92
-Interest Payment,1401 Oak Terr.,2400.0
-Interest Payment,141 Deer Park Dr,7500.0
-Interest Payment,144 Lake Front Dr.,2500.0
-Interest Payment,149 Winterhaven Dr,1666.67
-Interest Payment,150 Beaver Ridge,16411.29
-Interest Payment,1504 8th St NW,4800.0
-Interest Payment,151 2nd St. N,5749.98
-Interest Payment,1546 Lacie Dr,13951.61
-Interest Payment,1608 Kestwick Dr,17980.63
-Interest Payment,1645 Barrington Ln NE,1100.0
-Interest Payment,1676 Five Points Rd,1600.0
-Interest Payment,1766 Brookside Rd,5000.0
-Interest Payment,1791 Vestaview Ln,2811.68
-Interest Payment,180 Charleston Way,5000.0
-Interest Payment,1831 Satterwhite St.,2313.0
-Interest Payment,1909 Thornhill Rd.,1733.34
-Interest Payment,1929 11th St NW,8646.67
-Interest Payment,193 Rena Dr,7677.42
-Interest Payment,193 Woodland Dr.,14000.0
-Interest Payment,1939 Westridge,5850.0
-Interest Payment,1946 Seven Bark Ln.,4216.0
-Interest Payment,1973 Chandaway Dr.,10612.9
-Interest Payment,200 Saint John Dr.,2880.0
-Interest Payment,201 Forest Dr,6805.93
-Interest Payment,2038 22nd Ct S,23385.66
-Interest Payment,204 Lane Park Cir,7288.92
-Interest Payment,2116 Lakeview Trace,31854.12
-Interest Payment,21164 Elizabeth Dr,7000.0
-Interest Payment,2123 28th Ave N,9000.0
-Interest Payment,2146 Rock Mtn. Rd.,3333.35
-Interest Payment,2146 Rock Mtn. Rd,666.67
-Interest Payment,Total for 2146 Rock Mtn. Rd.,4000.02
-Interest Payment,245 Observatory Dr,3200.01
-Interest Payment,Total for 215 Observatory Dr,3200.01
-Interest Payment,216 Chestnut St,9600.03
-Interest Payment,2200 Dogwood Trail,7000.0
-Interest Payment,2232 Garland Dr,12911.56
-Interest Payment,2236 Carl Jones Rd,4500.0
-Interest Payment,2321 Royal Knoll Ln,9400.0
-Interest Payment,239 Warwick Ln,23650.0
-Interest Payment,2401 16th St,14390.32
-Interest Payment,2422 Mallard dr,1400.0
-Interest Payment,2517 Galloway Dr.,1600.01
-Interest Payment,2536 Hampstead Dr,4791.65
-Interest Payment,270 Myers Rd,12600.0
+HOA Fees,1125 Greystone Crest,2500
+HOA Fees,2360 Grayson Valley Dr,2160
+HOA Fees,3618 Haven View Cir,6124.8
+HOA Fees,Total,10901.65
+Interest Payment,10 Anderson Mtn Dr,9764.58
+Interest Payment,1008 Springhill Ln,2551.64
+Interest Payment,112 White Cap Cir,2759
+Interest Payment,1309 Springville Rd,3750
+Interest Payment,1310 Old Cahaba Cove,1750
+Interest Payment,141 Deer Park Dr,9000
+Interest Payment,150 Beaver Ridge,15250
+Interest Payment,1504 8th St NW,3200
+Interest Payment,1645 Barrington Ln NE,1650
+Interest Payment,1676 Five Points Rd,3200
+Interest Payment,1688 Brewster Rd,1129.03
+Interest Payment,193 Rena Dr,9677.42
+Interest Payment,1939 Westridge,7020
+Interest Payment,2038 22nd Ct S,5728.56
+Interest Payment,2123 28th Ave N,4500
+Interest Payment,2401 16th St,5400
+Interest Payment,270 Myers Rd,4350
 Interest Payment,2825 2nd Way NW,1226.22
-Interest Payment,2921 Florida Rd.,8750.0
-Interest Payment,294 Heritage Dr,11026.12
-Interest Payment,3018 Old Stone Dr,3300.0
-Interest Payment,3023 Massey Rd Unit F,4508.33
-Interest Payment,3050 Weatherford Dr,4977.97
-Interest Payment,308 Killough Dr,2794.3
-Interest Payment,312 Orchid Rd,1567.58
-Interest Payment,316 Gemini Cir,516.67
-Interest Payment,316 Willow Glen Ct,5250.0
-Interest Payment,322 Cherokee Drive,3266.66
-Interest Payment,322 Cherokee Dr.,4066.66
-Interest Payment,Total for 322 Cherokee Drive,7333.32
-Interest Payment,324 4th St. N,6291.65
-Interest Payment,3249 Wagon Gap Trail,36583.33
-Interest Payment,3348 Overton Rd,38694.49
-Interest Payment,3512 Nazha Cir,5458.33
-Interest Payment,3535 Deerfield Dr,7500.0
-Interest Payment,354 Highland Park Dr.,30000.24
-Interest Payment,3618 Haven View Cir,10000.0
-Interest Payment,3926 Valley Bend Dr.,3600.0
-Interest Payment,4032 Middle Ave,2745.16
+Interest Payment,294 Heritage Dr,4215.38
+Interest Payment,308 Killough Dr,3394.3
+Interest Payment,316 Gemini Cir,1050.56
+Interest Payment,316 Willow Glen Ct,7000
+Interest Payment,3348 Overton Rd,9819.33
+Interest Payment,3618 Haven View Cir,5000
 Interest Payment,4038 Ida Ln,4464.86
-Interest Payment,411 Woodward Rd.,8750.01
-Interest Payment,424 Co Rd 3150,4233.33
-Interest Payment,4358 Oak St,650.0
-Interest Payment,4433 Woodland Hills,8266.72
-Interest Payment,445 Annie Lee Rd,2588.75
 Interest Payment,4461 Parkwood Cir,2835.63
-Interest Payment,4533 Oak Dr,5687.5
-Interest Payment,4924 Branch Mill Cir,28252.77
-Interest Payment,496 Springdale Rd.,3333.55
-Interest Payment,5013 knollview cir,7350.0
-Interest Payment,508 Tambay Dr,3616.07
-Interest Payment,5130 Briarwood Cir,888.89
-Interest Payment,5136 Goldmar Dr,3605.77
-Interest Payment,521 Mountain Dr,4166.68
-Interest Payment,5230 willow Ridge Dr,800.0
+Interest Payment,4924 Branch Mill Cir,10436.11
+Interest Payment,508 Tambay Dr,4866.07
 Interest Payment,5239 Old Springville Rd,16860.24
-Interest Payment,532 Hickory St,5669.64
-Interest Payment,5381 Park Side Cir,9053.33
-Interest Payment,5551 Timber Hills,20000.0
-Interest Payment,5557 Dewey Heights Rd,3000.0
-Interest Payment,5557 Dry Creek Rd,34232.26
-Interest Payment,5609 Ridgeview Dr,17037.77
-Interest Payment,5741 Oakhill Dr,2444.03
-Interest Payment,5872 Janet Dr.,3413.33
-Interest Payment,5874 Dogwood Cir,619.99
-Interest Payment,588 Russet Bend Dr,4666.65
-Interest Payment,5912 Nuthatch Cir,3249.33
-Interest Payment,5929 Cheryl Dr,1666.68
-Interest Payment,5956 Creekwood Rd,1333.34
-Interest Payment,609 Chesser Ct,5216.24
-Interest Payment,620 Ridgefield Cove,5322.58
-Interest Payment,6202 Waterford Pl,11180.0
-Interest Payment,6251 Keith Rd,8646.22
-Interest Payment,6269 Renda Cir,5000.0
-Interest Payment,6279 Tyler Loop Rd,2500.0
-Interest Payment,629 Shadywood Ln,6666.68
-Interest Payment,640 Griffin Rd,19406.45
-Interest Payment,6435 Freda Dr.,3099.0
-Interest Payment,6521 Happy Hollow Rd,7000.0
-Interest Payment,6591 S Chalkville Rd,3792.64
-Interest Payment,6790 Paradise Cir,3884.83
-Interest Payment,6801 Brittany Pl,3051.92
-Interest Payment,690 Idlewild Cir,5000.0
-Interest Payment,7504 Spencer Ln,3540.52
-Interest Payment,7510 Arrowhead Ln,13899.99
-Interest Payment,7541 Carriage Cove,13435.27
-Interest Payment,7729 Shriner Dr.,3575.25
-Interest Payment,819 Sherwood Forest Dr,3282.27
-Interest Payment,832 Zellmark Dr,2440.02
-Interest Payment,8495 Clayton Cove,3333.34
-Interest Payment,909 Winchester Cir,7350.0
-Interest Payment,920 Wear Dr,3333.32
-Interest Payment,925 1st Ave,3200.01
-Interest Payment,9311 Dunnavant Valley Rd,13183.33
-Interest Payment,9389 Central Rd,15469.87
-Interest Payment,Company Loan,243768.91
-Interest Payment,Office,2100.0
-Interest Payment,Not specified,21509.65
-Labor,10 Anderson Mtn Dr,49138.0
-Labor,1008 Mtn. Oaks Dr.,27796.19
-Labor,1008 Springhill Ln,143940.0
-Labor,1014 Mtn. Laurel Cir.,32350.0
-Labor,1017 Burnt Pine Ln,7000.0
-Labor,103 Kingstown Cir,29050.0
-Labor,103 Mack Roper Rd.,38812.0
-Labor,1037 Sharp Dr,27225.0
-Labor,1048 Gene Reed Rd,17608.0
-Labor,105 Kingstown Rd,24705.0
-Labor,106 Wildwood Dr.,39948.0
-Labor,107 Kingstown Cir,37929.0
-Labor,108 Pine Tree Cir,25050.0
-Labor,108 Southview Dr,50696.48
-Labor,109 Spring Glade Cir,23451.0
-Labor,109 Westchester Dr.,150.0
-Labor,1104 Tulip Cir,33640.0
-Labor,1118 Westridge Cir.,47174.83
-Labor,112 Portsouth Ln,27825.0
-Labor,112 White Cap Cir,27160.0
-Labor,1125 Greystone Crest,144170.0
-Labor,1132 Martinwood Ln.,25850.0
-Labor,115 Meadowgreen Rd,10800.0
-Labor,1158 Holt Cir.,8800.0
-Labor,116 34th St N,32250.0
-Labor,120 Cahaba Forest Dr,48246.25
-Labor,120 Kay St.,24800.0
-Labor,122 Heather Ridge Dr.,34010.0
-Labor,1221 Rumson Dr,62691.56
-Labor,1265 Pine Tree Dr,12040.81
-Labor,128 Maple Street,40528.12
-Labor,12938 Ann Marie Dr,29190.0
-Labor,13 Royal Coach Cir,22640.0
-Labor,1308 34th St,17250.0
-Labor,1309 Springville Rd,34082.0
-Labor,131 Silver Ln,17505.0
-Labor,1310 Old Cahaba Cove,15404.96
-Labor,1313 McCoy St,25720.0
-Labor,132 Rosebud Rd,39920.0
-Labor,1324 Bardswood Terrace,450.0
-Labor,1337 Wilshire Dr.,32200.0
-Labor,1341 Hillwood Dr.,32616.27
-Labor,1341 Winola Ln,28614.0
-Labor,1345 Winola Ln,22910.0
-Labor,1359 Annie Lee Rd,10350.0
-Labor,1401 Oak Terr.,19550.0
-Labor,1409 High Point Terrace,26115.63
-Labor,141 Deer Park Dr,28400.0
-Labor,1412 13th Terrace.,22800.0
-Labor,1437 Ware Blvd,38331.45
-Labor,1449 Paragon Prkwy,22450.0
-Labor,149 Winterhaven Dr,20610.0
-Labor,150 Beaver Ridge,30551.5
-Labor,1504 8th St NW,33923.14
-Labor,1508 4th St. NW,15458.67
-Labor,151 2nd St. N,43660.0
-Labor,1546 Lacie Dr,47600.0
-Labor,155 Treymoore Dr,20931.25
-Labor,157 Sweetgum Dr,25622.63
-Labor,1604 Tahoe Rd,39150.0
-Labor,1608 Kestwick Dr,46879.93
-Labor,1609 Sonia Dr,54300.0
-Labor,1612 Big Mtn. Dr.,20371.14
-Labor,163 Sunrise Dr,25892.46
-Labor,1645 Barrington Ln NE,19000.0
-Labor,1646 Roberta Ln,25632.0
-Labor,1676 Five Points Rd,21639.0
-Labor,1703 Molly Cir.,15600.0
-Labor,1706 Greenbriar Dr,5000.0
-Labor,1708 Molly Dr.,22607.2
-Labor,1710 Greenbriar Dr,24891.79
-Labor,1713 Molly Dr.,22287.0
-Labor,1735 6th St. NW,12400.0
-Labor,17502 HWY 174,38403.66
-Labor,1761 Cornwall Dr.,38403.5
-Labor,1766 Brookside Rd,26400.77
-Labor,1788 Whitmire St,38425.0
-Labor,1791 Vestaview Ln,32035.0
-Labor,1792 Whitmire St,129726.08
-Labor,1809 Tin Valley Cir,7041.5
-Labor,1824 Otis Rd,26524.4
-Labor,1831 Otis Cir.,12450.0
-Labor,1831 Satterwhite St.,27613.0
-Labor,1908 Heritage Rd,37499.33
-Labor,1909 Thornhill Rd.,13000.0
-Labor,1929 11th St NW,22250.0
-Labor,193 Rena Dr,17500.0
-Labor,193 Woodland Dr.,36222.0
-Labor,1939 Westridge,24730.0
-Labor,1946 Seven Bark Ln.,27200.0
-Labor,1973 Chandaway Dr.,24850.0
-Labor,200 Saint John Dr.,15625.0
-Labor,20001 Rabbit Ridge,28195.32
-Labor,Total for 20001 Rabbit Ridge Rd,28195.32
-Labor,201 Forest Dr,27650.0
-Labor,2038 22nd Ct S,43043.0
-Labor,204 Lane Park Cir,20680.11
-Labor,205 Mashburn Dr,22774.32
-Labor,2050 Montreat Pkwy Unit A,345.0
-Labor,2056 Self Ln.,19535.25
-Labor,206 Annetta Cir,29507.33
-Labor,2073 Russet Woods Trl,23400.0
-Labor,2104 Carlisle Cir.,1422.0
-Labor,2116 Lakeview Trace,64740.0
-Labor,21164 Elizabeth Dr,25190.0
-Labor,212 Dexter Ct.,6450.0
-Labor,2123 28th Ave N,22000.0
-Labor,214 Stone Ridge Trail,35541.0
-Labor,2146 Rock Mtn. Rd.,24700.0
-Labor,Total for 2146 Rock Mtn. Rd.,24700.0
-Labor,245 Observatory Dr,29997.79
-Labor,Total for 215 Observatory Dr,29997.79
-Labor,216 Chestnut St,69510.61
-Labor,216 Handley Rd.,23119.2
-Labor,217 Kings Crest,48020.0
-Labor,2173 Chapel Hill Rd,14543.97
-Labor,2200 Dogwood Trail,39700.0
-Labor,2232 Garland Dr,39175.0
-Labor,2234 Pup Run,30630.0
-Labor,2236 Carl Jones Rd,26500.0
-Labor,2308 Kala St,25956.0
-Labor,232 Redstone way,13450.0
-Labor,2321 Royal Knoll Ln,38105.0
-Labor,2360 Grayson Valley Dr,4360.0
-Labor,2364 Rocky Ridge Rd,56550.0
-Labor,239 Warwick Ln,22103.19
-Labor,2401 16th St,34760.0
-Labor,2406 Hampstead Dr.,1050.0
-Labor,2422 Mallard dr,20237.0
-Labor,2454 Hampstead Dr,11828.72
-Labor,251 Pineview Cir,30547.74
-Labor,2512 October Dr,12020.0
-Labor,2513 7th St NE,5000.0
-Labor,2517 Galloway Dr.,9197.56
-Labor,2536 Hampstead Dr,1950.0
-Labor,2636 Dennise Rd.,9806.0
-Labor,270 Myers Rd,17165.0
-Labor,2701 Eastern Valley Rd,19500.0
-Labor,2720 Shoemaker St,14490.0
-Labor,2736 Darlene Cir,29775.0
-Labor,2755 Austin Ln,20554.0
-Labor,2825 2nd Way NW,19600.0
-Labor,2921 Florida Rd.,56416.31
-Labor,2928 Floyd Bradford Rd,44189.4
-Labor,294 Heritage Dr,50395.18
-Labor,300 42nd Ave.,5400.0
-Labor,300 Huntsville Ave,1250.0
-Labor,3009 Virginia Dr,38200.0
-Labor,3012 2nd St,36236.5
-Labor,3018 Old Stone Dr,31550.0
-Labor,3023 Massey Rd Unit F,13645.05
-Labor,3032 Tersea Dr.,27968.21
-Labor,3050 Weatherford Dr,18270.0
-Labor,308 Killough Dr,38200.0
-Labor,308 Willow Glen ct,38820.81
-Labor,312 Lehigh Rd,36925.0
-Labor,312 Orchid Rd,31292.0
-Labor,316 Gemini Cir,21380.0
-Labor,316 Willow Glen Ct,22000.0
-Labor,322 Cherokee Drive,1450.0
-Labor,322 Cherokee Dr.,51551.0
-Labor,Total for 322 Cherokee Drive,53001.0
-Labor,324 4th St. N,24675.0
-Labor,3249 Wagon Gap Trail,36380.0
-Labor,3348 Overton Rd,35980.0
-Labor,335 Co Rd 1130,17604.0
-Labor,3372 Wood Drive Cir.,19100.0
-Labor,3409 Crosscreek Cir,17900.0
-Labor,3512 Nazha Cir,33385.0
-Labor,3535 Deerfield Dr,31000.0
-Labor,354 Highland Park Dr.,52680.0
-Labor,3618 Haven View Cir,21900.0
-Labor,3834 Highway 11,13980.0
-Labor,3845 Nowlin Rd SW,37500.0
-Labor,39 Polly Ridge Rd,25326.0
-Labor,3926 Valley Bend Dr.,31567.0
-Labor,396 Union Station Way,17361.96
-Labor,40 Clearview Rd,16775.0
-Labor,4004 Saddle Run Cir,23000.0
-Labor,4032 Middle Ave,23825.0
-Labor,4038 Ida Ln,13262.0
-Labor,4042 Jubille ln,11600.0
-Labor,405 Art Hanes Blvd,44530.0
-Labor,411 Woodward Rd.,46400.0
-Labor,413 Popler Ridge,300.0
-Labor,424 Co Rd 3150,134042.18
-Labor,4358 Oak St,37065.56
-Labor,4433 Woodland Hills,52565.0
-Labor,445 Annie Lee Rd,17350.0
-Labor,4461 Parkwood Cir,21080.0
-Labor,45 Ridgefield Ln,6900.0
-Labor,450 Doss Ferry Pkwy,5980.0
-Labor,4533 Oak Dr,29827.66
-Labor,4652 Clairmont Ave,25400.0
-Labor,4924 Branch Mill Cir,84737.0
-Labor,496 Springdale Rd.,9315.0
-Labor,500 Lance Way,23729.0
-Labor,501 Cheri Ln,13650.0
-Labor,5013 knollview cir,35500.0
-Labor,5039 Vernon St,22350.0
-Labor,504 Lance Way,33760.0
-Labor,505 Sunhill Rd,36950.0
-Labor,508 Tambay Dr,22000.0
-Labor,509 Lansdowne Pl,11200.0
-Labor,510 Bennett Dr.,24591.0
-Labor,5130 Briarwood Cir,32252.0
-Labor,5136 Goldmar Dr,25710.0
-Labor,5150 Hickory Dr NE,14763.5
-Labor,517 10th Ave.,33313.7
-Labor,521 Mountain Dr,41130.62
-Labor,5230 willow Ridge Dr,18420.0
-Labor,5239 Old Springville Rd,7525.0
-Labor,5278 Willow Ridge Ln,28836.5
-Labor,532 Hickory St,29972.26
-Labor,533 Rollingwood Rd,34240.0
-Labor,5364 Balboa Ave,5500.0
-Labor,537 Fox Run,5950.0
-Labor,5381 Park Side Cir,12791.54
-Labor,5409 Nottinghill Dr,9750.0
-Labor,5427 Reese Ln,27800.0
-Labor,5445 Nottinghill Dr,13000.0
-Labor,5447 Nottinghill Dr,13766.0
-Labor,5536 Cheryl Dr.,15050.0
-Labor,5551 Timber Hills,30530.0
-Labor,5557 Dewey Heights Rd,31150.0
-Labor,5557 Dry Creek Rd,48815.0
-Labor,5609 Ridgeview Dr,127793.04
-Labor,5719 Park Side Rd,18950.0
-Labor,5720 33rd St. N,27100.0
-Labor,5731 Hickory Ct.,24750.0
-Labor,5741 Oakhill Dr,21279.0
-Labor,5751 Henry Black Dr.,24910.0
-Labor,5755 Cheryl Dr,49843.67
-Labor,580 Highland Ln.,17900.0
-Labor,5872 Janet Dr.,13877.0
-Labor,5874 Dogwood Cir,24000.0
-Labor,588 Russet Bend Dr,30300.0
-Labor,5901 nuthatch,15103.35
-Labor,5912 Nuthatch Cir,34150.0
-Labor,5913 Southhall Rd,45877.53
-Labor,5929 Cheryl Dr,24500.0
-Labor,5956 Creekwood Rd,14016.0
-Labor,606 Greenwood Dr,25075.0
-Labor,609 Chesser Ct,17650.0
-Labor,6134 Townhee Dr,24950.0
-Labor,620 Ridgefield Cove,17954.0
-Labor,6202 Waterford Pl,31902.71
-Labor,6212 Kestral View Rd,18881.63
-Labor,6251 Keith Rd,32490.0
-Labor,6269 Renda Cir,22910.0
-Labor,6279 Tyler Loop Rd,21200.0
-Labor,629 Shadywood Ln,37021.25
-Labor,63 Avery Hancock Dr,29405.0
-Labor,636 Mermont Dr.,10750.0
-Labor,636 Paden Dr,42737.0
-Labor,637 Vaughn Cir.,62000.0
-Labor,640 Griffin Rd,52873.83
-Labor,6435 Freda Dr.,28180.5
-Labor,645 Vaughn Cir,31590.0
-Labor,6451 Freda Dr,29227.53
-Labor,6521 Happy Hollow Rd,41530.0
-Labor,6556 Murphree Cir,32490.0
-Labor,6591 S Chalkville Rd,29765.0
-Labor,6602 Davidson Rd,14027.0
-Labor,6750 Heaton Manor,3400.0
-Labor,6765 Crossbrook Ln,12115.0
-Labor,6790 Paradise Cir,36712.35
-Labor,6801 Brittany Pl,20410.0
-Labor,6816 Brittany Pl,28230.21
-Labor,690 Idlewild Cir,28441.0
-Labor,6928 Woodvale Ln,27600.0
-Labor,6968 McFrancis Rd,30600.0
-Labor,7012 Shady Oaks Ln,4750.0
-Labor,704 Julia Cir,550.0
-Labor,704 Truss Ferry Rd,35400.0
-Labor,706 Berkley Dr,41120.0
-Labor,7093 Old Dixiana Rd.,28500.0
-Labor,7104 Claymont Dr,30990.0
-Labor,7121 Goodner Mtn. Rd,64000.0
-Labor,720 Darlene Dr,40077.92
-Labor,7218 Highway 75,29750.0
-Labor,75 Starlite Dr,22750.0
-Labor,7504 Spencer Ln,10740.0
-Labor,7510 Arrowhead Ln,14369.6
-Labor,7541 Carriage Cove,38879.13
-Labor,7624 Happy Hollow Rd,8800.0
-Labor,7729 Shriner Dr.,18715.14
-Labor,8056 Carrington Dr,4010.0
-Labor,808 Hillview Dr,40212.42
-Labor,819 Sherwood Forest Dr,29350.0
-Labor,828 Jeffrey Ln,10000.0
-Labor,8304 5th Ave. S.,36550.0
-Labor,8313 Farley Ave.,41100.0
-Labor,832 Zellmark Dr,17700.0
-Labor,8491 Clayton Cove,36000.0
-Labor,8495 Clayton Cove,35000.0
-Labor,8516 Highland Trace,5500.0
-Labor,867 Sandlin Dr.,23833.9
-Labor,89 Lakshore Rd,47037.33
-Labor,90 Buddy Ln,23429.05
-Labor,909 Winchester Cir,19624.13
-Labor,911 Bagley Ln.,26300.0
-Labor,915 Rose Dr.,41362.31
-Labor,920 Wear Dr,18082.03
-Labor,925 1st Ave,18905.2
-Labor,9311 Dunnavant Valley Rd,46260.0
-Labor,936 Kathryne Cir,24565.79
-Labor,9389 Central Rd,44175.0
-Labor,939 Gene Reed Rd,13299.96
-Labor,Joe Mangione,5018.0
-Labor,Office,1145.0
-Labor,Not specified,71099.51
-Labor and Materials,117 Lynn Dr.,12500.0
-Labor and Materials,122 Heather Ridge Dr.,4000.0
-Labor and Materials,14695 Hwy 75,2500.0
-Labor and Materials,1788 Whitmire St,7835.0
-Labor and Materials,2104 Carlisle Cir.,52899.4
-Labor and Materials,2116 Lakeview Trace,2100.0
-Labor and Materials,2146 Rock Mtn. Lake Dr.,20000.0
-Labor and Materials,2146 Rock Mtn. Rd,15000.0
-Labor and Materials,Total for 2146 Rock Mtn. Rd.,35000.0
-Labor and Materials,217 Kings Crest,760.0
-Legal Fees,2116 Lakeview Trace,400.0
-Legal Fees,2364 Rocky Ridge Rd,654.6
-Legal Fees,Not specified,10207.71
-Materials,10 Anderson Mtn Dr,43245.69
-Materials,1008 Mtn. Oaks Dr.,11304.02
-Materials,1008 Springhill Ln,198683.05
-Materials,1014 Mtn. Laurel Cir.,26771.11
-Materials,1017 Burnt Pine Ln,6244.69
-Materials,103 Kingstown Cir,19761.48
-Materials,103 Mack Roper Rd.,40815.83
-Materials,1037 Sharp Dr,33872.93
-Materials,1048 Gene Reed Rd,19692.78
-Materials,105 Kingstown Rd,30622.67
-Materials,106 Wildwood Dr.,28187.06
-Materials,107 Kingstown Cir,30517.78
-Materials,108 Pine Tree Cir,20836.73
-Materials,108 Southview Dr,55157.83
-Materials,109 Spring Glade Cir,16236.2
-Materials,1104 Tulip Cir,29744.51
-Materials,1118 Westridge Cir.,42701.39
-Materials,112 Portsouth Ln,23938.89
-Materials,112 White Cap Cir,37150.37
-Materials,1125 Greystone Crest,158476.16
-Materials,1132 Martinwood Ln.,26528.78
-Materials,115 Meadowgreen Rd,5351.46
-Materials,1158 Holt Cir.,3859.18
-Materials,116 34th St N,34316.08
-Materials,117 Lynn Dr.,3533.98
-Materials,120 Cahaba Forest Dr,41871.73
-Materials,120 Kay St.,21090.11
-Materials,122 Heather Ridge Dr.,31208.54
-Materials,1221 Rumson Dr,34616.61
-Materials,1265 Pine Tree Dr,4605.45
-Materials,128 Maple Street,23696.97
-Materials,12938 Ann Marie Dr,26383.77
-Materials,13 Royal Coach Cir,19231.78
-Materials,1308 34th St,13372.51
-Materials,1309 Springville Rd,45168.03
-Materials,131 Silver Ln,16457.5
-Materials,1310 Old Cahaba Cove,13589.41
-Materials,1313 McCoy St,23379.36
-Materials,132 Rosebud Rd,46595.15
-Materials,1324 Bardswood Terrace,52269.92
-Materials,1337 Wilshire Dr.,23794.97
-Materials,1341 Hillwood Dr.,19541.83
-Materials,1341 Winola Ln,23439.99
-Materials,1345 Winola Ln,17208.9
-Materials,1359 Annie Lee Rd,6699.23
-Materials,1401 Oak Terr.,10120.47
-Materials,1409 High Point Terrace,27716.76
-Materials,141 Deer Park Dr,30718.27
-Materials,1412 13th Terrace.,23467.38
-Materials,1437 Ware Blvd,29631.41
-Materials,144 Lake Front Dr.,8.44
-Materials,1449 Paragon Prkwy,10781.85
-Materials,149 Winterhaven Dr,25736.05
-Materials,150 Beaver Ridge,23134.65
-Materials,1504 8th St NW,24743.43
-Materials,1508 4th St. NW,4447.53
-Materials,151 2nd St. N,48069.9
-Materials,1533 Choctaw Dr,1119.56
-Materials,1546 Lacie Dr,60325.25
-Materials,155 Treymoore Dr,15175.43
-Materials,1557 Napoleon Dr,-420.4
-Materials,157 Sweetgum Dr,23232.88
-Materials,1604 Tahoe Rd,24097.94
-Materials,1608 Kestwick Dr,48406.67
-Materials,1609 Sonia Dr,41122.04
-Materials,1612 Big Mtn. Dr.,9440.59
-Materials,163 Sunrise Dr,19120.85
-Materials,1645 Barrington Ln NE,25449.76
-Materials,1646 Roberta Ln,16647.7
-Materials,1676 Five Points Rd,32650.28
-Materials,1688 Brewster Rd,8933.85
-Materials,1703 Molly Cir.,4205.01
-Materials,1706 Greenbriar Dr,3201.52
-Materials,1708 Molly Dr.,22658.97
-Materials,1710 Greenbriar Dr,20500.18
-Materials,1713 Molly Dr.,22007.58
-Materials,1735 6th St. NW,4803.25
-Materials,17502 HWY 174,20285.07
-Materials,1761 Cornwall Dr.,28590.46
-Materials,1766 Brookside Rd,10402.54
-Materials,1788 Whitmire St,45134.9
-Materials,1791 Vestaview Ln,40582.58
-Materials,1792 Whitmire St,43024.56
-Materials,180 Charleston Way,750.71
-Materials,1803 5th Ave.S.,1450.57
-Materials,1809 Tin Valley Cir,41187.66
-Materials,1824 Otis Rd,18864.25
-Materials,1831 Otis Cir.,12686.42
-Materials,1831 Satterwhite St.,15953.66
-Materials,1908 Heritage Rd,27336.76
-Materials,1909 Thornhill Rd.,10388.64
-Materials,1929 11th St NW,24752.47
-Materials,193 Rena Dr,33364.88
-Materials,193 Woodland Dr.,27071.14
-Materials,1939 Westridge,27739.75
-Materials,1946 Seven Bark Ln.,32282.02
-Materials,1973 Chandaway Dr.,26905.26
-Materials,200 Saint John Dr.,6014.32
-Materials,20001 Rabbit Ridge Rd,2333.67
-Materials,20001 Rabbit Ridge,23861.7
-Materials,Total for 20001 Rabbit Ridge Rd,26195.37
-Materials,201 Forest Dr,30727.57
-Materials,2038 22nd Ct S,53577.3
-Materials,204 Lane Park Cir,14466.69
-Materials,205 Mashburn Dr,21260.95
-Materials,2050 Montreat Pkwy Unit A,498.28
-Materials,2056 Self Ln.,13403.52
-Materials,206 Annetta Cir,21284.46
-Materials,2073 Russet Woods Trl,17822.82
-Materials,2104 Carlisle Cir.,118.97
-Materials,2116 Lakeview Trace,38856.18
-Materials,21164 Elizabeth Dr,28159.09
-Materials,212 Dexter Ct.,2111.45
-Materials,2123 28th Ave N,24872.71
-Materials,214 Stone Ridge Trail,45854.94
-Materials,2146 Rock Mtn. Lake Dr.,27.0
-Materials,Total for 2146 Rock Mtn. Rd.,27.0
-Materials,215 Observatory Dr,10810.21
-Materials,245 Observatory Dr,3994.28
-Materials,Total for 215 Observatory Dr,14804.49
-Materials,216 Chestnut St,53926.06
-Materials,216 Handley Rd.,13876.86
-Materials,217 Kings Crest,41104.8
-Materials,2173 Chapel Hill Rd,16907.36
-Materials,2200 Dogwood Trail,40260.58
-Materials,2232 Garland Dr,31056.48
-Materials,2234 Pup Run,32359.9
-Materials,2236 Carl Jones Rd,19155.58
-Materials,2308 Kala St,46661.1
-Materials,232 Redstone way,6948.95
-Materials,2321 Royal Knoll Ln,36622.78
-Materials,2360 Grayson Valley Dr,3706.79
-Materials,2364 Rocky Ridge Rd,70875.91
-Materials,239 Warwick Ln,4502.88
-Materials,2401 16th St,35676.75
-Materials,2406 Hampstead Dr.,529.86
-Materials,2422 Mallard dr,7576.51
-Materials,2454 Hampstead Dr,10832.59
-Materials,251 Pineview Cir,15447.3
-Materials,2512 October Dr,13714.29
-Materials,2513 7th St NE,13645.93
-Materials,2517 Galloway Dr.,2607.0
-Materials,2536 Hampstead Dr,493.73
-Materials,2569 Hampstead Dr,70.54
-Materials,2636 Dennise Rd.,3633.65
-Materials,270 Myers Rd,11122.48
-Materials,2701 Eastern Valley Rd,28265.13
-Materials,2720 Shoemaker St,14503.87
-Materials,2736 Darlene Cir,21581.38
-Materials,2755 Austin Ln,3845.18
-Materials,2825 2nd Way NW,31172.4
-Materials,2921 Florida Rd.,48646.43
-Materials,2928 Floyd Bradford Rd,60272.28
-Materials,294 Heritage Dr,58364.95
-Materials,300 42nd Ave.,1942.81
+Interest Payment,533 River Crest Way,1548.27
+Interest Payment,5551 Timber Hills,24000
+Interest Payment,5557 Dry Creek Rd,11200
+Interest Payment,5609 Ridgeview Dr,12551.11
+Interest Payment,5874 Dogwood Cir,1260.66
+Interest Payment,601 Mermont Dr,2012.9
+Interest Payment,6279 Tyler Loop Rd,2500
+Interest Payment,640 Griffin Rd,4700
+Interest Payment,690 Idlewild Cir,3000
+Interest Payment,828 Jeffrey Ln,2026.67
+Interest Payment,9311 Dunnavant Valley Rd,10500
+Interest Payment,Company Loan,127019.52
+Interest Payment,Total,364168.06
+Labor,10 Anderson Mtn Dr,275
+Labor,1008 Springhill Ln,15972
+Labor,1017 Burnt Pine Ln,9500
+Labor,1048 Gene Reed Rd,1200
+Labor,112 White Cap Cir,27160
+Labor,1125 Greystone Crest,95280
+Labor,13 Royal Coach Cir,1500
+Labor,1309 Springville Rd,34582
+Labor,1310 Old Cahaba Cove,1500
+Labor,141 Deer Park Dr,12900
+Labor,150 Beaver Ridge,5677
+Labor,1504 8th St NW,1000
+Labor,1557 Napoleon Dr,1555.25
+Labor,1645 Barrington Ln NE,19000
+Labor,1676 Five Points Rd,23639
+Labor,1688 Brewster Rd,4500
+Labor,1792 Whitmire St,52898.58
+Labor,193 Rena Dr,20500
+Labor,193 Woodland Dr.,17122
+Labor,1939 Westridge,22190
+Labor,2038 22nd Ct S,1945
+Labor,205 Mashburn Dr,1150
+Labor,2123 28th Ave N,400
+Labor,2308 Kala St,28456
+Labor,2401 16th St,2000
+Labor,2513 7th St NE,7000
+Labor,270 Myers Rd,1665
+Labor,2701 Eastern Valley Rd,22344
+Labor,2720 Shoemaker St,1840
+Labor,2825 2nd Way NW,21344
+Labor,294 Heritage Dr,3500
+Labor,300 Huntsville Ave,1250
+Labor,3012 2nd St,6900
+Labor,308 Killough Dr,38200
+Labor,312 Lehigh Rd,3150
+Labor,316 Gemini Cir,23359
+Labor,316 Willow Glen Ct,22000
+Labor,3348 Overton Rd,500
+Labor,335 Co Rd 1130,1500
+Labor,354 Highland Park Dr.,350
+Labor,3618 Haven View Cir,3430
+Labor,3834 Highway 11,13980
+Labor,4038 Ida Ln,14450
+Labor,424 Co Rd 3150,62000
+Labor,4461 Parkwood Cir,21080
+Labor,450 Doss Ferry Pkwy,5980
+Labor,4924 Branch Mill Cir,28700
+Labor,501 Cheri Ln,1350
+Labor,505 Sunhill Rd,36950
+Labor,508 Tambay Dr,22000
+Labor,5239 Old Springville Rd,800
+Labor,5278 Willow Ridge Ln,1840
+Labor,533 River Crest Way,5500
+Labor,5364 Balboa Ave,12500
+Labor,5427 Reese Ln,2800
+Labor,5551 Timber Hills,19330
+Labor,5557 Dry Creek Rd,800
+Labor,5609 Ridgeview Dr,50460
+Labor,5874 Dogwood Cir,26000
+Labor,6279 Tyler Loop Rd,21200
+Labor,640 Griffin Rd,7400
+Labor,690 Idlewild Cir,1200
+Labor,7012 Shady Oaks Ln,9750
+Labor,706 Berkley Dr,4990
+Labor,7510 Arrowhead Ln,400
+Labor,7624 Happy Hollow Rd,12800
+Labor,8056 Carrington Dr,4010
+Labor,828 Jeffrey Ln,12500
+Labor,8516 Highland Trace,5500
+Labor,9311 Dunnavant Valley Rd,3480
+Labor,Not specified,4000
+Labor,Total,973983.83
+Legal Fees,Not specified,4372.5
+Legal Fees,Total,4372.5
+Materials,10 Anderson Mtn Dr,251.41
+Materials,1008 Springhill Ln,25875.98
+Materials,1017 Burnt Pine Ln,16679.13
+Materials,1048 Gene Reed Rd,1124.23
+Materials,112 White Cap Cir,37189.78
+Materials,1125 Greystone Crest,85876.14
+Materials,116 34th St N,1570.53
+Materials,13 Royal Coach Cir,631.31
+Materials,1309 Springville Rd,45196.26
+Materials,1310 Old Cahaba Cove,279.7
+Materials,1409 High Point Terrace,72.41
+Materials,141 Deer Park Dr,12615.86
+Materials,1437 Ware Blvd,1585.5
+Materials,150 Beaver Ridge,880.43
+Materials,1504 8th St NW,913.52
+Materials,1645 Barrington Ln NE,24243.24
+Materials,1676 Five Points Rd,34229.83
+Materials,1688 Brewster Rd,11753.66
+Materials,1792 Whitmire St,38771.84
+Materials,193 Rena Dr,45583.45
+Materials,193 Woodland Dr.,12906.69
+Materials,1939 Westridge,16781.54
+Materials,201 Forest Dr,102.16
+Materials,2038 22nd Ct S,532.46
+Materials,205 Mashburn Dr,452.74
+Materials,2123 28th Ave N,298.43
+Materials,2308 Kala St,51589.09
+Materials,2401 16th St,407.71
+Materials,2513 7th St NE,19373.97
+Materials,2521 Arcadia Place,4036.45
+Materials,270 Myers Rd,656.82
+Materials,2701 Eastern Valley Rd,42610.62
+Materials,2720 Shoemaker St,477.25
+Materials,2825 2nd Way NW,33207.47
+Materials,294 Heritage Dr,1841.25
 Materials,300 Huntsville Ave,291.21
-Materials,3009 Virginia Dr,43245.48
-Materials,3012 2nd St,33943.13
-Materials,3018 Old Stone Dr,22226.09
-Materials,3023 Massey Rd Unit F,10301.54
-Materials,3032 Tersea Dr.,22915.04
-Materials,3050 Weatherford Dr,8315.03
-Materials,308 Killough Dr,45406.77
-Materials,308 Willow Glen ct,22634.68
-Materials,312 Lehigh Rd,46713.18
-Materials,312 Orchid Rd,23423.99
-Materials,316 Gemini Cir,21906.44
+Materials,3012 2nd St,4434.32
+Materials,308 Killough Dr,49335.49
+Materials,312 Lehigh Rd,2059.96
+Materials,316 Gemini Cir,22126.17
 Materials,316 Willow Glen Ct,24185.79
-Materials,322 Cherokee Dr.,66651.69
-Materials,Total for 322 Cherokee Drive,66651.69
-Materials,324 4th St. N,23302.88
-Materials,3249 Wagon Gap Trail,29574.04
-Materials,3348 Overton Rd,45198.31
-Materials,335 Co Rd 1130,17003.61
-Materials,3372 Wood Drive Cir.,17512.82
-Materials,3409 Crosscreek Cir,16004.97
-Materials,3512 Nazha Cir,38277.92
-Materials,3535 Deerfield Dr,30589.46
-Materials,354 Highland Park Dr.,55364.34
-Materials,3618 Haven View Cir,22346.52
+Materials,3348 Overton Rd,4470.07
+Materials,335 Co Rd 1130,917.03
+Materials,3618 Haven View Cir,4720.46
 Materials,3834 Highway 11,24331.36
-Materials,3845 Nowlin Rd SW,37014.39
-Materials,39 Polly Ridge Rd,25130.75
-Materials,3926 Valley Bend Dr.,22240.41
-Materials,396 Union Station Way,3935.52
-Materials,40 Clearview Rd,10876.14
-Materials,4004 Saddle Run Cir,13992.56
-Materials,4032 Middle Ave,19974.36
-Materials,4038 Ida Ln,5383.76
-Materials,4042 Jubille ln,6182.33
-Materials,405 Art Hanes Blvd,46963.16
-Materials,411 Woodward Rd.,40019.5
-Materials,413 Popler Ridge,666.81
-Materials,424 Co Rd 3150,126929.33
+Materials,4038 Ida Ln,5615.71
+Materials,424 Co Rd 3150,102000.75
 Materials,4248 Milner Rd E,520.45
-Materials,4358 Oak St,35753.37
-Materials,4433 Woodland Hills,38144.36
-Materials,445 Annie Lee Rd,13804.91
+Materials,440 Woodland Ct NE,853.93
 Materials,4461 Parkwood Cir,29268.32
-Materials,45 Ridgefield Ln,3326.18
 Materials,450 Doss Ferry Pkwy,1855.68
-Materials,4533 Oak Dr,26522.65
-Materials,4652 Clairmont Ave,28472.74
-Materials,4924 Branch Mill Cir,145890.92
-Materials,496 Springdale Rd.,6175.15
-Materials,500 Lance Way,21434.87
-Materials,501 Cheri Ln,7383.43
-Materials,5013 knollview cir,40192.24
-Materials,5039 Vernon St,14500.17
-Materials,504 Lance Way,22955.39
+Materials,4924 Branch Mill Cir,38425.6
+Materials,501 Cheri Ln,954.23
 Materials,505 Sunhill Rd,39674.66
 Materials,508 Tambay Dr,26273.28
-Materials,509 Lansdowne Pl,8667.54
-Materials,510 Bennett Dr.,16654.15
-Materials,5130 Briarwood Cir,8881.19
-Materials,5136 Goldmar Dr,25839.72
-Materials,5150 Hickory Dr NE,12484.07
-Materials,517 10th Ave.,16025.06
-Materials,521 Mountain Dr,32857.23
-Materials,5230 willow Ridge Dr,11450.06
-Materials,5239 Old Springville Rd,843.56
-Materials,5245 Old Springville Rd,297.03
-Materials,5278 Willow Ridge Ln,20117.08
-Materials,532 Hickory St,32381.06
-Materials,533 River Crest Way,4326.26
-Materials,533 Rollingwood Rd,27655.64
-Materials,5364 Balboa Ave,10174.98
-Materials,537 Fox Run,4092.27
-Materials,5381 Park Side Cir,10316.09
-Materials,5409 Nottinghill Dr,7486.18
-Materials,5427 Reese Ln,26157.57
-Materials,5445 Nottinghill Dr,11387.33
-Materials,5447 Nottinghill Dr,12337.98
-Materials,5536 Cheryl Dr.,9214.02
-Materials,5551 Timber Hills,47465.23
-Materials,5557 Dewey Heights Rd,22690.64
-Materials,5557 Dry Creek Rd,52405.37
-Materials,5609 Ridgeview Dr,157364.95
-Materials,5719 Park Side Rd,10391.81
-Materials,5720 33rd St. N,16417.33
-Materials,5731 Hickory Ct.,15638.97
-Materials,5741 Oakhill Dr,18473.08
-Materials,5751 Henry Black Dr.,23481.84
-Materials,5755 Cheryl Dr,45416.76
-Materials,580 Highland Ln.,3220.61
-Materials,5872 Janet Dr.,10713.57
-Materials,5874 Dogwood Cir,21776.56
-Materials,588 Russet Bend Dr,22714.48
-Materials,5912 Nuthatch Cir,21170.76
-Materials,5913 Southhall Rd,40847.58
-Materials,5929 Cheryl Dr,18392.86
-Materials,5956 Creekwood Rd,20432.84
-Materials,6022 Springville Rd,2500.0
-Materials,606 Greenwood Dr,16110.37
-Materials,609 Chesser Ct,11883.59
-Materials,6134 Townhee Dr,16434.75
-Materials,620 Ridgefield Cove,8682.63
-Materials,6202 Waterford Pl,31223.54
-Materials,6212 Kestral View Rd,14514.84
-Materials,6251 Keith Rd,22835.16
-Materials,6269 Renda Cir,19876.51
+Materials,5239 Old Springville Rd,305.14
+Materials,5278 Willow Ridge Ln,1615.45
+Materials,533 River Crest Way,9976.59
+Materials,5364 Balboa Ave,12643.21
+Materials,5400 J R Dr,39.56
+Materials,5427 Reese Ln,2929.05
+Materials,5445 Nottinghill Dr,53.82
+Materials,5551 Timber Hills,26903.84
+Materials,5557 Dry Creek Rd,352.97
+Materials,5609 Ridgeview Dr,62611.89
+Materials,5874 Dogwood Cir,22876.25
 Materials,6279 Tyler Loop Rd,19023.84
-Materials,629 Shadywood Ln,34733.04
-Materials,63 Avery Hancock Dr,23837.74
-Materials,636 Mermont Dr.,3066.26
-Materials,636 Paden Dr,53543.14
-Materials,637 Vaughn Cir.,26729.53
-Materials,640 Griffin Rd,48745.42
-Materials,6435 Freda Dr.,14402.06
-Materials,645 Vaughn Cir,22537.95
-Materials,6451 Freda Dr,25454.99
-Materials,6521 Happy Hollow Rd,52449.01
-Materials,6556 Murphree Cir,22986.26
-Materials,6556 Murphree Cir 2,6391.65
-Materials,6591 S Chalkville Rd,33935.23
-Materials,6602 Davidson Rd,3614.48
-Materials,6750 Heaton Manor,3043.37
-Materials,6765 Crossbrook Ln,4951.47
-Materials,6790 Paradise Cir,38832.32
-Materials,6801 Brittany Pl,23285.98
-Materials,6816 Brittany Pl,18186.27
-Materials,690 Idlewild Cir,28751.78
-Materials,6928 Woodvale Ln,20985.86
-Materials,6968 McFrancis Rd,25454.71
+Materials,640 Griffin Rd,2879.39
 Materials,7012 Shady Oaks Ln,6584.73
-Materials,704 Julia Cir,261.87
-Materials,704 Truss Ferry Rd,35943.77
-Materials,706 Berkley Dr,53848.77
-Materials,7093 Old Dixiana Rd.,19241.93
-Materials,7104 Claymont Dr,30481.91
-Materials,7121 Goodner Mtn. Rd,23286.09
-Materials,717 Jackson Cir.,568.51
-Materials,720 Darlene Dr,38255.04
-Materials,7218 Highway 75,17250.74
-Materials,726 argo margret,27.57
-Materials,75 Starlite Dr,10146.77
-Materials,7504 Spencer Ln,17576.88
-Materials,7510 Arrowhead Ln,5034.32
+Materials,706 Berkley Dr,6843.95
+Materials,7510 Arrowhead Ln,68.69
 Materials,7514 Lake Vista Dr,725.55
-Materials,7541 Carriage Cove,30828.01
-Materials,7624 Happy Hollow Rd,10863.42
-Materials,7729 Shriner Dr.,13304.15
-Materials,8056 Carrington Dr,2456.43
-Materials,808 Hillview Dr,35035.6
-Materials,819 Sherwood Forest Dr,21885.41
-Materials,828 Jeffrey Ln,21138.08
-Materials,8304 5th Ave. S.,36822.2
-Materials,8313 Farley Ave.,29120.62
-Materials,832 Zellmark Dr,12361.89
-Materials,8491 Clayton Cove,26705.66
-Materials,8495 Clayton Cove,31202.95
+Materials,7624 Happy Hollow Rd,19201.72
+Materials,8056 Carrington Dr,1650.67
+Materials,828 Jeffrey Ln,27110.98
 Materials,8516 Highland Trace,2278.87
-Materials,867 Sandlin Dr.,19084.22
-Materials,89 Lakshore Rd,45455.12
-Materials,90 Buddy Ln,12393.85
-Materials,909 Winchester Cir,21422.45
-Materials,911 Bagley Ln.,32225.53
-Materials,915 Rose Dr.,35874.01
-Materials,920 Wear Dr,15174.81
-Materials,925 1st Ave,15113.27
-Materials,9311 Dunnavant Valley Rd,68161.94
-Materials,936 Kathryne Cir,11060.02
-Materials,9389 Central Rd,37062.78
-Materials,939 Gene Reed Rd,4936.76
-Materials,General,1276.26
-Materials,Joe Mangione,9599.65
-Materials,Logan Pate,0.84
-Materials,Office,11909.24
-Materials,Trade Flow,27000.09
-Materials,Not specified,11811.68
-Meals,Office,12873.89
-Meals,Not specified,50791.46
-Mortgage Payment,1412 13th Terrace.,8176.51
-Mortgage Payment,1449 Paragon Prkwy,5172.1
-Mortgage Payment,217 Kings Crest,21337.68
-Mortgage Payment,2928 Floyd Bradford Rd,12691.16
-Mortgage Payment,3009 Virginia Dr,3926.99
-Mortgage Payment,5913 Southhall Rd,4499.36
-Mortgage Payment,606 Greenwood Dr,2653.85
-Mortgage Payment,636 Paden Dr,8549.48
-Movers,2454 Hampstead Dr,200.0
-Movers,5609 Ridgeview Dr,2000.0
-Movers,690 Idlewild Cir,270.0
-Office cleaning,7510 Arrowhead Ln,130.0
-Office cleaning,Office,15760.0
-Office cleaning,Not specified,8610.0
-Office Expenses,Office,423.7
-Office Expenses,Not specified,1566.93
-Office Mortgage Payment,7510 Arrowhead Ln,15000.0
-Office Mortgage Payment,Office,20000.0
-Office Mortgage Payment,Not specified,5000.0
-Office Supplies,150 Beaver Ridge,802.16
-Office Supplies,1809 Tin Valley Cir,1517.38
-Office Supplies,4032 Middle Ave,837.08
-Office Supplies,5445 Nottinghill Dr,21.55
-Office Supplies,Company shirts,197.93
-Office Supplies,Logan Pate,948.69
-Office Supplies,Office,43860.31
-Office Supplies,checks,334.85
-Office Supplies,security cameras,339.29
-Office Supplies,Not specified,28159.33
-Owner Distribution,Morgan,6000.0
-Owner Distribution,Office,150000.0
-Owner Distribution,Not specified,1578759.91
-Parking,1409 High Point Terrace,6.0
-Parking,Not specified,17.95
-Payroll,1014 Mtn. Laurel Cir.,20.28
-Payroll,7541 Carriage Cove,175.0
-Payroll,Chase Smith,10762.75
-Payroll,Logan Pate,16610.22
-Payroll,Office,536125.11
-Payroll,Not specified,888682.4
-Payroll Expenses,Office,3866.82
-Payroll Expenses,Not specified,3530.12
-Payroll Tax Expenses,Office,158908.72
-Payroll Tax Expenses,Not specified,209576.49
-Permits,1008 Mtn. Oaks Dr.,1632.25
-Permits,103 Mack Roper Rd.,1066.0
-Permits,1104 Tulip Cir,1904.65
-Permits,120 Kay St.,92.0
-Permits,122 Heather Ridge Dr.,2228.0
-Permits,151 2nd St. N,2484.0
-Permits,1546 Lacie Dr,1891.4
-Permits,1608 Kestwick Dr,3291.31
-Permits,1710 Greenbriar Dr,1260.0
-Permits,1761 Cornwall Dr.,1545.25
-Permits,1788 Whitmire St,1459.79
-Permits,1792 Whitmire St,5554.49
-Permits,1909 Thornhill Rd.,988.0
-Permits,193 Rena Dr,1655.0
-Permits,205 Mashburn Dr,1195.78
-Permits,2056 Self Ln.,174.0
-Permits,214 Stone Ridge Trail,100.0
-Permits,2232 Garland Dr,339.57
-Permits,2234 Pup Run,2422.0
-Permits,251 Pineview Cir,93.0
-Permits,3009 Virginia Dr,1838.0
-Permits,3032 Tersea Dr.,1415.0
-Permits,308 Willow Glen ct,1554.0
-Permits,324 4th St. N,1100.0
-Permits,3618 Haven View Cir,3074.0
+Materials,9311 Dunnavant Valley Rd,2874.93
+Materials,Office,1933.83
+Materials,Not specified,4379.12
+Materials,Total,1188777.37
+Meals,Office,322.69
+Meals,Not specified,3817.26
+Meals,Total,4139.95
+Office cleaning,Office,3430
+Office cleaning,Not specified,3060
+Office cleaning,Total,6490
+Office Expenses,Office,123.58
+Office Expenses,Not specified,23.62
+Office Expenses,Total,147.2
+Office Supplies,Office,14709.8
+Office Supplies,Not specified,3927.77
+Office Supplies,Total,18637.57
+Owner Distribution,Not specified,415000
+Owner Distribution,Total,415000
+Parking,Not specified,2
+Parking,Total,2
+Payroll,Office,142096.2
+Payroll,Not specified,25553.87
+Payroll,Total,167650.07
+Payroll Expenses,Office,1213.72
+Payroll Expenses,Not specified,74.63
+Payroll Expenses,Total,1288.35
+Payroll Tax Expenses,Office,60329.14
+Payroll Tax Expenses,Not specified,387.52
+Payroll Tax Expenses,Total,60716.66
+Permits,193 Rena Dr,1655
 Permits,3834 Highway 11,1836.91
-Permits,396 Union Station Way,633.24
-Permits,4652 Clairmont Ave,1775.0
-Permits,505 Sunhill Rd,1800.0
-Permits,508 Tambay Dr,2229.0
-Permits,521 Mountain Dr,1237.5
-Permits,5230 willow Ridge Dr,136.5
-Permits,5427 Reese Ln,1932.0
-Permits,5720 33rd St. N,1690.0
-Permits,5872 Janet Dr.,1252.0
-Permits,5913 Southhall Rd,2332.5
-Permits,6251 Keith Rd,2177.48
-Permits,6801 Brittany Pl,1967.0
-Permits,704 Truss Ferry Rd,256.0
-Permits,720 Darlene Dr,1270.0
-Permits,7218 Highway 75,133.8
-Permits,8313 Farley Ave.,1355.0
-Permits,867 Sandlin Dr.,120.0
-Permits,915 Rose Dr.,1570.0
-Permits,Trade Flow,145.3
-Permits,Not specified,2718.12
-Phone services,Office,6548.14
-Phone services,Not specified,1445.11
-Photography,106 Wildwood Dr.,10.0
-Photography,109 Spring Glade Cir,100.0
-Photography,1118 Westridge Cir.,200.0
-Photography,1132 Martinwood Ln.,300.0
-Photography,1158 Holt Cir.,100.0
-Photography,120 Kay St.,100.0
-Photography,128 Maple Street,100.0
-Photography,12938 Ann Marie Dr,115.0
-Photography,1341 Hillwood Dr.,100.0
-Photography,1401 Oak Terr.,115.0
-Photography,1508 4th St. NW,200.0
-Photography,155 Treymoore Dr,130.0
-Photography,1708 Molly Dr.,100.0
-Photography,1710 Greenbriar Dr,475.0
-Photography,17502 HWY 174,100.0
-Photography,1831 Otis Cir.,50.0
-Photography,2116 Lakeview Trace,188.0
-Photography,214 Stone Ridge Trail,115.0
-Photography,245 Observatory Dr,100.0
-Photography,Total for 215 Observatory Dr,100.0
-Photography,216 Handley Rd.,100.0
-Photography,217 Kings Crest,155.0
-Photography,2200 Dogwood Trail,130.0
-Photography,2364 Rocky Ridge Rd,175.0
-Photography,251 Pineview Cir,100.0
-Photography,2636 Dennise Rd.,115.0
-Photography,300 42nd Ave.,130.0
-Photography,411 Woodward Rd.,130.0
-Photography,500 Lance Way,230.0
-Photography,5013 knollview cir,130.0
-Photography,504 Lance Way,130.0
-Photography,509 Lansdowne Pl,115.0
-Photography,5130 Briarwood Cir,100.0
-Photography,517 10th Ave.,100.0
-Photography,5230 willow Ridge Dr,100.0
-Photography,580 Highland Ln.,100.0
-Photography,5872 Janet Dr.,300.0
-Photography,5929 Cheryl Dr,100.0
-Photography,5956 Creekwood Rd,100.0
-Photography,620 Ridgefield Cove,100.0
-Photography,6251 Keith Rd,271.0
-Photography,629 Shadywood Ln,115.0
-Photography,636 Mermont Dr.,100.0
-Photography,636 Paden Dr,150.0
-Photography,637 Vaughn Cir.,130.0
-Photography,6451 Freda Dr,130.0
-Photography,6602 Davidson Rd,100.0
-Photography,6750 Heaton Manor,100.0
-Photography,6765 Crossbrook Ln,130.0
-Photography,70 Sunset Strip,175.0
-Photography,704 Truss Ferry Rd,115.0
-Photography,7121 Goodner Mtn. Rd,615.0
-Photography,720 Darlene Dr,115.0
-Photography,7218 Highway 75,100.0
-Photography,75 Starlite Dr,115.0
-Photography,7536 Arrowhead Ln (deleted),175.0
-Photography,808 Hillview Dr,115.0
-Photography,8304 5th Ave. S.,115.0
-Photography,8313 Farley Ave.,100.0
-Photography,832 Zellmark Dr,100.0
-Photography,911 Bagley Ln.,165.0
-Photography,915 Rose Dr.,125.0
-Photography,939 Gene Reed Rd,415.0
-Photography,Office,230.0
-Photography,Not specified,1110.0
-Post cards,Office,31534.72
-Post cards,Not specified,36108.48
-Professional Fees,1008 Springhill Ln,2500.0
-Professional Fees,1337 Wilshire Dr.,1300.0
-Professional Fees,1909 Thornhill Rd.,200.0
-Professional Fees,2022 taxes,300.0
-Professional Fees,2038 22nd Ct S,522.11
-Professional Fees,251 Pineview Cir,1000.0
-Professional Fees,424 Co Rd 3150,650.0
-Professional Fees,4924 Branch Mill Cir,2500.0
-Professional Fees,Office,13900.0
-Professional Fees,Post Cards,100.0
-Professional Fees,Not specified,16244.83
-Profit Share,3512 Nazha Cir,61991.57
-Profit Share,3926 Valley Bend Dr.,22330.1
-Property Insurance,10 Anderson Mtn Dr,1436.29
-Property Insurance,1008 Springhill Ln,3043.5
-Property Insurance,1014 Mtn. Laurel Cir.,1686.0
+Permits,505 Sunhill Rd,1800
+Permits,508 Tambay Dr,2229
+Permits,Not specified,135.14
+Permits,Total,7656.05
+Phone services,Office,1580.43
+Phone services,Total,1580.43
+Professional Fees,Office,13500
+Professional Fees,Not specified,8511.89
+Professional Fees,Total,22011.89
+Property Insurance,10 Anderson Mtn Dr,-827.87
 Property Insurance,1017 Burnt Pine Ln,560.97
-Property Insurance,103 Mack Roper Rd.,1798.0
-Property Insurance,106 Wildwood Dr.,2666.5
-Property Insurance,109 Spring Glade Cir,461.75
-Property Insurance,1118 Westridge Cir.,917.5
 Property Insurance,112 White Cap Cir,1128.15
-Property Insurance,1132 Martinwood Ln.,838.5
-Property Insurance,120 Kay St.,1273.0
-Property Insurance,128 Maple Street,991.5
 Property Insurance,1309 Springville Rd,1333.08
-Property Insurance,1324 Bardswood Terrace,2149.0
-Property Insurance,1337 Wilshire Dr.,1597.5
-Property Insurance,1341 Hillwood Dr.,1187.0
-Property Insurance,141 Deer Park Dr,951.43
-Property Insurance,1504 8th St NW,590.42
+Property Insurance,141 Deer Park Dr,-566.07
 Property Insurance,1645 Barrington Ln NE,1335.15
 Property Insurance,1676 Five Points Rd,1008.09
-Property Insurance,1703 Molly Cir.,867.5
-Property Insurance,1735 6th St. NW,1185.5
-Property Insurance,17502 HWY 174,1405.0
-Property Insurance,1831 Satterwhite St.,842.5
-Property Insurance,1909 Thornhill Rd.,867.5
-Property Insurance,1939 Westridge,400.0
-Property Insurance,1946 Seven Bark Ln.,1270.5
-Property Insurance,200 Saint John Dr.,1634.0
-Property Insurance,204 Lane Park Cir,1431.5
-Property Insurance,2056 Self Ln.,716.0
-Property Insurance,2123 28th Ave N,727.16
-Property Insurance,217 Kings Crest,4738.0
-Property Insurance,251 Pineview Cir,848.0
-Property Insurance,270 Myers Rd,1053.64
+Property Insurance,2038 22nd Ct S,795.25
+Property Insurance,2157 Parsons Dr,542.34
 Property Insurance,2825 2nd Way NW,929.43
-Property Insurance,2928 Floyd Bradford Rd,1071.5
-Property Insurance,294 Heritage Dr,540.0
-Property Insurance,3009 Virginia Dr,691.5
-Property Insurance,3023 Massey Rd Unit F,400.0
 Property Insurance,308 Killough Dr,1078.47
 Property Insurance,316 Gemini Cir,788.67
 Property Insurance,3215 Fortner Ln,1051.56
-Property Insurance,3249 Wagon Gap Trail,8412.3
-Property Insurance,3372 Wood Drive Cir.,585.0
-Property Insurance,3512 Nazha Cir,1754.0
-Property Insurance,3618 Haven View Cir,1187.0
 Property Insurance,380 Myrick Rd,1261.67
-Property Insurance,3926 Valley Bend Dr.,1165.0
 Property Insurance,4038 Ida Ln,1812.29
 Property Insurance,440 Woodland Ct NE,633.42
 Property Insurance,4461 Parkwood Cir,1104.35
 Property Insurance,4793 Longmeadow Dr,675.86
-Property Insurance,4924 Branch Mill Cir,-78.82
-Property Insurance,500 Lance Way,1046.0
 Property Insurance,508 Tambay Dr,1378.62
-Property Insurance,5130 Briarwood Cir,1935.0
 Property Insurance,533 River Crest Way,1224.41
 Property Insurance,5364 Balboa Ave,582.71
 Property Insurance,5400 J R Dr,728.64
 Property Insurance,578 Shades Crest Rd,1456.25
-Property Insurance,580 Highland Ln.,664.5
 Property Insurance,5874 Dogwood Cir,966.69
-Property Insurance,5913 Southhall Rd,2148.0
-Property Insurance,6251 Keith Rd,1471.5
-Property Insurance,636 Paden Dr,3059.51
-Property Insurance,6435 Freda Dr.,992.0
-Property Insurance,690 Idlewild Cir,400.0
-Property Insurance,6968 McFrancis Rd,1220.5
-Property Insurance,7218 Highway 75,2036.0
-Property Insurance,7360 Old Acton Rd,558.75
-Property Insurance,8304 5th Ave. S.,1046.0
-Property Insurance,8313 Farley Ave.,716.0
-Property Insurance,832 Zellmark Dr,3039.25
-Property Insurance,915 Rose Dr.,967.5
-Property Insurance,920 Wear Dr,1113.24
-Property Insurance,9311 Dunnavant Valley Rd,724.0
-Property Insurance,Not specified,50985.27
-Property Purchase,10 Anderson Mtn Dr,77483.58
-Property Purchase,1008 Mtn. Oaks Dr.,156450.45
-Property Purchase,1008 Springhill Ln,100805.76
-Property Purchase,1014 Mtn. Laurel Cir.,181183.67
+Property Insurance,82 Co Rd 874,825.93
+Property Insurance,Not specified,17539.07
+Property Insurance,Total,39347.13
 Property Purchase,1017 Burnt Pine Ln,28163.01
-Property Purchase,103 Kingstown Cir,180841.14
-Property Purchase,103 Mack Roper Rd.,211015.62
-Property Purchase,108 Pine Tree Cir,163716.96
-Property Purchase,108 Southview Dr,63024.73
-Property Purchase,109 Westchester Dr.,131374.32
-Property Purchase,1104 Tulip Cir,37072.07
-Property Purchase,112 Portsouth Ln,42026.27
 Property Purchase,112 White Cap Cir,39353.06
-Property Purchase,1127 13th St N,61066.25
-Property Purchase,1132 Martinwood Ln.,126153.53
-Property Purchase,115 Meadowgreen Rd,125771.53
-Property Purchase,1158 Holt Cir.,171397.09
-Property Purchase,117 Lynn Dr.,75000.0
-Property Purchase,120 Kay St.,26512.91
-Property Purchase,122 Heather Ridge Dr.,205000.0
-Property Purchase,12938 Ann Marie Dr,35869.89
-Property Purchase,13 Royal Coach Cir,75142.5
-Property Purchase,1308 34th St,103286.0
 Property Purchase,1309 Springville Rd,5086.2
-Property Purchase,131 Silver Ln,16936.69
-Property Purchase,1310 Old Cahaba Cove,175000.0
-Property Purchase,1313 McCoy St,1877.62
-Property Purchase,132 Rosebud Rd,46218.23
-Property Purchase,1345 Winola Ln,128906.75
-Property Purchase,1359 Annie Lee Rd,221271.64
-Property Purchase,1409 High Point Terrace,102000.0
-Property Purchase,1412 13th Terrace.,206363.59
-Property Purchase,1437 Ware Blvd,73017.25
-Property Purchase,149 Winterhaven Dr,126089.09
-Property Purchase,150 Beaver Ridge,226876.65
-Property Purchase,1504 8th St NW,8857.5
-Property Purchase,1508 4th St. NW,91063.32
-Property Purchase,151 2nd St. N,116029.27
-Property Purchase,1533 Choctaw Dr,63552.09
-Property Purchase,1557 Napoleon Dr,45288.62
-Property Purchase,157 Sweetgum Dr,76460.59
-Property Purchase,1608 Kestwick Dr,68267.12
-Property Purchase,1609 Sonia Dr,50100.0
-Property Purchase,1612 Big Mtn. Dr.,80000.0
-Property Purchase,163 Sunrise Dr,15843.24
 Property Purchase,1645 Barrington Ln NE,3707.78
 Property Purchase,1676 Five Points Rd,6267.82
-Property Purchase,1703 Molly Cir.,80725.69
-Property Purchase,1708 Molly Dr.,81211.35
-Property Purchase,1710 Greenbriar Dr,126337.95
-Property Purchase,1713 Molly Dr.,45412.5
-Property Purchase,1735 6th St. NW,45835.57
-Property Purchase,1761 Cornwall Dr.,256152.8
-Property Purchase,1766 Brookside Rd,72955.0
-Property Purchase,1788 Whitmire St,86722.92
-Property Purchase,1790 Ray Wyatt Rd,91662.0
-Property Purchase,1791 Vestaview Ln,105610.5
-Property Purchase,180 Charleston Way,95337.11
-Property Purchase,1809 Tin Valley Cir,126316.5
-Property Purchase,1824 Otis Rd,129125.95
-Property Purchase,1831 Otis Cir.,139245.1
-Property Purchase,1908 Heritage Rd,120000.0
-Property Purchase,1929 11th St NW,2034.33
 Property Purchase,193 Rena Dr,1547.62
-Property Purchase,1951 Croydon Cir,151357.03
-Property Purchase,20001 Rabbit Ridge,45986.06
-Property Purchase,Total for 20001 Rabbit Ridge Rd,45986.06
-Property Purchase,201 Forest Dr,105466.99
-Property Purchase,2038 22nd Ct S,43551.86
-Property Purchase,204 Lane Park Cir,5000.0
-Property Purchase,2050 Montreat Pkwy Unit A,96443.39
-Property Purchase,2056 Self Ln.,74318.32
-Property Purchase,206 Annetta Cir,120985.09
-Property Purchase,2073 Russet Woods Trl,198000.0
-Property Purchase,2116 Lakeview Trace,489913.73
-Property Purchase,212 Dexter Ct.,105961.55
-Property Purchase,2123 28th Ave N,3590.5
-Property Purchase,214 Stone Ridge Trail,118065.55
-Property Purchase,2146 Rock Mtn. Rd,70000.0
-Property Purchase,Total for 2146 Rock Mtn. Rd.,70000.0
-Property Purchase,215 Sunrise Dr.,141604.31
-Property Purchase,216 Handley Rd.,131157.87
-Property Purchase,2173 Chapel Hill Rd,140562.1
-Property Purchase,2200 Dogwood Trail,150000.0
-Property Purchase,2232 Garland Dr,23274.61
-Property Purchase,2236 Carl Jones Rd,9148.9
-Property Purchase,232 Redstone way,75961.09
-Property Purchase,2360 Grayson Valley Dr,42221.25
-Property Purchase,2364 Rocky Ridge Rd,56662.31
-Property Purchase,239 Warwick Ln,202908.56
-Property Purchase,2401 16th St,120000.0
-Property Purchase,2406 Hampstead Dr.,71091.32
-Property Purchase,2432 Blueberry Dr.,156475.75
-Property Purchase,2454 Hampstead Dr,77167.65
-Property Purchase,251 Pineview Cir,40576.71
-Property Purchase,2512 October Dr,59179.5
+Property Purchase,2157 Parsons Dr,35326.68
 Property Purchase,2513 7th St NE,21042.18
 Property Purchase,2521 Arcadia Place,109092.55
-Property Purchase,2569 Hampstead Dr,84253.65
-Property Purchase,2636 Dennise Rd.,177461.12
-Property Purchase,270 Myers Rd,9384.42
-Property Purchase,2701 Eastern Valley Rd,347769.0
-Property Purchase,2720 Shoemaker St,90302.52
-Property Purchase,2736 Darlene Cir,85089.32
-Property Purchase,2755 Austin Ln,220195.31
+Property Purchase,2701 Eastern Valley Rd,347769
 Property Purchase,2825 2nd Way NW,19282.53
-Property Purchase,2928 Floyd Bradford Rd,380000.0
-Property Purchase,294 Heritage Dr,43659.25
-Property Purchase,300 42nd Ave.,210983.9
-Property Purchase,300 Huntsville Ave,89398.0
-Property Purchase,3009 Virginia Dr,140938.73
-Property Purchase,3012 2nd St,104819.08
-Property Purchase,3018 Old Stone Dr,8470.06
-Property Purchase,3023 Massey Rd Unit F,10794.69
-Property Purchase,3032 Tersea Dr.,133601.9
+Property Purchase,300 Huntsville Ave,89398
 Property Purchase,308 Killough Dr,643.13
-Property Purchase,308 Willow Glen ct,113862.6
-Property Purchase,309 Gemini Cir,116041.46
-Property Purchase,312 Lehigh Rd,48361.54
-Property Purchase,312 Orchid Rd,15666.25
 Property Purchase,316 Gemini Cir,22047.47
 Property Purchase,316 Willow Glen Ct,173449.05
-Property Purchase,324 4th St. N,151000.0
-Property Purchase,3249 Wagon Gap Trail,46981.08
-Property Purchase,3348 Overton Rd,83706.79
-Property Purchase,335 Co Rd 1130,1030.37
-Property Purchase,3535 Deerfield Dr,22187.63
-Property Purchase,354 Highland Park Dr.,93639.6
 Property Purchase,380 Myrick Rd,67393.94
-Property Purchase,3834 Highway 11,106341.14
-Property Purchase,3845 Nowlin Rd SW,220934.26
-Property Purchase,39 Polly Ridge Rd,35629.31
-Property Purchase,3926 Valley Bend Dr.,20000.0
-Property Purchase,396 Union Station Way,140472.55
-Property Purchase,40 Clearview Rd,126177.31
 Property Purchase,4038 Ida Ln,88739.2
 Property Purchase,440 Woodland Ct NE,24136.25
 Property Purchase,4461 Parkwood Cir,40515.65
-Property Purchase,45 Ridgefield Ln,231239.4
 Property Purchase,4545 Shocco Springs Rd,131552.94
-Property Purchase,4652 Clairmont Ave,229134.94
 Property Purchase,4793 Longmeadow Dr,34279.15
-Property Purchase,4924 Branch Mill Cir,172657.56
-Property Purchase,500 Lance Way,169442.7
-Property Purchase,501 Cheri Ln,40942.7
-Property Purchase,504 Lance Way,186003.81
 Property Purchase,505 Sunhill Rd,-1456.36
-Property Purchase,509 Lansdowne Pl,321941.89
-Property Purchase,5100 Rick Dr.,110000.0
-Property Purchase,5130 Briarwood Cir,110271.9
-Property Purchase,5136 Goldmar Dr,146036.98
-Property Purchase,5150 Hickory Dr NE,111085.76
-Property Purchase,517 10th Ave.,86475.67
-Property Purchase,517 Kings Crest,365127.17
-Property Purchase,5201 Mike Dr.,136130.12
-Property Purchase,5230 willow Ridge Dr,115375.79
-Property Purchase,5278 Willow Ridge Ln,120000.0
-Property Purchase,532 Hickory St,1531.89
 Property Purchase,533 River Crest Way,61184.14
-Property Purchase,533 Rollingwood Rd,45896.09
 Property Purchase,5364 Balboa Ave,4236.81
-Property Purchase,5381 Park Side Cir,25868.68
-Property Purchase,5409 Nottinghill Dr,74135.6
-Property Purchase,5415 Nottinghill Dr.,85877.58
-Property Purchase,5427 Reese Ln,75302.28
-Property Purchase,5445 Nottinghill Dr,81047.6
-Property Purchase,5447 Nottinghill Dr,70719.32
-Property Purchase,5536 Cheryl Dr.,120396.84
-Property Purchase,5609 Ridgeview Dr,84144.97
-Property Purchase,5720 33rd St. N,72269.08
-Property Purchase,5741 Oakhill Dr,22443.12
-Property Purchase,5755 Cheryl Dr,80129.75
+Property Purchase,5400 J R Dr,31903.24
 Property Purchase,578 Shades Crest Rd,55864.72
-Property Purchase,580 Highland Ln.,40672.0
 Property Purchase,5874 Dogwood Cir,25914.39
-Property Purchase,5913 Southhall Rd,61068.38
-Property Purchase,5970 Dewey Heights Rd,130484.42
 Property Purchase,601 Mermont Dr,1284.49
-Property Purchase,609 Chesser Ct,47718.68
-Property Purchase,613 Sundale Dr,95794.05
-Property Purchase,6134 Townhee Dr,175000.0
-Property Purchase,620 Ridgefield Cove,226758.35
-Property Purchase,6202 Waterford Pl,2633.44
-Property Purchase,6212 Kestral View Rd,22136.89
-Property Purchase,63 Avery Hancock Dr,48028.21
-Property Purchase,636 Mermont Dr.,291286.61
-Property Purchase,637 Vaughn Cir.,269921.3
-Property Purchase,645 Vaughn Cir,140518.2
-Property Purchase,6451 Freda Dr,144038.72
-Property Purchase,6521 Happy Hollow Rd,175085.12
-Property Purchase,6591 S Chalkville Rd,136463.0
-Property Purchase,6594 Womack RD,140610.1
-Property Purchase,6750 Heaton Manor,176527.84
-Property Purchase,6765 Crossbrook Ln,121523.39
-Property Purchase,6790 Paradise Cir,27879.54
-Property Purchase,6801 Brittany Pl,26551.94
-Property Purchase,6816 Brittany Pl,111387.01
-Property Purchase,690 Idlewild Cir,3571.79
-Property Purchase,6928 Woodvale Ln,251369.75
-Property Purchase,704 Julia Cir,141761.12
-Property Purchase,704 Truss Ferry Rd,161169.38
-Property Purchase,7104 Claymont Dr,138583.93
-Property Purchase,7121 Goodner Mtn. Rd,175309.01
-Property Purchase,717 Jackson Cir.,58860.92
-Property Purchase,75 Starlite Dr,180733.85
-Property Purchase,7536 Old Acton Rd.,168263.42
 Property Purchase,7624 Happy Hollow Rd,156243.8
-Property Purchase,7729 Shriner Dr.,112000.0
-Property Purchase,808 Hillview Dr,60175.27
-Property Purchase,819 Sherwood Forest Dr,24525.69
+Property Purchase,82 Co Rd 874,45292.27
 Property Purchase,828 Jeffrey Ln,121821.36
-Property Purchase,8304 5th Ave. S.,66028.7
-Property Purchase,8313 Farley Ave.,55201.55
-Property Purchase,867 Sandlin Dr.,26147.64
-Property Purchase,89 Lakshore Rd,39217.67
-Property Purchase,90 Buddy Ln,53965.27
-Property Purchase,911 Bagley Ln.,150705.01
-Property Purchase,915 Rose Dr.,105003.88
-Property Purchase,925 1st Ave,161040.72
-Property Purchase,936 Kathryne Cir,-122570.18
-Property Purchase,936 Pineview Rd,81365.39
-Property Purchase,9389 Central Rd,160000.0
-Property Purchase,939 Gene Reed Rd,136029.96
-Property Purchase,Rocky Bldg,44238.25
-Property Purchase,Trade Flow,10000.0
+Property Purchase,Total,1791082.07
 Property taxes,10 Anderson Mtn Dr,1600.2
-Property taxes,108 Southview Dr,3237.5
 Property taxes,1557 Napoleon Dr,1955.21
-Property taxes,1788 Whitmire St,1523.31
-Property taxes,2116 Lakeview Trace,5404.17
-Property taxes,251 Pineview Cir,388.83
 Property taxes,424 Co Rd 3150,3316.04
 Property taxes,5557 Dry Creek Rd,1373.89
-Property taxes,Not specified,76622.47
-real estate expenses,3512 Nazha Cir,92.14
-real estate expenses,6022 Springville Rd,165.0
-real estate expenses,Office,370.0
-real estate expenses,Not specified,15735.35
-Referal Fee,1048 Gene Reed Rd,15000.0
+Property taxes,Not specified,2174.12
+Property taxes,Total,10419.46
+real estate expenses,Office,140
+real estate expenses,Not specified,1100
+real estate expenses,Total,1240
 Referal Fee,1504 8th St NW,3006.3
-Referal Fee,1604 Tahoe Rd,1000.0
-Referal Fee,1612 Big Mtn. Dr.,2000.0
-Referal Fee,205 Mashburn Dr,5000.0
-Referal Fee,2321 Royal Knoll Ln,25000.0
-Referal Fee,2736 Darlene Cir,5000.0
-Referal Fee,3249 Wagon Gap Trail,2000.0
-Referal Fee,3926 Valley Bend Dr.,3500.0
-Referal Fee,411 Woodward Rd.,20000.0
-Referal Fee,4358 Oak St,6000.0
-Referal Fee,504 Lance Way,2000.0
-Referal Fee,5929 Cheryl Dr,12500.0
-Referal Fee,6269 Renda Cir,20000.0
-Referal Fee,6790 Paradise Cir,1500.0
-Referal Fee,706 Berkley Dr,15000.0
-Referal Fee,9311 Dunnavant Valley Rd,5000.0
-Referal Fee,Not specified,10000.0
-Refunds,Not specified,-147.0
-Reimbursment,117 Lynn Dr.,-2015.0
-Reimbursment,14695 Hwy 75,4732.0
-Reimbursment,2146 Rock Mtn. Rd.,215.06
-Reimbursment,Total for 2146 Rock Mtn. Rd.,215.06
-Reimbursment,215 Sunrise Dr.,-84.27
-Reimbursment,322 Cherokee Dr.,142.0
-Reimbursment,Total for 322 Cherokee Drive,142.0
-Reimbursment,333 Orchid Rd,-59183.0
-Reimbursment,5912 Nuthatch Cir,75.0
-Reimbursment,6022 Springville Rd,-100922.92
-Reimbursment,Trade Flow,-3800.0
-Reimbursment,Not specified,3984.11
-Reinspection Fee,1437 Ware Blvd,350.0
-Reinspection Fee,1608 Kestwick Dr,75.0
-Reinspection Fee,5150 Hickory Dr NE,150.0
-Reinspection Fee,704 Truss Ferry Rd,25.0
-Service fees,Not specified,184.35
+Referal Fee,706 Berkley Dr,15000
+Referal Fee,Total,18006.3
 Silver Investment,Not specified,169326.34
-Staging and Interiors,10 Anderson Mtn Dr,3650.0
-Staging and Interiors,1008 Springhill Ln,6599.43
-Staging and Interiors,1125 Greystone Crest,2500.0
-Staging and Interiors,141 Deer Park Dr,3500.0
-Staging and Interiors,151 2nd St. N,4000.0
-Staging and Interiors,2038 22nd Ct S,2800.0
-Staging and Interiors,2401 16th St,3650.0
-Staging and Interiors,294 Heritage Dr,3000.0
-Staging and Interiors,3012 2nd St,3700.0
-Staging and Interiors,3023 Massey Rd Unit F,170.37
-Staging and Interiors,316 Willow Glen Ct,3650.0
-Staging and Interiors,3249 Wagon Gap Trail,3000.0
-Staging and Interiors,3348 Overton Rd,3548.89
-Staging and Interiors,3618 Haven View Cir,3000.0
-Staging and Interiors,4038 Ida Ln,3500.0
-Staging and Interiors,4461 Parkwood Cir,3650.0
-Staging and Interiors,4924 Branch Mill Cir,3900.0
-Staging and Interiors,5551 Timber Hills,3400.0
-Staging and Interiors,5557 Dry Creek Rd,1986.21
-Staging and Interiors,640 Griffin Rd,3900.0
-Staging and Interiors,706 Berkley Dr,3800.0
+Silver Investment,Total,169326.34
+Staging and Interiors,10 Anderson Mtn Dr,3650
+Staging and Interiors,141 Deer Park Dr,3500
+Staging and Interiors,2038 22nd Ct S,2800
+Staging and Interiors,2401 16th St,3650
+Staging and Interiors,294 Heritage Dr,3000
+Staging and Interiors,3012 2nd St,3700
+Staging and Interiors,316 Willow Glen Ct,3650
+Staging and Interiors,3618 Haven View Cir,3000
+Staging and Interiors,4038 Ida Ln,3500
+Staging and Interiors,4461 Parkwood Cir,3650
+Staging and Interiors,4924 Branch Mill Cir,3900
+Staging and Interiors,5551 Timber Hills,3400
+Staging and Interiors,640 Griffin Rd,3900
+Staging and Interiors,706 Berkley Dr,3800
 Staging and Interiors,8056 Carrington Dr,9388.33
-Staging and Interiors,9311 Dunnavant Valley Rd,3600.0
-Staging and Interiors,Not specified,6948.09
-Storage,322 Cherokee Dr.,414.9
-Storage,Total for 322 Cherokee Drive,414.9
-Storage,Trade Flow,34380.0
-Storage,Not specified,534.0
-Survey,1788 Whitmire St,1219.67
-Survey,193 Rena Dr,900.0
-Survey,508 Tambay Dr,750.0
-Survey,89 Lakshore Rd,2500.0
-Tax payments,2021 tax payments,321914.29
-Tax payments,2022 taxes,759455.28
-Tax payments,Payroll tax,1896.45
-Tax payments,Not specified,874412.0
-Telephone Expense,Not specified,3213.48
-Third Party Vendors,10 Anderson Mtn Dr,35156.48
-Third Party Vendors,1008 Mtn. Oaks Dr.,52851.94
-Third Party Vendors,1008 Springhill Ln,128250.94
-Third Party Vendors,1014 Mtn. Laurel Cir.,14913.76
-Third Party Vendors,1017 Burnt Pine Ln,6200.0
-Third Party Vendors,103 Kingstown Cir,18081.84
-Third Party Vendors,103 Mack Roper Rd.,20704.5
-Third Party Vendors,1037 Sharp Dr,25783.25
-Third Party Vendors,1048 Gene Reed Rd,5940.08
-Third Party Vendors,105 Kingstown Rd,23605.71
-Third Party Vendors,106 Wildwood Dr.,50550.89
-Third Party Vendors,107 Kingstown Cir,24435.2
-Third Party Vendors,108 Pine Tree Cir,20930.59
-Third Party Vendors,108 Southview Dr,37947.3
-Third Party Vendors,109 Spring Glade Cir,9841.6
-Third Party Vendors,109 Westchester Dr.,535.0
-Third Party Vendors,1104 Tulip Cir,28479.92
-Third Party Vendors,1118 Westridge Cir.,25469.0
-Third Party Vendors,112 Portsouth Ln,17285.75
-Third Party Vendors,112 White Cap Cir,10318.12
-Third Party Vendors,1125 Greystone Crest,68769.43
-Third Party Vendors,1132 Martinwood Ln.,16281.65
-Third Party Vendors,115 Meadowgreen Rd,8281.49
-Third Party Vendors,1158 Holt Cir.,2792.73
-Third Party Vendors,116 34th St N,18417.93
-Third Party Vendors,117 Lynn Dr.,4025.0
-Third Party Vendors,120 Cahaba Forest Dr,17134.8
-Third Party Vendors,120 Kay St.,28627.85
-Third Party Vendors,122 Heather Ridge Dr.,30230.16
-Third Party Vendors,1221 Rumson Dr,24133.11
-Third Party Vendors,1265 Pine Tree Dr,6351.6
-Third Party Vendors,128 Maple Street,12767.85
-Third Party Vendors,12938 Ann Marie Dr,21439.0
-Third Party Vendors,13 Royal Coach Cir,9914.8
-Third Party Vendors,1308 34th St,22274.53
-Third Party Vendors,1309 Springville Rd,32310.85
-Third Party Vendors,131 Silver Ln,10249.98
-Third Party Vendors,1310 Old Cahaba Cove,15101.0
-Third Party Vendors,1313 McCoy St,11593.79
-Third Party Vendors,132 Rosebud Rd,23051.14
-Third Party Vendors,1324 Bardswood Terrace,19563.0
-Third Party Vendors,1337 Wilshire Dr.,18592.42
-Third Party Vendors,1341 Hillwood Dr.,12504.61
-Third Party Vendors,1341 Winola Ln,15826.92
-Third Party Vendors,1345 Winola Ln,12927.64
-Third Party Vendors,1359 Annie Lee Rd,4030.0
-Third Party Vendors,1401 Oak Terr.,9975.5
-Third Party Vendors,1409 High Point Terrace,25854.22
+Staging and Interiors,9311 Dunnavant Valley Rd,3600
+Staging and Interiors,Total,62088.33
+Survey,193 Rena Dr,900
+Survey,508 Tambay Dr,750
+Survey,Total,1650
+Tax payments,Not specified,195514.32
+Tax payments,Total,195514.32
+Third Party Vendors,10 Anderson Mtn Dr,7658.07
+Third Party Vendors,1008 Springhill Ln,18640.5
+Third Party Vendors,1017 Burnt Pine Ln,6200
+Third Party Vendors,112 White Cap Cir,10537.12
+Third Party Vendors,1125 Greystone Crest,31775
+Third Party Vendors,13 Royal Coach Cir,3147
+Third Party Vendors,1309 Springville Rd,33035.85
+Third Party Vendors,1310 Old Cahaba Cove,565
 Third Party Vendors,141 Deer Park Dr,15508.63
-Third Party Vendors,1412 13th Terrace.,7165.4
-Third Party Vendors,1437 Ware Blvd,33668.73
-Third Party Vendors,144 Lake Front Dr.,2638.0
-Third Party Vendors,1449 Paragon Prkwy,5775.0
-Third Party Vendors,14695 Hwy 75,268.0
-Third Party Vendors,149 Winterhaven Dr,9027.69
-Third Party Vendors,150 Beaver Ridge,26955.38
-Third Party Vendors,1504 8th St NW,9823.53
-Third Party Vendors,1508 4th St. NW,15874.22
-Third Party Vendors,151 2nd St. N,36281.4
-Third Party Vendors,1546 Lacie Dr,29179.8
-Third Party Vendors,155 Treymoore Dr,13636.33
-Third Party Vendors,1557 Napoleon Dr,15000.0
-Third Party Vendors,157 Sweetgum Dr,16396.53
-Third Party Vendors,1604 Tahoe Rd,13695.0
-Third Party Vendors,1608 Kestwick Dr,41957.23
-Third Party Vendors,1609 Sonia Dr,21062.84
-Third Party Vendors,1612 Big Mtn. Dr.,9328.11
-Third Party Vendors,163 Sunrise Dr,16017.83
-Third Party Vendors,1645 Barrington Ln NE,22492.34
-Third Party Vendors,1646 Roberta Ln,19451.03
-Third Party Vendors,1676 Five Points Rd,9010.0
-Third Party Vendors,1703 Molly Cir.,1940.0
-Third Party Vendors,1708 Molly Dr.,8970.0
-Third Party Vendors,1710 Greenbriar Dr,13354.25
-Third Party Vendors,1713 Molly Dr.,8270.25
-Third Party Vendors,1735 6th St. NW,3131.11
-Third Party Vendors,17502 HWY 174,16489.87
-Third Party Vendors,1755 6th st.,750.0
-Third Party Vendors,1761 Cornwall Dr.,30470.27
-Third Party Vendors,1766 Brookside Rd,19734.68
-Third Party Vendors,1788 Whitmire St,20640.23
-Third Party Vendors,1791 Vestaview Ln,42807.48
-Third Party Vendors,1792 Whitmire St,35220.0
-Third Party Vendors,1809 Tin Valley Cir,31402.25
-Third Party Vendors,1824 Otis Rd,15636.79
-Third Party Vendors,1831 Otis Cir.,9282.0
-Third Party Vendors,1831 Satterwhite St.,6934.95
-Third Party Vendors,1908 Heritage Rd,12251.8
-Third Party Vendors,1909 Thornhill Rd.,11393.07
-Third Party Vendors,1929 11th St NW,20795.81
-Third Party Vendors,193 Rena Dr,29245.0
-Third Party Vendors,193 Woodland Dr.,14788.64
-Third Party Vendors,1939 Westridge,9867.9
-Third Party Vendors,1946 Seven Bark Ln.,35155.5
-Third Party Vendors,1973 Chandaway Dr.,21193.4
-Third Party Vendors,200 Saint John Dr.,8984.98
-Third Party Vendors,20001 Rabbit Ridge,11589.6
-Third Party Vendors,Total for 20001 Rabbit Ridge Rd,11589.6
-Third Party Vendors,201 Forest Dr,23709.4
-Third Party Vendors,2038 22nd Ct S,50052.5
-Third Party Vendors,204 Lane Park Cir,7412.31
-Third Party Vendors,205 Mashburn Dr,22720.89
-Third Party Vendors,2050 Montreat Pkwy Unit A,1588.0
-Third Party Vendors,2056 Self Ln.,9200.0
-Third Party Vendors,206 Annetta Cir,7093.5
-Third Party Vendors,2073 Russet Woods Trl,7342.0
-Third Party Vendors,2104 Carlisle Cir.,8217.2
-Third Party Vendors,2116 Lakeview Trace,43236.12
-Third Party Vendors,21164 Elizabeth Dr,18009.0
-Third Party Vendors,212 Dexter Ct.,5770.0
-Third Party Vendors,2123 28th Ave N,18475.37
-Third Party Vendors,214 Stone Ridge Trail,27532.56
-Third Party Vendors,2146 Rock Mtn. Rd,2209.0
-Third Party Vendors,Total for 2146 Rock Mtn. Rd.,2209.0
-Third Party Vendors,215 Observatory Dr,118.0
-Third Party Vendors,245 Observatory Dr,15514.0
-Third Party Vendors,Total for 215 Observatory Dr,15632.0
-Third Party Vendors,216 Chestnut St,58674.01
-Third Party Vendors,216 Handley Rd.,20585.36
-Third Party Vendors,217 Kings Crest,14214.12
-Third Party Vendors,2173 Chapel Hill Rd,7507.0
-Third Party Vendors,2200 Dogwood Trail,17615.4
-Third Party Vendors,2232 Garland Dr,28456.66
-Third Party Vendors,2234 Pup Run,37127.88
-Third Party Vendors,2236 Carl Jones Rd,27690.6
+Third Party Vendors,1437 Ware Blvd,3060
+Third Party Vendors,150 Beaver Ridge,22345.38
+Third Party Vendors,1504 8th St NW,5865.53
+Third Party Vendors,1645 Barrington Ln NE,22582.34
+Third Party Vendors,1676 Five Points Rd,9610
+Third Party Vendors,1792 Whitmire St,7260
+Third Party Vendors,1805 Tin Valley Cir,70
+Third Party Vendors,193 Rena Dr,38813
+Third Party Vendors,193 Woodland Dr.,6370.64
+Third Party Vendors,1939 Westridge,9947.9
+Third Party Vendors,2038 22nd Ct S,11575
+Third Party Vendors,205 Mashburn Dr,1758
+Third Party Vendors,2050 Montreat Pkwy Unit A,1139
+Third Party Vendors,206 Annetta Cir,350
+Third Party Vendors,2123 28th Ave N,2285
 Third Party Vendors,2308 Kala St,4578.5
-Third Party Vendors,232 Redstone way,7137.0
-Third Party Vendors,2321 Royal Knoll Ln,26266.17
-Third Party Vendors,2360 Grayson Valley Dr,2805.8
-Third Party Vendors,2364 Rocky Ridge Rd,52499.5
-Third Party Vendors,239 Warwick Ln,38247.2
-Third Party Vendors,2401 16th St,44325.34
-Third Party Vendors,2406 Hampstead Dr.,1844.0
-Third Party Vendors,2422 Mallard dr,12237.23
-Third Party Vendors,2454 Hampstead Dr,13480.24
-Third Party Vendors,251 Pineview Cir,37155.25
-Third Party Vendors,2512 October Dr,20767.55
-Third Party Vendors,2517 Galloway Dr.,5957.7
-Third Party Vendors,2536 Hampstead Dr,7234.0
-Third Party Vendors,2636 Dennise Rd.,335.0
-Third Party Vendors,270 Myers Rd,7726.0
-Third Party Vendors,2701 Eastern Valley Rd,20400.0
-Third Party Vendors,2720 Shoemaker St,8043.47
-Third Party Vendors,2736 Darlene Cir,22242.0
-Third Party Vendors,2755 Austin Ln,12188.93
-Third Party Vendors,2825 2nd Way NW,11053.99
-Third Party Vendors,2921 Florida Rd.,39573.53
-Third Party Vendors,2928 Floyd Bradford Rd,30003.58
-Third Party Vendors,294 Heritage Dr,40700.0
-Third Party Vendors,300 42nd Ave.,3537.25
+Third Party Vendors,2401 16th St,2190
+Third Party Vendors,2513 7th St NE,919
+Third Party Vendors,270 Myers Rd,5366
+Third Party Vendors,2701 Eastern Valley Rd,31766
+Third Party Vendors,2720 Shoemaker St,1775
+Third Party Vendors,2825 2nd Way NW,13432.99
+Third Party Vendors,294 Heritage Dr,3683.5
 Third Party Vendors,300 Huntsville Ave,1207.75
-Third Party Vendors,3009 Virginia Dr,25421.15
-Third Party Vendors,3012 2nd St,28638.88
-Third Party Vendors,3018 Old Stone Dr,14715.25
-Third Party Vendors,3023 Massey Rd Unit F,10761.8
-Third Party Vendors,3032 Tersea Dr.,12475.0
-Third Party Vendors,3050 Weatherford Dr,4107.8
-Third Party Vendors,308 Killough Dr,17377.0
-Third Party Vendors,308 Willow Glen ct,21957.57
-Third Party Vendors,31 Simmons Street,1045.0
-Third Party Vendors,312 Lehigh Rd,31402.4
-Third Party Vendors,312 Orchid Rd,13096.84
-Third Party Vendors,316 Gemini Cir,7144.0
-Third Party Vendors,316 Willow Glen Ct,12451.59
-Third Party Vendors,322 Cherokee Dr.,11543.1
-Third Party Vendors,Total for 322 Cherokee Drive,11543.1
-Third Party Vendors,324 4th St. N,26512.55
-Third Party Vendors,3249 Wagon Gap Trail,21392.34
-Third Party Vendors,333 Orchid Rd,1373.0
-Third Party Vendors,3348 Overton Rd,44315.79
-Third Party Vendors,335 Co Rd 1130,14927.73
-Third Party Vendors,3372 Wood Drive Cir.,8465.5
-Third Party Vendors,3409 Crosscreek Cir,9845.3
-Third Party Vendors,3512 Nazha Cir,20006.5
-Third Party Vendors,3535 Deerfield Dr,27169.28
-Third Party Vendors,354 Highland Park Dr.,54335.7
-Third Party Vendors,3618 Haven View Cir,16941.0
-Third Party Vendors,3834 Highway 11,17784.0
-Third Party Vendors,3845 Nowlin Rd SW,14436.6
-Third Party Vendors,39 Polly Ridge Rd,8432.0
-Third Party Vendors,3926 Valley Bend Dr.,9913.49
-Third Party Vendors,396 Union Station Way,3272.78
-Third Party Vendors,40 Clearview Rd,9026.0
-Third Party Vendors,4004 Saddle Run Cir,12478.6
-Third Party Vendors,4032 Middle Ave,10977.4
-Third Party Vendors,4038 Ida Ln,1176.0
-Third Party Vendors,4042 Jubille ln,6669.4
-Third Party Vendors,405 Art Hanes Blvd,50139.2
-Third Party Vendors,411 Woodward Rd.,44373.11
-Third Party Vendors,424 Co Rd 3150,37220.0
-Third Party Vendors,4358 Oak St,19036.1
-Third Party Vendors,4433 Woodland Hills,24546.0
-Third Party Vendors,445 Annie Lee Rd,19240.92
-Third Party Vendors,4461 Parkwood Cir,9354.26
-Third Party Vendors,45 Ridgefield Ln,125.0
-Third Party Vendors,450 Doss Ferry Pkwy,1129.0
-Third Party Vendors,4533 Oak Dr,9462.55
-Third Party Vendors,4652 Clairmont Ave,42595.36
-Third Party Vendors,4924 Branch Mill Cir,75322.72
-Third Party Vendors,496 Springdale Rd.,4767.5
-Third Party Vendors,500 Lance Way,21813.23
-Third Party Vendors,501 Cheri Ln,3288.75
-Third Party Vendors,5013 knollview cir,31493.6
-Third Party Vendors,5039 Vernon St,9847.6
-Third Party Vendors,504 Lance Way,44295.63
-Third Party Vendors,505 Sunhill Rd,35617.58
-Third Party Vendors,508 Tambay Dr,10800.0
-Third Party Vendors,509 Lansdowne Pl,4482.5
-Third Party Vendors,510 Bennett Dr.,7151.1
-Third Party Vendors,5130 Briarwood Cir,6345.4
-Third Party Vendors,5136 Goldmar Dr,16925.5
-Third Party Vendors,5150 Hickory Dr NE,15972.25
-Third Party Vendors,517 10th Ave.,10288.48
-Third Party Vendors,517 Kings Crest,10825.0
-Third Party Vendors,521 Mountain Dr,47108.01
-Third Party Vendors,5230 willow Ridge Dr,11278.1
-Third Party Vendors,5278 Willow Ridge Ln,4700.6
-Third Party Vendors,532 Hickory St,22703.9
-Third Party Vendors,533 Rollingwood Rd,16142.0
-Third Party Vendors,5364 Balboa Ave,6150.0
-Third Party Vendors,537 Fox Run,4337.4
-Third Party Vendors,5381 Park Side Cir,16350.5
-Third Party Vendors,5409 Nottinghill Dr,7388.0
-Third Party Vendors,5425 Jr Dr,720.0
-Third Party Vendors,5427 Reese Ln,22902.49
-Third Party Vendors,5445 Nottinghill Dr,4349.8
-Third Party Vendors,5447 Nottinghill Dr,15859.03
-Third Party Vendors,5536 Cheryl Dr.,11185.23
-Third Party Vendors,5551 Timber Hills,32735.06
-Third Party Vendors,5557 Dewey Heights Rd,29228.28
-Third Party Vendors,5557 Dry Creek Rd,41745.19
-Third Party Vendors,5609 Ridgeview Dr,76827.1
-Third Party Vendors,5719 Park Side Rd,8807.45
-Third Party Vendors,5720 33rd St. N,29889.65
-Third Party Vendors,5731 Hickory Ct.,16901.2
-Third Party Vendors,5741 Oakhill Dr,16470.06
-Third Party Vendors,5751 Henry Black Dr.,13147.0
-Third Party Vendors,5755 Cheryl Dr,46228.8
-Third Party Vendors,580 Highland Ln.,4049.0
-Third Party Vendors,5872 Janet Dr.,6454.5
-Third Party Vendors,5874 Dogwood Cir,9125.0
-Third Party Vendors,588 Russet Bend Dr,29936.8
-Third Party Vendors,5901 nuthatch,18356.0
-Third Party Vendors,5912 Nuthatch Cir,7910.0
-Third Party Vendors,5913 Southhall Rd,34000.0
-Third Party Vendors,5929 Cheryl Dr,12195.8
-Third Party Vendors,5956 Creekwood Rd,4798.15
-Third Party Vendors,6005 Mockingbird Ln,100.0
-Third Party Vendors,6022 Springville Rd,223.0
-Third Party Vendors,606 Greenwood Dr,12476.6
-Third Party Vendors,609 Chesser Ct,19277.31
-Third Party Vendors,6134 Townhee Dr,19940.31
-Third Party Vendors,620 Ridgefield Cove,14299.7
-Third Party Vendors,6202 Waterford Pl,29921.48
-Third Party Vendors,6212 Kestral View Rd,12588.0
-Third Party Vendors,6251 Keith Rd,20533.5
-Third Party Vendors,6269 Renda Cir,15417.05
-Third Party Vendors,6279 Tyler Loop Rd,10320.0
-Third Party Vendors,629 Shadywood Ln,17430.8
-Third Party Vendors,63 Avery Hancock Dr,18864.3
-Third Party Vendors,636 Mermont Dr.,19994.5
-Third Party Vendors,636 Paden Dr,16723.6
-Third Party Vendors,637 Vaughn Cir.,8615.2
-Third Party Vendors,640 Griffin Rd,29192.5
-Third Party Vendors,6435 Freda Dr.,11081.3
-Third Party Vendors,645 Vaughn Cir,23147.8
-Third Party Vendors,6451 Freda Dr,23525.0
-Third Party Vendors,6521 Happy Hollow Rd,48553.68
-Third Party Vendors,6556 Murphree Cir,20091.4
-Third Party Vendors,6591 S Chalkville Rd,38500.82
-Third Party Vendors,6602 Davidson Rd,6974.8
-Third Party Vendors,6750 Heaton Manor,175.0
-Third Party Vendors,6765 Crossbrook Ln,6846.6
-Third Party Vendors,6790 Paradise Cir,48264.53
-Third Party Vendors,6801 Brittany Pl,5668.6
-Third Party Vendors,6816 Brittany Pl,11797.77
-Third Party Vendors,690 Idlewild Cir,23149.4
-Third Party Vendors,6928 Woodvale Ln,11982.6
-Third Party Vendors,6968 McFrancis Rd,14143.25
+Third Party Vendors,3012 2nd St,11090.4
+Third Party Vendors,308 Killough Dr,20577
+Third Party Vendors,312 Lehigh Rd,8404
+Third Party Vendors,316 Gemini Cir,7144
+Third Party Vendors,316 Willow Glen Ct,12926.59
+Third Party Vendors,3348 Overton Rd,5760
+Third Party Vendors,335 Co Rd 1130,5284.23
+Third Party Vendors,3618 Haven View Cir,3004
+Third Party Vendors,3834 Highway 11,17434
+Third Party Vendors,4038 Ida Ln,1375
+Third Party Vendors,424 Co Rd 3150,28432
+Third Party Vendors,4461 Parkwood Cir,9404.26
+Third Party Vendors,450 Doss Ferry Pkwy,1129
+Third Party Vendors,4924 Branch Mill Cir,41523.72
+Third Party Vendors,501 Cheri Ln,3163.75
+Third Party Vendors,505 Sunhill Rd,35697.58
+Third Party Vendors,508 Tambay Dr,10800
+Third Party Vendors,5278 Willow Ridge Ln,4510.6
+Third Party Vendors,533 River Crest Way,6299
+Third Party Vendors,5364 Balboa Ave,6700
+Third Party Vendors,5415 Nottinghill Dr.,60
+Third Party Vendors,5427 Reese Ln,1242
+Third Party Vendors,5445 Nottinghill Dr,95
+Third Party Vendors,5551 Timber Hills,35645.06
+Third Party Vendors,5557 Dry Creek Rd,12225
+Third Party Vendors,5609 Ridgeview Dr,46859
+Third Party Vendors,5874 Dogwood Cir,10925
+Third Party Vendors,6269 Renda Cir,79
+Third Party Vendors,6279 Tyler Loop Rd,10400
+Third Party Vendors,640 Griffin Rd,7075
 Third Party Vendors,7012 Shady Oaks Ln,7141.5
-Third Party Vendors,704 Julia Cir,1868.23
-Third Party Vendors,704 Truss Ferry Rd,17864.56
-Third Party Vendors,706 Berkley Dr,35316.98
-Third Party Vendors,7093 Old Dixiana Rd.,10773.5
-Third Party Vendors,7104 Claymont Dr,21259.92
-Third Party Vendors,7121 Goodner Mtn. Rd,24212.39
-Third Party Vendors,720 Darlene Dr,14255.2
-Third Party Vendors,7218 Highway 75,5860.87
-Third Party Vendors,726 argo margret,2660.0
-Third Party Vendors,75 Starlite Dr,10209.2
-Third Party Vendors,7504 Spencer Ln,16168.23
-Third Party Vendors,7510 Arrowhead Ln,3437.28
-Third Party Vendors,7536 Arrowhead Ln (deleted),14068.27
-Third Party Vendors,7536 Old Acton Rd.,800.0
-Third Party Vendors,7541 Carriage Cove,39426.08
-Third Party Vendors,7729 Shriner Dr.,10909.6
-Third Party Vendors,800 Sherwood Forest,967.0
-Third Party Vendors,8056 Carrington Dr,17773.05
-Third Party Vendors,808 Hillview Dr,43471.59
-Third Party Vendors,813 Windover Pl,980.0
-Third Party Vendors,819 Sherwood Forest Dr,29210.86
-Third Party Vendors,828 Jeffrey Ln,3200.0
-Third Party Vendors,8304 5th Ave. S.,24884.73
-Third Party Vendors,8313 Farley Ave.,23493.75
-Third Party Vendors,832 Zellmark Dr,9889.6
-Third Party Vendors,8403 5th Ave S,135.0
-Third Party Vendors,8491 Clayton Cove,17932.01
-Third Party Vendors,8495 Clayton Cove,32451.6
-Third Party Vendors,867 Sandlin Dr.,17238.61
-Third Party Vendors,89 Lakshore Rd,48561.66
-Third Party Vendors,90 Buddy Ln,12260.2
-Third Party Vendors,909 Winchester Cir,27270.74
-Third Party Vendors,911 Bagley Ln.,27339.1
-Third Party Vendors,915 Rose Dr.,45503.24
-Third Party Vendors,920 Wear Dr,4256.86
-Third Party Vendors,925 1st Ave,17082.0
-Third Party Vendors,9311 Dunnavant Valley Rd,55872.47
-Third Party Vendors,936 Kathryne Cir,14159.0
-Third Party Vendors,9389 Central Rd,14439.8
-Third Party Vendors,939 Gene Reed Rd,2798.0
-Third Party Vendors,Office,12959.0
-Third Party Vendors,Trade Flow,142058.88
-Third Party Vendors,Not specified,65251.73
-Travel Expense,Not specified,2000.0
-Utilities,10 Anderson Mtn Dr,4539.25
-Utilities,1008 Mtn. Oaks Dr.,551.37
-Utilities,1008 Springhill Ln,8628.97
-Utilities,1017 Burnt Pine Ln,306.0
-Utilities,1037 Sharp Dr,653.61
-Utilities,1048 Gene Reed Rd,753.35
-Utilities,105 Kingstown Rd,392.71
-Utilities,107 Kingstown Cir,705.62
-Utilities,108 Pine Tree Cir,82.98
-Utilities,108 Southview Dr,2422.33
-Utilities,1104 Tulip Cir,1352.23
-Utilities,112 Portsouth Ln,1852.97
-Utilities,112 White Cap Cir,952.73
-Utilities,116 34th St N,1222.7
-Utilities,122 Heather Ridge Dr.,249.22
-Utilities,13 Royal Coach Cir,1093.8
-Utilities,1309 Springville Rd,671.39
-Utilities,131 Silver Ln,2133.19
-Utilities,1310 Old Cahaba Cove,1276.57
-Utilities,1313 McCoy St,1251.9
-Utilities,132 Rosebud Rd,1229.15
-Utilities,1324 Bardswood Terrace,439.71
-Utilities,1341 Winola Ln,611.46
-Utilities,1409 High Point Terrace,1278.0
-Utilities,141 Deer Park Dr,1018.97
-Utilities,1412 13th Terrace.,696.68
-Utilities,1437 Ware Blvd,1266.67
-Utilities,144 Lake Front Dr.,5955.72
-Utilities,150 Beaver Ridge,1260.66
-Utilities,1504 8th St NW,1738.95
-Utilities,151 2nd St. N,62.05
-Utilities,155 Treymoore Dr,181.85
-Utilities,1557 Napoleon Dr,241.33
-Utilities,157 Sweetgum Dr,1318.25
-Utilities,1608 Kestwick Dr,3017.59
-Utilities,163 Sunrise Dr,872.19
+Third Party Vendors,706 Berkley Dr,9428.99
+Third Party Vendors,7510 Arrowhead Ln,521.25
+Third Party Vendors,7624 Happy Hollow Rd,6850
+Third Party Vendors,8056 Carrington Dr,10719.8
+Third Party Vendors,828 Jeffrey Ln,3200
+Third Party Vendors,920 Wear Dr,249
+Third Party Vendors,9311 Dunnavant Valley Rd,10530
+Third Party Vendors,Highland Trail,2800
+Third Party Vendors,Trade Flow,15279
+Third Party Vendors,Not specified,31625
+Third Party Vendors,Total,798626.43
+Travel Expense,Not specified,2000
+Travel Expense,Total,2000
+Utilities,10 Anderson Mtn Dr,2039.9
+Utilities,1008 Springhill Ln,2869.57
+Utilities,1017 Burnt Pine Ln,402.57
+Utilities,112 White Cap Cir,1042.13
+Utilities,13 Royal Coach Cir,562.32
+Utilities,1309 Springville Rd,745.62
+Utilities,1310 Old Cahaba Cove,611.63
+Utilities,141 Deer Park Dr,661.58
+Utilities,1437 Ware Blvd,170.79
+Utilities,144 Lake Front Dr.,1967.83
+Utilities,150 Beaver Ridge,1072.1
+Utilities,1504 8th St NW,734.75
+Utilities,1557 Napoleon Dr,281.26
 Utilities,1645 Barrington Ln NE,641.27
-Utilities,1676 Five Points Rd,568.75
-Utilities,1688 Brewster Rd,188.97
-Utilities,1710 Greenbriar Dr,50.0
-Utilities,1766 Brookside Rd,1316.13
-Utilities,1788 Whitmire St,2254.4
-Utilities,1791 Vestaview Ln,666.61
+Utilities,1676 Five Points Rd,604.22
+Utilities,1688 Brewster Rd,258.87
 Utilities,1792 Whitmire St,4609.83
-Utilities,1824 Otis Rd,1575.89
-Utilities,1929 11th St NW,1598.66
-Utilities,193 Rena Dr,1764.81
+Utilities,193 Rena Dr,1773.11
 Utilities,193 Woodland Dr.,202.08
-Utilities,1939 Westridge,1320.9
-Utilities,1946 Seven Bark Ln.,50.0
-Utilities,1973 Chandaway Dr.,50.0
-Utilities,20001 Rabbit Ridge,115.0
-Utilities,Total for 20001 Rabbit Ridge Rd,115.0
-Utilities,201 Forest Dr,301.51
-Utilities,2038 22nd Ct S,1492.16
-Utilities,205 Mashburn Dr,1979.2
-Utilities,2050 Montreat Pkwy Unit A,78.35
-Utilities,206 Annetta Cir,1224.88
-Utilities,2073 Russet Woods Trl,282.13
-Utilities,2116 Lakeview Trace,1377.43
-Utilities,21164 Elizabeth Dr,150.0
-Utilities,2123 28th Ave N,2578.88
-Utilities,214 Stone Ridge Trail,375.0
-Utilities,2173 Chapel Hill Rd,765.93
-Utilities,2200 Dogwood Trail,217.97
-Utilities,2232 Garland Dr,2473.84
-Utilities,2234 Pup Run,1941.15
-Utilities,2236 Carl Jones Rd,125.0
-Utilities,2308 Kala St,312.96
-Utilities,2321 Royal Knoll Ln,154.89
-Utilities,2401 16th St,1699.05
-Utilities,2454 Hampstead Dr,381.73
+Utilities,1939 Westridge,976.79
+Utilities,2038 22nd Ct S,729.68
+Utilities,205 Mashburn Dr,670.24
+Utilities,2123 28th Ave N,957.32
+Utilities,2157 Parsons Dr,179.38
+Utilities,2308 Kala St,357.49
+Utilities,2401 16th St,1184.38
 Utilities,2513 7th St NE,335.37
 Utilities,2521 Arcadia Place,448.97
-Utilities,270 Myers Rd,2712.45
-Utilities,2701 Eastern Valley Rd,463.19
-Utilities,2720 Shoemaker St,533.78
-Utilities,2755 Austin Ln,627.73
+Utilities,270 Myers Rd,1145.34
+Utilities,2701 Eastern Valley Rd,555.73
+Utilities,2720 Shoemaker St,210.02
 Utilities,2825 2nd Way NW,494.07
-Utilities,2921 Florida Rd.,150.0
-Utilities,294 Heritage Dr,3811.37
-Utilities,300 Huntsville Ave,383.69
-Utilities,3009 Virginia Dr,651.15
-Utilities,3012 2nd St,1142.11
-Utilities,3018 Old Stone Dr,793.84
-Utilities,3023 Massey Rd Unit F,541.86
-Utilities,308 Killough Dr,643.52
-Utilities,312 Lehigh Rd,1557.98
-Utilities,312 Orchid Rd,769.68
-Utilities,316 Gemini Cir,490.74
-Utilities,316 Willow Glen Ct,958.14
-Utilities,324 4th St. N,31.77
-Utilities,3249 Wagon Gap Trail,1668.54
-Utilities,3348 Overton Rd,3419.88
-Utilities,335 Co Rd 1130,2149.99
-Utilities,3409 Crosscreek Cir,440.94
-Utilities,3535 Deerfield Dr,881.13
-Utilities,354 Highland Park Dr.,2512.04
-Utilities,3618 Haven View Cir,1258.53
+Utilities,294 Heritage Dr,1276.48
+Utilities,300 Huntsville Ave,452.95
+Utilities,3012 2nd St,225.25
+Utilities,308 Killough Dr,667.37
+Utilities,312 Lehigh Rd,520.55
+Utilities,316 Gemini Cir,555.47
+Utilities,316 Willow Glen Ct,966.52
+Utilities,3348 Overton Rd,883.59
+Utilities,335 Co Rd 1130,1093.99
+Utilities,3618 Haven View Cir,803.64
 Utilities,380 Myrick Rd,283.77
 Utilities,3834 Highway 11,234.99
-Utilities,3845 Nowlin Rd SW,200.15
-Utilities,4038 Ida Ln,400.65
-Utilities,424 Co Rd 3150,2644.69
-Utilities,4358 Oak St,892.97
-Utilities,440 Woodland Ct NE,218.0
-Utilities,445 Annie Lee Rd,278.83
-Utilities,4461 Parkwood Cir,634.16
-Utilities,4533 Oak Dr,1409.06
-Utilities,4793 Longmeadow Dr,192.5
-Utilities,4924 Branch Mill Cir,2201.56
-Utilities,496 Springdale Rd.,407.64
-Utilities,5039 Vernon St,476.96
-Utilities,505 Sunhill Rd,542.31
-Utilities,508 Tambay Dr,517.79
-Utilities,5136 Goldmar Dr,606.56
-Utilities,5150 Hickory Dr NE,798.24
-Utilities,5278 Willow Ridge Ln,1532.59
-Utilities,532 Hickory St,1073.67
+Utilities,4038 Ida Ln,476.96
+Utilities,424 Co Rd 3150,1232
+Utilities,440 Woodland Ct NE,218
+Utilities,4461 Parkwood Cir,660.49
+Utilities,4545 Shocco Springs Rd,77.63
+Utilities,4793 Longmeadow Dr,445.48
+Utilities,4924 Branch Mill Cir,951.26
+Utilities,505 Sunhill Rd,554.98
+Utilities,508 Tambay Dr,547.42
+Utilities,5278 Willow Ridge Ln,782.32
 Utilities,533 River Crest Way,214.4
-Utilities,5364 Balboa Ave,117.77
-Utilities,5381 Park Side Cir,734.63
-Utilities,5409 Nottinghill Dr,250.86
-Utilities,5427 Reese Ln,1754.83
-Utilities,5445 Nottinghill Dr,2078.32
-Utilities,5447 Nottinghill Dr,377.04
-Utilities,5551 Timber Hills,855.52
-Utilities,5557 Dry Creek Rd,2157.21
-Utilities,5609 Ridgeview Dr,2782.95
-Utilities,5719 Park Side Rd,761.2
-Utilities,5720 33rd St. N,1147.17
-Utilities,5741 Oakhill Dr,1316.63
-Utilities,5751 Henry Black Dr.,175.0
-Utilities,578 Shades Crest Rd,165.33
-Utilities,5874 Dogwood Cir,294.86
-Utilities,5913 Southhall Rd,-199.88
+Utilities,5364 Balboa Ave,191.07
+Utilities,5409 Nottinghill Dr,100.86
+Utilities,5427 Reese Ln,391.36
+Utilities,5445 Nottinghill Dr,1642.59
+Utilities,5551 Timber Hills,872.42
+Utilities,5557 Dry Creek Rd,1260.15
+Utilities,5609 Ridgeview Dr,1963.35
+Utilities,578 Shades Crest Rd,178.96
+Utilities,5874 Dogwood Cir,334.45
 Utilities,601 Mermont Dr,323.31
-Utilities,609 Chesser Ct,1573.2
-Utilities,6134 Townhee Dr,101.97
-Utilities,6202 Waterford Pl,1072.81
-Utilities,6212 Kestral View Rd,1861.94
-Utilities,6269 Renda Cir,1535.92
-Utilities,6279 Tyler Loop Rd,330.07
-Utilities,63 Avery Hancock Dr,835.76
-Utilities,640 Griffin Rd,1363.54
-Utilities,6591 S Chalkville Rd,875.84
-Utilities,6790 Paradise Cir,741.78
-Utilities,6801 Brittany Pl,253.39
-Utilities,690 Idlewild Cir,1089.21
-Utilities,706 Berkley Dr,2294.1
-Utilities,7104 Claymont Dr,934.52
-Utilities,75 Starlite Dr,325.0
-Utilities,7504 Spencer Ln,100.0
-Utilities,7510 Arrowhead Ln,1799.57
-Utilities,7536 Arrowhead Ln (deleted),115.79
-Utilities,7541 Carriage Cove,1242.86
+Utilities,6279 Tyler Loop Rd,338.37
+Utilities,640 Griffin Rd,508.61
+Utilities,690 Idlewild Cir,46.66
+Utilities,706 Berkley Dr,1345.48
+Utilities,7510 Arrowhead Ln,89.5
 Utilities,7624 Happy Hollow Rd,57.04
-Utilities,7729 Shriner Dr.,46.13
-Utilities,8056 Carrington Dr,10450.58
-Utilities,819 Sherwood Forest Dr,1801.11
-Utilities,828 Jeffrey Ln,205.69
-Utilities,89 Lakshore Rd,1362.37
-Utilities,909 Winchester Cir,1445.53
-Utilities,920 Wear Dr,802.15
-Utilities,9311 Dunnavant Valley Rd,1990.26
-Utilities,9389 Central Rd,1219.91
-Utilities,Office,526.39
-Utilities,Not specified,181945.78
-Website Domain,Not specified,371.56
-Zoning Variance,Not specified,50.0
-Accidental/Miscellaneous Charge,Not specified,480.12
-Ask My Accountant,Not specified,-186675.55
-Payoff,6269 Renda Cir,125000.0
-Payoff,9389 Central Rd,105280.0
-Payoff,Company Loan,766000.0
-Redistribution of Capital,Not specified,200000.0
+Utilities,8056 Carrington Dr,3427.4
+Utilities,828 Jeffrey Ln,346.01
+Utilities,9311 Dunnavant Valley Rd,1773.08
+Utilities,Not specified,26.68
+Utilities,Total,58839.07
+Website Domain,Not specified,288
+Website Domain,Total,288
+Total for Expenses,10 Anderson Mtn Dr,24661.29
+Total for Expenses,1008 Springhill Ln,67812.89
+Total for Expenses,1017 Burnt Pine Ln,61645.02
+Total for Expenses,1048 Gene Reed Rd,2324.23
+Total for Expenses,112 White Cap Cir,123454.76
+Total for Expenses,1125 Greystone Crest,216354.88
+Total for Expenses,116 34th St N,1570.53
+Total for Expenses,13 Royal Coach Cir,5840.63
+Total for Expenses,1309 Springville Rd,126927.18
+Total for Expenses,1310 Old Cahaba Cove,4706.33
+Total for Expenses,1409 High Point Terrace,72.41
+Total for Expenses,141 Deer Park Dr,54777.08
+Total for Expenses,1437 Ware Blvd,4816.29
+Total for Expenses,144 Lake Front Dr.,1967.83
+Total for Expenses,150 Beaver Ridge,45699.91
+Total for Expenses,1504 8th St NW,15181.97
+Total for Expenses,1557 Napoleon Dr,3931.06
+Total for Expenses,1645 Barrington Ln NE,74731.86
+Total for Expenses,1676 Five Points Rd,80028.96
+Total for Expenses,1688 Brewster Rd,17641.56
+Total for Expenses,1792 Whitmire St,104602.66
+Total for Expenses,1805 Tin Valley Cir,990.64
+Total for Expenses,193 Rena Dr,121984.7
+Total for Expenses,193 Woodland Dr.,36601.41
+Total for Expenses,1939 Westridge,59303.01
+Total for Expenses,201 Forest Dr,102.16
+Total for Expenses,2038 22nd Ct S,24539.28
+Total for Expenses,205 Mashburn Dr,4030.98
+Total for Expenses,2050 Montreat Pkwy Unit A,1139
+Total for Expenses,206 Annetta Cir,350
+Total for Expenses,2123 28th Ave N,8440.75
+Total for Expenses,2157 Parsons Dr,36048.4
+Total for Expenses,2308 Kala St,86937.23
+Total for Expenses,2360 Grayson Valley Dr,2160
+Total for Expenses,2401 16th St,15057.09
+Total for Expenses,2513 7th St NE,50816.67
+Total for Expenses,2521 Arcadia Place,113577.97
+Total for Expenses,2645 Laburnum Dr,776.87
+Total for Expenses,270 Myers Rd,14134.07
+Total for Expenses,2701 Eastern Valley Rd,452970.55
+Total for Expenses,2720 Shoemaker St,4724.57
+Total for Expenses,2825 2nd Way NW,92594.21
+Total for Expenses,294 Heritage Dr,18216.61
+Total for Expenses,300 Huntsville Ave,93599.91
+Total for Expenses,3012 2nd St,26549.97
+Total for Expenses,308 Killough Dr,120990.08
+Total for Expenses,312 Lehigh Rd,15158.26
+Total for Expenses,316 Gemini Cir,78410.09
+Total for Expenses,316 Willow Glen Ct,245826.91
+Total for Expenses,3215 Fortner Ln,1051.56
+Total for Expenses,3348 Overton Rd,21670.49
+Total for Expenses,335 Co Rd 1130,8995.25
+Total for Expenses,354 Highland Park Dr.,350
+Total for Expenses,3618 Haven View Cir,26282.9
+Total for Expenses,380 Myrick Rd,68939.38
+Total for Expenses,3834 Highway 11,57817.26
+Total for Expenses,4038 Ida Ln,121541.32
+Total for Expenses,424 Co Rd 3150,197391.44
+Total for Expenses,4248 Milner Rd E,520.45
+Total for Expenses,4320 Corinth Dr,10000
+Total for Expenses,440 Woodland Ct NE,25841.6
+Total for Expenses,4461 Parkwood Cir,109860.55
+Total for Expenses,450 Doss Ferry Pkwy,9410.93
+Total for Expenses,4545 Shocco Springs Rd,131630.57
+Total for Expenses,4793 Longmeadow Dr,35400.49
+Total for Expenses,4924 Branch Mill Cir,126864.36
+Total for Expenses,501 Cheri Ln,5467.98
+Total for Expenses,505 Sunhill Rd,118385.86
+Total for Expenses,508 Tambay Dr,68844.39
+Total for Expenses,5239 Old Springville Rd,17965.38
+Total for Expenses,5245 Old Springville Rd,815.06
+Total for Expenses,5278 Willow Ridge Ln,9672.11
+Total for Expenses,533 River Crest Way,85946.81
+Total for Expenses,5337 Pine Needle Dr,3000
+Total for Expenses,5364 Balboa Ave,36853.8
+Total for Expenses,5400 J R Dr,32671.44
+Total for Expenses,5409 Nottinghill Dr,100.86
+Total for Expenses,5415 Nottinghill Dr.,60
+Total for Expenses,5427 Reese Ln,7362.41
+Total for Expenses,5445 Nottinghill Dr,2198.94
+Total for Expenses,5551 Timber Hills,111527.95
+Total for Expenses,5557 Dry Creek Rd,27212.01
+Total for Expenses,5609 Ridgeview Dr,177538.24
+Total for Expenses,578 Shades Crest Rd,57499.93
+Total for Expenses,5874 Dogwood Cir,89858.32
+Total for Expenses,601 Mermont Dr,3620.7
+Total for Expenses,6269 Renda Cir,79
+Total for Expenses,6279 Tyler Loop Rd,55132.21
+Total for Expenses,640 Griffin Rd,26870.53
+Total for Expenses,690 Idlewild Cir,4246.66
+Total for Expenses,7012 Shady Oaks Ln,23817.48
+Total for Expenses,706 Berkley Dr,43069.03
+Total for Expenses,7510 Arrowhead Ln,1079.44
+Total for Expenses,7514 Lake Vista Dr,1133.08
+Total for Expenses,7624 Happy Hollow Rd,197961.31
+Total for Expenses,8056 Carrington Dr,29603.73
+Total for Expenses,82 Co Rd 874,46118.2
+Total for Expenses,828 Jeffrey Ln,169256.01
+Total for Expenses,8516 Highland Trace,7778.87
+Total for Expenses,920 Coupland Rd,541.59
+Total for Expenses,920 Wear Dr,249
+Total for Expenses,9311 Dunnavant Valley Rd,33469.88
+Total for Expenses,Company Loan,127019.52
+Total for Expenses,Highland Trail,2800
+Total for Expenses,Office,269311.25
+Total for Expenses,Trade Flow,15279
+Total for Expenses,Not specified,1119725.18
+Total for Expenses,Total,6749492.43
+Net Operating Income,10 Anderson Mtn Dr,-24661.29
+Net Operating Income,1008 Springhill Ln,834111.38
+Net Operating Income,1017 Burnt Pine Ln,-61645.02
+Net Operating Income,1048 Gene Reed Rd,-2324.23
+Net Operating Income,112 White Cap Cir,-123454.76
+Net Operating Income,1125 Greystone Crest,-116354.88
+Net Operating Income,116 34th St N,-1570.53
+Net Operating Income,13 Royal Coach Cir,212534.42
+Net Operating Income,1309 Springville Rd,-126927.18
+Net Operating Income,1310 Old Cahaba Cove,83651.41
+Net Operating Income,1409 High Point Terrace,-72.41
+Net Operating Income,141 Deer Park Dr,-54777.08
+Net Operating Income,1437 Ware Blvd,205674.56
+Net Operating Income,144 Lake Front Dr.,-1967.83
+Net Operating Income,150 Beaver Ridge,-45699.91
+Net Operating Income,1504 8th St NW,102025.16
+Net Operating Income,1557 Napoleon Dr,-3931.06
+Net Operating Income,1645 Barrington Ln NE,-74731.86
+Net Operating Income,1676 Five Points Rd,-80028.96
+Net Operating Income,1688 Brewster Rd,-17641.56
+Net Operating Income,1792 Whitmire St,-104602.66
+Net Operating Income,1805 Tin Valley Cir,-990.64
+Net Operating Income,193 Rena Dr,-121984.7
+Net Operating Income,193 Woodland Dr.,-36601.41
+Net Operating Income,1939 Westridge,-59303.01
+Net Operating Income,201 Forest Dr,-102.16
+Net Operating Income,2038 22nd Ct S,-24539.28
+Net Operating Income,205 Mashburn Dr,69709.8
+Net Operating Income,2050 Montreat Pkwy Unit A,-1139
+Net Operating Income,206 Annetta Cir,-350
+Net Operating Income,2123 28th Ave N,89773.45
+Net Operating Income,2157 Parsons Dr,-36048.4
+Net Operating Income,2308 Kala St,-86937.23
+Net Operating Income,2360 Grayson Valley Dr,-2160
+Net Operating Income,2401 16th St,-15057.09
+Net Operating Income,2513 7th St NE,-50816.67
+Net Operating Income,2521 Arcadia Place,-113577.97
+Net Operating Income,2645 Laburnum Dr,-776.87
+Net Operating Income,270 Myers Rd,71092.53
+Net Operating Income,2701 Eastern Valley Rd,-452970.55
+Net Operating Income,2720 Shoemaker St,-4724.57
+Net Operating Income,2825 2nd Way NW,-92594.21
+Net Operating Income,294 Heritage Dr,275354.42
+Net Operating Income,300 Huntsville Ave,-93599.91
+Net Operating Income,3012 2nd St,218511.55
+Net Operating Income,308 Killough Dr,-120990.08
+Net Operating Income,312 Lehigh Rd,205194.92
+Net Operating Income,316 Gemini Cir,-78410.09
+Net Operating Income,316 Willow Glen Ct,-245826.91
+Net Operating Income,3215 Fortner Ln,-1051.56
+Net Operating Income,3348 Overton Rd,-21670.49
+Net Operating Income,335 Co Rd 1130,176842.95
+Net Operating Income,354 Highland Park Dr.,-350
+Net Operating Income,3618 Haven View Cir,54902.78
+Net Operating Income,380 Myrick Rd,-68939.38
+Net Operating Income,3834 Highway 11,-57817.26
+Net Operating Income,4038 Ida Ln,-121541.32
+Net Operating Income,424 Co Rd 3150,-197391.44
+Net Operating Income,4248 Milner Rd E,-520.45
+Net Operating Income,4320 Corinth Dr,-10000
+Net Operating Income,440 Woodland Ct NE,-25841.6
+Net Operating Income,4461 Parkwood Cir,64230.55
+Net Operating Income,450 Doss Ferry Pkwy,-9410.93
+Net Operating Income,4545 Shocco Springs Rd,-131630.57
+Net Operating Income,4793 Longmeadow Dr,-35400.49
+Net Operating Income,4924 Branch Mill Cir,701523.85
+Net Operating Income,501 Cheri Ln,-5467.98
+Net Operating Income,505 Sunhill Rd,-118385.86
+Net Operating Income,508 Tambay Dr,-68844.39
+Net Operating Income,5239 Old Springville Rd,356267.47
+Net Operating Income,5245 Old Springville Rd,-815.06
+Net Operating Income,5278 Willow Ridge Ln,-9672.11
+Net Operating Income,533 River Crest Way,-85946.81
+Net Operating Income,5337 Pine Needle Dr,-3000
+Net Operating Income,5364 Balboa Ave,-36853.8
+Net Operating Income,5400 J R Dr,-32671.44
+Net Operating Income,5409 Nottinghill Dr,-100.86
+Net Operating Income,5415 Nottinghill Dr.,-60
+Net Operating Income,5427 Reese Ln,218078.76
+Net Operating Income,5445 Nottinghill Dr,-2198.94
+Net Operating Income,5551 Timber Hills,-111527.95
+Net Operating Income,5557 Dry Creek Rd,211895.46
+Net Operating Income,5609 Ridgeview Dr,-177538.24
+Net Operating Income,578 Shades Crest Rd,-57499.93
+Net Operating Income,5874 Dogwood Cir,-89858.32
+Net Operating Income,601 Mermont Dr,-3620.7
+Net Operating Income,6269 Renda Cir,-79
+Net Operating Income,6279 Tyler Loop Rd,-55132.21
+Net Operating Income,640 Griffin Rd,158180.99
+Net Operating Income,690 Idlewild Cir,-4246.66
+Net Operating Income,7012 Shady Oaks Ln,-23817.48
+Net Operating Income,706 Berkley Dr,-43069.03
+Net Operating Income,7510 Arrowhead Ln,-1079.44
+Net Operating Income,7514 Lake Vista Dr,-1133.08
+Net Operating Income,7624 Happy Hollow Rd,-197961.31
+Net Operating Income,8056 Carrington Dr,-29603.73
+Net Operating Income,82 Co Rd 874,-46118.2
+Net Operating Income,828 Jeffrey Ln,-169256.01
+Net Operating Income,8516 Highland Trace,-7778.87
+Net Operating Income,920 Coupland Rd,-541.59
+Net Operating Income,920 Wear Dr,-249
+Net Operating Income,9311 Dunnavant Valley Rd,-33469.88
+Net Operating Income,Company Loan,-127019.52
+Net Operating Income,Highland Trail,-2800
+Net Operating Income,Office,-269311.25
+Net Operating Income,Trade Flow,-15279
+Net Operating Income,Not specified,-1073494.14
+Net Operating Income,Total,-1757402.84
+Mortgage,116 34th St N,120000
+Mortgage,316 Willow Glen Ct,175000
+Mortgage,7510 Arrowhead Ln,-5000
+Mortgage,828 Jeffrey Ln,130000
+Mortgage,9389 Central Rd,160000
+Mortgage,Total,580000
+Real estate commisions,Not specified,3652.75
+Real estate commisions,Total,3652.75
+Total for Other Income,116 34th St N,120000
+Total for Other Income,316 Willow Glen Ct,175000
+Total for Other Income,7510 Arrowhead Ln,-5000
+Total for Other Income,828 Jeffrey Ln,130000
+Total for Other Income,9389 Central Rd,160000
+Total for Other Income,Not specified,3652.75
+Total for Other Income,Total,583652.75
 Transfer,5381 Park Side Cir,289053.33
+Transfer,Total,289053.33
+Total for Other Expenses,5381 Park Side Cir,289053.33
+Total for Other Expenses,Total,289053.33
+Net Other Income,116 34th St N,120000
+Net Other Income,316 Willow Glen Ct,175000
+Net Other Income,5381 Park Side Cir,-289053.33
+Net Other Income,7510 Arrowhead Ln,-5000
+Net Other Income,828 Jeffrey Ln,130000
+Net Other Income,9389 Central Rd,160000
+Net Other Income,Not specified,3652.75
+Net Other Income,Total,294599.42
+Net Income,10 Anderson Mtn Dr,-24661.29
+Net Income,1008 Springhill Ln,834111.38
+Net Income,1017 Burnt Pine Ln,-61645.02
+Net Income,1048 Gene Reed Rd,-2324.23
+Net Income,112 White Cap Cir,-123454.76
+Net Income,1125 Greystone Crest,-116354.88
+Net Income,116 34th St N,118429.47
+Net Income,13 Royal Coach Cir,212534.42
+Net Income,1309 Springville Rd,-126927.18
+Net Income,1310 Old Cahaba Cove,83651.41
+Net Income,1409 High Point Terrace,-72.41
+Net Income,141 Deer Park Dr,-54777.08
+Net Income,1437 Ware Blvd,205674.56
+Net Income,144 Lake Front Dr.,-1967.83
+Net Income,150 Beaver Ridge,-45699.91
+Net Income,1504 8th St NW,102025.16
+Net Income,1557 Napoleon Dr,-3931.06
+Net Income,1645 Barrington Ln NE,-74731.86
+Net Income,1676 Five Points Rd,-80028.96
+Net Income,1688 Brewster Rd,-17641.56
+Net Income,1792 Whitmire St,-104602.66
+Net Income,1805 Tin Valley Cir,-990.64
+Net Income,193 Rena Dr,-121984.7
+Net Income,193 Woodland Dr.,-36601.41
+Net Income,1939 Westridge,-59303.01
+Net Income,201 Forest Dr,-102.16
+Net Income,2038 22nd Ct S,-24539.28
+Net Income,205 Mashburn Dr,69709.8
+Net Income,2050 Montreat Pkwy Unit A,-1139
+Net Income,206 Annetta Cir,-350
+Net Income,2123 28th Ave N,89773.45
+Net Income,2157 Parsons Dr,-36048.4
+Net Income,2308 Kala St,-86937.23
+Net Income,2360 Grayson Valley Dr,-2160
+Net Income,2401 16th St,-15057.09
+Net Income,2513 7th St NE,-50816.67
+Net Income,2521 Arcadia Place,-113577.97
+Net Income,2645 Laburnum Dr,-776.87
+Net Income,270 Myers Rd,71092.53
+Net Income,2701 Eastern Valley Rd,-452970.55
+Net Income,2720 Shoemaker St,-4724.57
+Net Income,2825 2nd Way NW,-92594.21
+Net Income,294 Heritage Dr,275354.42
+Net Income,300 Huntsville Ave,-93599.91
+Net Income,3012 2nd St,218511.55
+Net Income,308 Killough Dr,-120990.08
+Net Income,312 Lehigh Rd,205194.92
+Net Income,316 Gemini Cir,-78410.09
+Net Income,316 Willow Glen Ct,-70826.91
+Net Income,3215 Fortner Ln,-1051.56
+Net Income,3348 Overton Rd,-21670.49
+Net Income,335 Co Rd 1130,176842.95
+Net Income,354 Highland Park Dr.,-350
+Net Income,3618 Haven View Cir,54902.78
+Net Income,380 Myrick Rd,-68939.38
+Net Income,3834 Highway 11,-57817.26
+Net Income,4038 Ida Ln,-121541.32
+Net Income,424 Co Rd 3150,-197391.44
+Net Income,4248 Milner Rd E,-520.45
+Net Income,4320 Corinth Dr,-10000
+Net Income,440 Woodland Ct NE,-25841.6
+Net Income,4461 Parkwood Cir,64230.55
+Net Income,450 Doss Ferry Pkwy,-9410.93
+Net Income,4545 Shocco Springs Rd,-131630.57
+Net Income,4793 Longmeadow Dr,-35400.49
+Net Income,4924 Branch Mill Cir,701523.85
+Net Income,501 Cheri Ln,-5467.98
+Net Income,505 Sunhill Rd,-118385.86
+Net Income,508 Tambay Dr,-68844.39
+Net Income,5239 Old Springville Rd,356267.47
+Net Income,5245 Old Springville Rd,-815.06
+Net Income,5278 Willow Ridge Ln,-9672.11
+Net Income,533 River Crest Way,-85946.81
+Net Income,5337 Pine Needle Dr,-3000
+Net Income,5364 Balboa Ave,-36853.8
+Net Income,5381 Park Side Cir,-289053.33
+Net Income,5400 J R Dr,-32671.44
+Net Income,5409 Nottinghill Dr,-100.86
+Net Income,5415 Nottinghill Dr.,-60
+Net Income,5427 Reese Ln,218078.76
+Net Income,5445 Nottinghill Dr,-2198.94
+Net Income,5551 Timber Hills,-111527.95
+Net Income,5557 Dry Creek Rd,211895.46
+Net Income,5609 Ridgeview Dr,-177538.24
+Net Income,578 Shades Crest Rd,-57499.93
+Net Income,5874 Dogwood Cir,-89858.32
+Net Income,601 Mermont Dr,-3620.7
+Net Income,6269 Renda Cir,-79
+Net Income,6279 Tyler Loop Rd,-55132.21
+Net Income,640 Griffin Rd,158180.99
+Net Income,690 Idlewild Cir,-4246.66
+Net Income,7012 Shady Oaks Ln,-23817.48
+Net Income,706 Berkley Dr,-43069.03
+Net Income,7510 Arrowhead Ln,-6079.44
+Net Income,7514 Lake Vista Dr,-1133.08
+Net Income,7624 Happy Hollow Rd,-197961.31
+Net Income,8056 Carrington Dr,-29603.73
+Net Income,82 Co Rd 874,-46118.2
+Net Income,828 Jeffrey Ln,-39256.01
+Net Income,8516 Highland Trace,-7778.87
+Net Income,920 Coupland Rd,-541.59
+Net Income,920 Wear Dr,-249
+Net Income,9311 Dunnavant Valley Rd,-33469.88
+Net Income,9389 Central Rd,160000
+Net Income,Company Loan,-127019.52
+Net Income,Highland Trail,-2800
+Net Income,Office,-269311.25
+Net Income,Trade Flow,-15279
+Net Income,Not specified,-1069841.39
+Net Income,Total,-1462803.42
