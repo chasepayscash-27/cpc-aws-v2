@@ -133,7 +133,7 @@ const TeamPage = () => {
               order: task.order ?? null,
               stage: task.stage?.trim() || 'Unnamed task',
               propertyId,
-              propertyLabel: projectLookup.get(propertyId) ?? propertyId || 'Unknown property',
+              propertyLabel: (projectLookup.get(propertyId) ?? propertyId) || 'Unknown property',
               assigneeId: task.assigneeId?.trim() || '',
             };
           })
@@ -169,7 +169,10 @@ const TeamPage = () => {
     return map;
   }, [teamMembers, tasks]);
 
-  const selectedMemberTasks = selectedMember ? tasksByMember.get(selectedMember.name) ?? [] : [];
+  const selectedMemberTasks = useMemo(
+    () => (selectedMember ? tasksByMember.get(selectedMember.name) ?? [] : []),
+    [selectedMember, tasksByMember]
+  );
 
   const selectedMemberTaskGroups = useMemo(() => {
     const groups = new Map<string, OutstandingTask[]>();
