@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { Schema } from "../../amplify/data/resource";
-import { getTasksForTab, getWorkflowTabs, updateTask } from "./propertyWorkflowTabs";
+import { deriveRecipientFromRow, getTasksForTab, getWorkflowTabs, normalizeAlertRecipient, normalizePhoneToE164, updateTask } from "./propertyWorkflowTabs";
 
 type PropertyTask = Schema["PropertyTask"]["type"];
 
@@ -17,6 +17,7 @@ function buildTask(overrides: Partial<PropertyTask>): PropertyTask {
     completedAt: overrides.completedAt ?? null,
     completedBy: overrides.completedBy ?? null,
     assigneeId: overrides.assigneeId ?? null,
+    alertRecipientId: overrides.alertRecipientId ?? null,
     createdAt: overrides.createdAt ?? new Date().toISOString(),
     updatedAt: overrides.updatedAt ?? new Date().toISOString(),
   } as PropertyTask;
@@ -71,6 +72,22 @@ describe("PropertyWorkflow tab helpers", () => {
     expect(aliceTask?.completedBy).toBe("Alice");
   });
 
+  it("moves a task between employee tabs when assignee changes", () => {
+    const tasks = [
+      buildTask({ id: "1", stage: "A", assigneeId: "Alice" }),
+      buildTask({ id: "2", stage: "B", assigneeId: "Bob" }),
+    ];
+
+    const afterReassign = updateTask(tasks, "1", { assigneeId: "Bob" });
+    const tabs = getWorkflowTabs(afterReassign);
+    const bobTab = tabs.find((tab) => tab.label === "Bob");
+    const aliceTab = tabs.find((tab) => tab.label === "Alice");
+
+    expect(aliceTab).toBeUndefined();
+    expect(bobTab).toBeDefined();
+    expect(getTasksForTab(afterReassign, bobTab!).map((task) => task.id)).toEqual(["1", "2"]);
+  });
+
   it("hides employee tabs when that employee has no assigned items", () => {
     const tasks = [buildTask({ id: "1", assigneeId: "Alice" }), buildTask({ id: "2", assigneeId: null })];
 
@@ -78,5 +95,69 @@ describe("PropertyWorkflow tab helpers", () => {
 
     expect(tabs.some((tab) => tab.label === "Bob")).toBe(false);
     expect(tabs.map((tab) => tab.label)).toEqual(["Main Workflow", "Alice"]);
+  });
+
+  it("normalizes alert recipient values", () => {
+    expect(normalizeAlertRecipient(" alex ")).toBe("alex");
+    expect(normalizeAlertRecipient("")).toBeNull();
+    expect(normalizeAlertRecipient(null)).toBeNull();
+  });
+});
+
+describe("normalizePhoneToE164", () => {
+  it("handles dashed 10-digit format", () => {
+    expect(normalizePhoneToE164("205-500-1784")).toBe("+12055001784");
+  });
+  it("handles parenthesized format", () => {
+    expect(normalizePhoneToE164("(205) 500-1784")).toBe("+12055001784");
+  });
+  it("preserves already-E.164 input", () => {
+    expect(normalizePhoneToE164("+12055001784")).toBe("+12055001784");
+  });
+  it("returns null for empty / invalid input", () => {
+    expect(normalizePhoneToE164("")).toBeNull();
+    expect(normalizePhoneToE164(null)).toBeNull();
+    expect(normalizePhoneToE164("not a number")).toBeNull();
+    expect(normalizePhoneToE164("123")).toBeNull();
+  });
+});
+
+describe("deriveRecipientFromRow", () => {
+  it("derives id from first name lowercased and label from first name as-is", () => {
+    expect(
+      deriveRecipientFromRow({
+        employee_name: "Chase Smith",
+        employee_email: "chase@chasepayscash.com",
+        phone_number: "205-500-1784",
+      })
+    ).toEqual({
+      id: "chase",
+      label: "Chase",
+      email: "chase@chasepayscash.com",
+      phone: "+12055001784",
+    });
+  });
+  it("returns null when phone is missing or invalid", () => {
+    expect(
+      deriveRecipientFromRow({
+        employee_name: "Foo Bar",
+        employee_email: "foo@example.com",
+        phone_number: "",
+      })
+    ).toBeNull();
+  });
+  it("tolerates the BOM-prefixed header", () => {
+    expect(
+      deriveRecipientFromRow({
+        "\uFEFFemployee_name": "Alex Henderson",
+        employee_email: "ahenderson@chasepayscash.com",
+        phone_number: "205-914-1329",
+      })
+    ).toEqual({
+      id: "alex",
+      label: "Alex",
+      email: "ahenderson@chasepayscash.com",
+      phone: "+12059141329",
+    });
   });
 });
