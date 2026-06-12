@@ -76,10 +76,45 @@ describe('addressesMatch', () => {
     expect(addressesMatch('1645 Barrington Ln NE', '1645 Barrington Lane Northeast')).toBe(true);
   });
 
+  // ── Trailing directional omitted in one dataset ───────────────────────────
+  it('matches 505 Sunhill Road Northwest ↔ 505 Sunhill Rd (primary reported bug)', () => {
+    expect(addressesMatch('505 Sunhill Road Northwest', '505 Sunhill Rd')).toBe(true);
+    expect(addressesMatch('505 Sunhill Rd', '505 Sunhill Road Northwest')).toBe(true);
+  });
+
+  it('matches abbreviated directional vs no directional: 1234 Example St NW ↔ 1234 Example Street', () => {
+    expect(addressesMatch('1234 Example St NW', '1234 Example Street')).toBe(true);
+    expect(addressesMatch('1234 Example Street', '1234 Example St NW')).toBe(true);
+  });
+
+  it('matches 316 Gemini Circle Northwest ↔ 316 Gemini Cir', () => {
+    expect(addressesMatch('316 Gemini Circle Northwest', '316 Gemini Cir')).toBe(true);
+    expect(addressesMatch('316 Gemini Cir', '316 Gemini Circle Northwest')).toBe(true);
+  });
+
+  // ── Street type omitted in one dataset ────────────────────────────────────
+  it('matches 150 Beaver Ridge Drive ↔ 150 Beaver Ridge (street type dropped in P&L)', () => {
+    expect(addressesMatch('150 Beaver Ridge Drive', '150 Beaver Ridge')).toBe(true);
+    expect(addressesMatch('150 Beaver Ridge', '150 Beaver Ridge Drive')).toBe(true);
+  });
+
+  it('matches 1939 Westridge Drive ↔ 1939 Westridge (street type dropped in P&L)', () => {
+    expect(addressesMatch('1939 Westridge Drive', '1939 Westridge')).toBe(true);
+    expect(addressesMatch('1939 Westridge', '1939 Westridge Drive')).toBe(true);
+  });
+
   // ── Negative cases ────────────────────────────────────────────────────────
   it('does NOT match genuinely different addresses', () => {
     expect(addressesMatch('123 Oak Street', '456 Oak Street')).toBe(false);
     expect(addressesMatch('5609 Ridge View Drive', '5610 Ridge View Drive')).toBe(false);
     expect(addressesMatch('1788 Whitmire Street', '1792 Whitmire Street')).toBe(false);
+  });
+
+  it('does NOT match addresses with the same directional but different house numbers', () => {
+    expect(addressesMatch('505 Sunhill Road Northwest', '507 Sunhill Road Northwest')).toBe(false);
+  });
+
+  it('does NOT match addresses with different street types when both are present', () => {
+    expect(addressesMatch('150 Beaver Ridge Drive', '150 Beaver Ridge Lane')).toBe(false);
   });
 });
