@@ -7,11 +7,14 @@ import './App.css';
 // The browser only downloads a page's chunk when the user navigates to it.
 const YTDSummaryPage = lazy(() => import('./pages/YTDSummaryPage'));
 const ProjectsPage   = lazy(() => import('./pages/ProjectsPage'));
+const MapsPage       = lazy(() => import('./pages/MapsPage'));
 const FinancialsPage = lazy(() => import('./pages/FinancialsPage'));
 const ResourcesPage  = lazy(() => import('./pages/ResourcesPage'));
 const TeamPage       = lazy(() => import('./pages/TeamPage'));
 const AnalyticsPage  = lazy(() => import('./pages/AnalyticsPage'));
 const ChatPage       = lazy(() => import('./pages/ChatPage'));
+const WorkflowPage   = lazy(() => import('./pages/WorkflowPage'));
+const TeamChatPage   = lazy(() => import('./pages/TeamChatPage'));
 
 const App = () => {
   return (
@@ -32,11 +35,14 @@ const App = () => {
             <Routes>
               <Route path="/" element={<YTDSummaryPage />} />
               <Route path="/projects" element={<ProjectsPage />} />
+              <Route path="/maps" element={<MapsPage />} />
               <Route path="/financials" element={<FinancialsPage />} />
               <Route path="/resources" element={<ResourcesPage />} />
               <Route path="/team" element={<TeamPage />} />
               <Route path="/analytics" element={<AnalyticsPage />} />
               <Route path="/chat" element={<ChatPage />} />
+              <Route path="/workflow" element={<WorkflowPage />} />
+              <Route path="/team-chat" element={<TeamChatPage />} />
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </Suspense>

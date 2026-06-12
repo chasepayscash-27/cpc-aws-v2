@@ -3,7 +3,9 @@ import type { ProjectRow } from "../types/project";
 import type { PhotoLogRow } from "../types/photoLog";
 import { loadCsv } from "../utils/csv";
 import PropertyFinancials from "./PropertyFinancials";
-import { generatePropertyPdf } from "../utils/generatePropertyPdf";
+import PropertyWorksheet from "./PropertyWorksheet";
+import PropertyWorkflow from "./PropertyWorkflow";
+import ConstructionWorkflowTemplate from "./ConstructionWorkflowTemplate";
 
 interface Props {
   project: ProjectRow;
@@ -50,9 +52,21 @@ function DetailRow({ label, value }: { label: string; value?: string | null }) {
   );
 }
 
+const COST_LABELS = ["Labor", "Materials", "3rd Party"] as const;
+
 export default function ProjectDetailsModal({ project: row, onClose, onViewFullPnL }: Props) {
   const [photos, setPhotos] = useState<PhotoLogRow[]>([]);
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
+  const [worksheetOpen, setWorksheetOpen] = useState(false);
+  const [constructionWorkflowOpen, setConstructionWorkflowOpen] = useState(false);
+  const [costSummary, setCostSummary] = useState<[number, number, number]>([0, 0, 0]);
+
+  const handleFinancialSummary = useCallback(
+    (labor: number, materials: number, thirdParty: number) => {
+      setCostSummary([labor, materials, thirdParty]);
+    },
+    []
+  );
 
   const isLightboxOpen = lightboxIndex !== null;
 
@@ -166,6 +180,11 @@ export default function ProjectDetailsModal({ project: row, onClose, onViewFullP
   const sqft = sqftFormatted ? sqftFormatted + " sq ft" : undefined;
   const createdDate = row.created_at ? new Date(row.created_at).toLocaleDateString() : undefined;
   const updatedDate = row.updated_at ? new Date(row.updated_at).toLocaleDateString() : undefined;
+  const propertyId =
+    row.project_uuid?.trim() ||
+    row.name?.trim() ||
+    row.full_address?.trim() ||
+    "";
 
   return (
     <>
@@ -204,6 +223,31 @@ export default function ProjectDetailsModal({ project: row, onClose, onViewFullP
 
           {/* Content */}
           <div style={{ padding: "22px 24px 28px" }}>
+            {/* Cost placeholders */}
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12, marginBottom: 20 }}>
+              {COST_LABELS.map((label, i) => (
+                <div
+                  key={label}
+                  style={{
+                    background: "#f0f7f1",
+                    border: "1px solid #d4e8d8",
+                    borderRadius: 12,
+                    padding: "12px 14px",
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: 4,
+                  }}
+                >
+                  <span style={{ fontSize: 10, fontWeight: 600, color: "#5a7060", textTransform: "uppercase", letterSpacing: "0.06em" }}>
+                    {label}
+                  </span>
+                  <span style={{ fontSize: 18, fontWeight: 700, color: "#1a7a3c" }}>
+                    ${costSummary[i].toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  </span>
+                </div>
+              ))}
+            </div>
+
             {/* Header */}
             <div style={{ marginBottom: 16 }}>
               <h2 style={{ margin: "0 0 6px", fontSize: 22, fontWeight: 700, lineHeight: 1.2, paddingRight: 36 }}>
@@ -232,36 +276,93 @@ export default function ProjectDetailsModal({ project: row, onClose, onViewFullP
               </div>
             )}
 
-            {/* Download PDF button */}
-            <button
-              onClick={() => generatePropertyPdf(row)}
-              style={{
-                marginBottom: 20,
-                padding: "8px 18px",
-                borderRadius: 12,
-                border: "1px solid #1a7a3c",
-                background: "#f0f7f1",
-                color: "#1a7a3c",
-                fontSize: 13,
-                fontWeight: 600,
-                cursor: "pointer",
-                display: "inline-flex",
-                alignItems: "center",
-                gap: 6,
-                transition: "background 0.15s, color 0.15s",
-              }}
-              onMouseEnter={(e) => {
-                (e.currentTarget as HTMLButtonElement).style.background = "#1a7a3c";
-                (e.currentTarget as HTMLButtonElement).style.color = "#ffffff";
-              }}
-              onMouseLeave={(e) => {
-                (e.currentTarget as HTMLButtonElement).style.background = "#f0f7f1";
-                (e.currentTarget as HTMLButtonElement).style.color = "#1a7a3c";
-              }}
-              aria-label="Download PDF report"
-            >
-              📄 Download PDF
-            </button>
+            {/* Worksheet / construction workflow toggle buttons */}
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: worksheetOpen || constructionWorkflowOpen ? 12 : 20 }}>
+              <button
+                onClick={() => setWorksheetOpen((v) => !v)}
+                style={{
+                  padding: "8px 18px",
+                  borderRadius: 12,
+                  border: "1px solid #1a7a3c",
+                  background: worksheetOpen ? "#1a7a3c" : "#f0f7f1",
+                  color: worksheetOpen ? "#ffffff" : "#1a7a3c",
+                  fontSize: 13,
+                  fontWeight: 600,
+                  cursor: "pointer",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 6,
+                  transition: "background 0.15s, color 0.15s",
+                }}
+                onMouseEnter={(e) => {
+                  if (!worksheetOpen) {
+                    (e.currentTarget as HTMLButtonElement).style.background = "#1a7a3c";
+                    (e.currentTarget as HTMLButtonElement).style.color = "#ffffff";
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (!worksheetOpen) {
+                    (e.currentTarget as HTMLButtonElement).style.background = "#f0f7f1";
+                    (e.currentTarget as HTMLButtonElement).style.color = "#1a7a3c";
+                  }
+                }}
+                aria-expanded={worksheetOpen}
+                aria-label={worksheetOpen ? "Close property worksheet" : "Open property worksheet"}
+              >
+                📋 {worksheetOpen ? "Close Worksheet" : "Edit Worksheet"}
+              </button>
+
+              <button
+                onClick={() => setConstructionWorkflowOpen((v) => !v)}
+                style={{
+                  padding: "8px 18px",
+                  borderRadius: 12,
+                  border: "1px solid #1a7a3c",
+                  background: constructionWorkflowOpen ? "#1a7a3c" : "#f0f7f1",
+                  color: constructionWorkflowOpen ? "#ffffff" : "#1a7a3c",
+                  fontSize: 13,
+                  fontWeight: 600,
+                  cursor: "pointer",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 6,
+                  transition: "background 0.15s, color 0.15s",
+                }}
+                onMouseEnter={(e) => {
+                  if (!constructionWorkflowOpen) {
+                    (e.currentTarget as HTMLButtonElement).style.background = "#1a7a3c";
+                    (e.currentTarget as HTMLButtonElement).style.color = "#ffffff";
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (!constructionWorkflowOpen) {
+                    (e.currentTarget as HTMLButtonElement).style.background = "#f0f7f1";
+                    (e.currentTarget as HTMLButtonElement).style.color = "#1a7a3c";
+                  }
+                }}
+                aria-expanded={constructionWorkflowOpen}
+                aria-label={constructionWorkflowOpen ? "Close construction workflow template" : "Open construction workflow template"}
+              >
+                🏗️ {constructionWorkflowOpen ? "Close Construction Workflow" : "Construction Workflow"}
+              </button>
+            </div>
+
+            {/* Inline editable worksheet */}
+            {worksheetOpen && (
+              <div style={{ marginBottom: 20 }}>
+                <PropertyWorksheet row={row} />
+              </div>
+            )}
+
+            {constructionWorkflowOpen && (
+              <div style={{ marginBottom: 20 }}>
+                <ConstructionWorkflowTemplate propertyName={row.name} />
+              </div>
+            )}
+
+            <div style={{ marginBottom: 20 }}>
+              <PropertyWorkflow propertyId={propertyId} />
+            </div>
 
             {/* Quick stats */}
             {(row.beds || row.baths || sqft || row.year_built) && (
@@ -428,6 +529,7 @@ export default function ProjectDetailsModal({ project: row, onClose, onViewFullP
                       ? () => { onViewFullPnL(row.name as string); onClose(); }
                       : undefined
                   }
+                  onSummary={handleFinancialSummary}
                 />
               </>
             )}

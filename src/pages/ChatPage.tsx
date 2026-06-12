@@ -6,12 +6,11 @@ export default function ChatPage() {
       <div className="pageHeader">
         <h1 className="h1">AI Assistant</h1>
         <p className="muted">
-          Ask anything about real estate investing, deal analysis, or your
-          portfolio — no login required.
+          Powered by Amazon Titan Text Lite — ask anything about real estate investing or your portfolio.
         </p>
       </div>
 
-      <div className="card" style={{ marginTop: "8px" }}>
+      <div className="card chatCard" style={{ marginTop: "8px" }}>
         <PublicChatWidget />
       </div>
     </div>

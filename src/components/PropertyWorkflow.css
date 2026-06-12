@@ -1,0 +1,179 @@
+.propertyWorkflow {
+  border: 1px solid #d4e8d8;
+  border-radius: 12px;
+  background: #f8fcf9;
+  padding: 14px;
+}
+
+.propertyWorkflowHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+}
+
+.propertyWorkflowHeader h3 {
+  margin: 0;
+  font-size: 15px;
+  color: #1a2e1a;
+}
+
+.propertyWorkflowHeader p {
+  margin: 0;
+  font-size: 12px;
+  color: #5a7060;
+}
+
+.pwProgressBar {
+  width: 100%;
+  height: 8px;
+  border-radius: 999px;
+  overflow: hidden;
+  background: #e6f2e8;
+  margin: 10px 0 12px;
+}
+
+.pwProgressBar span {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, #1a7a3c, #28a852);
+  transition: width 0.2s ease;
+}
+
+.pwAlertToggleRow {
+  margin: 6px 0 10px;
+}
+
+.pwAlertToggleLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #1a2e1a;
+}
+
+.pwTabs {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+  margin-bottom: 8px;
+}
+
+.pwTab {
+  border: 1px solid #cde8d5;
+  background: #fff;
+  color: #1a7a3c;
+  border-radius: 999px;
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.pwTab.active {
+  background: #1a7a3c;
+  color: #fff;
+  border-color: #1a7a3c;
+}
+
+.pwChecklist {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.pwRow {
+  display: grid;
+  grid-template-columns: auto auto 1fr;
+  gap: 10px;
+  align-items: flex-start;
+  border: 1px solid #deede2;
+  border-radius: 10px;
+  background: #fff;
+  padding: 10px;
+}
+
+.pwRow.completed {
+  background: #f3faf4;
+}
+
+.pwRow input[type="checkbox"] {
+  margin-top: 2px;
+}
+
+.pwOrder {
+  color: #1a7a3c;
+  font-size: 12px;
+  font-weight: 700;
+  min-width: 24px;
+}
+
+.pwTopLine {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.pwAssigneeWrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.pwAssigneeLabel {
+  font-size: 11px;
+  color: #5a7060;
+}
+
+.pwAssigneeSelect {
+  border: 1px solid #cde8d5;
+  border-radius: 8px;
+  background: #fff;
+  color: #1a2e1a;
+  font-size: 12px;
+  padding: 2px 6px;
+}
+
+.pwBadge {
+  display: inline-block;
+  background: #e9f7ec;
+  border: 1px solid #cde8d5;
+  color: #1a7a3c;
+  border-radius: 999px;
+  padding: 2px 8px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.pwContent p {
+  margin: 5px 0 0;
+  font-size: 13px;
+  color: #1a2e1a;
+}
+
+.pwNotes {
+  color: #5a7060 !important;
+  font-size: 12px !important;
+}
+
+.pwMuted {
+  margin: 0;
+  color: #5a7060;
+  font-size: 12px;
+}
+
+.pwError {
+  margin: 0 0 8px;
+  color: #c0392b;
+  font-size: 12px;
+}
+
+.pwSuccess {
+  margin: 0 0 8px;
+  color: #1a7a3c;
+  font-size: 12px;
+}

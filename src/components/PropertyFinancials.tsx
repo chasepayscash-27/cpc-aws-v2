@@ -1,5 +1,5 @@
-import React, { useEffect, useState, useMemo } from 'react';
-import { normalizeAddress } from '../utils/normalizeAddress';
+import React, { useEffect, useState, useMemo, useCallback } from 'react';
+import { addressesMatch } from '../utils/normalizeAddress';
 
 interface FinancialRecord {
   account: string;
@@ -10,9 +10,10 @@ interface FinancialRecord {
 interface PropertyFinancialsProps {
   propertyName: string;
   onViewFullPnL?: () => void;
+  onSummary?: (labor: number, materials: number, thirdParty: number) => void;
 }
 
-const PropertyFinancials: React.FC<PropertyFinancialsProps> = ({ propertyName, onViewFullPnL }) => {
+const PropertyFinancials: React.FC<PropertyFinancialsProps> = ({ propertyName, onViewFullPnL, onSummary }) => {
   const [data, setData] = useState<FinancialRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -47,7 +48,7 @@ const PropertyFinancials: React.FC<PropertyFinancialsProps> = ({ propertyName, o
 
 const propertyData = useMemo(
   () => data.filter(record =>
-    normalizeAddress(record.property_name) === normalizeAddress(propertyName)
+    addressesMatch(record.property_name, propertyName)
   ),
   [data, propertyName]
 );
@@ -89,6 +90,35 @@ const propertyData = useMemo(
     }
     return totalIncome - totalExpenses;
   }, [propertyData, totalIncome, totalExpenses]);
+
+  const laborTotal = useMemo(
+    () => propertyData.filter(r => r.account === 'Labor').reduce((sum, r) => sum + r.amount, 0),
+    [propertyData]
+  );
+
+  const materialsTotal = useMemo(
+    () => propertyData.filter(r => r.account === 'Materials').reduce((sum, r) => sum + r.amount, 0),
+    [propertyData]
+  );
+
+  const thirdPartyTotal = useMemo(
+    () => propertyData.filter(r => r.account === 'Third Party Vendors').reduce((sum, r) => sum + r.amount, 0),
+    [propertyData]
+  );
+
+  const stableOnSummary = useCallback(
+    (labor: number, materials: number, thirdParty: number) => {
+      onSummary?.(labor, materials, thirdParty);
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [onSummary]
+  );
+
+  useEffect(() => {
+    if (!loading) {
+      stableOnSummary(laborTotal, materialsTotal, thirdPartyTotal);
+    }
+  }, [loading, laborTotal, materialsTotal, thirdPartyTotal, stableOnSummary]);
 
   if (loading) {
     return (

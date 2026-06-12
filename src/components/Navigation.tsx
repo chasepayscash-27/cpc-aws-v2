@@ -4,11 +4,15 @@ import { NavLink } from 'react-router-dom';
 const navItems = [
   { label: '🏠 Home', path: '/' },
   { label: '🏗️ Projects', path: '/projects' },
-  { label: '💰 Financials', path: '/financials' },
+  { label: '🗺️ Maps', path: '/maps' },
+  // Temporarily hidden: financials nav can be re-enabled by uncommenting this entry.
+  // { label: '💰 Financials', path: '/financials' },
   { label: '📊 Analytics', path: '/analytics' },
   { label: '🤖 AI Chat', path: '/chat' },
+  { label: '🧭 Workflow', path: '/workflow' },
   { label: '🔧 Resources', path: '/resources' },
   { label: '👥 Team', path: '/team' },
+  { label: '💬 Team Chat', path: '/team-chat' },
 ];
 
 const Navigation: React.FC = () => {

@@ -1,20 +1,23 @@
 import { useMemo, useState } from "react";
-import { generateClient } from "aws-amplify/data";
-import type { Schema } from "../../amplify/data/resource";
 import outputs from "../../amplify/amplify_outputs.json";
-import {
-  getBedrockModelAccessRegions,
-  getBedrockModelAccessUrl,
-} from "../utils/bedrockModelAccess";
-import { parseAmplifyErrors, formatCaughtError } from "../utils/amplifyErrors";
 
-const client = generateClient<Schema>({ authMode: "apiKey" });
+const HTTP_API_URL =
+  (outputs as { custom?: { cpcHttpApi?: { url?: string } } })?.custom?.cpcHttpApi?.url ?? "";
+const CHAT_ENDPOINT = HTTP_API_URL ? `${HTTP_API_URL.replace(/\/?$/, "/")}chat` : "";
+const MAX_AI_RETRIES = 3;
 
-// Deployment region — surfaced in error messages and console links so the user
-// knows which AWS Console region(s) to check for Bedrock model access.
-const DEPLOYMENT_REGION: string | undefined =
-  (outputs as { data?: { aws_region?: string } })?.data?.aws_region;
-const BEDROCK_MODEL_ACCESS_REGIONS = getBedrockModelAccessRegions(DEPLOYMENT_REGION);
+function delay(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+function getErrorMessage(payload: unknown, fallback: string): string {
+  if (payload && typeof payload === "object") {
+    const record = payload as { error?: unknown; detail?: unknown };
+    if (typeof record.error === "string" && record.error.trim()) return record.error;
+    if (typeof record.detail === "string" && record.detail.trim()) return record.detail;
+  }
+  return fallback;
+}
 
 export interface PropertyData {
   sold_year: number;
@@ -32,84 +35,86 @@ export interface PropertyData {
 }
 
 interface Props {
-  properties: PropertyData[];
+  properties?: PropertyData[] | null;
 }
 
 export function AiInsightsPanel({ properties }: Props) {
   const [loading, setLoading] = useState(false);
   const [output, setOutput] = useState<string>("");
   const [error, setError] = useState<string>("");
-  const [showBedrockConsoleLink, setShowBedrockConsoleLink] = useState(false);
+  const safeProperties = useMemo(
+    () => (Array.isArray(properties) ? properties : []),
+    [properties]
+  );
 
   const metrics = useMemo(() => {
-    const n = properties.length;
-    if (n === 0) return null;
+    try {
+      const n = safeProperties.length;
+      if (n === 0) return null;
 
-    const totalRevenue = properties.reduce(
-      (acc, p) => acc + (p.sold_amount_num || 0),
-      0
-    );
-    const totalProfit = properties.reduce(
-      (acc, p) => acc + (p.gross_profit_num || 0),
-      0
-    );
-    const totalRehab = properties.reduce(
-      (acc, p) => acc + (p.rehab_amount_num || 0),
-      0
-    );
-    const avgDaysOnMarket = Math.round(
-      properties.reduce((acc, p) => acc + (p.days_on_market_num || 0), 0) / n
-    );
-    const avgProfit = Math.round(totalProfit / n);
+      const totalRevenue = safeProperties.reduce(
+        (acc, p) => acc + (p.sold_amount_num || 0),
+        0
+      );
+      const totalProfit = safeProperties.reduce(
+        (acc, p) => acc + (p.gross_profit_num || 0),
+        0
+      );
+      const totalRehab = safeProperties.reduce(
+        (acc, p) => acc + (p.rehab_amount_num || 0),
+        0
+      );
+      const avgDaysOnMarket = Math.round(
+        safeProperties.reduce((acc, p) => acc + (p.days_on_market_num || 0), 0) / n
+      );
+      const avgProfit = Math.round(totalProfit / n);
 
-    const leadCounts: Record<string, number> = {};
-    for (const p of properties) {
-      const key = p.lead_source || "Unknown";
-      leadCounts[key] = (leadCounts[key] || 0) + 1;
-    }
-    const topLeadSources = Object.entries(leadCounts)
-      .sort((a, b) => b[1] - a[1])
-      .slice(0, 5)
-      .map(([source, count]) => ({ source, count }));
-
-    const agentProfits: Record<string, number> = {};
-    for (const p of properties) {
-      if (p.agent) {
-        agentProfits[p.agent] = (agentProfits[p.agent] || 0) + (p.gross_profit_num || 0);
+      const leadCounts: Record<string, number> = {};
+      for (const p of safeProperties) {
+        const key = p.lead_source || "Unknown";
+        leadCounts[key] = (leadCounts[key] || 0) + 1;
       }
-    }
-    const topAgents = Object.entries(agentProfits)
-      .sort((a, b) => b[1] - a[1])
-      .slice(0, 3)
-      .map(([agent, profit]) => ({ agent, profit }));
+      const topLeadSources = Object.entries(leadCounts)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 5)
+        .map(([source, count]) => ({ source, count }));
 
-    return {
-      count: n,
-      totalRevenue,
-      totalProfit,
-      totalRehab,
-      avgDaysOnMarket,
-      avgProfit,
-      topLeadSources,
-      topAgents,
-    };
-  }, [properties]);
+      const agentProfits: Record<string, number> = {};
+      for (const p of safeProperties) {
+        if (p.agent) {
+          agentProfits[p.agent] = (agentProfits[p.agent] || 0) + (p.gross_profit_num || 0);
+        }
+      }
+      const topAgents = Object.entries(agentProfits)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 3)
+        .map(([agent, profit]) => ({ agent, profit }));
+
+      return {
+        count: n,
+        totalRevenue,
+        totalProfit,
+        totalRehab,
+        avgDaysOnMarket,
+        avgProfit,
+        topLeadSources,
+        topAgents,
+      };
+    } catch (err) {
+      console.error("[AiInsightsPanel] Failed to calculate metrics:", err);
+      return null;
+    }
+  }, [safeProperties]);
 
   async function generate() {
     if (!metrics) return;
     setLoading(true);
     setOutput("");
     setError("");
-    setShowBedrockConsoleLink(false);
     try {
-      if (typeof client.generations?.generateRecipe !== "function") {
-        console.error(
-          "[AiInsightsPanel] client.generations.generateRecipe is not available. " +
-            "Ensure Amplify outputs are up-to-date and include the generateRecipe generation route."
-        );
-        throw new Error(
-          "AI Insights are not available right now. Please try again later or contact support."
-        );
+      if (!CHAT_ENDPOINT) {
+        setError("AI Insights endpoint is unavailable. Please try again later.");
+        return;
       }
 
       const prompt = `
@@ -123,22 +128,56 @@ Metrics:
 ${JSON.stringify(metrics, null, 2)}
 `.trim();
 
-      const { data, errors } = await client.generations.generateRecipe({
-        description: prompt,
-      });
+      for (let attempt = 0; attempt < MAX_AI_RETRIES; attempt += 1) {
+        const isLastAttempt = attempt === MAX_AI_RETRIES - 1;
 
-      if (errors?.length) {
-        const parsed = parseAmplifyErrors("AiInsightsPanel", errors, DEPLOYMENT_REGION);
-        setShowBedrockConsoleLink(parsed.showBedrockConsoleLink);
-        setError(parsed.userMessage);
+        const res = await fetch(CHAT_ENDPOINT, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ message: prompt }),
+        });
+        let json: unknown = null;
+        try {
+          json = await res.json();
+        } catch {
+          json = null;
+        }
+        const jsonObject =
+          json && typeof json === "object"
+            ? (json as { reply?: unknown; error?: unknown; detail?: unknown })
+            : null;
+
+        if (!res.ok) {
+          const isRetryable = res.status === 429 || res.status >= 500;
+
+          if (isRetryable && !isLastAttempt) {
+            const retryDelayMs = (res.status === 429 ? 1500 : 2000) * 2 ** attempt;
+            console.warn(
+              `[AiInsightsPanel] Retrying AI request in ${retryDelayMs}ms after ${res.status}.`
+            );
+            await delay(retryDelayMs);
+            continue;
+          }
+
+          setError(getErrorMessage(jsonObject, `AI request failed (${res.status}). Please try again.`));
+          return;
+        }
+
+        if (!jsonObject) {
+          setError("AI response was invalid. Please try again.");
+          return;
+        }
+
+        const reply =
+          typeof jsonObject.reply === "string"
+            ? (jsonObject.reply || "No insights returned.")
+            : "No insights returned.";
+        setOutput(reply);
         return;
       }
-
-      setOutput(data?.instructions ?? "No insights returned.");
     } catch (e: unknown) {
-      const parsed = formatCaughtError("AiInsightsPanel", e, DEPLOYMENT_REGION);
-      setShowBedrockConsoleLink(parsed.showBedrockConsoleLink);
-      setError(parsed.userMessage);
+      const msg = e instanceof Error ? e.message : "An unexpected error occurred.";
+      setError(msg);
     } finally {
       setLoading(false);
     }
@@ -170,37 +209,26 @@ ${JSON.stringify(metrics, null, 2)}
         <button
           className="btnPrimary"
           onClick={generate}
-          disabled={loading || !metrics}
+          disabled={loading || !metrics || !CHAT_ENDPOINT}
           style={{ whiteSpace: "nowrap" }}
         >
           {loading ? "Thinking…" : "✨ Generate Insights"}
         </button>
       </div>
 
+      {!CHAT_ENDPOINT && (
+        <div style={{ marginTop: "8px" }}>
+          <p style={{ color: "var(--muted)", fontSize: "13px", margin: 0 }}>
+            AI Insights are temporarily unavailable.
+          </p>
+        </div>
+      )}
+
       {error && (
         <div style={{ marginTop: "8px" }}>
           <p style={{ color: "#dc2626", fontSize: "13px", margin: "0 0 6px" }}>
             {error}
           </p>
-          {showBedrockConsoleLink && (
-            <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
-              {(BEDROCK_MODEL_ACCESS_REGIONS.length > 0
-                ? BEDROCK_MODEL_ACCESS_REGIONS
-                : [undefined]
-              ).map((region) => (
-                <a
-                  key={region ?? "default"}
-                  href={getBedrockModelAccessUrl(region)}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="btn"
-                  style={{ fontSize: "12px", display: "inline-block" }}
-                >
-                  🔗 Bedrock Model Access{region ? ` (${region})` : ""}
-                </a>
-              ))}
-            </div>
-          )}
         </div>
       )}
 
