@@ -1,11 +1,10 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { generateClient } from 'aws-amplify/data';
 import { getCurrentUser } from 'aws-amplify/auth';
 import type { Schema } from '../../amplify/data/resource';
 import { loadCsv } from '../utils/csv';
 import type { ProjectRow } from '../types/project';
 import { getPrimaryTasksAcrossProperties } from '../components/propertyTaskCollections';
-import { updateTask } from '../components/propertyWorkflowTabs';
+import { usePropertyTasks } from '../contexts/PropertyTasksContext';
 import '../App.css';
 
 interface TeamMember {
@@ -27,8 +26,6 @@ interface TeamTaskView {
   task: PropertyTask;
   propertyLabel: string;
 }
-
-const client = generateClient<Schema>();
 
 function normalizeToken(value: string): string {
   return value.trim().toLowerCase().replace(/[^a-z0-9]/g, '');
@@ -75,16 +72,18 @@ function buildProjectLookup(rows: ProjectRow[]): Map<string, string> {
 }
 
 const TeamPage = () => {
+  const { allTasks, isLoading: isTaskLoading, error: contextTaskError, updateTaskCompletion } = usePropertyTasks();
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
-  const [tasks, setTasks] = useState<PropertyTask[]>([]);
   const [projectLookup, setProjectLookup] = useState<Map<string, string>>(new Map());
   const [isLoading, setIsLoading] = useState(true);
-  const [isTaskLoading, setIsTaskLoading] = useState(true);
   const [error, setError] = useState('');
-  const [taskError, setTaskError] = useState('');
+  const [toggleError, setToggleError] = useState('');
   const [selectedMember, setSelectedMember] = useState<TeamMember | null>(null);
   const [completedByUser, setCompletedByUser] = useState<string | null>(null);
   const [updatingTaskIds, setUpdatingTaskIds] = useState<string[]>([]);
+
+  const taskError = contextTaskError || toggleError;
+  const tasks = useMemo(() => getPrimaryTasksAcrossProperties(allTasks), [allTasks]);
 
   useEffect(() => {
     getCurrentUser()
@@ -126,60 +125,23 @@ const TeamPage = () => {
     };
   }, []);
 
-  useEffect(() => {
-    const subscription = client.models.PropertyTask.observeQuery().subscribe({
-      next: ({ items }) => {
-        setTasks(getPrimaryTasksAcrossProperties(items));
-        setIsTaskLoading(false);
-        setTaskError('');
-      },
-      error: (loadError) => {
-        setIsTaskLoading(false);
-        setTaskError(loadError instanceof Error ? loadError.message : 'Unable to load workflow tasks.');
-      },
-    });
-
-    return () => subscription.unsubscribe();
-  }, []);
-
   const handleToggle = useCallback(
     async (task: PropertyTask, checked: boolean) => {
-      setTaskError('');
-      const previousCompletedAt = task.completedAt;
-      const previousCompletedBy = task.completedBy;
+      setToggleError('');
       const completedAt = checked ? new Date().toISOString() : null;
       const completedBy = checked ? completedByUser : null;
 
       setUpdatingTaskIds((current) => [...current, task.id]);
-      setTasks((currentTasks) =>
-        updateTask(currentTasks, task.id, {
-          isComplete: checked,
-          completedAt,
-          completedBy,
-        })
-      );
 
-      const { errors } = await client.models.PropertyTask.update({
-        id: task.id,
-        isComplete: checked,
-        completedAt,
-        completedBy,
-      });
+      const { errors } = await updateTaskCompletion(task, checked, completedAt, completedBy);
 
       setUpdatingTaskIds((current) => current.filter((id) => id !== task.id));
 
       if (errors?.length) {
-        setTasks((currentTasks) =>
-          updateTask(currentTasks, task.id, {
-            isComplete: !!task.isComplete,
-            completedAt: previousCompletedAt ?? null,
-            completedBy: previousCompletedBy ?? null,
-          })
-        );
-        setTaskError(errors.map((item) => item.message).join('; '));
+        setToggleError(errors.map((item) => item.message).join('; '));
       }
     },
-    [completedByUser]
+    [completedByUser, updateTaskCompletion]
   );
 
   const tasksByMember = useMemo(() => {

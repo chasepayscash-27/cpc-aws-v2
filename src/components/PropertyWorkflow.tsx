@@ -13,6 +13,7 @@ import {
   type WorkflowAlertRecipient,
 } from "./propertyWorkflowTabs";
 import { dedupeTasksByCanonicalOrder, getWorkflowProgressCounts, normalizeWorkflowOwner } from "./propertyWorkflowNormalization";
+import { usePropertyTasks } from "../contexts/PropertyTasksContext";
 import "./PropertyWorkflow.css";
 
 type PropertyTask = Schema["PropertyTask"]["type"];
@@ -32,6 +33,7 @@ function sortTasks(tasks: PropertyTask[]): PropertyTask[] {
 }
 
 export default function PropertyWorkflow({ propertyId }: Props) {
+  const { updateTaskCompletion } = usePropertyTasks();
   const [tasks, setTasks] = useState<PropertyTask[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -271,28 +273,25 @@ export default function PropertyWorkflow({ propertyId }: Props) {
       setError("");
       setAlertStatus("");
       const wasComplete = !!task.isComplete;
-      const previousCompletedAt = task.completedAt;
-      const previousCompletedBy = task.completedBy;
+      const completedAt = checked ? new Date().toISOString() : null;
+      const completedBy = checked ? completedByUser : null;
+
+      // Optimistic update for this component's own display.
       setTasks((currentTasks) =>
-        updateTask(currentTasks, task.id, {
-          isComplete: checked,
-          completedAt: checked ? new Date().toISOString() : null,
-          completedBy: checked ? completedByUser : null,
-        })
+        updateTask(currentTasks, task.id, { isComplete: checked, completedAt, completedBy })
       );
 
-      const { errors } = await client.models.PropertyTask.update({
-        id: task.id,
-        isComplete: checked,
-        completedAt: checked ? new Date().toISOString() : null,
-        completedBy: checked ? completedByUser : null,
-      });
+      // Route the write through the shared context so TeamPage and
+      // ConstructionWorkflowTemplate see the change immediately.
+      const { errors } = await updateTaskCompletion(task, checked, completedAt, completedBy);
+
       if (errors?.length) {
+        // Revert this component's local copy (context already reverted allTasks).
         setTasks((currentTasks) =>
           updateTask(currentTasks, task.id, {
             isComplete: !!task.isComplete,
-            completedAt: previousCompletedAt ?? null,
-            completedBy: previousCompletedBy ?? null,
+            completedAt: task.completedAt ?? null,
+            completedBy: task.completedBy ?? null,
           })
         );
         setError(errors.map((item) => item.message).join("; "));
@@ -321,11 +320,11 @@ export default function PropertyWorkflow({ propertyId }: Props) {
             return;
           }
 
-          setAlertStatus(`Queued email + text alert to ${recipient.label} for “${task.stage}”.`);
+          setAlertStatus(`Queued email + text alert to ${recipient.label} for "${task.stage}".`);
         }
       }
     },
-    [alertsEnabled, completedByUser, propertyId, recipients]
+    [alertsEnabled, completedByUser, propertyId, recipients, updateTaskCompletion]
   );
 
   const handleAssigneeChange = useCallback(async (task: PropertyTask, assigneeId: string | null) => {
