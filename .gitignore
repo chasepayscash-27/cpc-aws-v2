@@ -27,3 +27,13 @@ dist-ssr
 .amplify
 amplify_outputs*
 amplifyconfiguration*
+
+# Jupyter notebooks & checkpoints (data-pipeline scratch)
+*.ipynb
+.ipynb_checkpoints/
+
+# Prevent re-nesting the project inside public/
+public/data/cpc-aws-v2/
+
+# Allow the canonical working notebook
+!notebooks/Flipper_Force_API_05212026.ipynb

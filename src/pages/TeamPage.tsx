@@ -1,8 +1,10 @@
-import { useEffect, useMemo, useState } from 'react';
-import { generateClient } from 'aws-amplify/data';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { getCurrentUser } from 'aws-amplify/auth';
 import type { Schema } from '../../amplify/data/resource';
 import { loadCsv } from '../utils/csv';
 import type { ProjectRow } from '../types/project';
+import { getPrimaryTasksAcrossProperties } from '../components/propertyTaskCollections';
+import { usePropertyTasks } from '../contexts/PropertyTasksContext';
 import '../App.css';
 
 interface TeamMember {
@@ -20,16 +22,10 @@ interface TeamCsvRow {
 
 type PropertyTask = Schema['PropertyTask']['type'];
 
-interface OutstandingTask {
-  id: string;
-  order: number | null;
-  stage: string;
-  propertyId: string;
+interface TeamTaskView {
+  task: PropertyTask;
   propertyLabel: string;
-  assigneeId: string;
 }
-
-const client = generateClient<Schema>();
 
 function normalizeToken(value: string): string {
   return value.trim().toLowerCase().replace(/[^a-z0-9]/g, '');
@@ -75,40 +71,34 @@ function buildProjectLookup(rows: ProjectRow[]): Map<string, string> {
   return map;
 }
 
-async function listAllPropertyTasks(): Promise<PropertyTask[]> {
-  const allTasks: PropertyTask[] = [];
-  let nextToken: string | null | undefined;
-
-  do {
-    const { data, nextToken: newToken } = await client.models.PropertyTask.list({
-      limit: 1000,
-      nextToken,
-    });
-    allTasks.push(...(data ?? []));
-    nextToken = newToken;
-  } while (nextToken);
-
-  return allTasks;
-}
-
 const TeamPage = () => {
+  const { allTasks, isLoading: isTaskLoading, error: contextTaskError, updateTaskCompletion } = usePropertyTasks();
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
-  const [tasks, setTasks] = useState<OutstandingTask[]>([]);
+  const [projectLookup, setProjectLookup] = useState<Map<string, string>>(new Map());
   const [isLoading, setIsLoading] = useState(true);
-  const [isTaskLoading, setIsTaskLoading] = useState(true);
   const [error, setError] = useState('');
-  const [taskError, setTaskError] = useState('');
+  const [toggleError, setToggleError] = useState('');
   const [selectedMember, setSelectedMember] = useState<TeamMember | null>(null);
+  const [completedByUser, setCompletedByUser] = useState<string | null>(null);
+  const [updatingTaskIds, setUpdatingTaskIds] = useState<string[]>([]);
+
+  const taskError = contextTaskError || toggleError;
+  const tasks = useMemo(() => getPrimaryTasksAcrossProperties(allTasks), [allTasks]);
+
+  useEffect(() => {
+    getCurrentUser()
+      .then((user) => {
+        const identifier = user.signInDetails?.loginId ?? user.username ?? user.userId;
+        setCompletedByUser(identifier ?? null);
+      })
+      .catch(() => setCompletedByUser(null));
+  }, []);
 
   useEffect(() => {
     let isMounted = true;
 
-    Promise.all([
-      loadCsv<TeamCsvRow>('/data/cpc_job_titles.csv'),
-      loadCsv<ProjectRow>('/data/projects_v2.csv'),
-      listAllPropertyTasks(),
-    ])
-      .then(([teamRows, projectRows, propertyTasks]) => {
+    Promise.all([loadCsv<TeamCsvRow>('/data/cpc_job_titles.csv'), loadCsv<ProjectRow>('/data/projects_v2.csv')])
+      .then(([teamRows, projectRows]) => {
         if (!isMounted) return;
         const cleanedMembers = teamRows
           .map((row) => {
@@ -121,47 +111,13 @@ const TeamPage = () => {
           })
           .filter((row) => row.name || row.position || row.email);
         setTeamMembers(cleanedMembers);
+        setProjectLookup(buildProjectLookup(projectRows));
         setIsLoading(false);
-
-        const projectLookup = buildProjectLookup(projectRows);
-
-        // Deduplicate tasks: for each (propertyId, order) pair keep only the first
-        // encountered task. This prevents duplicate DB rows from showing in the team list.
-        const seenTaskKeys = new Set<string>();
-        const dedupedTasks = propertyTasks.filter((task) => {
-          const key = `${task.propertyId?.trim() ?? ''}:${task.order ?? ''}`;
-          if (seenTaskKeys.has(key)) return false;
-          seenTaskKeys.add(key);
-          return true;
-        });
-
-        const outstanding = dedupedTasks
-          .filter((task) => !task.isComplete)
-          .map((task) => {
-            const propertyId = task.propertyId?.trim() || '';
-            return {
-              id: task.id,
-              order: task.order ?? null,
-              stage: task.stage?.trim() || 'Unnamed task',
-              propertyId,
-              propertyLabel: (projectLookup.get(propertyId) ?? propertyId) || 'Unknown property',
-              assigneeId: task.assigneeId?.trim() || '',
-            };
-          })
-          .filter((task) => task.assigneeId);
-        setTasks(outstanding);
-        setIsTaskLoading(false);
       })
       .catch((loadError) => {
         if (!isMounted) return;
         setIsLoading(false);
-        setIsTaskLoading(false);
-        const message = loadError instanceof Error ? loadError.message : 'Failed to load team data.';
-        if (message.toLowerCase().includes('propertytask')) {
-          setTaskError('Unable to load workflow tasks.');
-        } else {
-          setError('Unable to load team member data.');
-        }
+        setError(loadError instanceof Error ? loadError.message : 'Unable to load team member data.');
       });
 
     return () => {
@@ -169,16 +125,46 @@ const TeamPage = () => {
     };
   }, []);
 
+  const handleToggle = useCallback(
+    async (task: PropertyTask, checked: boolean) => {
+      setToggleError('');
+      const completedAt = checked ? new Date().toISOString() : null;
+      const completedBy = checked ? completedByUser : null;
+
+      setUpdatingTaskIds((current) => [...current, task.id]);
+
+      const { errors } = await updateTaskCompletion(task, checked, completedAt, completedBy);
+
+      setUpdatingTaskIds((current) => current.filter((id) => id !== task.id));
+
+      if (errors?.length) {
+        setToggleError(errors.map((item) => item.message).join('; '));
+      }
+    },
+    [completedByUser, updateTaskCompletion]
+  );
+
   const tasksByMember = useMemo(() => {
-    const map = new Map<string, OutstandingTask[]>();
+    const map = new Map<string, TeamTaskView[]>();
     for (const member of teamMembers) {
       const memberTasks = tasks
-        .filter((task) => isTaskAssignedToEmployee(task.assigneeId, member.name))
-        .sort((a, b) => (a.order ?? Number.MAX_SAFE_INTEGER) - (b.order ?? Number.MAX_SAFE_INTEGER));
+        .filter((task) => isTaskAssignedToEmployee(task.assigneeId?.trim() || '', member.name))
+        .map((task) => {
+          const propertyId = task.propertyId?.trim() || '';
+          return {
+            task,
+            propertyLabel: (projectLookup.get(propertyId) ?? propertyId) || 'Unknown property',
+          };
+        })
+        .sort((a, b) => {
+          const completionDelta = Number(!!a.task.isComplete) - Number(!!b.task.isComplete);
+          if (completionDelta !== 0) return completionDelta;
+          return (a.task.order ?? Number.MAX_SAFE_INTEGER) - (b.task.order ?? Number.MAX_SAFE_INTEGER);
+        });
       map.set(member.name, memberTasks);
     }
     return map;
-  }, [teamMembers, tasks]);
+  }, [projectLookup, teamMembers, tasks]);
 
   const selectedMemberTasks = useMemo(
     () => (selectedMember ? tasksByMember.get(selectedMember.name) ?? [] : []),
@@ -186,7 +172,7 @@ const TeamPage = () => {
   );
 
   const selectedMemberTaskGroups = useMemo(() => {
-    const groups = new Map<string, OutstandingTask[]>();
+    const groups = new Map<string, TeamTaskView[]>();
     for (const task of selectedMemberTasks) {
       const existing = groups.get(task.propertyLabel) ?? [];
       existing.push(task);
@@ -194,6 +180,8 @@ const TeamPage = () => {
     }
     return [...groups.entries()].sort(([a], [b]) => a.localeCompare(b));
   }, [selectedMemberTasks]);
+
+  const selectedMemberOutstandingCount = selectedMemberTasks.filter(({ task }) => !task.isComplete).length;
 
   return (
     <>
@@ -227,7 +215,9 @@ const TeamPage = () => {
             <article key={`${member.name || 'member'}-${index}`} className="card teamCard">
               <button className="teamNameButton" onClick={() => setSelectedMember(member)}>
                 <span className="teamName">{member.name || 'Unknown Team Member'}</span>
-                <span className="teamTaskCount">{tasksByMember.get(member.name)?.length ?? 0} outstanding</span>
+                <span className="teamTaskCount">
+                  {tasksByMember.get(member.name)?.filter(({ task }) => !task.isComplete).length ?? 0} outstanding
+                </span>
               </button>
               <div className="teamPosition">{member.position || 'Position not listed'}</div>
               {member.email ? (
@@ -243,9 +233,14 @@ const TeamPage = () => {
 
       {selectedMember && (
         <div className="teamTaskModalOverlay" role="presentation" onClick={() => setSelectedMember(null)}>
-          <section className="teamTaskModal card" role="dialog" aria-modal="true" aria-label={`Outstanding tasks for ${selectedMember.name}`} onClick={(event) => event.stopPropagation()}>
+          <section className="teamTaskModal card" role="dialog" aria-modal="true" aria-label={`Tasks for ${selectedMember.name}`} onClick={(event) => event.stopPropagation()}>
             <div className="teamTaskModalHeader">
-              <h2>{selectedMember.name} — Outstanding Task List</h2>
+              <div>
+                <h2>{selectedMember.name} — Task List</h2>
+                <p className="teamTaskModalSummary">
+                  {selectedMemberOutstandingCount} outstanding of {selectedMemberTasks.length} assigned
+                </p>
+              </div>
               <button type="button" className="teamTaskModalClose" onClick={() => setSelectedMember(null)}>
                 Close
               </button>
@@ -253,20 +248,30 @@ const TeamPage = () => {
             {isTaskLoading && <p className="muted">Loading workflow tasks...</p>}
             {!isTaskLoading && taskError && <p className="muted">{taskError}</p>}
             {!isTaskLoading && !taskError && selectedMemberTaskGroups.length === 0 && (
-              <p className="muted">No outstanding workflow tasks assigned.</p>
+              <p className="muted">No workflow tasks assigned.</p>
             )}
             {!isTaskLoading &&
               !taskError &&
               selectedMemberTaskGroups.map(([propertyLabel, propertyTasks]) => (
                 <div key={propertyLabel} className="teamTaskPropertyGroup">
                   <h3>{propertyLabel}</h3>
-                  <ul>
-                    {propertyTasks.map((task) => (
-                      <li key={task.id}>
-                        #{task.order ?? '—'} {task.stage}
-                      </li>
+                  <div className="teamTaskList">
+                    {propertyTasks.map(({ task }) => (
+                      <label className={`teamTaskRow${task.isComplete ? ' completed' : ''}`} key={task.id}>
+                        <input
+                          type="checkbox"
+                          checked={!!task.isComplete}
+                          disabled={updatingTaskIds.includes(task.id)}
+                          aria-label={`Mark ${task.stage?.trim() || 'task'} ${task.isComplete ? 'incomplete' : 'complete'} for ${propertyLabel}`}
+                          onChange={(event) => {
+                            void handleToggle(task, event.currentTarget.checked);
+                          }}
+                        />
+                        <span className="teamTaskOrder">#{task.order ?? '—'}</span>
+                        <span className="teamTaskStage">{task.stage?.trim() || 'Unnamed task'}</span>
+                      </label>
                     ))}
-                  </ul>
+                  </div>
                 </div>
               ))}
           </section>
@@ -364,6 +369,12 @@ const TeamPage = () => {
           color: #1a2e1a;
         }
 
+        .teamTaskModalSummary {
+          margin: 4px 0 0;
+          font-size: 12px;
+          color: #5a7060;
+        }
+
         .teamTaskModalClose {
           border: 1px solid rgba(26, 122, 60, 0.3);
           background: #f0f7f1;
@@ -386,10 +397,42 @@ const TeamPage = () => {
           font-size: 16px;
         }
 
-        .teamTaskPropertyGroup ul {
-          margin: 0;
-          padding-left: 20px;
+        .teamTaskList {
+          display: grid;
+          gap: 8px;
+        }
+
+        .teamTaskRow {
+          display: grid;
+          grid-template-columns: auto auto 1fr;
+          align-items: center;
+          gap: 10px;
+          border: 1px solid rgba(26, 122, 60, 0.18);
+          border-radius: 10px;
+          background: #ffffff;
+          padding: 10px 12px;
           color: #1a2e1a;
+        }
+
+        .teamTaskRow.completed {
+          background: #f5faf6;
+          color: #5a7060;
+        }
+
+        .teamTaskOrder {
+          font-size: 12px;
+          font-weight: 700;
+          color: #1a7a3c;
+        }
+
+        .teamTaskRow.completed .teamTaskOrder,
+        .teamTaskRow.completed .teamTaskStage {
+          text-decoration: line-through;
+        }
+
+        .teamTaskStage {
+          font-size: 14px;
+          font-weight: 600;
         }
       `}</style>
     </>

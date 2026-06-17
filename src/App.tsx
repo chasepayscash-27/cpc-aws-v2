@@ -1,6 +1,7 @@
 import { lazy, Suspense } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import Navigation from './components/Navigation';
+import { PropertyTasksProvider } from './contexts/PropertyTasksContext';
 import './App.css';
 
 // Lazy-load each page so Vite emits a separate chunk per route.
@@ -31,6 +32,7 @@ const App = () => {
       <div className="body">
         <Navigation />
         <main className="content">
+          <PropertyTasksProvider>
           <Suspense fallback={<div className="pageHeader" role="status" aria-live="polite"><p className="muted">Loading…</p></div>}>
             <Routes>
               <Route path="/" element={<YTDSummaryPage />} />
@@ -46,6 +48,7 @@ const App = () => {
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </Suspense>
+          </PropertyTasksProvider>
         </main>
       </div>
     </div>

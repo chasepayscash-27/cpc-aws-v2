@@ -356,7 +356,7 @@ export default function ProjectDetailsModal({ project: row, onClose, onViewFullP
 
             {constructionWorkflowOpen && (
               <div style={{ marginBottom: 20 }}>
-                <ConstructionWorkflowTemplate propertyName={row.name} />
+                <ConstructionWorkflowTemplate key={propertyId} propertyId={propertyId} propertyName={row.name} />
               </div>
             )}
 
