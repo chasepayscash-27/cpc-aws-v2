@@ -1,9 +1,8 @@
 import { useCallback, useEffect, useMemo, useState, type CSSProperties } from "react";
-import { generateClient } from "aws-amplify/data";
 import { getCurrentUser } from "aws-amplify/auth";
 import type { Schema } from "../../amplify/data/resource";
 import { getConstructionWorkflowTasks } from "./propertyTaskCollections";
-import { updateTask } from "./propertyWorkflowTabs";
+import { usePropertyTasks } from "../contexts/PropertyTasksContext";
 
 interface Props {
   propertyId?: string | null;
@@ -11,8 +10,6 @@ interface Props {
 }
 
 type PropertyTask = Schema["PropertyTask"]["type"];
-
-const client = generateClient<Schema>();
 
 const cardStyle: CSSProperties = {
   border: "1px solid #d4e8d8",
@@ -22,11 +19,13 @@ const cardStyle: CSSProperties = {
 };
 
 export default function ConstructionWorkflowTemplate({ propertyId, propertyName }: Props) {
-  const [tasks, setTasks] = useState<PropertyTask[] | null>(propertyId ? null : []);
-  const [error, setError] = useState("");
+  const { allTasks, isLoading: contextLoading, error: contextError, updateTaskCompletion } = usePropertyTasks();
+  const [toggleError, setToggleError] = useState("");
   const [notes, setNotes] = useState("");
   const [completedByUser, setCompletedByUser] = useState<string | null>(null);
   const [updatingTaskIds, setUpdatingTaskIds] = useState<string[]>([]);
+
+  const error = toggleError || contextError;
 
   useEffect(() => {
     getCurrentUser()
@@ -37,65 +36,31 @@ export default function ConstructionWorkflowTemplate({ propertyId, propertyName 
       .catch(() => setCompletedByUser(null));
   }, []);
 
-  useEffect(() => {
-    if (!propertyId) return;
+  const loading = !!propertyId && contextLoading;
 
-    const subscription = client.models.PropertyTask.observeQuery({
-      filter: { propertyId: { eq: propertyId } },
-    }).subscribe({
-      next: ({ items }) => {
-        setTasks(items);
-        setError("");
-      },
-      error: (loadError) => {
-        setError(loadError instanceof Error ? loadError.message : "Unable to load construction workflow.");
-      },
-    });
-
-    return () => subscription.unsubscribe();
-  }, [propertyId]);
-
-  const loading = !!propertyId && tasks === null && !error;
-  const constructionTasks = useMemo(() => getConstructionWorkflowTasks(tasks ?? []), [tasks]);
+  const constructionTasks = useMemo(() => {
+    if (!propertyId) return [];
+    const propertyTasks = allTasks.filter((t) => t.propertyId === propertyId);
+    return getConstructionWorkflowTasks(propertyTasks);
+  }, [allTasks, propertyId]);
 
   const handleToggle = useCallback(
     async (task: PropertyTask, checked: boolean) => {
-      setError("");
-      const previousCompletedAt = task.completedAt;
-      const previousCompletedBy = task.completedBy;
+      setToggleError("");
       const completedAt = checked ? new Date().toISOString() : null;
       const completedBy = checked ? completedByUser : null;
 
       setUpdatingTaskIds((current) => [...current, task.id]);
-      setTasks((currentTasks) =>
-        updateTask(currentTasks ?? [], task.id, {
-          isComplete: checked,
-          completedAt,
-          completedBy,
-        })
-      );
 
-      const { errors } = await client.models.PropertyTask.update({
-        id: task.id,
-        isComplete: checked,
-        completedAt,
-        completedBy,
-      });
+      const { errors } = await updateTaskCompletion(task, checked, completedAt, completedBy);
 
       setUpdatingTaskIds((current) => current.filter((id) => id !== task.id));
 
       if (errors?.length) {
-        setTasks((currentTasks) =>
-          updateTask(currentTasks ?? [], task.id, {
-            isComplete: !!task.isComplete,
-            completedAt: previousCompletedAt ?? null,
-            completedBy: previousCompletedBy ?? null,
-          })
-        );
-        setError(errors.map((item) => item.message).join("; "));
+        setToggleError(errors.map((item) => item.message).join("; "));
       }
     },
-    [completedByUser]
+    [completedByUser, updateTaskCompletion]
   );
 
   return (
