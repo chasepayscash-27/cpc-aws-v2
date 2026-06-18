@@ -1,4 +1,5 @@
 import type { ProjectRow } from '../types/project';
+import { isArchivedStage, NEGOTIATION_STAGES, normalizePipelineStatus } from '../utils/pipelineStatus';
 
 export const ACTIVE_STAGE_ORDER = [
   'negotiation',
@@ -28,6 +29,22 @@ function formatStage(stage: string): string {
     .replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
+/**
+ * Maps a raw Flipper Force stage value to the canonical ACTIVE_STAGE_ORDER key
+ * used by PipelineTracker, or returns null if the stage should not be displayed
+ * (e.g. archived, completed, on-hold).
+ */
+function toTrackerStage(rawStage?: string | null): string | null {
+  if (!rawStage) return null;
+  if (isArchivedStage(rawStage)) return null;
+  const normalized = normalizePipelineStatus(rawStage);
+  if (NEGOTIATION_STAGES.has(normalized)) return 'negotiation';
+  // Convert space-separated form back to underscore form for lookup
+  const underscored = normalized.replace(/\s+/g, '_');
+  if (ACTIVE_STAGE_ORDER.includes(underscored)) return underscored;
+  return null;
+}
+
 const TILE_DEFAULT_BG = '#f0f7f1';
 const TILE_HOVER_BG = '#d4e8d8';
 const TILE_DEFAULT_BORDER = '#d4e8d8';
@@ -39,15 +56,19 @@ interface PipelineTrackerProps {
 }
 
 export default function PipelineTracker({ rows, onProjectClick }: PipelineTrackerProps) {
-  // Group active projects by stage
+  // Group active, non-archived projects by pipeline stage.
+  // Negotiation-bucket stages (lead, offer_made, etc.) are normalised to
+  // 'negotiation' so they surface correctly instead of being silently dropped.
   const grouped: Record<string, ProjectRow[]> = {};
   for (const stage of ACTIVE_STAGE_ORDER) {
     grouped[stage] = [];
   }
   for (const row of rows) {
-    const stage = row.stage?.trim().toLowerCase();
-    if (stage && ACTIVE_STAGE_ORDER.includes(stage)) {
-      grouped[stage].push(row);
+    // Skip explicitly archived rows (archived_at populated OR stage === archived)
+    if (row.archived_at) continue;
+    const trackerStage = toTrackerStage(row.stage);
+    if (trackerStage) {
+      grouped[trackerStage].push(row);
     }
   }
 

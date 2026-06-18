@@ -10,10 +10,42 @@ export const PIPELINE_STATUS_COLORS = {
   unknown: "#94a3b8",
 } as const;
 
+/**
+ * Stage values that represent an archived/removed project.
+ * These should be excluded from all active-pipeline views.
+ */
+export const ARCHIVED_STAGES = new Set([
+  "archived",
+  "archive",
+]);
+
+/**
+ * Returns true when the given stage string marks a project as archived in
+ * Flipper Force, meaning it must be hidden from the active pipeline.
+ */
+export function isArchivedStage(stage?: string | null): boolean {
+  if (!stage) return false;
+  return ARCHIVED_STAGES.has(stage.trim().toLowerCase().replace(/[_-]+/g, " ").replace(/\s+/g, " "));
+}
+
+/**
+ * All Flipper Force stage values that belong to the "Negotiation" bucket
+ * (lead → under offer). Kept in sync with PIPELINE_STATUS_COLOR_ALIASES.
+ */
+export const NEGOTIATION_STAGES = new Set([
+  "negotiation",
+  "under negotiation",
+  "lead",
+  "contacting seller",
+  "appointment set",
+  "offer made",
+]);
+
 const PIPELINE_STATUS_COLOR_ALIASES: Record<string, keyof typeof PIPELINE_STATUS_COLORS> = {
   negotiation: "negotiation",
   "under negotiation": "negotiation",
   lead: "negotiation",
+  "contacting seller": "negotiation",
   "appointment set": "negotiation",
   "offer made": "negotiation",
   pending: "pending_purchase",
