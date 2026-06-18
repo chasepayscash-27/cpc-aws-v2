@@ -3,6 +3,7 @@ export interface ProjectRow {
   workspace_uuid?: string;
   created_at?: string;
   updated_at?: string;
+  archived_at?: string;
   name?: string;
   full_address?: string;
   address_1?: string;

@@ -3,6 +3,7 @@ import { loadCsv } from '../utils/csv';
 import type { ProjectRow } from '../types/project';
 import PipelineTracker from '../components/PipelineTracker';
 import ProjectDetailsModal from '../components/ProjectDetailsModal';
+import { isArchivedStage } from '../utils/pipelineStatus';
 import '../App.css';
 
 interface YTDRow {
@@ -46,7 +47,11 @@ export default function YTDSummaryPage() {
   useEffect(() => {
     loadCsv<ProjectRow>('/data/projects_v2.csv')
       .then((rows) => {
-        setProjectRows(rows);
+        // Exclude archived projects so they do not appear in the active pipeline.
+        const active = rows.filter(
+          (r) => !r.archived_at && !isArchivedStage(r.stage)
+        );
+        setProjectRows(active);
         setStagesLoading(false);
       })
       .catch(() => {

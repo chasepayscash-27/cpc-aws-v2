@@ -3,6 +3,7 @@ import { loadCsv } from "../utils/csv";
 import type { ProjectRow } from "../types/project";
 import ProjectsTable from "../components/ProjectsTable";
 import ProjectsGallery from "../components/ProjectsGallery";
+import { isArchivedStage } from "../utils/pipelineStatus";
 
 type ViewMode = "table" | "gallery";
 
@@ -39,7 +40,8 @@ export default function ProjectsPage({ onViewFullPnL }: Props) {
       try {
         setLoading(true);
         const data = await loadCsv<ProjectRow>("/data/projects_v2.csv");
-        setRows(data);
+        // Exclude archived projects; they should not appear in any active view.
+        setRows(data.filter((r) => !r.archived_at && !isArchivedStage(r.stage)));
       } catch (err) {
         setError(err instanceof Error ? err.message : "Failed to load projects");
       } finally {
