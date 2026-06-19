@@ -3,6 +3,10 @@ import { generateClient } from 'aws-amplify/data';
 import { loadCsv } from '../utils/csv';
 import type { ProjectRow } from '../types/project';
 import type { Schema } from '../../amplify/data/resource';
+import {
+  getActiveListingPropertyKey,
+  getActiveListingPropertyLabel,
+} from './activeListingProperty';
 
 type ActiveListingNote = Schema['ActiveListingNote']['type'];
 
@@ -64,15 +68,37 @@ export default function ActiveListingPage() {
   const [noteInput, setNoteInput] = useState('');
   const [sending, setSending] = useState(false);
   const [sendError, setSendError] = useState('');
-  const [filterProperty, setFilterProperty] = useState('all');
+  const [selectedPropertyKey, setSelectedPropertyKey] = useState('');
   const notesBottomRef = useRef<HTMLDivElement>(null);
 
+  const selectedProperty = useMemo(
+    () =>
+      rows.find((row, index) => getActiveListingPropertyKey(row, index) === selectedPropertyKey) ??
+      null,
+    [rows, selectedPropertyKey],
+  );
+  const selectedPropertyLabel = selectedProperty
+    ? getActiveListingPropertyLabel(selectedProperty)
+    : '';
+
   useEffect(() => {
+    if (selectedPropertyKey && !selectedProperty) {
+      setSelectedPropertyKey('');
+    }
+  }, [selectedProperty, selectedPropertyKey]);
+
+  useEffect(() => {
+    if (!selectedPropertyLabel) {
+      setNotes([]);
+      setNotesLoading(false);
+      setNotesError('');
+      return;
+    }
+
+    setNotesLoading(true);
+    setNotesError('');
     const subscription = client.models.ActiveListingNote.observeQuery({
-      filter:
-        filterProperty !== 'all'
-          ? { propertyAddress: { eq: filterProperty } }
-          : undefined,
+      filter: { propertyAddress: { eq: selectedPropertyLabel } },
     }).subscribe({
       next: ({ items }) => {
         const sorted = [...items].sort(
@@ -89,23 +115,27 @@ export default function ActiveListingPage() {
       },
     });
     return () => subscription.unsubscribe();
-  }, [filterProperty]);
+  }, [selectedPropertyLabel]);
 
   useEffect(() => {
     notesBottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [notes]);
 
+  useEffect(() => {
+    setNoteInput('');
+    setSendError('');
+  }, [selectedPropertyKey]);
+
   async function submitNote(e: React.FormEvent) {
     e.preventDefault();
     const text = noteInput.trim();
-    if (!text || sending) return;
+    if (!text || sending || !selectedPropertyLabel) return;
     setSending(true);
     setSendError('');
-    const property = filterProperty !== 'all' ? filterProperty : undefined;
     try {
       const { errors } = await client.models.ActiveListingNote.create({
         content: text,
-        ...(property ? { propertyAddress: property } : {}),
+        propertyAddress: selectedPropertyLabel,
       });
       if (errors?.length) {
         throw new Error(errors.map((e) => e.message).join('; '));
@@ -137,11 +167,6 @@ export default function ActiveListingPage() {
     outline: 'none',
     minWidth: 0,
   };
-
-  const propertyOptions = useMemo(
-    () => rows.map((r) => r.name ?? r.full_address ?? '').filter(Boolean),
-    [rows],
-  );
 
   return (
     <>
@@ -229,33 +254,68 @@ export default function ActiveListingPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {filteredRows.map((row, idx) => (
-                    <tr
-                      key={row.project_uuid ?? idx}
-                      style={{ borderBottom: '1px solid #fce7f3' }}
-                    >
-                      <td style={{ padding: '10px 12px', fontWeight: 500, fontSize: 14 }}>
-                        {row.name ?? row.full_address ?? '—'}
-                      </td>
-                      <td style={{ padding: '10px 12px', color: 'var(--muted)', fontSize: 13 }}>
-                        {row.city ?? '—'}
-                        {row.state ? `, ${row.state}` : ''}
-                      </td>
-                      <td style={{ padding: '10px 12px', fontSize: 13 }}>{row.type ?? '—'}</td>
-                      <td style={{ padding: '10px 12px', textAlign: 'right', fontSize: 13 }}>
-                        {row.beds ?? '—'}
-                      </td>
-                      <td style={{ padding: '10px 12px', textAlign: 'right', fontSize: 13 }}>
-                        {row.baths ?? '—'}
-                      </td>
-                      <td style={{ padding: '10px 12px', textAlign: 'right', fontSize: 13 }}>
-                        {row.square_feet ? Number(row.square_feet).toLocaleString() : '—'}
-                      </td>
-                      <td style={{ padding: '10px 12px', textAlign: 'right', fontSize: 13 }}>
-                        {row.year_built ?? '—'}
-                      </td>
-                    </tr>
-                  ))}
+                  {filteredRows.map((row, idx) => {
+                    const propertyKey = getActiveListingPropertyKey(row, idx);
+                    const propertyLabel = getActiveListingPropertyLabel(row);
+                    const isSelected = propertyKey === selectedPropertyKey;
+
+                    return (
+                      <tr
+                        key={propertyKey}
+                        onClick={() => setSelectedPropertyKey(propertyKey)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            setSelectedPropertyKey(propertyKey);
+                          }
+                        }}
+                        tabIndex={0}
+                        aria-selected={isSelected}
+                        style={{
+                          borderBottom: '1px solid #fce7f3',
+                          background: isSelected ? '#fdf2f8' : undefined,
+                          cursor: 'pointer',
+                          outline: 'none',
+                        }}
+                      >
+                        <td style={{ padding: '10px 12px', fontWeight: 500, fontSize: 14 }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+                            <span>{propertyLabel}</span>
+                            {isSelected && (
+                              <span
+                                style={{
+                                  fontSize: 11,
+                                  color: '#be185d',
+                                  background: 'rgba(236,72,153,0.10)',
+                                  borderRadius: 999,
+                                  padding: '2px 8px',
+                                }}
+                              >
+                                Selected
+                              </span>
+                            )}
+                          </div>
+                        </td>
+                        <td style={{ padding: '10px 12px', color: 'var(--muted)', fontSize: 13 }}>
+                          {row.city ?? '—'}
+                          {row.state ? `, ${row.state}` : ''}
+                        </td>
+                        <td style={{ padding: '10px 12px', fontSize: 13 }}>{row.type ?? '—'}</td>
+                        <td style={{ padding: '10px 12px', textAlign: 'right', fontSize: 13 }}>
+                          {row.beds ?? '—'}
+                        </td>
+                        <td style={{ padding: '10px 12px', textAlign: 'right', fontSize: 13 }}>
+                          {row.baths ?? '—'}
+                        </td>
+                        <td style={{ padding: '10px 12px', textAlign: 'right', fontSize: 13 }}>
+                          {row.square_feet ? Number(row.square_feet).toLocaleString() : '—'}
+                        </td>
+                        <td style={{ padding: '10px 12px', textAlign: 'right', fontSize: 13 }}>
+                          {row.year_built ?? '—'}
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
@@ -278,139 +338,151 @@ export default function ActiveListingPage() {
           Notes
         </h2>
 
-        {/* Optional property filter for notes */}
-        {propertyOptions.length > 0 && (
-          <div style={{ marginBottom: 10 }}>
-            <select
-              value={filterProperty}
-              onChange={(e) => setFilterProperty(e.target.value)}
-              style={{ ...inputStyle, minWidth: 240 }}
-            >
-              <option value="all">All Properties</option>
-              {propertyOptions.map((p) => (
-                <option key={p} value={p}>
-                  {p}
-                </option>
-              ))}
-            </select>
-          </div>
-        )}
+        <p className="muted" style={{ fontSize: 13, margin: '0 0 10px' }}>
+          {selectedPropertyLabel
+            ? `Viewing and editing notes for ${selectedPropertyLabel}.`
+            : 'Select a property from the table above to view or add notes.'}
+        </p>
 
         <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
-          {/* Notes list */}
-          <div
-            style={{
-              maxHeight: 320,
-              overflowY: 'auto',
-              padding: '12px 16px',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: 10,
-            }}
-          >
-            {notesLoading && (
-              <p className="muted" style={{ fontSize: 13 }}>
-                Loading notes…
-              </p>
-            )}
-            {notesError && (
-              <p style={{ color: '#dc2626', fontSize: 13 }}>{notesError}</p>
-            )}
-            {!notesLoading && !notesError && notes.length === 0 && (
-              <p className="muted" style={{ fontSize: 13 }}>
-                No notes yet. Add one below.
-              </p>
-            )}
-            {notes.map((note) => (
+          {!selectedPropertyLabel ? (
+            <div style={{ padding: '20px 16px', color: '#5a7060', fontSize: 14 }}>
+              Choose an active listing property to open its notes.
+            </div>
+          ) : (
+            <>
               <div
-                key={note.id}
                 style={{
-                  background: '#fdf2f8',
-                  border: '1px solid rgba(236,72,153,0.15)',
-                  borderRadius: 10,
-                  padding: '10px 14px',
+                  padding: '12px 16px',
+                  borderBottom: '1px solid rgba(236,72,153,0.12)',
+                  background: 'rgba(236,72,153,0.05)',
                 }}
               >
-                <p style={{ margin: '0 0 6px', fontSize: 14, color: '#1a2e1a', whiteSpace: 'pre-wrap' }}>
-                  {note.content}
-                </p>
-                <div
-                  style={{
-                    display: 'flex',
-                    gap: 8,
-                    alignItems: 'center',
-                    flexWrap: 'wrap',
-                  }}
-                >
-                  <span style={{ fontSize: 11, color: '#9d174d', fontWeight: 500 }}>
-                    🕐 {formatDateTime(note.createdAt)}
-                  </span>
-                  {note.propertyAddress && (
-                    <span
+                <div style={{ fontSize: 15, fontWeight: 700, color: '#831843' }}>{selectedPropertyLabel}</div>
+                {selectedProperty && (selectedProperty.city || selectedProperty.state) && (
+                  <div style={{ marginTop: 4, fontSize: 12, color: '#9d174d' }}>
+                    {[selectedProperty.city, selectedProperty.state].filter(Boolean).join(', ')}
+                  </div>
+                )}
+              </div>
+
+              {/* Notes list */}
+              <div
+                style={{
+                  maxHeight: 320,
+                  overflowY: 'auto',
+                  padding: '12px 16px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 10,
+                }}
+              >
+                {notesLoading && (
+                  <p className="muted" style={{ fontSize: 13 }}>
+                    Loading notes…
+                  </p>
+                )}
+                {notesError && (
+                  <p style={{ color: '#dc2626', fontSize: 13 }}>{notesError}</p>
+                )}
+                {!notesLoading && !notesError && notes.length === 0 && (
+                  <p className="muted" style={{ fontSize: 13 }}>
+                    No notes yet. Add one below.
+                  </p>
+                )}
+                {notes.map((note) => (
+                  <div
+                    key={note.id}
+                    style={{
+                      background: '#fdf2f8',
+                      border: '1px solid rgba(236,72,153,0.15)',
+                      borderRadius: 10,
+                      padding: '10px 14px',
+                    }}
+                  >
+                    <p style={{ margin: '0 0 6px', fontSize: 14, color: '#1a2e1a', whiteSpace: 'pre-wrap' }}>
+                      {note.content}
+                    </p>
+                    <div
                       style={{
-                        fontSize: 11,
-                        color: '#be185d',
-                        background: 'rgba(236,72,153,0.10)',
-                        borderRadius: 6,
-                        padding: '1px 6px',
+                        display: 'flex',
+                        gap: 8,
+                        alignItems: 'center',
+                        flexWrap: 'wrap',
                       }}
                     >
-                      📍 {note.propertyAddress}
-                    </span>
-                  )}
-                </div>
+                      <span style={{ fontSize: 11, color: '#9d174d', fontWeight: 500 }}>
+                        🕐 {formatDateTime(note.createdAt)}
+                      </span>
+                      {note.propertyAddress && (
+                        <span
+                          style={{
+                            fontSize: 11,
+                            color: '#be185d',
+                            background: 'rgba(236,72,153,0.10)',
+                            borderRadius: 6,
+                            padding: '1px 6px',
+                          }}
+                        >
+                          📍 {note.propertyAddress}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                ))}
+                <div ref={notesBottomRef} />
               </div>
-            ))}
-            <div ref={notesBottomRef} />
-          </div>
 
-          {/* Divider */}
-          <div style={{ borderTop: '1px solid rgba(236,72,153,0.12)' }} />
+              {/* Divider */}
+              <div style={{ borderTop: '1px solid rgba(236,72,153,0.12)' }} />
 
-          {/* Note input */}
-          <form onSubmit={submitNote} style={{ padding: '12px 16px', display: 'flex', gap: 8 }}>
-            <textarea
-              rows={2}
-              value={noteInput}
-              onChange={(e) => setNoteInput(e.target.value)}
-              onKeyDown={handleNoteKeyDown}
-              placeholder="Add a note… (Enter to save, Shift+Enter for new line)"
-              disabled={sending}
-              style={{
-                flex: 1,
-                padding: '8px 12px',
-                borderRadius: 10,
-                border: '1px solid rgba(236,72,153,0.20)',
-                fontSize: 13,
-                color: '#1a2e1a',
-                background: '#fdf2f8',
-                resize: 'none',
-                fontFamily: 'inherit',
-                outline: 'none',
-              }}
-            />
-            <button
-              type="submit"
-              disabled={sending || !noteInput.trim()}
-              style={{
-                alignSelf: 'flex-end',
-                padding: '8px 16px',
-                borderRadius: 10,
-                border: 'none',
-                background: ACCENT_COLOR,
-                color: '#fff',
-                fontWeight: 700,
-                fontSize: 13,
-                cursor: sending || !noteInput.trim() ? 'not-allowed' : 'pointer',
-                opacity: sending || !noteInput.trim() ? 0.6 : 1,
-                whiteSpace: 'nowrap',
-              }}
-            >
-              {sending ? '…' : 'Save Note'}
-            </button>
-          </form>
-          {sendError && (
-            <p style={{ margin: '0 16px 10px', color: '#dc2626', fontSize: 12 }}>{sendError}</p>
+              {/* Note input */}
+              <form onSubmit={submitNote} style={{ padding: '12px 16px', display: 'flex', gap: 8 }}>
+                <textarea
+                  rows={2}
+                  value={noteInput}
+                  onChange={(e) => setNoteInput(e.target.value)}
+                  onKeyDown={handleNoteKeyDown}
+                  placeholder={`Add a note for ${selectedPropertyLabel}… (Enter to save, Shift+Enter for new line)`}
+                  disabled={sending}
+                  style={{
+                    flex: 1,
+                    padding: '8px 12px',
+                    borderRadius: 10,
+                    border: '1px solid rgba(236,72,153,0.20)',
+                    fontSize: 13,
+                    color: '#1a2e1a',
+                    background: '#fdf2f8',
+                    resize: 'none',
+                    fontFamily: 'inherit',
+                    outline: 'none',
+                  }}
+                />
+                <button
+                  type="submit"
+                  disabled={sending || !noteInput.trim() || !selectedPropertyLabel}
+                  style={{
+                    alignSelf: 'flex-end',
+                    padding: '8px 16px',
+                    borderRadius: 10,
+                    border: 'none',
+                    background: ACCENT_COLOR,
+                    color: '#fff',
+                    fontWeight: 700,
+                    fontSize: 13,
+                    cursor:
+                      sending || !noteInput.trim() || !selectedPropertyLabel ? 'not-allowed' : 'pointer',
+                    opacity: sending || !noteInput.trim() || !selectedPropertyLabel ? 0.6 : 1,
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  {sending ? '…' : 'Save Note'}
+                </button>
+              </form>
+              {sendError && (
+                <p style={{ margin: '0 16px 10px', color: '#dc2626', fontSize: 12 }}>{sendError}</p>
+              )}
+            </>
           )}
         </div>
       </section>
