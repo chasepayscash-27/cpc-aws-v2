@@ -4,6 +4,7 @@ import { NavLink } from 'react-router-dom';
 const navItems = [
   { label: '🏠 Home', path: '/' },
   { label: '🏗️ Projects', path: '/projects' },
+  { label: '🏷️ Active Listing', path: '/active-listing' },
   { label: '🗺️ Maps', path: '/maps' },
   // Temporarily hidden: financials nav can be re-enabled by uncommenting this entry.
   // { label: '💰 Financials', path: '/financials' },

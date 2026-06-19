@@ -105,6 +105,20 @@ const schema = a.schema({
             allow.guest(),
             allow.publicApiKey(),
         ]),
+
+    // ─── Active Listing Notes ─────────────────────────────────────────────────────
+
+    ActiveListingNote: a
+        .model({
+            content: a.string().required(),
+            propertyAddress: a.string(),
+            authorName: a.string(),
+        })
+        .authorization((allow) => [
+            allow.authenticated("identityPool"),
+            allow.guest(),
+            allow.publicApiKey(),
+        ]),
 });
 
 export const data = defineData({

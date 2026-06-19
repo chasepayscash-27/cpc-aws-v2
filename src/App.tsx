@@ -14,8 +14,9 @@ const ResourcesPage  = lazy(() => import('./pages/ResourcesPage'));
 const TeamPage       = lazy(() => import('./pages/TeamPage'));
 const AnalyticsPage  = lazy(() => import('./pages/AnalyticsPage'));
 const ChatPage       = lazy(() => import('./pages/ChatPage'));
-const WorkflowPage   = lazy(() => import('./pages/WorkflowPage'));
-const TeamChatPage   = lazy(() => import('./pages/TeamChatPage'));
+const WorkflowPage      = lazy(() => import('./pages/WorkflowPage'));
+const TeamChatPage      = lazy(() => import('./pages/TeamChatPage'));
+const ActiveListingPage = lazy(() => import('./pages/ActiveListingPage'));
 
 const App = () => {
   return (
@@ -45,6 +46,7 @@ const App = () => {
               <Route path="/chat" element={<ChatPage />} />
               <Route path="/workflow" element={<WorkflowPage />} />
               <Route path="/team-chat" element={<TeamChatPage />} />
+              <Route path="/active-listing" element={<ActiveListingPage />} />
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </Suspense>
