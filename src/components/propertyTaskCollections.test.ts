@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { Schema } from "../../amplify/data/resource";
-import { getConstructionWorkflowTasks, getPrimaryTasksAcrossProperties } from "./propertyTaskCollections";
+import { getConstructionWorkflowTaskGroups, getConstructionWorkflowTasks, getPrimaryTasksAcrossProperties } from "./propertyTaskCollections";
 
 type PropertyTask = Schema["PropertyTask"]["type"];
 
@@ -57,5 +57,18 @@ describe("getConstructionWorkflowTasks", () => {
       "finished",
       "pictures",
     ]);
+  });
+
+  it("splits ordering tasks from construction tasks", () => {
+    const tasks = [
+      buildTask({ id: "utilities", stage: "Utilities check", order: 5 }),
+      buildTask({ id: "demo", stage: "Construction - Demo", order: 19 }),
+      buildTask({ id: "order-cabinets", stage: "Ordering - Cabinets", order: 39 }),
+    ];
+
+    const grouped = getConstructionWorkflowTaskGroups(tasks);
+    expect(grouped.constructionTasks.map((task) => task.id)).toEqual(["utilities", "demo"]);
+    expect(grouped.orderingTasks.map((task) => task.id)).toEqual(["order-cabinets"]);
+    expect(grouped.allTasks.map((task) => task.id)).toEqual(["utilities", "demo", "order-cabinets"]);
   });
 });
