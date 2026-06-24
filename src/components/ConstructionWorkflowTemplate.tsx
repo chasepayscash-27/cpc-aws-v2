@@ -1,12 +1,15 @@
 import { useCallback, useEffect, useMemo, useState, type CSSProperties } from "react";
 import { getCurrentUser } from "aws-amplify/auth";
 import type { Schema } from "../../amplify/data/resource";
-import { getConstructionWorkflowTasks } from "./propertyTaskCollections";
+import outputs from "../../amplify/amplify_outputs.json";
+import { getConstructionWorkflowTaskGroups } from "./propertyTaskCollections";
 import { usePropertyTasks } from "../contexts/PropertyTasksContext";
+import type { ProjectRow } from "../types/project";
 
 interface Props {
   propertyId?: string | null;
   propertyName?: string | null;
+  projectStage?: ProjectRow["stage"] | null;
 }
 
 type PropertyTask = Schema["PropertyTask"]["type"];
@@ -18,12 +21,53 @@ const cardStyle: CSSProperties = {
   background: "#f0f7f1",
 };
 
-export default function ConstructionWorkflowTemplate({ propertyId, propertyName }: Props) {
+const HTTP_API_URL =
+  (outputs as { custom?: { cpcHttpApi?: { url?: string } } })?.custom?.cpcHttpApi?.url ?? "";
+const WORKSHEET_ENDPOINT = HTTP_API_URL
+  ? `${HTTP_API_URL.replace(/\/?$/, "/")}worksheet`
+  : "";
+
+const negativeWorksheetValues = new Set(["no", "none", "n/a", "na", "false", "0"]);
+
+function hasScopeValue(value: string | null | undefined): boolean {
+  const normalized = value?.trim().toLowerCase();
+  if (!normalized) return false;
+  return !negativeWorksheetValues.has(normalized);
+}
+
+function shouldShowTask(stage: string | null | undefined, worksheetFields: Record<string, string>, projectStage?: string | null): boolean {
+  const normalizedStage = (stage ?? "").toLowerCase();
+  if (!normalizedStage) return true;
+
+  if (normalizedStage.includes("fireplace")) {
+    return hasScopeValue(worksheetFields.fireplace);
+  }
+  if (normalizedStage.includes("roof")) {
+    return hasScopeValue(worksheetFields.roof);
+  }
+  if (normalizedStage.includes("windows")) {
+    return hasScopeValue(worksheetFields.windows_update);
+  }
+  if (normalizedStage.includes("permit")) {
+    return (projectStage ?? "").toLowerCase().includes("permit");
+  }
+  return true;
+}
+
+function getProgress(tasks: PropertyTask[]): { done: number; total: number; percent: number } {
+  const total = tasks.length;
+  const done = tasks.filter((task) => !!task.isComplete).length;
+  const percent = total === 0 ? 0 : Math.round((done / total) * 100);
+  return { done, total, percent };
+}
+
+export default function ConstructionWorkflowTemplate({ propertyId, propertyName, projectStage }: Props) {
   const { allTasks, isLoading: contextLoading, error: contextError, updateTaskCompletion } = usePropertyTasks();
   const [toggleError, setToggleError] = useState("");
   const [notes, setNotes] = useState("");
   const [completedByUser, setCompletedByUser] = useState<string | null>(null);
   const [updatingTaskIds, setUpdatingTaskIds] = useState<string[]>([]);
+  const [worksheetFields, setWorksheetFields] = useState<Record<string, string>>({});
 
   const error = toggleError || contextError;
 
@@ -36,13 +80,41 @@ export default function ConstructionWorkflowTemplate({ propertyId, propertyName 
       .catch(() => setCompletedByUser(null));
   }, []);
 
+  useEffect(() => {
+    if (!propertyId || !WORKSHEET_ENDPOINT) {
+      return;
+    }
+
+    fetch(`${WORKSHEET_ENDPOINT}?projectId=${encodeURIComponent(propertyId)}`)
+      .then((response) => response.json())
+      .then((data: { fields?: Record<string, string> }) => {
+        setWorksheetFields(data.fields ?? {});
+      })
+      .catch(() => {
+        setWorksheetFields({});
+      });
+  }, [propertyId]);
+
   const loading = !!propertyId && contextLoading;
 
-  const constructionTasks = useMemo(() => {
-    if (!propertyId) return [];
+  const constructionTaskGroups = useMemo(() => {
+    if (!propertyId) return { constructionTasks: [], orderingTasks: [], allTasks: [] };
     const propertyTasks = allTasks.filter((t) => t.propertyId === propertyId);
-    return getConstructionWorkflowTasks(propertyTasks);
+    return getConstructionWorkflowTaskGroups(propertyTasks);
   }, [allTasks, propertyId]);
+
+  const visibleConstructionTasks = useMemo(
+    () => constructionTaskGroups.constructionTasks.filter((task) => shouldShowTask(task.stage, worksheetFields, projectStage)),
+    [constructionTaskGroups, worksheetFields, projectStage]
+  );
+  const visibleOrderingTasks = useMemo(
+    () => constructionTaskGroups.orderingTasks.filter((task) => shouldShowTask(task.stage, worksheetFields, projectStage)),
+    [constructionTaskGroups, worksheetFields, projectStage]
+  );
+  const visibleTasks = useMemo(() => [...visibleConstructionTasks, ...visibleOrderingTasks], [visibleConstructionTasks, visibleOrderingTasks]);
+  const overallProgress = useMemo(() => getProgress(visibleTasks), [visibleTasks]);
+  const constructionProgress = useMemo(() => getProgress(visibleConstructionTasks), [visibleConstructionTasks]);
+  const orderingProgress = useMemo(() => getProgress(visibleOrderingTasks), [visibleOrderingTasks]);
 
   const handleToggle = useCallback(
     async (task: PropertyTask, checked: boolean) => {
@@ -74,13 +146,29 @@ export default function ConstructionWorkflowTemplate({ propertyId, propertyName 
 
       {loading && <div style={{ fontSize: 12, color: "#5a7060", marginBottom: 12 }}>Loading construction workflow…</div>}
       {!loading && error && <div style={{ fontSize: 12, color: "#8f2d2d", marginBottom: 12 }}>⚠️ {error}</div>}
-      {!loading && !error && constructionTasks.length === 0 && (
+      {!loading && !error && visibleTasks.length > 0 && (
+        <div style={{ display: "grid", gap: 8, marginBottom: 12 }}>
+          {[{ label: "Overall", ...overallProgress }, { label: "Construction", ...constructionProgress }, { label: "Ordering", ...orderingProgress }].map((item) => (
+            <div key={item.label}>
+              <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11, color: "#5a7060", marginBottom: 4 }}>
+                <span>{item.label} progress</span>
+                <span>{item.done}/{item.total} ({item.percent}%)</span>
+              </div>
+              <div style={{ height: 8, borderRadius: 999, background: "#dbeadf", overflow: "hidden" }}>
+                <div style={{ width: `${item.percent}%`, height: "100%", background: "#1a7a3c" }} />
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {!loading && !error && visibleTasks.length === 0 && (
         <div style={{ fontSize: 12, color: "#5a7060", marginBottom: 12 }}>No construction workflow tasks available yet.</div>
       )}
 
-      {!loading && !error && constructionTasks.length > 0 && (
+      {!loading && !error && visibleTasks.length > 0 && (
         <div style={{ display: "grid", gap: 8 }}>
-          {constructionTasks.map((task) => (
+          {visibleTasks.map((task) => (
             <label
               key={task.id}
               style={{
@@ -120,6 +208,11 @@ export default function ConstructionWorkflowTemplate({ propertyId, propertyName 
                 {(task.responsibilities || task.notes) && (
                   <span style={{ display: "block", fontSize: 12, color: "#5a7060" }}>
                     {task.responsibilities?.trim() || task.notes?.trim()}
+                  </span>
+                )}
+                {task.completedAt && (
+                  <span style={{ display: "block", fontSize: 11, color: "#5a7060", marginTop: 2 }}>
+                    Completed {new Date(task.completedAt).toLocaleString()}
                   </span>
                 )}
               </span>

@@ -4,7 +4,14 @@ import { dedupeTasksByCanonicalOrder } from "./propertyWorkflowNormalization";
 
 type PropertyTask = Schema["PropertyTask"]["type"];
 
-const constructionTaskOrders = new Set<number>([5, 6, 7, 8, 9, 10, 11, 12, 13, 14]);
+const constructionTaskOrders = new Set<number>([5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38]);
+const orderingTaskOrders = new Set<number>([39, 40, 41, 42, 43, 44, 45, 46]);
+
+export interface ConstructionTaskGroups {
+  constructionTasks: PropertyTask[];
+  orderingTasks: PropertyTask[];
+  allTasks: PropertyTask[];
+}
 
 export function getPrimaryTasksAcrossProperties(tasks: PropertyTask[]): PropertyTask[] {
   const tasksByProperty = new Map<string, PropertyTask[]>();
@@ -30,14 +37,29 @@ export function getPrimaryTasksAcrossProperties(tasks: PropertyTask[]): Property
 }
 
 export function getConstructionWorkflowTasks(tasks: PropertyTask[]): PropertyTask[] {
+  return getConstructionWorkflowTaskGroups(tasks).allTasks;
+}
+
+export function getConstructionWorkflowTaskGroups(tasks: PropertyTask[]): ConstructionTaskGroups {
   const { keepByOrder } = dedupeTasksByCanonicalOrder(tasks);
-  const result: PropertyTask[] = [];
+  const constructionTasks: PropertyTask[] = [];
+  const orderingTasks: PropertyTask[] = [];
 
   for (const workflowTask of defaultWorkflow) {
-    if (!constructionTaskOrders.has(workflowTask.order)) continue;
+    if (!constructionTaskOrders.has(workflowTask.order) && !orderingTaskOrders.has(workflowTask.order)) continue;
     const task = keepByOrder.get(workflowTask.order);
-    if (task) result.push(task);
+    if (!task) continue;
+
+    if (orderingTaskOrders.has(workflowTask.order)) {
+      orderingTasks.push(task);
+    } else {
+      constructionTasks.push(task);
+    }
   }
 
-  return result;
+  return {
+    constructionTasks,
+    orderingTasks,
+    allTasks: [...constructionTasks, ...orderingTasks],
+  };
 }

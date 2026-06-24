@@ -38,7 +38,7 @@ describe("property workflow normalization", () => {
     expect(normalizeWorkflowOwner("Devin/Chase")).toBe("Devin/Chase");
   });
 
-  it("reports workflow progress against canonical 18-task workflow and deduplicates duplicate orders", () => {
+  it("reports workflow progress against canonical workflow and deduplicates duplicate orders", () => {
     const tasks = [
       buildTask({ id: "1", stage: "Offer placed", order: 1, isComplete: true }),
       buildTask({ id: "2", stage: "Offer placed", order: 1, isComplete: false }),
@@ -49,7 +49,7 @@ describe("property workflow normalization", () => {
     ];
 
     expect(getWorkflowProgressCounts(tasks)).toEqual({
-      totalCount: 18,
+      totalCount: defaultWorkflow.length,
       completedCount: 2,
     });
   });
@@ -107,28 +107,28 @@ describe("dedupeTasksByCanonicalOrder", () => {
   });
 
   it("flags a canonical order as missing when no task exists for it", () => {
-    // Only provide a task for order 1; orders 2..18 should be in missing
+    // Only provide a task for order 1; all other canonical orders should be in missing
     const task = buildTask({ id: "a", stage: "Offer placed", order: 1 });
     const { missing } = dedupeTasksByCanonicalOrder([task]);
     expect(missing.length).toBe(defaultWorkflow.length - 1);
     expect(missing).not.toContain(1);
-    for (let o = 2; o <= 18; o++) {
+    for (let o = 2; o <= defaultWorkflow.length; o++) {
       expect(missing).toContain(o);
     }
   });
 
-  it("keeps only one task per canonical order when duplicates are spread across all 18 orders", () => {
-    // Two copies of each of the 18 canonical tasks
+  it("keeps only one task per canonical order when duplicates are spread across all orders", () => {
+    // Two copies of each canonical task
     const doubled = defaultWorkflow.flatMap((t, i) => [
       buildTask({ id: `${i}-a`, stage: t.stage, order: t.order, isComplete: false, createdAt: "2024-01-01T00:00:00Z" }),
       buildTask({ id: `${i}-b`, stage: t.stage, order: t.order, isComplete: false, createdAt: "2024-06-01T00:00:00Z" }),
     ]);
     const { keepByOrder, remove, missing } = dedupeTasksByCanonicalOrder(doubled);
-    expect(keepByOrder.size).toBe(18);
-    expect(remove.length).toBe(18); // one duplicate per order
+    expect(keepByOrder.size).toBe(defaultWorkflow.length);
+    expect(remove.length).toBe(defaultWorkflow.length); // one duplicate per order
     expect(missing.length).toBe(0);
-    // Ensure every canonical order 1..18 has exactly one entry
-    for (let o = 1; o <= 18; o++) {
+    // Ensure every canonical order has exactly one entry
+    for (let o = 1; o <= defaultWorkflow.length; o++) {
       expect(keepByOrder.has(o)).toBe(true);
     }
   });
