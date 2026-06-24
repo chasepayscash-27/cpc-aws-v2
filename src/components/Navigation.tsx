@@ -14,6 +14,7 @@ const navItems = [
   { label: '🔧 Resources', path: '/resources' },
   { label: '👥 Team', path: '/team' },
   { label: '💬 Team Chat', path: '/team-chat' },
+  { label: '📋 Sales Meetings', path: '/sales-meetings' },
 ];
 
 const Navigation: React.FC = () => {
