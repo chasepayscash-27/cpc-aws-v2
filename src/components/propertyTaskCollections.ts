@@ -44,6 +44,17 @@ export function getConstructionWorkflowTasks(tasks: PropertyTask[]): PropertyTas
   return getConstructionWorkflowTaskGroups(tasks).allTasks;
 }
 
+export function getChecklistWorkflowTasks(tasks: PropertyTask[]): PropertyTask[] {
+  const { keepByOrder } = dedupeTasksByCanonicalOrder(tasks);
+  const result: PropertyTask[] = [];
+  for (const workflowTask of defaultWorkflow) {
+    if (!orderingTaskOrders.has(workflowTask.order)) continue;
+    const task = keepByOrder.get(workflowTask.order);
+    if (task) result.push(task);
+  }
+  return result;
+}
+
 export function getConstructionWorkflowTaskGroups(tasks: PropertyTask[]): ConstructionTaskGroups {
   const { keepByOrder } = dedupeTasksByCanonicalOrder(tasks);
   const constructionTasks: PropertyTask[] = [];
