@@ -43,32 +43,31 @@ describe("getPrimaryTasksAcrossProperties", () => {
 describe("getConstructionWorkflowTasks", () => {
   it("returns only the construction-related workflow tasks in canonical order", () => {
     const tasks = [
-      buildTask({ id: "offer", stage: "Offer placed", order: 1 }),
-      buildTask({ id: "utilities", stage: "Utilities check", order: 5 }),
-      buildTask({ id: "walk", stage: "Initial walk through", order: 6 }),
-      buildTask({ id: "finished", stage: "Construction finished", order: 10 }),
-      buildTask({ id: "pictures", stage: "Pictures", order: 14 }),
-      buildTask({ id: "market", stage: "On market", order: 15 }),
+      buildTask({ id: "main", stage: "Make an offer", order: 1 }),
+      buildTask({ id: "construction-a", stage: "All items removed", order: 19 }),
+      buildTask({ id: "construction-b", stage: "Gutters Installed", order: 48 }),
+      buildTask({ id: "construction-c", stage: "garage doors open and shut", order: 59 }),
+      buildTask({ id: "checklist", stage: "Tile ordered", order: 61 }),
     ];
 
     expect(getConstructionWorkflowTasks(tasks).map((task) => task.id)).toEqual([
-      "utilities",
-      "walk",
-      "finished",
-      "pictures",
+      "construction-a",
+      "construction-b",
+      "construction-c",
+      "checklist",
     ]);
   });
 
   it("splits ordering tasks from construction tasks", () => {
     const tasks = [
-      buildTask({ id: "utilities", stage: "Utilities check", order: 5 }),
-      buildTask({ id: "demo", stage: "Construction - Demo", order: 19 }),
-      buildTask({ id: "order-cabinets", stage: "Ordering - Cabinets", order: 39 }),
+      buildTask({ id: "main", stage: "Make an offer", order: 1 }),
+      buildTask({ id: "demo", stage: "All items removed", order: 19 }),
+      buildTask({ id: "order-cabinets", stage: "Cabinets replaced", order: 68 }),
     ];
 
     const grouped = getConstructionWorkflowTaskGroups(tasks);
-    expect(grouped.constructionTasks.map((task) => task.id)).toEqual(["utilities", "demo"]);
+    expect(grouped.constructionTasks.map((task) => task.id)).toEqual(["demo"]);
     expect(grouped.orderingTasks.map((task) => task.id)).toEqual(["order-cabinets"]);
-    expect(grouped.allTasks.map((task) => task.id)).toEqual(["utilities", "demo", "order-cabinets"]);
+    expect(grouped.allTasks.map((task) => task.id)).toEqual(["demo", "order-cabinets"]);
   });
 });

@@ -42,7 +42,7 @@ export interface DedupeResult {
   keepByOrder: Map<number, PropertyTask>;
   /** Duplicate and unmappable tasks that should be deleted. */
   remove: PropertyTask[];
-  /** Canonical order numbers (1..18) for which no task was found in the input. */
+  /** Canonical order numbers from `defaultWorkflow` for which no task was found in the input. */
   missing: number[];
 }
 
@@ -64,13 +64,13 @@ export function selectPrimaryTask(group: PropertyTask[]): PropertyTask {
 }
 
 /**
- * Groups `tasks` by canonical order (1..18) and identifies:
+ * Groups `tasks` by canonical order from `defaultWorkflow` and identifies:
  *  - The single primary task to keep for each order (via `selectPrimaryTask`).
  *  - Extra duplicates and unmappable tasks to remove.
  *  - Canonical orders that have no task at all (need to be created).
  *
  * Canonical order resolution per task:
- *  1. Use `task.order` if it is a valid canonical order number.
+ *  1. Use `task.order` if it is a valid canonical order number in `defaultWorkflow`.
  *  2. Otherwise fall back to the order that `task.stage` maps to in `defaultWorkflow`.
  *  3. If neither maps, the task is unmappable and goes into `remove`.
  */

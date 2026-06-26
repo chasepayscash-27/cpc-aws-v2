@@ -160,6 +160,53 @@
   font-size: 12px !important;
 }
 
+.pwTaskNote {
+  margin: 6px 0 0 !important;
+  font-size: 12px !important;
+  color: #1a2e1a !important;
+}
+
+.pwTaskNoteMeta {
+  display: block;
+  color: #5a7060;
+  font-size: 11px;
+  margin-top: 2px;
+}
+
+.pwTaskNoteComposer {
+  margin-top: 8px;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.pwTaskNoteInput {
+  flex: 1;
+  min-width: 180px;
+  border: 1px solid #cde8d5;
+  border-radius: 8px;
+  background: #fff;
+  color: #1a2e1a;
+  font-size: 12px;
+  padding: 5px 8px;
+}
+
+.pwTaskNoteButton {
+  border: 1px solid #cde8d5;
+  background: #f0f7f1;
+  color: #1a7a3c;
+  border-radius: 8px;
+  padding: 5px 8px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.pwTaskNoteButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .pwMuted {
   margin: 0;
   color: #5a7060;

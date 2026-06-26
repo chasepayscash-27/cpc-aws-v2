@@ -1,6 +1,13 @@
 import { describe, expect, it } from "vitest";
 import type { Schema } from "../../amplify/data/resource";
-import { deriveRecipientFromRow, getTasksForTab, getWorkflowTabs, normalizeAlertRecipient, normalizePhoneToE164, updateTask } from "./propertyWorkflowTabs";
+import {
+  createTaskNotePayload,
+  deriveRecipientFromRow,
+  getTasksForTab,
+  getWorkflowTabs,
+  normalizeAlertRecipient,
+  normalizePhoneToE164,
+} from "./propertyWorkflowTabs";
 
 type PropertyTask = Schema["PropertyTask"]["type"];
 
@@ -14,93 +21,85 @@ function buildTask(overrides: Partial<PropertyTask>): PropertyTask {
     responsibilities: overrides.responsibilities ?? null,
     notes: overrides.notes ?? null,
     isComplete: overrides.isComplete ?? false,
+    workflowType: overrides.workflowType ?? null,
+    subWorkflowType: overrides.subWorkflowType ?? null,
     completedAt: overrides.completedAt ?? null,
     completedBy: overrides.completedBy ?? null,
     assigneeId: overrides.assigneeId ?? null,
     alertRecipientId: overrides.alertRecipientId ?? null,
+    taskNote: overrides.taskNote ?? null,
+    taskNoteCreatedAt: overrides.taskNoteCreatedAt ?? null,
     createdAt: overrides.createdAt ?? new Date().toISOString(),
     updatedAt: overrides.updatedAt ?? new Date().toISOString(),
   } as PropertyTask;
 }
 
 describe("PropertyWorkflow tab helpers", () => {
-  it("renders main tab plus one tab per assigned employee", () => {
+  it("renders main tab and construction tab when construction tasks exist", () => {
     const tasks = [
-      buildTask({ id: "1", assigneeId: "Alice" }),
-      buildTask({ id: "2", assigneeId: "Bob" }),
-      buildTask({ id: "3", assigneeId: "Alice" }),
-      buildTask({ id: "4", assigneeId: null }),
+      buildTask({ id: "1", order: 1 }),
+      buildTask({ id: "2", order: 19 }),
     ];
 
     const tabs = getWorkflowTabs(tasks);
 
-    expect(tabs.map((tab) => tab.label)).toEqual(["Main Workflow", "Alice", "Bob"]);
+    expect(tabs.map((tab) => tab.label)).toEqual(["Main Workflow", "Construction Workflow"]);
   });
 
-  it("filters employee tab to only that employee's tasks", () => {
+  it("main tab excludes construction and checklist tasks", () => {
     const tasks = [
-      buildTask({ id: "1", stage: "A", assigneeId: "Alice" }),
-      buildTask({ id: "2", stage: "B", assigneeId: "Bob" }),
-      buildTask({ id: "3", stage: "C", assigneeId: null }),
+      buildTask({ id: "main", order: 1 }),
+      buildTask({ id: "construction", order: 19 }),
+      buildTask({ id: "checklist", order: 60 }),
     ];
 
-    const aliceTab = getWorkflowTabs(tasks).find((tab) => tab.label === "Alice");
-    expect(aliceTab).toBeDefined();
+    const mainTab = getWorkflowTabs(tasks).find((tab) => tab.id === "main");
+    expect(mainTab).toBeDefined();
 
-    const filtered = getTasksForTab(tasks, aliceTab!);
-    expect(filtered.map((task) => task.id)).toEqual(["1"]);
+    const filtered = getTasksForTab(tasks, mainTab!);
+    expect(filtered.map((task) => task.id)).toEqual(["main"]);
   });
 
-  it("keeps one underlying record so main and employee views stay in sync", () => {
+  it("construction tab excludes main tasks and includes construction/checklist tasks", () => {
     const tasks = [
-      buildTask({ id: "1", stage: "A", assigneeId: "Alice", isComplete: false }),
-      buildTask({ id: "2", stage: "B", assigneeId: "Bob", isComplete: false }),
+      buildTask({ id: "main", order: 1 }),
+      buildTask({ id: "construction", order: 19 }),
+      buildTask({ id: "checklist", order: 60 }),
     ];
 
-    const aliceTab = getWorkflowTabs(tasks).find((tab) => tab.label === "Alice")!;
+    const constructionTab = getWorkflowTabs(tasks).find((tab) => tab.id === "construction");
+    expect(constructionTab).toBeDefined();
 
-    const afterToggle = updateTask(tasks, "1", { isComplete: true, completedBy: "Alice" });
-
-    const mainTask = getTasksForTab(afterToggle, { id: "main", label: "Main Workflow", assigneeId: null }).find(
-      (task) => task.id === "1"
-    );
-    const aliceTask = getTasksForTab(afterToggle, aliceTab).find((task) => task.id === "1");
-
-    expect(mainTask?.isComplete).toBe(true);
-    expect(aliceTask?.isComplete).toBe(true);
-    expect(mainTask?.completedBy).toBe("Alice");
-    expect(aliceTask?.completedBy).toBe("Alice");
+    const filtered = getTasksForTab(tasks, constructionTab!);
+    expect(filtered.map((task) => task.id)).toEqual(["construction", "checklist"]);
   });
 
-  it("moves a task between employee tabs when assignee changes", () => {
-    const tasks = [
-      buildTask({ id: "1", stage: "A", assigneeId: "Alice" }),
-      buildTask({ id: "2", stage: "B", assigneeId: "Bob" }),
-    ];
-
-    const afterReassign = updateTask(tasks, "1", { assigneeId: "Bob" });
-    const tabs = getWorkflowTabs(afterReassign);
-    const bobTab = tabs.find((tab) => tab.label === "Bob");
-    const aliceTab = tabs.find((tab) => tab.label === "Alice");
-
-    expect(aliceTab).toBeUndefined();
-    expect(bobTab).toBeDefined();
-    expect(getTasksForTab(afterReassign, bobTab!).map((task) => task.id)).toEqual(["1", "2"]);
-  });
-
-  it("hides employee tabs when that employee has no assigned items", () => {
-    const tasks = [buildTask({ id: "1", assigneeId: "Alice" }), buildTask({ id: "2", assigneeId: null })];
-
-    const tabs = getWorkflowTabs(tasks);
-
-    expect(tabs.some((tab) => tab.label === "Bob")).toBe(false);
-    expect(tabs.map((tab) => tab.label)).toEqual(["Main Workflow", "Alice"]);
+  it("falls back to canonical order when workflowType is missing on records", () => {
+    const tasks = [buildTask({ id: "1", order: 1, workflowType: null }), buildTask({ id: "2", order: 19, workflowType: null })];
+    const mainTab = getWorkflowTabs(tasks).find((tab) => tab.id === "main")!;
+    const constructionTab = getWorkflowTabs(tasks).find((tab) => tab.id === "construction")!;
+    expect(getTasksForTab(tasks, mainTab).map((task) => task.id)).toEqual(["1"]);
+    expect(getTasksForTab(tasks, constructionTab).map((task) => task.id)).toEqual(["2"]);
   });
 
   it("normalizes alert recipient values", () => {
     expect(normalizeAlertRecipient(" alex ")).toBe("alex");
     expect(normalizeAlertRecipient("")).toBeNull();
     expect(normalizeAlertRecipient(null)).toBeNull();
+  });
+
+  describe("createTaskNotePayload", () => {
+    it("returns a persisted note with timestamp", () => {
+      const timestamp = new Date("2026-06-25T18:30:00.000Z");
+      expect(createTaskNotePayload("  Need permit follow-up  ", timestamp)).toEqual({
+        taskNote: "Need permit follow-up",
+        taskNoteCreatedAt: "2026-06-25T18:30:00.000Z",
+      });
+    });
+
+    it("returns null for empty drafts", () => {
+      expect(createTaskNotePayload("   ")).toBeNull();
+    });
   });
 });
 
