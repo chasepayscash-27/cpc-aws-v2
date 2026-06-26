@@ -6,6 +6,7 @@ import PropertyFinancials from "./PropertyFinancials";
 import PropertyWorksheet from "./PropertyWorksheet";
 import PropertyWorkflow from "./PropertyWorkflow";
 import ConstructionWorkflowTemplate from "./ConstructionWorkflowTemplate";
+import ChecklistWorkflowTemplate from "./ChecklistWorkflowTemplate";
 
 interface Props {
   project: ProjectRow;
@@ -59,6 +60,7 @@ export default function ProjectDetailsModal({ project: row, onClose, onViewFullP
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
   const [worksheetOpen, setWorksheetOpen] = useState(false);
   const [constructionWorkflowOpen, setConstructionWorkflowOpen] = useState(false);
+  const [checklistOpen, setChecklistOpen] = useState(false);
   const [costSummary, setCostSummary] = useState<[number, number, number]>([0, 0, 0]);
 
   const handleFinancialSummary = useCallback(
@@ -276,8 +278,8 @@ export default function ProjectDetailsModal({ project: row, onClose, onViewFullP
               </div>
             )}
 
-            {/* Worksheet / construction workflow toggle buttons */}
-            <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: worksheetOpen || constructionWorkflowOpen ? 12 : 20 }}>
+            {/* Worksheet / construction workflow / checklist toggle buttons */}
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: worksheetOpen || constructionWorkflowOpen || checklistOpen ? 12 : 20 }}>
               <button
                 onClick={() => setWorksheetOpen((v) => !v)}
                 style={{
@@ -345,6 +347,40 @@ export default function ProjectDetailsModal({ project: row, onClose, onViewFullP
               >
                 🏗️ {constructionWorkflowOpen ? "Close Construction Workflow" : "Construction Workflow"}
               </button>
+
+              <button
+                onClick={() => setChecklistOpen((v) => !v)}
+                style={{
+                  padding: "8px 18px",
+                  borderRadius: 12,
+                  border: "1px solid #1a7a3c",
+                  background: checklistOpen ? "#1a7a3c" : "#f0f7f1",
+                  color: checklistOpen ? "#ffffff" : "#1a7a3c",
+                  fontSize: 13,
+                  fontWeight: 600,
+                  cursor: "pointer",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 6,
+                  transition: "background 0.15s, color 0.15s",
+                }}
+                onMouseEnter={(e) => {
+                  if (!checklistOpen) {
+                    (e.currentTarget as HTMLButtonElement).style.background = "#1a7a3c";
+                    (e.currentTarget as HTMLButtonElement).style.color = "#ffffff";
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (!checklistOpen) {
+                    (e.currentTarget as HTMLButtonElement).style.background = "#f0f7f1";
+                    (e.currentTarget as HTMLButtonElement).style.color = "#1a7a3c";
+                  }
+                }}
+                aria-expanded={checklistOpen}
+                aria-label={checklistOpen ? "Close checklist" : "Open checklist"}
+              >
+                ✅ {checklistOpen ? "Close Checklist" : "Checklist"}
+              </button>
             </div>
 
             {/* Inline editable worksheet */}
@@ -357,6 +393,12 @@ export default function ProjectDetailsModal({ project: row, onClose, onViewFullP
             {constructionWorkflowOpen && (
               <div style={{ marginBottom: 20 }}>
                 <ConstructionWorkflowTemplate key={propertyId} propertyId={propertyId} propertyName={row.name} projectStage={row.stage} />
+              </div>
+            )}
+
+            {checklistOpen && (
+              <div style={{ marginBottom: 20 }}>
+                <ChecklistWorkflowTemplate key={propertyId} propertyId={propertyId} propertyName={row.name} projectStage={row.stage} />
               </div>
             )}
 
