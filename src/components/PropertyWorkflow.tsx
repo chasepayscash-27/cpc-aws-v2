@@ -4,6 +4,7 @@ import { getCurrentUser } from "aws-amplify/auth";
 import type { Schema } from "../../amplify/data/resource";
 import { defaultWorkflow } from "../data/defaultWorkflow";
 import {
+  createTaskNotePayload,
   getTasksForTab,
   getWorkflowTabs,
   loadWorkflowAlertRecipients,
@@ -43,6 +44,7 @@ export default function PropertyWorkflow({ propertyId }: Props) {
   const [completedByUser, setCompletedByUser] = useState<string | null>(null);
   const [activeTabId, setActiveTabId] = useState("main");
   const [recipients, setRecipients] = useState<WorkflowAlertRecipient[]>([]);
+  const [noteDraftByTaskId, setNoteDraftByTaskId] = useState<Record<string, string>>({});
   const seedAttemptedRef = useRef(false);
   const seedingRef = useRef(false);
   const reconcileAttemptedRef = useRef(false);
@@ -69,6 +71,8 @@ export default function PropertyWorkflow({ propertyId }: Props) {
         const { errors } = await client.models.PropertyTask.create({
           propertyId,
           stage: templateTask.stage,
+          workflowType: templateTask.workflowType,
+          subWorkflowType: templateTask.subWorkflowType,
           owner: templateTask.owner,
           responsibilities: templateTask.responsibilities,
           notes: templateTask.notes,
@@ -119,6 +123,8 @@ export default function PropertyWorkflow({ propertyId }: Props) {
       const { errors } = await client.models.PropertyTask.create({
         propertyId,
         stage: templateTask.stage,
+        workflowType: templateTask.workflowType,
+        subWorkflowType: templateTask.subWorkflowType,
         owner: normalizeWorkflowOwner(templateTask.owner),
         responsibilities: templateTask.responsibilities,
         notes: templateTask.notes,
@@ -136,7 +142,15 @@ export default function PropertyWorkflow({ propertyId }: Props) {
     for (const [order, primary] of keepByOrder) {
       const templateTask = templateByOrder.get(order)!;
       const normalizedOwner = normalizeWorkflowOwner(primary.owner);
-      const updatePayload: { id: string; order?: number; stage?: string; owner?: string | null; assigneeId?: string | null } = { id: primary.id };
+      const updatePayload: {
+        id: string;
+        order?: number;
+        stage?: string;
+        owner?: string | null;
+        assigneeId?: string | null;
+        workflowType?: string | null;
+        subWorkflowType?: string | null;
+      } = { id: primary.id };
       let shouldUpdate = false;
 
       if (primary.order !== templateTask.order) {
@@ -153,6 +167,14 @@ export default function PropertyWorkflow({ propertyId }: Props) {
       }
       if (primary.assigneeId == null && normalizedOwner !== null) {
         updatePayload.assigneeId = normalizedOwner;
+        shouldUpdate = true;
+      }
+      if (primary.workflowType !== templateTask.workflowType) {
+        updatePayload.workflowType = templateTask.workflowType;
+        shouldUpdate = true;
+      }
+      if (primary.subWorkflowType !== templateTask.subWorkflowType) {
+        updatePayload.subWorkflowType = templateTask.subWorkflowType;
         shouldUpdate = true;
       }
 
@@ -197,6 +219,7 @@ export default function PropertyWorkflow({ propertyId }: Props) {
     setLoading(true);
     setError("");
     setAlertStatus("");
+    setNoteDraftByTaskId({});
 
     const subscription = client.models.PropertyTask.observeQuery({
       filter: { propertyId: { eq: propertyId } },
@@ -390,9 +413,39 @@ export default function PropertyWorkflow({ propertyId }: Props) {
     setAlertPreferenceId(data?.id ?? null);
   }, [alertPreferenceId, alertsEnabled, propertyId]);
 
+  const handleTaskNoteDraftChange = useCallback((taskId: string, value: string) => {
+    setNoteDraftByTaskId((current) => ({ ...current, [taskId]: value }));
+  }, []);
+
+  const handleTaskNoteCreate = useCallback(async (task: PropertyTask) => {
+    const payload = createTaskNotePayload(noteDraftByTaskId[task.id] ?? "");
+    if (!payload) return;
+
+    setError("");
+    setTasks((currentTasks) => updateTask(currentTasks, task.id, payload));
+    setNoteDraftByTaskId((current) => ({ ...current, [task.id]: "" }));
+
+    const { errors } = await client.models.PropertyTask.update({
+      id: task.id,
+      taskNote: payload.taskNote,
+      taskNoteCreatedAt: payload.taskNoteCreatedAt,
+    });
+
+    if (errors?.length) {
+      setTasks((currentTasks) =>
+        updateTask(currentTasks, task.id, {
+          taskNote: task.taskNote ?? null,
+          taskNoteCreatedAt: task.taskNoteCreatedAt ?? null,
+        })
+      );
+      setNoteDraftByTaskId((current) => ({ ...current, [task.id]: payload.taskNote }));
+      setError(errors.map((item) => item.message).join("; "));
+    }
+  }, [noteDraftByTaskId]);
+
   const tabs = useMemo(() => getWorkflowTabs(dedupedTasks), [dedupedTasks]);
   const activeTab = useMemo(
-    () => tabs.find((tab) => tab.id === activeTabId) ?? tabs[0] ?? { id: "main", label: "Main Workflow", assigneeId: null },
+    () => tabs.find((tab) => tab.id === activeTabId) ?? tabs[0] ?? { id: "main", label: "Main Workflow", workflowType: "Main Workflow" as const },
     [tabs, activeTabId]
   );
   const visibleTasks = useMemo(() => getTasksForTab(dedupedTasks, activeTab), [dedupedTasks, activeTab]);
@@ -549,6 +602,34 @@ export default function PropertyWorkflow({ propertyId }: Props) {
                 </div>
                 {task.responsibilities && <p>{task.responsibilities}</p>}
                 {task.notes && <p className="pwNotes">{task.notes}</p>}
+                {task.taskNote && (
+                  <p className="pwTaskNote">
+                    {task.taskNote}
+                    {task.taskNoteCreatedAt && <span className="pwTaskNoteMeta">Added {new Date(task.taskNoteCreatedAt).toLocaleString()}</span>}
+                  </p>
+                )}
+                <div className="pwTaskNoteComposer">
+                  <input
+                    type="text"
+                    className="pwTaskNoteInput"
+                    placeholder="Add note"
+                    value={noteDraftByTaskId[task.id] ?? ""}
+                    onChange={(event) => {
+                      handleTaskNoteDraftChange(task.id, event.currentTarget.value);
+                    }}
+                    aria-label={`Add note for ${task.stage}`}
+                  />
+                  <button
+                    type="button"
+                    className="pwTaskNoteButton"
+                    disabled={!createTaskNotePayload(noteDraftByTaskId[task.id] ?? "")}
+                    onClick={() => {
+                      void handleTaskNoteCreate(task);
+                    }}
+                  >
+                    Save note
+                  </button>
+                </div>
               </div>
             </label>
           ))}

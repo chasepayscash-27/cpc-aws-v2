@@ -1,56 +1,105 @@
 export interface DefaultWorkflowTask {
   order: number;
   stage: string;
+  workflowType: WorkflowType;
+  subWorkflowType: string;
   owner: string;
   responsibilities: string;
   notes: string;
 }
 
+export type WorkflowType = "Main Workflow" | "Construction Workflow" | "Check List Workflow";
+
+export const WORKFLOW_DEFINITION_SOURCE_PATH = "/data/Workflow_New_June_25_2026.xlsx";
+
 export const defaultWorkflow: DefaultWorkflowTask[] = [
-  { order: 1, stage: "Offer placed", owner: "Justin", responsibilities: "Place offer on the property", notes: "" },
-  { order: 2, stage: "Closed on property", owner: "Devin", responsibilities: "Close on the property", notes: "" },
-  { order: 3, stage: "Got keys in lockbox", owner: "Justin", responsibilities: "Obtain keys and place in lockbox", notes: "" },
-  { order: 4, stage: "Utility activation", owner: "Devin", responsibilities: "Activate all utilities for the property", notes: "" },
-  { order: 5, stage: "Utilities check", owner: "Kevin/Matt", responsibilities: "Verify water, gas, and power are active", notes: "" },
-  { order: 6, stage: "Initial walk through", owner: "Kevin/Matt", responsibilities: "Walk through property and assess scope of work", notes: "" },
-  { order: 7, stage: "Dumpster Ordered", owner: "", responsibilities: "Order dumpster for construction debris", notes: "" },
-  { order: 8, stage: "Initial material ordered", owner: "Kevin", responsibilities: "Order initial materials needed for construction", notes: "" },
-  { order: 9, stage: "Contractor walk through", owner: "Matt", responsibilities: "Walk contractor through job scope and pricing", notes: "" },
-  { order: 10, stage: "Construction finished", owner: "Matt", responsibilities: "Oversee and confirm construction completion", notes: "" },
-  { order: 11, stage: "Final walk through", owner: "Matt", responsibilities: "Perform final walkthrough to ensure quality", notes: "" },
-  { order: 12, stage: "Clean house", owner: "Matt", responsibilities: "Coordinate house cleaning after construction", notes: "" },
-  { order: 13, stage: "Staging", owner: "Matt", responsibilities: "Coordinate property staging", notes: "" },
-  { order: 14, stage: "Pictures", owner: "Matt", responsibilities: "Coordinate listing photography", notes: "" },
-  { order: 15, stage: "On market", owner: "Devin", responsibilities: "List property on the market", notes: "" },
-  { order: 16, stage: "Offer Accepted", owner: "Devin/Chase", responsibilities: "Accept offer on the property", notes: "" },
-  { order: 17, stage: "Repair addendum", owner: "Justin", responsibilities: "Handle repair addendum process", notes: "" },
-  { order: 18, stage: "Retrieve lock box after closing", owner: "Justin", responsibilities: "Retrieve lockbox after property closes", notes: "" },
-  { order: 19, stage: "Construction - Demo", owner: "Kevin/Matt", responsibilities: "Complete demolition and disposal plan", notes: "" },
-  { order: 20, stage: "Construction - Foundation", owner: "Kevin/Matt", responsibilities: "Complete foundation repair or install scope", notes: "" },
-  { order: 21, stage: "Construction - Grading", owner: "Kevin/Matt", responsibilities: "Complete grading and drainage prep", notes: "" },
-  { order: 22, stage: "Construction - Gutters", owner: "Kevin/Matt", responsibilities: "Install or repair gutters", notes: "" },
-  { order: 23, stage: "Construction - Downspouts", owner: "Kevin/Matt", responsibilities: "Install or repair downspouts", notes: "" },
-  { order: 24, stage: "Construction - Roof", owner: "Kevin/Matt", responsibilities: "Complete roof replacement or repair", notes: "" },
-  { order: 25, stage: "Construction - HVAC", owner: "Kevin/Matt", responsibilities: "Complete HVAC scope", notes: "" },
-  { order: 26, stage: "Construction - Plumbing", owner: "Kevin/Matt", responsibilities: "Complete plumbing scope", notes: "" },
-  { order: 27, stage: "Construction - Electrical", owner: "Kevin/Matt", responsibilities: "Complete electrical scope", notes: "" },
-  { order: 28, stage: "Construction - Fireplace", owner: "Kevin/Matt", responsibilities: "Complete fireplace updates when applicable", notes: "" },
-  { order: 29, stage: "Construction - Windows", owner: "Kevin/Matt", responsibilities: "Complete window updates when applicable", notes: "" },
-  { order: 30, stage: "Construction - Bathrooms", owner: "Kevin/Matt", responsibilities: "Complete bathroom scope", notes: "" },
-  { order: 31, stage: "Construction - Paint", owner: "Kevin/Matt", responsibilities: "Complete interior/exterior paint scope", notes: "" },
-  { order: 32, stage: "Construction - Flooring", owner: "Kevin/Matt", responsibilities: "Complete flooring install scope", notes: "" },
-  { order: 33, stage: "Construction - Cabinets", owner: "Kevin/Matt", responsibilities: "Install cabinets and hardware", notes: "" },
-  { order: 34, stage: "Construction - Countertops", owner: "Kevin/Matt", responsibilities: "Install countertops", notes: "" },
-  { order: 35, stage: "Construction - Landscaping", owner: "Kevin/Matt", responsibilities: "Complete exterior landscaping scope", notes: "" },
-  { order: 36, stage: "Construction - Walkthrough", owner: "Kevin/Matt", responsibilities: "Complete construction walkthrough", notes: "" },
-  { order: 37, stage: "Construction - Cleaning", owner: "Kevin/Matt", responsibilities: "Complete final construction clean", notes: "" },
-  { order: 38, stage: "Construction - Staging", owner: "Kevin/Matt", responsibilities: "Finish construction staging tasks", notes: "" },
-  { order: 39, stage: "Ordering - Cabinets", owner: "Kevin", responsibilities: "Track cabinet order status and delivery", notes: "" },
-  { order: 40, stage: "Ordering - Appliances", owner: "Kevin", responsibilities: "Track appliance order status and delivery", notes: "" },
-  { order: 41, stage: "Ordering - Windows", owner: "Kevin", responsibilities: "Track window order status and delivery", notes: "" },
-  { order: 42, stage: "Ordering - Tile", owner: "Kevin", responsibilities: "Track tile order status and delivery", notes: "" },
-  { order: 43, stage: "Ordering - Flooring", owner: "Kevin", responsibilities: "Track flooring order status and delivery", notes: "" },
-  { order: 44, stage: "Ordering - Paint", owner: "Kevin", responsibilities: "Track paint order status and delivery", notes: "" },
-  { order: 45, stage: "Ordering - Garage Doors", owner: "Kevin", responsibilities: "Track garage door order status and delivery", notes: "" },
-  { order: 46, stage: "Ordering - Materials", owner: "Kevin", responsibilities: "Track miscellaneous material orders", notes: "" },
+  { order: 1, stage: "Make an offer", workflowType: "Main Workflow", subWorkflowType: "Main Workflow", owner: "", responsibilities: "", notes: "" },
+  { order: 2, stage: "Close On property", workflowType: "Main Workflow", subWorkflowType: "Main Workflow", owner: "", responsibilities: "", notes: "" },
+  { order: 3, stage: "Put keys in lockbox", workflowType: "Main Workflow", subWorkflowType: "Main Workflow", owner: "", responsibilities: "", notes: "" },
+  { order: 4, stage: "Get utilities Turned on", workflowType: "Main Workflow", subWorkflowType: "Main Workflow", owner: "", responsibilities: "", notes: "" },
+  { order: 5, stage: "Verify all utilities are on and not locked", workflowType: "Main Workflow", subWorkflowType: "Main Workflow", owner: "", responsibilities: "", notes: "" },
+  { order: 6, stage: "Initial Walk through", workflowType: "Main Workflow", subWorkflowType: "Main Workflow", owner: "", responsibilities: "", notes: "" },
+  { order: 7, stage: "Contractor walk through", workflowType: "Main Workflow", subWorkflowType: "Main Workflow", owner: "", responsibilities: "", notes: "" },
+  { order: 8, stage: "Material Ordered", workflowType: "Main Workflow", subWorkflowType: "Main Workflow", owner: "", responsibilities: "", notes: "" },
+  { order: 9, stage: "Construction", workflowType: "Main Workflow", subWorkflowType: "Main Workflow", owner: "", responsibilities: "", notes: "" },
+  { order: 10, stage: "Final Walk through", workflowType: "Main Workflow", subWorkflowType: "Main Workflow", owner: "", responsibilities: "", notes: "" },
+  { order: 11, stage: "Staging", workflowType: "Main Workflow", subWorkflowType: "Main Workflow", owner: "", responsibilities: "", notes: "" },
+  { order: 12, stage: "Cleaned", workflowType: "Main Workflow", subWorkflowType: "Main Workflow", owner: "", responsibilities: "", notes: "" },
+  { order: 13, stage: "Pictures", workflowType: "Main Workflow", subWorkflowType: "Main Workflow", owner: "", responsibilities: "", notes: "" },
+  { order: 14, stage: "Offer Accepted", workflowType: "Main Workflow", subWorkflowType: "Main Workflow", owner: "", responsibilities: "", notes: "" },
+  { order: 15, stage: "Repair Addendum Sent", workflowType: "Main Workflow", subWorkflowType: "Main Workflow", owner: "", responsibilities: "", notes: "" },
+  { order: 16, stage: "Repaired Addendum Finished", workflowType: "Main Workflow", subWorkflowType: "Main Workflow", owner: "", responsibilities: "", notes: "" },
+  { order: 17, stage: "Closed on property", workflowType: "Main Workflow", subWorkflowType: "Main Workflow", owner: "", responsibilities: "", notes: "" },
+  { order: 18, stage: "Got lockbox back", workflowType: "Main Workflow", subWorkflowType: "Main Workflow", owner: "", responsibilities: "", notes: "" },
+  { order: 19, stage: "All items removed", workflowType: "Construction Workflow", subWorkflowType: "Demo Stage", owner: "", responsibilities: "", notes: "" },
+  { order: 20, stage: "all flooring out", workflowType: "Construction Workflow", subWorkflowType: "Demo Stage", owner: "", responsibilities: "", notes: "" },
+  { order: 21, stage: "bathrooms demo", workflowType: "Construction Workflow", subWorkflowType: "Demo Stage", owner: "", responsibilities: "", notes: "" },
+  { order: 22, stage: "Cabinets out", workflowType: "Construction Workflow", subWorkflowType: "Demo Stage", owner: "", responsibilities: "", notes: "" },
+  { order: 23, stage: "Walls taken out?", workflowType: "Construction Workflow", subWorkflowType: "Demo Stage", owner: "", responsibilities: "", notes: "Yes/No" },
+  { order: 24, stage: "ROUGH IN", workflowType: "Construction Workflow", subWorkflowType: "Demo Stage", owner: "", responsibilities: "", notes: "" },
+  { order: 25, stage: "plumbers rough", workflowType: "Construction Workflow", subWorkflowType: "Demo Stage", owner: "", responsibilities: "", notes: "" },
+  { order: 26, stage: "Electricians rough", workflowType: "Construction Workflow", subWorkflowType: "Demo Stage", owner: "", responsibilities: "", notes: "" },
+  { order: 27, stage: "hvac rough", workflowType: "Construction Workflow", subWorkflowType: "Demo Stage", owner: "", responsibilities: "", notes: "" },
+  { order: 28, stage: "Durarock bathrooms", workflowType: "Construction Workflow", subWorkflowType: "Prep stage", owner: "", responsibilities: "", notes: "" },
+  { order: 29, stage: "Water proof bathrooms", workflowType: "Construction Workflow", subWorkflowType: "Prep stage", owner: "", responsibilities: "", notes: "" },
+  { order: 30, stage: "Prep interior for paint", workflowType: "Construction Workflow", subWorkflowType: "Prep stage", owner: "", responsibilities: "", notes: "" },
+  { order: 31, stage: "Replace/repair baseboard trim etc", workflowType: "Construction Workflow", subWorkflowType: "Prep stage", owner: "", responsibilities: "", notes: "" },
+  { order: 32, stage: "repair subflooring", workflowType: "Construction Workflow", subWorkflowType: "Prep stage", owner: "", responsibilities: "", notes: "" },
+  { order: 33, stage: "repair bad wood exterior", workflowType: "Construction Workflow", subWorkflowType: "Prep stage", owner: "", responsibilities: "", notes: "" },
+  { order: 34, stage: "repair siding", workflowType: "Construction Workflow", subWorkflowType: "Prep stage", owner: "", responsibilities: "", notes: "" },
+  { order: 35, stage: "prep exterior for paint", workflowType: "Construction Workflow", subWorkflowType: "Prep stage", owner: "", responsibilities: "", notes: "" },
+  { order: 36, stage: "Grading away from house", workflowType: "Construction Workflow", subWorkflowType: "Prep stage", owner: "", responsibilities: "", notes: "" },
+  { order: 37, stage: "interior painted", workflowType: "Construction Workflow", subWorkflowType: "Finishing Stage", owner: "", responsibilities: "", notes: "" },
+  { order: 38, stage: "exterior painted", workflowType: "Construction Workflow", subWorkflowType: "Finishing Stage", owner: "", responsibilities: "", notes: "" },
+  { order: 39, stage: "bathrooms tiled", workflowType: "Construction Workflow", subWorkflowType: "Finishing Stage", owner: "", responsibilities: "", notes: "" },
+  { order: 40, stage: "flooring installed", workflowType: "Construction Workflow", subWorkflowType: "Finishing Stage", owner: "", responsibilities: "", notes: "" },
+  { order: 41, stage: "cabinets installed", workflowType: "Construction Workflow", subWorkflowType: "Finishing Stage", owner: "", responsibilities: "", notes: "" },
+  { order: 42, stage: "countertops installed", workflowType: "Construction Workflow", subWorkflowType: "Finishing Stage", owner: "", responsibilities: "", notes: "" },
+  { order: 43, stage: "backsplash installed", workflowType: "Construction Workflow", subWorkflowType: "Finishing Stage", owner: "", responsibilities: "", notes: "" },
+  { order: 44, stage: "hardware on cabinets", workflowType: "Construction Workflow", subWorkflowType: "Finishing Stage", owner: "", responsibilities: "", notes: "" },
+  { order: 45, stage: "light fixtures installed", workflowType: "Construction Workflow", subWorkflowType: "Finishing Stage", owner: "", responsibilities: "", notes: "" },
+  { order: 46, stage: "plumbing fixtures installed", workflowType: "Construction Workflow", subWorkflowType: "Finishing Stage", owner: "", responsibilities: "", notes: "" },
+  { order: 47, stage: "door hardware installed", workflowType: "Construction Workflow", subWorkflowType: "Finishing Stage", owner: "", responsibilities: "", notes: "" },
+  { order: 48, stage: "Gutters Installed", workflowType: "Construction Workflow", subWorkflowType: "Finishing Stage", owner: "", responsibilities: "", notes: "" },
+  { order: 49, stage: "Appliances installed", workflowType: "Construction Workflow", subWorkflowType: "Finishing Stage", owner: "", responsibilities: "", notes: "" },
+  { order: 50, stage: "Appliances working", workflowType: "Construction Workflow", subWorkflowType: "Walk Through Stage", owner: "", responsibilities: "", notes: "" },
+  { order: 51, stage: "Plumbing fixtures all work", workflowType: "Construction Workflow", subWorkflowType: "Walk Through Stage", owner: "", responsibilities: "", notes: "" },
+  { order: 52, stage: "All lights and fixtures work", workflowType: "Construction Workflow", subWorkflowType: "Walk Through Stage", owner: "", responsibilities: "", notes: "" },
+  { order: 53, stage: "all windows open", workflowType: "Construction Workflow", subWorkflowType: "Walk Through Stage", owner: "", responsibilities: "", notes: "" },
+  { order: 54, stage: "water heater is on", workflowType: "Construction Workflow", subWorkflowType: "Walk Through Stage", owner: "", responsibilities: "", notes: "" },
+  { order: 55, stage: "HVAC working", workflowType: "Construction Workflow", subWorkflowType: "Walk Through Stage", owner: "", responsibilities: "", notes: "" },
+  { order: 56, stage: "No paint on windows", workflowType: "Construction Workflow", subWorkflowType: "Walk Through Stage", owner: "", responsibilities: "", notes: "" },
+  { order: 57, stage: "all doors shut and lock", workflowType: "Construction Workflow", subWorkflowType: "Walk Through Stage", owner: "", responsibilities: "", notes: "" },
+  { order: 58, stage: "grass is cut", workflowType: "Construction Workflow", subWorkflowType: "Walk Through Stage", owner: "", responsibilities: "", notes: "" },
+  { order: 59, stage: "garage doors open and shut", workflowType: "Construction Workflow", subWorkflowType: "Walk Through Stage", owner: "", responsibilities: "", notes: "" },
+  { order: 60, stage: "Initial order ordered", workflowType: "Check List Workflow", subWorkflowType: "Checklist Workflow", owner: "", responsibilities: "", notes: "" },
+  { order: 61, stage: "Tile ordered", workflowType: "Check List Workflow", subWorkflowType: "Checklist Workflow", owner: "", responsibilities: "", notes: "" },
+  { order: 62, stage: "Flooring ordered", workflowType: "Check List Workflow", subWorkflowType: "Checklist Workflow", owner: "", responsibilities: "", notes: "" },
+  { order: 63, stage: "Paint ordered", workflowType: "Check List Workflow", subWorkflowType: "Checklist Workflow", owner: "", responsibilities: "", notes: "" },
+  { order: 64, stage: "Amazon ordered", workflowType: "Check List Workflow", subWorkflowType: "Checklist Workflow", owner: "", responsibilities: "", notes: "" },
+  { order: 65, stage: "Fireplace", workflowType: "Check List Workflow", subWorkflowType: "Checklist Workflow", owner: "", responsibilities: "", notes: "Fireplace working" },
+  { order: 66, stage: "Roof replaced", workflowType: "Check List Workflow", subWorkflowType: "Checklist Workflow", owner: "", responsibilities: "", notes: "Roof ordered" },
+  { order: 67, stage: "Windows replaced", workflowType: "Check List Workflow", subWorkflowType: "Checklist Workflow", owner: "", responsibilities: "", notes: "windows ordered" },
+  { order: 68, stage: "Cabinets replaced", workflowType: "Check List Workflow", subWorkflowType: "Checklist Workflow", owner: "", responsibilities: "", notes: "cabinets ordered" },
+  { order: 69, stage: "Appliances Ordered", workflowType: "Check List Workflow", subWorkflowType: "Checklist Workflow", owner: "", responsibilities: "", notes: "" },
+  { order: 70, stage: "Countertops ordered", workflowType: "Check List Workflow", subWorkflowType: "Checklist Workflow", owner: "", responsibilities: "", notes: "" },
+  { order: 71, stage: "Pool", workflowType: "Check List Workflow", subWorkflowType: "Checklist Workflow", owner: "", responsibilities: "", notes: "Pool started" },
+  { order: 72, stage: "Foundation work", workflowType: "Check List Workflow", subWorkflowType: "Checklist Workflow", owner: "", responsibilities: "", notes: "Crack guys scheduled" },
+  { order: 73, stage: "Gutters Ordered", workflowType: "Check List Workflow", subWorkflowType: "Checklist Workflow", owner: "", responsibilities: "", notes: "" },
 ];
+
+export const workflowDefinitionByOrder = new Map(defaultWorkflow.map((task) => [task.order, task]));
+const workflowTypeByStage = new Map(defaultWorkflow.map((task) => [task.stage, task.workflowType]));
+
+export function resolveTaskWorkflowType(task: { order?: number | null; stage?: string | null; workflowType?: string | null }): WorkflowType | null {
+  if (task.workflowType === "Main Workflow" || task.workflowType === "Construction Workflow" || task.workflowType === "Check List Workflow") {
+    return task.workflowType;
+  }
+  if (typeof task.order === "number") {
+    const byOrder = workflowDefinitionByOrder.get(task.order);
+    if (byOrder) return byOrder.workflowType;
+  }
+  const stage = task.stage?.trim();
+  if (!stage) return null;
+  return workflowTypeByStage.get(stage) ?? null;
+}

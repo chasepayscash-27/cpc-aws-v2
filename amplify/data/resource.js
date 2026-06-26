@@ -64,11 +64,15 @@ const schema = a.schema({
             responsibilities: a.string(),
             notes: a.string(),
             order: a.integer().required(),
+            workflowType: a.string(),
+            subWorkflowType: a.string(),
             isComplete: a.boolean().default(false),
             completedAt: a.datetime(),
             completedBy: a.string(),
             assigneeId: a.string(),
             alertRecipientId: a.string(),
+            taskNote: a.string(),
+            taskNoteCreatedAt: a.datetime(),
         })
         .authorization((allow) => [
             allow.authenticated("identityPool"),

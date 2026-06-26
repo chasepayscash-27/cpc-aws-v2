@@ -1,10 +1,12 @@
 import { loadCsv } from "../utils/csv";
 import type { Schema } from "../../amplify/data/resource";
+import { resolveTaskWorkflowType, type WorkflowType } from "../data/defaultWorkflow";
 
 type PropertyTask = Schema["PropertyTask"]["type"];
 
-export type WorkflowTab = { id: string; label: string; assigneeId: string | null };
+export type WorkflowTab = { id: string; label: string; workflowType: WorkflowType };
 export type WorkflowAlertRecipient = { id: string; label: string; email: string; phone: string };
+export type TaskNotePayload = { taskNote: string; taskNoteCreatedAt: string };
 
 export function normalizePhoneToE164(raw: string | null | undefined): string | null {
   if (!raw) return null;
@@ -60,29 +62,36 @@ export function normalizeAlertRecipient(recipientId: string | null | undefined):
 }
 
 export function getWorkflowTabs(tasks: PropertyTask[]): WorkflowTab[] {
-  const assignees = new Set<string>();
-  for (const task of tasks) {
-    const assigneeId = normalizeAssignee(task.assigneeId);
-    if (assigneeId) {
-      assignees.add(assigneeId);
-    }
+  const workflowTypes = new Set(tasks.map((task) => resolveTaskWorkflowType(task)).filter((value): value is WorkflowType => value !== null));
+  const tabs: WorkflowTab[] = [{ id: "main", label: "Main Workflow", workflowType: "Main Workflow" }];
+
+  if (workflowTypes.has("Construction Workflow") || workflowTypes.has("Check List Workflow")) {
+    tabs.push({ id: "construction", label: "Construction Workflow", workflowType: "Construction Workflow" });
   }
 
-  return [
-    { id: "main", label: "Main Workflow", assigneeId: null },
-    ...[...assignees]
-      .sort((a, b) => a.localeCompare(b))
-      .map((assigneeId) => ({ id: `employee:${assigneeId}`, label: assigneeId, assigneeId })),
-  ];
+  return tabs;
 }
 
 export function getTasksForTab(tasks: PropertyTask[], tab: WorkflowTab): PropertyTask[] {
-  if (!tab.assigneeId) {
-    return tasks;
+  if (tab.workflowType === "Main Workflow") {
+    return tasks.filter((task) => resolveTaskWorkflowType(task) === "Main Workflow");
   }
-  return tasks.filter((task) => normalizeAssignee(task.assigneeId) === tab.assigneeId);
+
+  return tasks.filter((task) => {
+    const workflowType = resolveTaskWorkflowType(task);
+    return workflowType === "Construction Workflow" || workflowType === "Check List Workflow";
+  });
 }
 
 export function updateTask(tasks: PropertyTask[], id: string, updates: Partial<PropertyTask>): PropertyTask[] {
   return tasks.map((task) => (task.id === id ? { ...task, ...updates } : task));
+}
+
+export function createTaskNotePayload(noteDraft: string, timestamp: Date = new Date()): TaskNotePayload | null {
+  const taskNote = noteDraft.trim();
+  if (!taskNote) return null;
+  return {
+    taskNote,
+    taskNoteCreatedAt: timestamp.toISOString(),
+  };
 }
