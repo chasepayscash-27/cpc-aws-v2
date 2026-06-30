@@ -98,7 +98,9 @@ export default function ConstructionWorkflowTemplate({ propertyId, propertyName,
   const loading = !!propertyId && contextLoading;
 
   const constructionTaskGroups = useMemo(() => {
-    if (!propertyId) return { constructionTasks: [], orderingTasks: [], allTasks: [] };
+    if (!propertyId) {
+      return { constructionTasks: [], orderingTasks: [], constructionSections: [], orderingSections: [], allTasks: [] };
+    }
     const propertyTasks = allTasks.filter((t) => t.propertyId === propertyId);
     return getConstructionWorkflowTaskGroups(propertyTasks);
   }, [allTasks, propertyId]);
@@ -167,57 +169,75 @@ export default function ConstructionWorkflowTemplate({ propertyId, propertyName,
       )}
 
       {!loading && !error && visibleTasks.length > 0 && (
-        <div style={{ display: "grid", gap: 8 }}>
-          {visibleTasks.map((task) => (
-            <label
-              key={task.id}
-              style={{
-                display: "flex",
-                alignItems: "flex-start",
-                gap: 10,
-                border: "1px solid #d4e8d8",
-                borderRadius: 10,
-                background: task.isComplete ? "rgba(26,122,60,0.12)" : "#ffffff",
-                padding: "10px 12px",
-                textAlign: "left",
-                cursor: updatingTaskIds.includes(task.id) ? "progress" : "pointer",
-              }}
-            >
-              <input
-                type="checkbox"
-                checked={!!task.isComplete}
-                disabled={updatingTaskIds.includes(task.id)}
-                style={{ marginTop: 2 }}
-                aria-label={`Mark ${task.stage ?? "task"} ${task.isComplete ? "incomplete" : "complete"} in construction workflow`}
-                onChange={(event) => {
-                  void handleToggle(task, event.currentTarget.checked);
-                }}
-              />
-              <span>
-                <span
-                  style={{
-                    display: "block",
-                    fontSize: 13,
-                    fontWeight: 600,
-                    color: "#1a2e1a",
-                    textDecoration: task.isComplete ? "line-through" : "none",
-                  }}
-                >
-                  #{task.order ?? "—"} {task.stage}
-                </span>
-                {(task.responsibilities || task.notes) && (
-                  <span style={{ display: "block", fontSize: 12, color: "#5a7060" }}>
-                    {task.responsibilities?.trim() || task.notes?.trim()}
-                  </span>
-                )}
-                {task.completedAt && (
-                  <span style={{ display: "block", fontSize: 11, color: "#5a7060", marginTop: 2 }}>
-                    Completed {new Date(task.completedAt).toLocaleString()}
-                  </span>
-                )}
-              </span>
-            </label>
-          ))}
+        <div style={{ display: "grid", gap: 12 }}>
+          {[...constructionTaskGroups.constructionSections, ...constructionTaskGroups.orderingSections].map((section) => {
+            const sectionVisibleTasks = section.tasks.filter((task) => shouldShowTask(task.stage, worksheetFields, projectStage));
+            if (sectionVisibleTasks.length === 0) return null;
+            const sectionProgress = getProgress(sectionVisibleTasks);
+            return (
+              <section key={section.id} style={{ display: "grid", gap: 8 }}>
+                <div style={{ display: "grid", gap: 4 }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", gap: 8 }}>
+                    <strong style={{ fontSize: 12, color: "#1a7a3c", textTransform: "uppercase", letterSpacing: "0.04em" }}>{section.label}</strong>
+                    <span style={{ fontSize: 11, color: "#5a7060" }}>{sectionProgress.done}/{sectionProgress.total}</span>
+                  </div>
+                  <div style={{ height: 6, borderRadius: 999, background: "#dbeadf", overflow: "hidden" }}>
+                    <div style={{ width: `${sectionProgress.percent}%`, height: "100%", background: "#1a7a3c" }} />
+                  </div>
+                </div>
+                {sectionVisibleTasks.map((task) => (
+                  <label
+                    key={task.id}
+                    style={{
+                      display: "flex",
+                      alignItems: "flex-start",
+                      gap: 10,
+                      border: "1px solid #d4e8d8",
+                      borderRadius: 10,
+                      background: task.isComplete ? "rgba(26,122,60,0.12)" : "#ffffff",
+                      padding: "10px 12px",
+                      textAlign: "left",
+                      cursor: updatingTaskIds.includes(task.id) ? "progress" : "pointer",
+                    }}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={!!task.isComplete}
+                      disabled={updatingTaskIds.includes(task.id)}
+                      style={{ marginTop: 2 }}
+                      aria-label={`Mark ${task.stage ?? "task"} ${task.isComplete ? "incomplete" : "complete"} in construction workflow`}
+                      onChange={(event) => {
+                        void handleToggle(task, event.currentTarget.checked);
+                      }}
+                    />
+                    <span>
+                      <span
+                        style={{
+                          display: "block",
+                          fontSize: 13,
+                          fontWeight: 600,
+                          color: "#1a2e1a",
+                          textDecoration: task.isComplete ? "line-through" : "none",
+                        }}
+                      >
+                        #{task.order ?? "—"} {task.stage}
+                      </span>
+                      {(task.responsibilities || task.notes) && (
+                        <span style={{ display: "block", fontSize: 12, color: "#5a7060" }}>
+                          {task.responsibilities?.trim() || task.notes?.trim()}
+                        </span>
+                      )}
+                      {task.completedAt && (
+                        <span style={{ display: "block", fontSize: 11, color: "#5a7060", marginTop: 2 }}>
+                          Completed {new Date(task.completedAt).toLocaleString()}
+                        </span>
+                      )}
+                    </span>
+                  </label>
+                ))}
+              </section>
+            );
+          })}
         </div>
       )}
 

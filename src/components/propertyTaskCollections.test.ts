@@ -7,7 +7,7 @@ type PropertyTask = Schema["PropertyTask"]["type"];
 function buildTask(overrides: Partial<PropertyTask>): PropertyTask {
   return {
     id: overrides.id ?? crypto.randomUUID(),
-    propertyId: overrides.propertyId ?? "property-1",
+    propertyId: "propertyId" in overrides ? (overrides.propertyId ?? null) : "property-1",
     stage: overrides.stage ?? "Task",
     order: overrides.order ?? 1,
     owner: overrides.owner ?? null,
@@ -37,6 +37,26 @@ describe("getPrimaryTasksAcrossProperties", () => {
       "p1-order-2",
       "p2-order-1",
     ]);
+  });
+
+  it("keeps non-canonical team tasks including tasks without a property", () => {
+    const tasks = [
+      buildTask({ id: "p1-order-1", propertyId: "property-1", stage: "Offer placed", order: 1 }),
+      buildTask({
+        id: "general-team-task",
+        propertyId: null,
+        stage: "Call electrician",
+        order: 15000,
+        workflowType: "Team Task",
+        subWorkflowType: "General Team Task",
+      }),
+    ];
+
+    expect(getPrimaryTasksAcrossProperties(tasks).map((task) => task.id)).toEqual([
+      "p1-order-1",
+      "general-team-task",
+    ]);
+    expect(getPrimaryTasksAcrossProperties(tasks).find((task) => task.id === "general-team-task")?.propertyId).toBeNull();
   });
 });
 
@@ -69,5 +89,7 @@ describe("getConstructionWorkflowTasks", () => {
     expect(grouped.constructionTasks.map((task) => task.id)).toEqual(["demo"]);
     expect(grouped.orderingTasks.map((task) => task.id)).toEqual(["order-cabinets"]);
     expect(grouped.allTasks.map((task) => task.id)).toEqual(["demo", "order-cabinets"]);
+    expect(grouped.constructionSections.map((section) => section.label)).toEqual(["Demolition & Rough-In"]);
+    expect(grouped.orderingSections.map((section) => section.label)).toEqual(["Ordering & Scope Checklist"]);
   });
 });
