@@ -6,6 +6,7 @@ import { loadCsv } from '../utils/csv';
 import type { ProjectRow } from '../types/project';
 import { getPrimaryTasksAcrossProperties } from '../components/propertyTaskCollections';
 import { usePropertyTasks } from '../contexts/PropertyTasksContext';
+import { buildTeamTaskCreatePayload } from './teamTaskCreatePayload';
 import '../App.css';
 
 interface TeamMember {
@@ -271,25 +272,18 @@ const TeamPage = () => {
       return;
     }
 
-    const propertyId = newTaskPropertyId.trim() || null;
     setCreateError('');
     setIsCreatingTask(true);
-    const { errors } = await client.models.PropertyTask.create({
-      propertyId,
-      stage,
-      order: buildGeneralTaskOrder(),
-      workflowType: TEAM_TASK_WORKFLOW_TYPE,
-      subWorkflowType: newTaskIsPersonal ? TEAM_TASK_PERSONAL_SUBTYPE : TEAM_TASK_GENERAL_SUBTYPE,
-      owner: normalizedAssignee,
-      responsibilities: null,
-      notes: null,
-      isComplete: false,
-      assigneeId: normalizedAssignee,
-      alertRecipientId: null,
-      taskNote: null,
-      taskNoteCreatedAt: null,
-      createdById: completedByUser,
-    });
+    const { errors } = await client.models.PropertyTask.create(
+      buildTeamTaskCreatePayload({
+        propertyId: newTaskPropertyId,
+        stage,
+        order: buildGeneralTaskOrder(),
+        isPersonal: newTaskIsPersonal,
+        assignee: normalizedAssignee,
+        createdById: completedByUser,
+      })
+    );
     setIsCreatingTask(false);
 
     if (errors?.length) {
