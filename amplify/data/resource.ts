@@ -57,7 +57,7 @@ const schema = a.schema({
 
   PropertyTask: a
     .model({
-      propertyId: a.id().required(),
+      propertyId: a.id(),
       property: a.belongsTo("Property", "propertyId"),
       stage: a.string().required(),
       owner: a.string(),
@@ -73,6 +73,7 @@ const schema = a.schema({
       alertRecipientId: a.string(),
       taskNote: a.string(),
       taskNoteCreatedAt: a.datetime(),
+      createdById: a.string(),
     })
     .authorization((allow) => [
       allow.authenticated("identityPool"),
