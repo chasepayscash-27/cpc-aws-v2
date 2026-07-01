@@ -1,4 +1,4 @@
-import { lazy, Suspense } from 'react';
+import { lazy, Suspense, useState } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import Navigation from './components/Navigation';
 import { PropertyTasksProvider } from './contexts/PropertyTasksContext';
@@ -20,19 +20,31 @@ const ActiveListingPage   = lazy(() => import('./pages/ActiveListingPage'));
 const SalesMeetingsPage   = lazy(() => import('./pages/SalesMeetingsPage'));
 
 const App = () => {
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+
   return (
     <div className="appShell">
       <header className="topbar">
-        <div className="brand">
-          <div className="brandMark">CPC</div>
-          <div>
-            <div className="brandTitle">Chase Pays Cash</div>
-            <div className="brandSub">Analytics Dashboard</div>
+        <div className="topbarLeft">
+          <button
+            className="sidebarToggle"
+            onClick={() => setSidebarOpen((v) => !v)}
+            aria-label={sidebarOpen ? 'Collapse sidebar' : 'Expand sidebar'}
+            title={sidebarOpen ? 'Collapse sidebar' : 'Expand sidebar'}
+          >
+            {sidebarOpen ? '◀' : '▶'}
+          </button>
+          <div className="brand">
+            <div className="brandMark">CPC</div>
+            <div>
+              <div className="brandTitle">Chase Pays Cash</div>
+              <div className="brandSub">Analytics Dashboard</div>
+            </div>
           </div>
         </div>
       </header>
-      <div className="body">
-        <Navigation />
+      <div className={`body${sidebarOpen ? '' : ' sidebarCollapsed'}`}>
+        <Navigation collapsed={!sidebarOpen} />
         <main className="content">
           <PropertyTasksProvider>
           <Suspense fallback={<div className="pageHeader" role="status" aria-live="polite"><p className="muted">Loading…</p></div>}>
