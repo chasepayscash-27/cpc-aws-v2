@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { Schema } from "../../amplify/data/resource";
-import { getConstructionWorkflowTaskGroups, getConstructionWorkflowTasks, getPrimaryTasksAcrossProperties } from "./propertyTaskCollections";
+import { getChecklistWorkflowTasks, getConstructionWorkflowTaskGroups, getConstructionWorkflowTasks, getPrimaryTasksAcrossProperties } from "./propertyTaskCollections";
 
 type PropertyTask = Schema["PropertyTask"]["type"];
 
@@ -91,5 +91,20 @@ describe("getConstructionWorkflowTasks", () => {
     expect(grouped.allTasks.map((task) => task.id)).toEqual(["demo", "order-cabinets"]);
     expect(grouped.constructionSections.map((section) => section.label)).toEqual(["Demolition & Rough-In"]);
     expect(grouped.orderingSections.map((section) => section.label)).toEqual(["Ordering & Scope Checklist"]);
+  });
+});
+
+describe("getChecklistWorkflowTasks", () => {
+  it("returns checklist workflow items in canonical order including glass shower door", () => {
+    const tasks = [
+      buildTask({ id: "main", stage: "Make an offer", order: 1 }),
+      buildTask({ id: "tile", stage: "Tile ordered", order: 61 }),
+      buildTask({ id: "glass-shower-door", stage: "glass shower door", order: 74 }),
+    ];
+
+    expect(getChecklistWorkflowTasks(tasks).map((task) => task.id)).toEqual([
+      "tile",
+      "glass-shower-door",
+    ]);
   });
 });
