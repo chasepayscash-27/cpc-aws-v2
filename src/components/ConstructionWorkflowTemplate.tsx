@@ -99,24 +99,17 @@ export default function ConstructionWorkflowTemplate({ propertyId, propertyName,
 
   const constructionTaskGroups = useMemo(() => {
     if (!propertyId) {
-      return { constructionTasks: [], orderingTasks: [], constructionSections: [], orderingSections: [], allTasks: [] };
+      return { constructionTasks: [], constructionSections: [], allTasks: [] };
     }
     const propertyTasks = allTasks.filter((t) => t.propertyId === propertyId);
     return getConstructionWorkflowTaskGroups(propertyTasks);
   }, [allTasks, propertyId]);
 
-  const visibleConstructionTasks = useMemo(
+  const visibleTasks = useMemo(
     () => constructionTaskGroups.constructionTasks.filter((task) => shouldShowTask(task.stage, worksheetFields, projectStage)),
     [constructionTaskGroups, worksheetFields, projectStage]
   );
-  const visibleOrderingTasks = useMemo(
-    () => constructionTaskGroups.orderingTasks.filter((task) => shouldShowTask(task.stage, worksheetFields, projectStage)),
-    [constructionTaskGroups, worksheetFields, projectStage]
-  );
-  const visibleTasks = useMemo(() => [...visibleConstructionTasks, ...visibleOrderingTasks], [visibleConstructionTasks, visibleOrderingTasks]);
   const overallProgress = useMemo(() => getProgress(visibleTasks), [visibleTasks]);
-  const constructionProgress = useMemo(() => getProgress(visibleConstructionTasks), [visibleConstructionTasks]);
-  const orderingProgress = useMemo(() => getProgress(visibleOrderingTasks), [visibleOrderingTasks]);
 
   const handleToggle = useCallback(
     async (task: PropertyTask, checked: boolean) => {
@@ -150,7 +143,7 @@ export default function ConstructionWorkflowTemplate({ propertyId, propertyName,
       {!loading && error && <div style={{ fontSize: 12, color: "#8f2d2d", marginBottom: 12 }}>⚠️ {error}</div>}
       {!loading && !error && visibleTasks.length > 0 && (
         <div style={{ display: "grid", gap: 8, marginBottom: 12 }}>
-          {[{ label: "Overall", ...overallProgress }, { label: "Construction", ...constructionProgress }, { label: "Ordering", ...orderingProgress }].map((item) => (
+          {[{ label: "Overall", ...overallProgress }].map((item) => (
             <div key={item.label}>
               <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11, color: "#5a7060", marginBottom: 4 }}>
                 <span>{item.label} progress</span>
@@ -170,7 +163,7 @@ export default function ConstructionWorkflowTemplate({ propertyId, propertyName,
 
       {!loading && !error && visibleTasks.length > 0 && (
         <div style={{ display: "grid", gap: 12 }}>
-          {[...constructionTaskGroups.constructionSections, ...constructionTaskGroups.orderingSections].map((section) => {
+          {constructionTaskGroups.constructionSections.map((section) => {
             const sectionVisibleTasks = section.tasks.filter((task) => shouldShowTask(task.stage, worksheetFields, projectStage));
             if (sectionVisibleTasks.length === 0) return null;
             const sectionProgress = getProgress(sectionVisibleTasks);

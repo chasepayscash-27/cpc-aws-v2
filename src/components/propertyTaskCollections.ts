@@ -14,9 +14,7 @@ const orderingTaskOrders = new Set<number>(
 
 export interface ConstructionTaskGroups {
   constructionTasks: PropertyTask[];
-  orderingTasks: PropertyTask[];
   constructionSections: { id: string; label: string; tasks: PropertyTask[] }[];
-  orderingSections: { id: string; label: string; tasks: PropertyTask[] }[];
   allTasks: PropertyTask[];
 }
 
@@ -136,36 +134,25 @@ export function getTasksForTeamMember(tasks: PropertyTask[], employeeName: strin
 export function getConstructionWorkflowTaskGroups(tasks: PropertyTask[]): ConstructionTaskGroups {
   const { keepByOrder } = dedupeTasksByCanonicalOrder(tasks);
   const constructionTasks: PropertyTask[] = [];
-  const orderingTasks: PropertyTask[] = [];
   const constructionSections = new Map<string, { id: string; label: string; tasks: PropertyTask[] }>();
-  const orderingSections = new Map<string, { id: string; label: string; tasks: PropertyTask[] }>();
 
   for (const workflowTask of defaultWorkflow) {
-    if (!constructionTaskOrders.has(workflowTask.order) && !orderingTaskOrders.has(workflowTask.order)) continue;
+    if (!constructionTaskOrders.has(workflowTask.order)) continue;
     const task = keepByOrder.get(workflowTask.order);
     if (!task) continue;
 
     const sectionLabel = getTaskSubWorkflowLabel(workflowTask);
     const sectionId = toSectionId(sectionLabel);
 
-    if (orderingTaskOrders.has(workflowTask.order)) {
-      orderingTasks.push(task);
-      const section = orderingSections.get(sectionId) ?? { id: sectionId, label: sectionLabel, tasks: [] };
-      section.tasks.push(task);
-      orderingSections.set(sectionId, section);
-    } else {
-      constructionTasks.push(task);
-      const section = constructionSections.get(sectionId) ?? { id: sectionId, label: sectionLabel, tasks: [] };
-      section.tasks.push(task);
-      constructionSections.set(sectionId, section);
-    }
+    constructionTasks.push(task);
+    const section = constructionSections.get(sectionId) ?? { id: sectionId, label: sectionLabel, tasks: [] };
+    section.tasks.push(task);
+    constructionSections.set(sectionId, section);
   }
 
   return {
     constructionTasks,
-    orderingTasks,
     constructionSections: [...constructionSections.values()],
-    orderingSections: [...orderingSections.values()],
-    allTasks: [...constructionTasks, ...orderingTasks],
+    allTasks: [...constructionTasks],
   };
 }

@@ -76,11 +76,10 @@ describe("getConstructionWorkflowTasks", () => {
       "construction-a",
       "construction-b",
       "construction-c",
-      "checklist",
     ]);
   });
 
-  it("splits ordering tasks from construction tasks", () => {
+  it("excludes ordering/scope tasks from the construction workflow", () => {
     const tasks = [
       buildTask({ id: "main", stage: "Make an offer", order: 1 }),
       buildTask({ id: "demo", stage: "All items removed", order: 19 }),
@@ -89,10 +88,8 @@ describe("getConstructionWorkflowTasks", () => {
 
     const grouped = getConstructionWorkflowTaskGroups(tasks);
     expect(grouped.constructionTasks.map((task) => task.id)).toEqual(["demo"]);
-    expect(grouped.orderingTasks.map((task) => task.id)).toEqual(["order-cabinets"]);
-    expect(grouped.allTasks.map((task) => task.id)).toEqual(["demo", "order-cabinets"]);
+    expect(grouped.allTasks.map((task) => task.id)).toEqual(["demo"]);
     expect(grouped.constructionSections.map((section) => section.label)).toEqual(["Demolition & Rough-In"]);
-    expect(grouped.orderingSections.map((section) => section.label)).toEqual(["Ordering & Scope Checklist"]);
   });
 });
 
