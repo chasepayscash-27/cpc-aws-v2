@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { Schema } from "../../amplify/data/resource";
-import { getChecklistWorkflowTasks, getConstructionWorkflowTaskGroups, getConstructionWorkflowTasks, getPrimaryTasksAcrossProperties } from "./propertyTaskCollections";
+import { filterTasksForTeamTab, getChecklistWorkflowTasks, getConstructionWorkflowTaskGroups, getConstructionWorkflowTasks, getPrimaryTasksAcrossProperties } from "./propertyTaskCollections";
 
 type PropertyTask = Schema["PropertyTask"]["type"];
 
@@ -10,6 +10,8 @@ function buildTask(overrides: Partial<PropertyTask>): PropertyTask {
     propertyId: "propertyId" in overrides ? (overrides.propertyId ?? null) : "property-1",
     stage: overrides.stage ?? "Task",
     order: overrides.order ?? 1,
+    workflowType: overrides.workflowType ?? null,
+    subWorkflowType: overrides.subWorkflowType ?? null,
     owner: overrides.owner ?? null,
     responsibilities: overrides.responsibilities ?? null,
     notes: overrides.notes ?? null,
@@ -106,5 +108,92 @@ describe("getChecklistWorkflowTasks", () => {
       "tile",
       "glass-shower-door",
     ]);
+  });
+});
+
+describe("filterTasksForTeamTab", () => {
+  it("excludes main workflow tasks", () => {
+    const tasks = [
+      buildTask({ id: "main-1", stage: "Make an offer", order: 1 }),
+      buildTask({ id: "main-2", stage: "Staged", order: 11 }),
+    ];
+
+    expect(filterTasksForTeamTab(tasks)).toHaveLength(0);
+  });
+
+  it("excludes construction workflow tasks", () => {
+    const tasks = [
+      buildTask({ id: "construction-1", stage: "All items removed", order: 19 }),
+      buildTask({ id: "construction-2", stage: "Gutters Installed", order: 48 }),
+    ];
+
+    expect(filterTasksForTeamTab(tasks)).toHaveLength(0);
+  });
+
+  it("includes checklist workflow tasks", () => {
+    const tasks = [
+      buildTask({ id: "checklist-1", stage: "Tile ordered", order: 61 }),
+      buildTask({ id: "checklist-2", stage: "Appliances Ordered", order: 69 }),
+    ];
+
+    expect(filterTasksForTeamTab(tasks).map((task) => task.id)).toEqual([
+      "checklist-1",
+      "checklist-2",
+    ]);
+  });
+
+  it("includes Team Task entries created from the Team tab", () => {
+    const tasks = [
+      buildTask({
+        id: "team-task-1",
+        propertyId: null,
+        stage: "Call title company",
+        order: 10001,
+        workflowType: "Team Task",
+        subWorkflowType: "General Team Task",
+      }),
+      buildTask({
+        id: "team-task-personal",
+        propertyId: null,
+        stage: "Review inbox",
+        order: 10002,
+        workflowType: "Team Task",
+        subWorkflowType: "Personal Task",
+      }),
+    ];
+
+    expect(filterTasksForTeamTab(tasks).map((task) => task.id)).toEqual([
+      "team-task-1",
+      "team-task-personal",
+    ]);
+  });
+
+  it("excludes main and construction tasks while keeping checklist and team tasks", () => {
+    const tasks = [
+      buildTask({ id: "main", stage: "Make an offer", order: 1 }),
+      buildTask({ id: "construction", stage: "All items removed", order: 19 }),
+      buildTask({ id: "checklist", stage: "Tile ordered", order: 61 }),
+      buildTask({
+        id: "team-task",
+        propertyId: null,
+        stage: "Call contractor",
+        order: 10001,
+        workflowType: "Team Task",
+        subWorkflowType: "General Team Task",
+      }),
+    ];
+
+    expect(filterTasksForTeamTab(tasks).map((task) => task.id)).toEqual([
+      "checklist",
+      "team-task",
+    ]);
+  });
+
+  it("includes checklist tasks resolved by workflowType field", () => {
+    const tasks = [
+      buildTask({ id: "checklist-explicit", workflowType: "Check List Workflow", order: 9999 }),
+    ];
+
+    expect(filterTasksForTeamTab(tasks).map((task) => task.id)).toEqual(["checklist-explicit"]);
   });
 });

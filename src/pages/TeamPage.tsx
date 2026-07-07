@@ -4,7 +4,7 @@ import { generateClient } from 'aws-amplify/data';
 import type { Schema } from '../../amplify/data/resource';
 import { loadCsv } from '../utils/csv';
 import type { ProjectRow } from '../types/project';
-import { getPrimaryTasksAcrossProperties } from '../components/propertyTaskCollections';
+import { getPrimaryTasksAcrossProperties, filterTasksForTeamTab } from '../components/propertyTaskCollections';
 import { usePropertyTasks } from '../contexts/PropertyTasksContext';
 import { buildTeamTaskCreatePayload } from './teamTaskCreatePayload';
 import '../App.css';
@@ -123,7 +123,7 @@ const TeamPage = () => {
   const [newTaskIsPersonal, setNewTaskIsPersonal] = useState(false);
 
   const taskError = contextTaskError || toggleError;
-  const tasks = useMemo(() => getPrimaryTasksAcrossProperties(allTasks), [allTasks]);
+  const tasks = useMemo(() => filterTasksForTeamTab(getPrimaryTasksAcrossProperties(allTasks)), [allTasks]);
 
   useEffect(() => {
     getCurrentUser()
