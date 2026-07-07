@@ -1,5 +1,5 @@
 import type { Schema } from "../../amplify/data/resource";
-import { defaultWorkflow } from "../data/defaultWorkflow";
+import { defaultWorkflow, resolveTaskWorkflowType } from "../data/defaultWorkflow";
 import { dedupeTasksByCanonicalOrder } from "./propertyWorkflowNormalization";
 
 type PropertyTask = Schema["PropertyTask"]["type"];
@@ -77,6 +77,18 @@ export function getChecklistWorkflowTasks(tasks: PropertyTask[]): PropertyTask[]
     if (task) result.push(task);
   }
   return result;
+}
+
+/**
+ * Returns only the tasks that should be shown in the Team tab:
+ * checklist workflow tasks and manually-created Team Tasks.
+ * Main Workflow and Construction Workflow tasks are excluded.
+ */
+export function filterTasksForTeamTab(tasks: PropertyTask[]): PropertyTask[] {
+  return tasks.filter((task) => {
+    if (task.workflowType === "Team Task") return true;
+    return resolveTaskWorkflowType(task) === "Check List Workflow";
+  });
 }
 
 export function getConstructionWorkflowTaskGroups(tasks: PropertyTask[]): ConstructionTaskGroups {
