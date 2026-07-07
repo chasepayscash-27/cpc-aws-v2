@@ -4,7 +4,7 @@ import { generateClient } from 'aws-amplify/data';
 import type { Schema } from '../../amplify/data/resource';
 import { loadCsv } from '../utils/csv';
 import type { ProjectRow } from '../types/project';
-import { getPrimaryTasksAcrossProperties, filterTasksForTeamTab } from '../components/propertyTaskCollections';
+import { getPrimaryTasksAcrossProperties, filterTasksForTeamTab, getTasksForTeamMember } from '../components/propertyTaskCollections';
 import { usePropertyTasks } from '../contexts/PropertyTasksContext';
 import { buildTeamTaskCreatePayload } from './teamTaskCreatePayload';
 import '../App.css';
@@ -225,8 +225,7 @@ const TeamPage = () => {
   const tasksByMember = useMemo(() => {
     const map = new Map<string, TeamTaskView[]>();
     for (const member of teamMembers) {
-      const memberTasks = tasks
-        .filter((task) => isTaskAssignedToEmployee(task.assigneeId?.trim() || '', member.name))
+      const memberTasks = getTasksForTeamMember(tasks, member.name)
         .filter((task) => canCurrentUserViewTask(task, member))
         .map((task) => {
           const propertyId = task.propertyId?.trim() || '';

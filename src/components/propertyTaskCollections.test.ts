@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { Schema } from "../../amplify/data/resource";
-import { filterTasksForTeamTab, getChecklistWorkflowTasks, getConstructionWorkflowTaskGroups, getConstructionWorkflowTasks, getPrimaryTasksAcrossProperties } from "./propertyTaskCollections";
+import { filterTasksForTeamTab, getChecklistWorkflowTasks, getConstructionWorkflowTaskGroups, getConstructionWorkflowTasks, getPrimaryTasksAcrossProperties, getTasksForTeamMember, resolveTeamTaskAssignee } from "./propertyTaskCollections";
 
 type PropertyTask = Schema["PropertyTask"]["type"];
 
@@ -195,5 +195,55 @@ describe("filterTasksForTeamTab", () => {
     ];
 
     expect(filterTasksForTeamTab(tasks).map((task) => task.id)).toEqual(["checklist-explicit"]);
+  });
+});
+
+describe("team member task derivation", () => {
+  it("links checklist tasks to the correct employee using assigneeId or owner fallback", () => {
+    const teamTasks = filterTasksForTeamTab(getPrimaryTasksAcrossProperties([
+      buildTask({ id: "checklist-kim", stage: "Tile ordered", order: 61, assigneeId: "", owner: "Kim" }),
+      buildTask({ id: "checklist-lee", stage: "Appliances Ordered", order: 69, assigneeId: "Lee", owner: null }),
+      buildTask({ id: "construction", stage: "All items removed", order: 19, assigneeId: "Kim" }),
+    ]));
+
+    expect(getTasksForTeamMember(teamTasks, "Kim").map((task) => task.id)).toEqual(["checklist-kim"]);
+    expect(getTasksForTeamMember(teamTasks, "Lee").map((task) => task.id)).toEqual(["checklist-lee"]);
+  });
+
+  it("keeps manual team tasks alongside checklist tasks for the same employee", () => {
+    const teamTasks = filterTasksForTeamTab(getPrimaryTasksAcrossProperties([
+      buildTask({ id: "checklist", stage: "Tile ordered", order: 61, assigneeId: "Kim" }),
+      buildTask({
+        id: "manual-team-task",
+        propertyId: null,
+        stage: "Call title company",
+        order: 10001,
+        workflowType: "Team Task",
+        subWorkflowType: "General Team Task",
+        assigneeId: "Kim",
+        owner: "Kim",
+      }),
+      buildTask({ id: "main", stage: "Make an offer", order: 1, assigneeId: "Kim" }),
+    ]));
+
+    expect(getTasksForTeamMember(teamTasks, "Kim").map((task) => task.id)).toEqual([
+      "checklist",
+      "manual-team-task",
+    ]);
+  });
+
+  it("resolves direct workflowType checklist edge cases for team grouping", () => {
+    const task = buildTask({
+      id: "checklist-explicit-owner",
+      workflowType: "Check List Workflow",
+      subWorkflowType: "Ordering & Scope Checklist",
+      order: 9999,
+      assigneeId: "   ",
+      owner: "Kevin & Matt",
+    });
+
+    expect(resolveTeamTaskAssignee(task)).toBe("Kevin/Matt");
+    expect(getTasksForTeamMember([task], "Kevin")).toEqual([task]);
+    expect(getTasksForTeamMember([task], "Matt")).toEqual([task]);
   });
 });

@@ -1,6 +1,6 @@
 import type { Schema } from "../../amplify/data/resource";
 import { defaultWorkflow, resolveTaskWorkflowType } from "../data/defaultWorkflow";
-import { dedupeTasksByCanonicalOrder } from "./propertyWorkflowNormalization";
+import { dedupeTasksByCanonicalOrder, normalizeWorkflowOwner } from "./propertyWorkflowNormalization";
 
 type PropertyTask = Schema["PropertyTask"]["type"];
 type WorkflowTaskDefinition = (typeof defaultWorkflow)[number];
@@ -34,6 +34,35 @@ function isCanonicalWorkflowTask(task: PropertyTask): boolean {
   const stage = task.stage?.trim();
   if (!stage) return false;
   return defaultWorkflow.some((item) => item.stage === stage);
+}
+
+function normalizeTeamMemberToken(value: string): string {
+  return value.trim().toLowerCase().replace(/[^a-z0-9]/g, "");
+}
+
+function getEmployeeTokens(name: string): Set<string> {
+  const cleaned = name.trim();
+  const parts = cleaned.split(/\s+/).map(normalizeTeamMemberToken).filter(Boolean);
+  const tokens = new Set(parts);
+  tokens.add(normalizeTeamMemberToken(cleaned));
+  return tokens;
+}
+
+function getAssigneeTokens(assigneeId: string): Set<string> {
+  const parts = assigneeId
+    .split(/(?:\band\b|\/|&|,)/i)
+    .flatMap((segment) => segment.trim().split(/\s+/))
+    .map(normalizeTeamMemberToken)
+    .filter(Boolean);
+  const tokens = new Set(parts);
+  tokens.add(normalizeTeamMemberToken(assigneeId));
+  return tokens;
+}
+
+export function resolveTeamTaskAssignee(task: PropertyTask): string | null {
+  const assigneeId = task.assigneeId?.trim();
+  if (assigneeId) return assigneeId;
+  return normalizeWorkflowOwner(task.owner);
 }
 
 export function getPrimaryTasksAcrossProperties(tasks: PropertyTask[]): PropertyTask[] {
@@ -88,6 +117,19 @@ export function filterTasksForTeamTab(tasks: PropertyTask[]): PropertyTask[] {
   return tasks.filter((task) => {
     if (task.workflowType === "Team Task") return true;
     return resolveTaskWorkflowType(task) === "Check List Workflow";
+  });
+}
+
+export function getTasksForTeamMember(tasks: PropertyTask[], employeeName: string): PropertyTask[] {
+  const employeeTokens = getEmployeeTokens(employeeName);
+  return tasks.filter((task) => {
+    const assigneeId = resolveTeamTaskAssignee(task);
+    if (!assigneeId) return false;
+    const assigneeTokens = getAssigneeTokens(assigneeId);
+    for (const token of assigneeTokens) {
+      if (employeeTokens.has(token)) return true;
+    }
+    return false;
   });
 }
 
