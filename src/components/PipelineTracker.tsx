@@ -1,5 +1,8 @@
 import type { ProjectRow } from '../types/project';
 import { isArchivedStage, NEGOTIATION_STAGES, normalizePipelineStatus } from '../utils/pipelineStatus';
+import { usePropertyTasks } from '../contexts/PropertyTasksContext';
+import { computeMainWorkflowProgress } from '../utils/workflowProgress';
+import ProgressStatusBadge from './ProgressStatusBadge';
 
 export const ACTIVE_STAGE_ORDER = [
   'negotiation',
@@ -56,6 +59,8 @@ interface PipelineTrackerProps {
 }
 
 export default function PipelineTracker({ rows, onProjectClick }: PipelineTrackerProps) {
+  const { allTasks, isLoading: tasksLoading } = usePropertyTasks();
+
   // Group active, non-archived projects by pipeline stage.
   // Negotiation-bucket stages (lead, offer_made, etc.) are normalised to
   // 'negotiation' so they surface correctly instead of being silently dropped.
@@ -175,6 +180,7 @@ export default function PipelineTracker({ rows, onProjectClick }: PipelineTracke
                 projects.map((p, i) => {
                   const label = getProjectLabel(p);
                   const sub = [p.city, p.state].filter(Boolean).join(', ');
+                  const { percent } = computeMainWorkflowProgress(allTasks, p.project_uuid);
                   return (
                     <div
                       key={p.project_uuid ?? i}
@@ -201,13 +207,29 @@ export default function PipelineTracker({ rows, onProjectClick }: PipelineTracke
                     >
                       <div
                         style={{
-                          fontSize: 12,
-                          fontWeight: 600,
-                          color: '#1a3a22',
-                          lineHeight: 1.3,
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 6,
                         }}
                       >
-                        {label}
+                        <span aria-hidden="true" style={{ fontSize: 13, flexShrink: 0 }}>🏠</span>
+                        <span
+                          style={{
+                            fontSize: 12,
+                            fontWeight: 600,
+                            color: '#1a3a22',
+                            lineHeight: 1.3,
+                            flex: 1,
+                            minWidth: 0,
+                          }}
+                        >
+                          {label}
+                        </span>
+                        <ProgressStatusBadge
+                          percent={percent}
+                          propertyName={label}
+                          loading={tasksLoading}
+                        />
                       </div>
                       {sub && (
                         <div
