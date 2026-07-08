@@ -44,6 +44,7 @@ const navGroups: NavGroup[] = [
     items: [
       { icon: '👥', label: 'Team', path: '/team' },
       { icon: '💬', label: 'Team Chat', path: '/team-chat' },
+      { icon: '🚧', label: 'Team - WIP', path: '/team-wip' },
     ],
   },
 ];
