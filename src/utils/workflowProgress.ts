@@ -2,6 +2,11 @@ import type { Schema } from "../../amplify/data/resource";
 import { defaultWorkflow, resolveTaskWorkflowType } from "../data/defaultWorkflow";
 
 type PropertyTask = Schema["PropertyTask"]["type"];
+type WorkflowProgress = { percent: number; completed: number; total: number };
+
+const MAIN_WORKFLOW_TOTAL = defaultWorkflow.filter(
+  (t) => t.workflowType === "Main Workflow",
+).length;
 
 /**
  * Thresholds that map a progress percentage to a semantic color tier.
@@ -64,13 +69,9 @@ export function getProgressColors(tier: ProgressColorTier): {
 export function computeMainWorkflowProgress(
   allTasks: PropertyTask[],
   propertyId: string | null | undefined,
-): { percent: number; completed: number; total: number } {
-  const mainWorkflowTotal = defaultWorkflow.filter(
-    (t) => t.workflowType === "Main Workflow",
-  ).length;
-
+): WorkflowProgress {
   if (!propertyId) {
-    return { percent: 0, completed: 0, total: mainWorkflowTotal };
+    return { percent: 0, completed: 0, total: MAIN_WORKFLOW_TOTAL };
   }
 
   const propertyTasks = allTasks.filter(
@@ -78,12 +79,44 @@ export function computeMainWorkflowProgress(
   );
 
   if (propertyTasks.length === 0) {
-    return { percent: 0, completed: 0, total: mainWorkflowTotal };
+    return { percent: 0, completed: 0, total: MAIN_WORKFLOW_TOTAL };
   }
 
   const completed = propertyTasks.filter((t) => !!t.isComplete).length;
-  const total = Math.max(propertyTasks.length, mainWorkflowTotal);
+  const total = Math.max(propertyTasks.length, MAIN_WORKFLOW_TOTAL);
   const percent = total === 0 ? 0 : Math.round((completed / total) * 100);
 
   return { percent, completed, total };
+}
+
+/**
+ * Computes main-workflow progress for all properties in one pass.
+ * Useful for list views (e.g. Home pipeline tiles) to avoid repeated filtering.
+ */
+export function computeMainWorkflowProgressByProperty(
+  allTasks: PropertyTask[],
+): Record<string, WorkflowProgress> {
+  const progressByProperty: Record<string, { completed: number; total: number }> = {};
+
+  for (const task of allTasks) {
+    if (!task.propertyId || resolveTaskWorkflowType(task) !== "Main Workflow") continue;
+
+    const current = progressByProperty[task.propertyId] ?? { completed: 0, total: 0 };
+    progressByProperty[task.propertyId] = {
+      completed: current.completed + (task.isComplete ? 1 : 0),
+      total: current.total + 1,
+    };
+  }
+
+  const result: Record<string, WorkflowProgress> = {};
+  for (const [propertyId, progress] of Object.entries(progressByProperty)) {
+    const total = Math.max(progress.total, MAIN_WORKFLOW_TOTAL);
+    result[propertyId] = {
+      completed: progress.completed,
+      total,
+      percent: total === 0 ? 0 : Math.round((progress.completed / total) * 100),
+    };
+  }
+
+  return result;
 }

@@ -1,7 +1,8 @@
+import { useMemo } from 'react';
 import type { ProjectRow } from '../types/project';
 import { isArchivedStage, NEGOTIATION_STAGES, normalizePipelineStatus } from '../utils/pipelineStatus';
 import { usePropertyTasks } from '../contexts/PropertyTasksContext';
-import { computeMainWorkflowProgress } from '../utils/workflowProgress';
+import { computeMainWorkflowProgressByProperty } from '../utils/workflowProgress';
 import ProgressStatusBadge from './ProgressStatusBadge';
 
 export const ACTIVE_STAGE_ORDER = [
@@ -60,6 +61,10 @@ interface PipelineTrackerProps {
 
 export default function PipelineTracker({ rows, onProjectClick }: PipelineTrackerProps) {
   const { allTasks, isLoading: tasksLoading } = usePropertyTasks();
+  const progressByProperty = useMemo(
+    () => computeMainWorkflowProgressByProperty(allTasks),
+    [allTasks],
+  );
 
   // Group active, non-archived projects by pipeline stage.
   // Negotiation-bucket stages (lead, offer_made, etc.) are normalised to
@@ -180,7 +185,8 @@ export default function PipelineTracker({ rows, onProjectClick }: PipelineTracke
                 projects.map((p, i) => {
                   const label = getProjectLabel(p);
                   const sub = [p.city, p.state].filter(Boolean).join(', ');
-                  const { percent } = computeMainWorkflowProgress(allTasks, p.project_uuid);
+                  const progress = p.project_uuid ? progressByProperty[p.project_uuid] : undefined;
+                  const percent = progress?.percent ?? 0;
                   return (
                     <div
                       key={p.project_uuid ?? i}
@@ -228,7 +234,7 @@ export default function PipelineTracker({ rows, onProjectClick }: PipelineTracke
                         <ProgressStatusBadge
                           percent={percent}
                           propertyName={label}
-                          loading={tasksLoading}
+                          loading={tasksLoading && !progress}
                         />
                       </div>
                       {sub && (

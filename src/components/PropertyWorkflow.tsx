@@ -34,7 +34,7 @@ function sortTasks(tasks: PropertyTask[]): PropertyTask[] {
 }
 
 export default function PropertyWorkflow({ propertyId }: Props) {
-  const { updateTaskCompletion } = usePropertyTasks();
+  const { allTasks, isLoading: tasksContextLoading, updateTaskCompletion } = usePropertyTasks();
   const [tasks, setTasks] = useState<PropertyTask[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -49,6 +49,13 @@ export default function PropertyWorkflow({ propertyId }: Props) {
   const seedingRef = useRef(false);
   const reconcileAttemptedRef = useRef(false);
   const seedAlertPreferenceAttemptedRef = useRef(false);
+  const contextTasksForProperty = useMemo(
+    () =>
+      sortTasks(
+        allTasks.filter((task) => task.propertyId === propertyId),
+      ),
+    [allTasks, propertyId],
+  );
 
   const seedPropertyTasks = useCallback(async () => {
     if (!propertyId || seedingRef.current) return;
@@ -57,32 +64,32 @@ export default function PropertyWorkflow({ propertyId }: Props) {
       const existing = await client.models.PropertyTask.list({
         filter: { propertyId: { eq: propertyId } },
       });
-      if ((existing.data?.length ?? 0) > 0) return;
+      const existingOrders = new Set((existing.data ?? []).map((task) => task.order));
+      const missingTemplateTasks = defaultWorkflow.filter(
+        (templateTask) => !existingOrders.has(templateTask.order),
+      );
 
-      for (const templateTask of defaultWorkflow) {
-        const byOrder = await client.models.PropertyTask.list({
-          filter: {
-            propertyId: { eq: propertyId },
-            order: { eq: templateTask.order },
-          },
-        });
-        if ((byOrder.data?.length ?? 0) > 0) continue;
-
-        const { errors } = await client.models.PropertyTask.create({
-          propertyId,
-          stage: templateTask.stage,
-          workflowType: templateTask.workflowType,
-          subWorkflowType: templateTask.subWorkflowType,
-          owner: templateTask.owner,
-          responsibilities: templateTask.responsibilities,
-          notes: templateTask.notes,
-          order: templateTask.order,
-          isComplete: false,
-          alertRecipientId: recipients[0]?.id ?? null,
-          assigneeId: normalizeWorkflowOwner(templateTask.owner),
-        });
-        if (errors?.length) {
-          throw new Error(errors.map((item) => item.message).join("; "));
+      if (missingTemplateTasks.length > 0) {
+        const results = await Promise.all(
+          missingTemplateTasks.map((templateTask) =>
+            client.models.PropertyTask.create({
+              propertyId,
+              stage: templateTask.stage,
+              workflowType: templateTask.workflowType,
+              subWorkflowType: templateTask.subWorkflowType,
+              owner: templateTask.owner,
+              responsibilities: templateTask.responsibilities,
+              notes: templateTask.notes,
+              order: templateTask.order,
+              isComplete: false,
+              alertRecipientId: recipients[0]?.id ?? null,
+              assigneeId: normalizeWorkflowOwner(templateTask.owner),
+            }),
+          ),
+        );
+        const createErrors = results.flatMap((result) => result.errors ?? []).map((item) => item.message);
+        if (createErrors.length > 0) {
+          throw new Error(createErrors.join("; "));
         }
       }
 
@@ -208,6 +215,20 @@ export default function PropertyWorkflow({ propertyId }: Props) {
       })
       .catch(() => setCompletedByUser(null));
   }, []);
+
+  useEffect(() => {
+    if (!propertyId) return;
+
+    if (contextTasksForProperty.length > 0) {
+      setTasks(contextTasksForProperty);
+      setLoading(false);
+      return;
+    }
+
+    if (!tasksContextLoading) {
+      setLoading(false);
+    }
+  }, [contextTasksForProperty, propertyId, tasksContextLoading]);
 
   useEffect(() => {
     if (!propertyId) return;
