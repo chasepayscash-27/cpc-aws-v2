@@ -39,12 +39,10 @@ export function PropertyTasksProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const subscription = client.models.PropertyTask.observeQuery().subscribe({
-      next: ({ items, isSynced }) => {
+      next: ({ items }) => {
         setAllTasks([...items]);
         setError('');
-        if (isSynced) {
-          setIsLoading(false);
-        }
+        setIsLoading(false);
       },
       error: (subscriptionError: unknown) => {
         setError(

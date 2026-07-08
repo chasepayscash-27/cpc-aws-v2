@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import type { Schema } from "../../amplify/data/resource";
 import {
   PROGRESS_THRESHOLDS,
+  computeMainWorkflowProgressByProperty,
   computeMainWorkflowProgress,
   getProgressColorTier,
   getProgressColors,
@@ -149,5 +150,32 @@ describe("computeMainWorkflowProgress", () => {
     const result = computeMainWorkflowProgress(tasks, "prop-1");
     expect(result.percent).toBeGreaterThanOrEqual(0);
     expect(result.percent).toBeLessThanOrEqual(100);
+  });
+});
+
+describe("computeMainWorkflowProgressByProperty", () => {
+  const mainTotal = defaultWorkflow.filter((t) => t.workflowType === "Main Workflow").length;
+
+  it("builds per-property progress in one pass", () => {
+    const results = computeMainWorkflowProgressByProperty([
+      buildTask({ propertyId: "prop-1", order: 1, isComplete: true }),
+      buildTask({ propertyId: "prop-1", order: 2, isComplete: false }),
+      buildTask({ propertyId: "prop-2", order: 1, isComplete: true }),
+      buildTask({ propertyId: "prop-2", order: 2, isComplete: true }),
+    ]);
+
+    expect(results["prop-1"]?.completed).toBe(1);
+    expect(results["prop-2"]?.completed).toBe(2);
+    expect(results["prop-1"]?.total).toBe(mainTotal);
+  });
+
+  it("ignores non-main-workflow and missing-property tasks", () => {
+    const results = computeMainWorkflowProgressByProperty([
+      buildTask({ propertyId: "prop-1", order: 9991, workflowType: "Construction Workflow", isComplete: true }),
+      buildTask({ propertyId: "prop-1", order: 9992, workflowType: "Check List Workflow", isComplete: true }),
+      buildTask({ propertyId: "", workflowType: "Main Workflow", isComplete: true }),
+    ]);
+
+    expect(results["prop-1"]).toBeUndefined();
   });
 });
