@@ -18,6 +18,7 @@ const WorkflowPage      = lazy(() => import('./pages/WorkflowPage'));
 const TeamChatPage        = lazy(() => import('./pages/TeamChatPage'));
 const ActiveListingPage   = lazy(() => import('./pages/ActiveListingPage'));
 const SalesMeetingsPage   = lazy(() => import('./pages/SalesMeetingsPage'));
+const TeamWipPage         = lazy(() => import('./pages/TeamWipPage'));
 
 const App = () => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -61,6 +62,7 @@ const App = () => {
               <Route path="/team-chat" element={<TeamChatPage />} />
               <Route path="/active-listing" element={<ActiveListingPage />} />
               <Route path="/sales-meetings" element={<SalesMeetingsPage />} />
+              <Route path="/team-wip" element={<TeamWipPage />} />
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </Suspense>
