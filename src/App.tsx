@@ -21,10 +21,20 @@ const SalesMeetingsPage   = lazy(() => import('./pages/SalesMeetingsPage'));
 const TeamWipPage         = lazy(() => import('./pages/TeamWipPage'));
 
 const App = () => {
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(
+    () => typeof window !== 'undefined' && window.innerWidth > 768,
+  );
 
   return (
     <div className="appShell">
+      {/* Overlay shown on mobile when sidebar is open */}
+      {sidebarOpen && (
+        <div
+          className="sidebarOverlay"
+          onClick={() => setSidebarOpen(false)}
+          aria-hidden="true"
+        />
+      )}
       <header className="topbar">
         <div className="topbarLeft">
           <button
