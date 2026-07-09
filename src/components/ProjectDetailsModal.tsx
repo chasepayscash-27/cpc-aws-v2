@@ -59,8 +59,6 @@ export default function ProjectDetailsModal({ project: row, onClose, onViewFullP
   const [photos, setPhotos] = useState<PhotoLogRow[]>([]);
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
   const [worksheetOpen, setWorksheetOpen] = useState(false);
-  const [constructionWorkflowOpen, setConstructionWorkflowOpen] = useState(false);
-  const [checklistOpen, setChecklistOpen] = useState(false);
   const [costSummary, setCostSummary] = useState<[number, number, number]>([0, 0, 0]);
 
   const handleFinancialSummary = useCallback(
@@ -118,20 +116,19 @@ export default function ProjectDetailsModal({ project: row, onClose, onViewFullP
     background: "rgba(0,0,0,0.70)",
     backdropFilter: "blur(6px)",
     zIndex: 1000,
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    padding: "16px",
+    display: "block",
+    padding: 0,
     animation: "fadeIn 0.18s ease",
   };
 
   const modalStyle: CSSProperties = {
     background: "#ffffff",
     border: "1px solid #d4e8d8",
-    borderRadius: 20,
-    width: "100%",
-    maxWidth: 680,
-    maxHeight: "90vh",
+    borderRadius: 0,
+    width: "100vw",
+    height: "100vh",
+    maxWidth: "100vw",
+    maxHeight: "100vh",
     overflowY: "auto",
     boxShadow: "0 24px 80px rgba(0,0,0,0.15), 0 0 0 1px rgba(26,122,60,0.10)",
     animation: "slideUp 0.22s ease",
@@ -140,10 +137,10 @@ export default function ProjectDetailsModal({ project: row, onClose, onViewFullP
 
   const closeBtnStyle: CSSProperties = {
     position: "absolute",
-    top: 14,
-    right: 14,
-    width: 32,
-    height: 32,
+    top: 16,
+    right: 16,
+    width: 36,
+    height: 36,
     borderRadius: "50%",
     border: "1px solid #d4e8d8",
     background: "#f0f7f1",
@@ -194,6 +191,7 @@ export default function ProjectDetailsModal({ project: row, onClose, onViewFullP
         @keyframes fadeIn { from { opacity: 0 } to { opacity: 1 } }
         @keyframes slideUp { from { opacity: 0; transform: translateY(24px) } to { opacity: 1; transform: translateY(0) } }
         .modal-close-btn:hover { background: #d4e8d8 !important; color: #1a7a3c !important; }
+        .modal-close-btn:focus-visible { outline: 2px solid #1a7a3c; outline-offset: 2px; }
         .photo-thumb:hover { transform: scale(1.03); box-shadow: 0 4px 18px rgba(26,122,60,0.18); }
         .lightbox-nav-btn:hover { background: rgba(255,255,255,0.25) !important; }
       `}</style>
@@ -211,7 +209,7 @@ export default function ProjectDetailsModal({ project: row, onClose, onViewFullP
 
           {/* Hero image */}
           {row.featured_image_url && (
-            <div style={{ height: 220, overflow: "hidden", borderRadius: "20px 20px 0 0" }}>
+            <div style={{ height: 260, overflow: "hidden" }}>
               <img
                 src={row.featured_image_url}
                 alt={row.name ?? "project"}
@@ -224,9 +222,9 @@ export default function ProjectDetailsModal({ project: row, onClose, onViewFullP
           )}
 
           {/* Content */}
-          <div style={{ padding: "22px 24px 28px" }}>
+          <div style={{ padding: "24px 24px 28px" }}>
             {/* Cost placeholders */}
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12, marginBottom: 20 }}>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 12, marginBottom: 20 }}>
               {COST_LABELS.map((label, i) => (
                 <div
                   key={label}
@@ -278,8 +276,8 @@ export default function ProjectDetailsModal({ project: row, onClose, onViewFullP
               </div>
             )}
 
-            {/* Worksheet / construction workflow / checklist toggle buttons */}
-            <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: worksheetOpen || constructionWorkflowOpen || checklistOpen ? 12 : 20 }}>
+            {/* Worksheet toggle */}
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: worksheetOpen ? 12 : 20 }}>
               <button
                 onClick={() => setWorksheetOpen((v) => !v)}
                 style={{
@@ -313,74 +311,6 @@ export default function ProjectDetailsModal({ project: row, onClose, onViewFullP
               >
                 📋 {worksheetOpen ? "Close Worksheet" : "Edit Worksheet"}
               </button>
-
-              <button
-                onClick={() => setConstructionWorkflowOpen((v) => !v)}
-                style={{
-                  padding: "8px 18px",
-                  borderRadius: 12,
-                  border: "1px solid #1a7a3c",
-                  background: constructionWorkflowOpen ? "#1a7a3c" : "#f0f7f1",
-                  color: constructionWorkflowOpen ? "#ffffff" : "#1a7a3c",
-                  fontSize: 13,
-                  fontWeight: 600,
-                  cursor: "pointer",
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: 6,
-                  transition: "background 0.15s, color 0.15s",
-                }}
-                onMouseEnter={(e) => {
-                  if (!constructionWorkflowOpen) {
-                    (e.currentTarget as HTMLButtonElement).style.background = "#1a7a3c";
-                    (e.currentTarget as HTMLButtonElement).style.color = "#ffffff";
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  if (!constructionWorkflowOpen) {
-                    (e.currentTarget as HTMLButtonElement).style.background = "#f0f7f1";
-                    (e.currentTarget as HTMLButtonElement).style.color = "#1a7a3c";
-                  }
-                }}
-                aria-expanded={constructionWorkflowOpen}
-                aria-label={constructionWorkflowOpen ? "Close construction workflow template" : "Open construction workflow template"}
-              >
-                🏗️ {constructionWorkflowOpen ? "Close Construction Workflow" : "Construction Workflow"}
-              </button>
-
-              <button
-                onClick={() => setChecklistOpen((v) => !v)}
-                style={{
-                  padding: "8px 18px",
-                  borderRadius: 12,
-                  border: "1px solid #1a7a3c",
-                  background: checklistOpen ? "#1a7a3c" : "#f0f7f1",
-                  color: checklistOpen ? "#ffffff" : "#1a7a3c",
-                  fontSize: 13,
-                  fontWeight: 600,
-                  cursor: "pointer",
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: 6,
-                  transition: "background 0.15s, color 0.15s",
-                }}
-                onMouseEnter={(e) => {
-                  if (!checklistOpen) {
-                    (e.currentTarget as HTMLButtonElement).style.background = "#1a7a3c";
-                    (e.currentTarget as HTMLButtonElement).style.color = "#ffffff";
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  if (!checklistOpen) {
-                    (e.currentTarget as HTMLButtonElement).style.background = "#f0f7f1";
-                    (e.currentTarget as HTMLButtonElement).style.color = "#1a7a3c";
-                  }
-                }}
-                aria-expanded={checklistOpen}
-                aria-label={checklistOpen ? "Close checklist" : "Open checklist"}
-              >
-                ✅ {checklistOpen ? "Close Checklist" : "Checklist"}
-              </button>
             </div>
 
             {/* Inline editable worksheet */}
@@ -390,20 +320,30 @@ export default function ProjectDetailsModal({ project: row, onClose, onViewFullP
               </div>
             )}
 
-            {constructionWorkflowOpen && (
-              <div style={{ marginBottom: 20 }}>
-                <ConstructionWorkflowTemplate key={propertyId} propertyId={propertyId} propertyName={row.name} projectStage={row.stage} />
-              </div>
-            )}
+            <div style={{ marginBottom: 24 }}>
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))",
+                  gap: 14,
+                  alignItems: "start",
+                }}
+              >
+                <section style={{ background: "#f9fcf9", border: "1px solid #d4e8d8", borderRadius: 12, padding: 12 }}>
+                  <div style={sectionLabelStyle}>Main Workflow</div>
+                  <PropertyWorkflow propertyId={propertyId} />
+                </section>
 
-            {checklistOpen && (
-              <div style={{ marginBottom: 20 }}>
-                <ChecklistWorkflowTemplate key={propertyId} propertyId={propertyId} propertyName={row.name} projectStage={row.stage} />
-              </div>
-            )}
+                <section style={{ background: "#f9fcf9", border: "1px solid #d4e8d8", borderRadius: 12, padding: 12 }}>
+                  <div style={sectionLabelStyle}>Construction Workflow</div>
+                  <ConstructionWorkflowTemplate key={`${propertyId}-construction`} propertyId={propertyId} propertyName={row.name} projectStage={row.stage} />
+                </section>
 
-            <div style={{ marginBottom: 20 }}>
-              <PropertyWorkflow propertyId={propertyId} />
+                <section style={{ background: "#f9fcf9", border: "1px solid #d4e8d8", borderRadius: 12, padding: 12 }}>
+                  <div style={sectionLabelStyle}>Checklist Workflow</div>
+                  <ChecklistWorkflowTemplate key={`${propertyId}-checklist`} propertyId={propertyId} propertyName={row.name} projectStage={row.stage} />
+                </section>
+              </div>
             </div>
 
             {/* Quick stats */}
