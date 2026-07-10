@@ -92,7 +92,6 @@ function PropertyWorkflow({ propertyId }: Props) {
           throw new Error(createErrors.join("; "));
         }
 
-        export default memo(PropertyWorkflow);
       }
 
       // Guard against concurrent seeds creating duplicate rows: re-list and dedup.
@@ -661,3 +660,5 @@ function PropertyWorkflow({ propertyId }: Props) {
     </section>
   );
 }
+
+export default memo(PropertyWorkflow);

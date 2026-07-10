@@ -125,7 +125,6 @@ const propertyData = useMemo(
     (labor: number, materials: number, thirdParty: number) => {
       onSummary?.(labor, materials, thirdParty);
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [onSummary]
   );
 

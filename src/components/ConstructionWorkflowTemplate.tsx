@@ -85,8 +85,6 @@ function ConstructionWorkflowTemplate({ propertyId, propertyName, projectStage }
       return;
     }
 
-    export default memo(ConstructionWorkflowTemplate);
-
     fetch(`${WORKSHEET_ENDPOINT}?projectId=${encodeURIComponent(propertyId)}`)
       .then((response) => response.json())
       .then((data: { fields?: Record<string, string> }) => {
@@ -258,3 +256,5 @@ function ConstructionWorkflowTemplate({ propertyId, propertyName, projectStage }
     </div>
   );
 }
+
+export default memo(ConstructionWorkflowTemplate);

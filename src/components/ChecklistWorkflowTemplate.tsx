@@ -88,8 +88,6 @@ function ChecklistWorkflowTemplate({ propertyId, propertyName, projectStage }: P
       return;
     }
 
-    export default memo(ChecklistWorkflowTemplate);
-
     fetch(`${WORKSHEET_ENDPOINT}?projectId=${encodeURIComponent(propertyId)}`)
       .then((response) => response.json())
       .then((data: { fields?: Record<string, string> }) => {
@@ -219,3 +217,5 @@ function ChecklistWorkflowTemplate({ propertyId, propertyName, projectStage }: P
     </div>
   );
 }
+
+export default memo(ChecklistWorkflowTemplate);
