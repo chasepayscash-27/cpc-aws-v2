@@ -1,10 +1,17 @@
-import React, { useEffect, useState, useMemo, useCallback } from 'react';
+import React, { memo, useEffect, useState, useMemo, useCallback } from 'react';
 import { addressesMatch } from '../utils/normalizeAddress';
+import { loadCsv } from '../utils/csv';
 
 interface FinancialRecord {
   account: string;
   property_name: string;
   amount: number;
+}
+
+interface FinancialCsvRow {
+  account?: string;
+  property_name?: string;
+  amount?: string;
 }
 
 interface PropertyFinancialsProps {
@@ -19,31 +26,39 @@ const PropertyFinancials: React.FC<PropertyFinancialsProps> = ({ propertyName, o
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetch('/data/sweet_home_bama_pl_long_fixed.csv')
-      .then(response => response.text())
-      .then(csvText => {
-        const lines = csvText.trim().split('\n');
-        const records: FinancialRecord[] = [];
-        for (let i = 1; i < lines.length; i++) {
-          const [account, property_name, amount] = lines[i].split(',');
-          if (account && property_name && amount) {
-            const parsedAmount = parseFloat(amount);
-            if (isNaN(parsedAmount)) continue;
-            records.push({
-              account: account.trim(),
-              property_name: property_name.trim(),
-              amount: parsedAmount,
-            });
+    let cancelled = false;
+
+    loadCsv<FinancialCsvRow>('/data/sweet_home_bama_pl_long_fixed.csv')
+      .then((rows) => {
+        if (cancelled) return;
+        const records = rows.reduce<FinancialRecord[]>((acc, row) => {
+          const account = row.account?.trim();
+          const property_name = row.property_name?.trim();
+          const parsedAmount = Number(row.amount);
+          if (!account || !property_name || Number.isNaN(parsedAmount)) {
+            return acc;
           }
-        }
+          acc.push({
+            account,
+            property_name,
+            amount: parsedAmount,
+          });
+          return acc;
+        }, []);
         setData(records);
+        setError(null);
         setLoading(false);
       })
       .catch(err => {
+        if (cancelled) return;
         console.error('Error loading financial data:', err);
         setError('Failed to load financial data');
         setLoading(false);
       });
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
 const propertyData = useMemo(
@@ -110,7 +125,6 @@ const propertyData = useMemo(
     (labor: number, materials: number, thirdParty: number) => {
       onSummary?.(labor, materials, thirdParty);
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [onSummary]
   );
 
@@ -240,4 +254,4 @@ const propertyData = useMemo(
   );
 };
 
-export default PropertyFinancials;
+export default memo(PropertyFinancials);

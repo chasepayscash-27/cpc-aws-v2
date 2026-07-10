@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState, type CSSProperties } from "react";
+import { memo, useCallback, useEffect, useMemo, useState, type CSSProperties } from "react";
 import { getCurrentUser } from "aws-amplify/auth";
 import type { Schema } from "../../amplify/data/resource";
 import outputs from "../../amplify/amplify_outputs.json";
@@ -61,7 +61,7 @@ function getProgress(tasks: PropertyTask[]): { done: number; total: number; perc
   return { done, total, percent };
 }
 
-export default function ConstructionWorkflowTemplate({ propertyId, propertyName, projectStage }: Props) {
+function ConstructionWorkflowTemplate({ propertyId, propertyName, projectStage }: Props) {
   const { allTasks, isLoading: contextLoading, error: contextError, updateTaskCompletion } = usePropertyTasks();
   const [toggleError, setToggleError] = useState("");
   const [notes, setNotes] = useState("");
@@ -256,3 +256,5 @@ export default function ConstructionWorkflowTemplate({ propertyId, propertyName,
     </div>
   );
 }
+
+export default memo(ConstructionWorkflowTemplate);

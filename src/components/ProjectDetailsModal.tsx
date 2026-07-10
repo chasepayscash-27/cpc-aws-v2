@@ -71,6 +71,11 @@ export default function ProjectDetailsModal({ project: row, onClose, onViewFullP
   const isLightboxOpen = lightboxIndex !== null;
 
   const closeLightbox = useCallback(() => setLightboxIndex(null), []);
+  const handleViewFullPnL = useCallback(() => {
+    if (!onViewFullPnL || !row.name) return;
+    onViewFullPnL(row.name);
+    onClose();
+  }, [onClose, onViewFullPnL, row.name]);
 
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
@@ -98,6 +103,7 @@ export default function ProjectDetailsModal({ project: row, onClose, onViewFullP
     async function fetchPhotos() {
       try {
         const all = await loadCsv<PhotoLogRow>("/data/project_photo_log_v2.csv");
+        if (aborted) return;
         const projectId = (row.project_uuid ?? "").trim().toLowerCase();
         const filtered = all.filter(
           (p) => (p.project_uuid ?? "").trim().toLowerCase() === projectId && p.source_view_url
@@ -107,7 +113,11 @@ export default function ProjectDetailsModal({ project: row, onClose, onViewFullP
         // silently ignore — section simply won't render
       }
     }
+    let aborted = false;
     if (row.project_uuid) fetchPhotos();
+    return () => {
+      aborted = true;
+    };
   }, [row.project_uuid]);
 
   const overlayStyle: CSSProperties = {
@@ -471,11 +481,7 @@ export default function ProjectDetailsModal({ project: row, onClose, onViewFullP
                 <div style={sectionLabelStyle}>💰 Financials</div>
                 <PropertyFinancials
                   propertyName={row.name}
-                  onViewFullPnL={
-                    onViewFullPnL && row.name
-                      ? () => { onViewFullPnL(row.name as string); onClose(); }
-                      : undefined
-                  }
+                  onViewFullPnL={onViewFullPnL && row.name ? handleViewFullPnL : undefined}
                   onSummary={handleFinancialSummary}
                 />
               </>
