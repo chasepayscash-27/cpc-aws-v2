@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState, type CSSProperties } from "react";
+import { memo, useCallback, useEffect, useMemo, useState, type CSSProperties } from "react";
 import { getCurrentUser } from "aws-amplify/auth";
 import type { Schema } from "../../amplify/data/resource";
 import outputs from "../../amplify/amplify_outputs.json";
@@ -65,7 +65,7 @@ function getProgress(tasks: PropertyTask[]): { done: number; total: number; perc
   return { done, total, percent };
 }
 
-export default function ChecklistWorkflowTemplate({ propertyId, propertyName, projectStage }: Props) {
+function ChecklistWorkflowTemplate({ propertyId, propertyName, projectStage }: Props) {
   const { allTasks, isLoading: contextLoading, error: contextError, updateTaskCompletion } = usePropertyTasks();
   const [toggleError, setToggleError] = useState("");
   const [completedByUser, setCompletedByUser] = useState<string | null>(null);
@@ -87,6 +87,8 @@ export default function ChecklistWorkflowTemplate({ propertyId, propertyName, pr
     if (!propertyId || !WORKSHEET_ENDPOINT) {
       return;
     }
+
+    export default memo(ChecklistWorkflowTemplate);
 
     fetch(`${WORKSHEET_ENDPOINT}?projectId=${encodeURIComponent(propertyId)}`)
       .then((response) => response.json())

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState, type KeyboardEvent } from "react";
+import { memo, useCallback, useEffect, useMemo, useRef, useState, type KeyboardEvent } from "react";
 import { generateClient } from "aws-amplify/data";
 import { getCurrentUser } from "aws-amplify/auth";
 import type { Schema } from "../../amplify/data/resource";
@@ -33,7 +33,7 @@ function sortTasks(tasks: PropertyTask[]): PropertyTask[] {
   );
 }
 
-export default function PropertyWorkflow({ propertyId }: Props) {
+function PropertyWorkflow({ propertyId }: Props) {
   const { allTasks, isLoading: tasksContextLoading, updateTaskCompletion } = usePropertyTasks();
   const [tasks, setTasks] = useState<PropertyTask[]>([]);
   const [loading, setLoading] = useState(true);
@@ -91,6 +91,8 @@ export default function PropertyWorkflow({ propertyId }: Props) {
         if (createErrors.length > 0) {
           throw new Error(createErrors.join("; "));
         }
+
+        export default memo(PropertyWorkflow);
       }
 
       // Guard against concurrent seeds creating duplicate rows: re-list and dedup.
