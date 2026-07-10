@@ -53,6 +53,21 @@ const ACTIVE_PROPERTIES = [
 const INITIAL_NOTES =
   'Team sync every Monday 9 AM.\n\nReminder: all permits must be filed 48 hrs before inspection.\n\nChase — follow up with HOA on Cedar Ct by EOD.';
 
+// ─── Tab definitions ──────────────────────────────────────────────────────────
+
+type WipTab = 'overview' | 'workflow' | 'construction' | 'budget' | 'files' | 'photos' | 'timeline' | 'messages';
+
+const WIP_TABS: { id: WipTab; label: string; icon: string }[] = [
+  { id: 'overview',     label: 'Overview',     icon: '🏠' },
+  { id: 'workflow',     label: 'Workflow',      icon: '🔄' },
+  { id: 'construction', label: 'Construction',  icon: '🏗️' },
+  { id: 'budget',       label: 'Budget',        icon: '💰' },
+  { id: 'files',        label: 'Files',         icon: '📁' },
+  { id: 'photos',       label: 'Photos',        icon: '📸' },
+  { id: 'timeline',     label: 'Timeline',      icon: '📅' },
+  { id: 'messages',     label: 'Messages',      icon: '💬' },
+];
+
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
 function priorityBadge(priority: Task['priority']) {
@@ -95,6 +110,13 @@ function todayLabel() {
     month: 'long',
     day: 'numeric',
   });
+}
+
+function greeting() {
+  const h = new Date().getHours();
+  if (h < 12) return 'morning';
+  if (h < 17) return 'afternoon';
+  return 'evening';
 }
 
 // ─── Sub-components ──────────────────────────────────────────────────────────
@@ -149,66 +171,78 @@ function TaskRow({ task }: TaskRowProps) {
   );
 }
 
-// ─── Page ────────────────────────────────────────────────────────────────────
+// ─── Placeholder tab panels ───────────────────────────────────────────────────
 
-export default function TeamWipPage() {
-  const [notes, setNotes] = useState(INITIAL_NOTES);
-  const [refreshedAt, setRefreshedAt] = useState(new Date());
-
-  const overdue = SAMPLE_TASKS.filter((t) => t.status === 'overdue');
-  const dueToday = SAMPLE_TASKS.filter((t) => t.status === 'due-today');
-  const upcoming = SAMPLE_TASKS.filter((t) => t.status === 'upcoming');
-  const blocked = SAMPLE_TASKS.filter((t) => t.status === 'blocked');
-
-  function handleRefresh() {
-    setRefreshedAt(new Date());
-  }
-
+function PlaceholderPanel({ icon, title, description }: { icon: string; title: string; description: string }) {
   return (
-    <>
-      {/* ── Page header ── */}
-      <div className="pageHeader" style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: 10 }}>
-        <div>
-          <h1 className="h1">Team — WIP</h1>
-          <p className="muted" style={{ marginTop: 4 }}>
-            Good {greeting()}, team 👋 — here's where things stand today.
-          </p>
-        </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
-          <span style={{ fontSize: 13, color: 'var(--muted)' }}>
-            📅 {todayLabel()}
-          </span>
-          <button
-            className="btnPrimary"
-            onClick={handleRefresh}
-            aria-label="Refresh dashboard data"
-            title="Refresh dashboard"
-          >
-            🔄 Update
-          </button>
-        </div>
-      </div>
-
-      <p style={{ fontSize: 12, color: 'var(--muted)', marginBottom: 14, marginTop: -6 }}>
-        Last updated: {refreshedAt.toLocaleTimeString()}
-      </p>
-
-      {/* ── KPI Cards ── */}
-      <section
-        aria-label="KPI summary"
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '48px 24px',
+        textAlign: 'center',
+        gap: 12,
+      }}
+    >
+      <div
         style={{
+          width: 64,
+          height: 64,
+          borderRadius: 20,
+          background: 'var(--panel2)',
+          border: '1.5px solid var(--border)',
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))',
-          gap: 12,
-          marginBottom: 20,
+          placeItems: 'center',
+          fontSize: 30,
+          boxShadow: '0 2px 8px rgba(26,122,60,0.08)',
         }}
       >
-        <KpiCard label="Overdue" count={overdue.length} icon="🔴" accentColor="#dc2626" />
-        <KpiCard label="Due Today" count={dueToday.length} icon="🟡" accentColor="#d97706" />
-        <KpiCard label="Upcoming" count={upcoming.length} icon="🟢" accentColor="var(--accent)" />
-        <KpiCard label="Blocked" count={blocked.length} icon="🚧" accentColor="#7c3aed" />
-      </section>
+        {icon}
+      </div>
+      <div style={{ fontWeight: 700, fontSize: 17, color: 'var(--text)' }}>{title}</div>
+      <div style={{ fontSize: 14, color: 'var(--muted)', maxWidth: 360, lineHeight: 1.6 }}>{description}</div>
+      <div
+        style={{
+          marginTop: 4,
+          display: 'inline-block',
+          padding: '4px 14px',
+          borderRadius: 99,
+          fontSize: 11,
+          fontWeight: 700,
+          background: 'rgba(26,122,60,0.08)',
+          color: 'var(--accent)',
+          border: '1px solid rgba(26,122,60,0.18)',
+          letterSpacing: '0.04em',
+          textTransform: 'uppercase',
+        }}
+      >
+        Coming Soon
+      </div>
+    </div>
+  );
+}
 
+// ─── Overview tab content (existing wired content) ────────────────────────────
+
+function OverviewPanel({
+  notes,
+  setNotes,
+  overdue,
+  dueToday,
+  upcoming,
+  blocked,
+}: {
+  notes: string;
+  setNotes: (v: string) => void;
+  overdue: Task[];
+  dueToday: Task[];
+  upcoming: Task[];
+  blocked: Task[];
+}) {
+  return (
+    <>
       {/* ── Main content grid ── */}
       <div
         style={{
@@ -397,9 +431,207 @@ export default function TeamWipPage() {
   );
 }
 
-function greeting() {
-  const h = new Date().getHours();
-  if (h < 12) return 'morning';
-  if (h < 17) return 'afternoon';
-  return 'evening';
+// ─── Page ────────────────────────────────────────────────────────────────────
+
+export default function TeamWipPage() {
+  const [notes, setNotes] = useState(INITIAL_NOTES);
+  const [refreshedAt, setRefreshedAt] = useState(new Date());
+  const [activeTab, setActiveTab] = useState<WipTab>('overview');
+
+  const overdue = SAMPLE_TASKS.filter((t) => t.status === 'overdue');
+  const dueToday = SAMPLE_TASKS.filter((t) => t.status === 'due-today');
+  const upcoming = SAMPLE_TASKS.filter((t) => t.status === 'upcoming');
+  const blocked = SAMPLE_TASKS.filter((t) => t.status === 'blocked');
+
+  function handleRefresh() {
+    setRefreshedAt(new Date());
+  }
+
+  function renderTabPanel() {
+    switch (activeTab) {
+      case 'overview':
+        return (
+          <OverviewPanel
+            notes={notes}
+            setNotes={setNotes}
+            overdue={overdue}
+            dueToday={dueToday}
+            upcoming={upcoming}
+            blocked={blocked}
+          />
+        );
+      case 'workflow':
+        return (
+          <PlaceholderPanel
+            icon="🔄"
+            title="Workflow"
+            description="View and manage the full property workflow pipeline. Step-by-step task tracking across acquisition, renovation, and disposition stages."
+          />
+        );
+      case 'construction':
+        return (
+          <PlaceholderPanel
+            icon="🏗️"
+            title="Construction"
+            description="Track construction progress, contractor assignments, punch-list items, and inspection status across all active renovation projects."
+          />
+        );
+      case 'budget':
+        return (
+          <PlaceholderPanel
+            icon="💰"
+            title="Budget"
+            description="Monitor project budgets, track actual vs. estimated costs, and review spending by category for each active property."
+          />
+        );
+      case 'files':
+        return (
+          <PlaceholderPanel
+            icon="📁"
+            title="Files"
+            description="Access contracts, permits, inspection reports, and other property documents organized by project and category."
+          />
+        );
+      case 'photos':
+        return (
+          <PlaceholderPanel
+            icon="📸"
+            title="Photos"
+            description="Browse before/during/after photo logs for each active property. Track visual progress over time."
+          />
+        );
+      case 'timeline':
+        return (
+          <PlaceholderPanel
+            icon="📅"
+            title="Timeline"
+            description="See a Gantt-style timeline of milestones, deadlines, and key events across all active projects in one view."
+          />
+        );
+      case 'messages':
+        return (
+          <PlaceholderPanel
+            icon="💬"
+            title="Messages"
+            description="Team communication hub for project-specific threads. Keep all contractor and team conversations organized by property."
+          />
+        );
+      default:
+        return null;
+    }
+  }
+
+  return (
+    <>
+      {/* ── Page header ── */}
+      <div
+        className="card wipHeaderCard"
+        style={{
+          marginBottom: 18,
+          background: 'linear-gradient(135deg, var(--accent) 0%, var(--accent-light) 100%)',
+          border: 'none',
+          color: '#fff',
+          borderRadius: 18,
+          padding: '18px 22px',
+          display: 'flex',
+          alignItems: 'flex-start',
+          justifyContent: 'space-between',
+          flexWrap: 'wrap',
+          gap: 12,
+        }}
+      >
+        <div>
+          <h1
+            style={{
+              margin: 0,
+              fontSize: 22,
+              fontWeight: 800,
+              color: '#fff',
+              letterSpacing: '-0.3px',
+            }}
+          >
+            Team — Work In Progress
+          </h1>
+          <p style={{ margin: '4px 0 0', fontSize: 14, color: 'rgba(255,255,255,0.82)', lineHeight: 1.4 }}>
+            Good {greeting()}, team 👋 — here's where things stand today.
+          </p>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0, flexWrap: 'wrap' }}>
+          <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.80)' }}>
+            📅 {todayLabel()}
+          </span>
+          <button
+            style={{
+              background: 'rgba(255,255,255,0.18)',
+              border: '1px solid rgba(255,255,255,0.35)',
+              color: '#fff',
+              padding: '8px 14px',
+              borderRadius: 12,
+              cursor: 'pointer',
+              fontWeight: 700,
+              fontSize: 13,
+              transition: 'background 0.2s ease',
+            }}
+            onClick={handleRefresh}
+            aria-label="Refresh dashboard data"
+            title="Refresh dashboard"
+          >
+            🔄 Update
+          </button>
+        </div>
+      </div>
+
+      <p style={{ fontSize: 12, color: 'var(--muted)', marginBottom: 16, marginTop: -10 }}>
+        Last updated: {refreshedAt.toLocaleTimeString()}
+      </p>
+
+      {/* ── KPI Cards ── */}
+      <section
+        aria-label="KPI summary"
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))',
+          gap: 12,
+          marginBottom: 20,
+        }}
+      >
+        <KpiCard label="Overdue" count={overdue.length} icon="🔴" accentColor="#dc2626" />
+        <KpiCard label="Due Today" count={dueToday.length} icon="🟡" accentColor="#d97706" />
+        <KpiCard label="Upcoming" count={upcoming.length} icon="🟢" accentColor="var(--accent)" />
+        <KpiCard label="Blocked" count={blocked.length} icon="🚧" accentColor="#7c3aed" />
+      </section>
+
+      {/* ── Tab navigation ── */}
+      <div className="wipTabBar" role="tablist" aria-label="Team WIP sections">
+        {WIP_TABS.map((tab) => {
+          const isActive = tab.id === activeTab;
+          return (
+            <button
+              key={tab.id}
+              type="button"
+              role="tab"
+              id={`wip-tab-${tab.id}`}
+              aria-selected={isActive}
+              aria-controls={`wip-panel-${tab.id}`}
+              className={`wipTab${isActive ? ' active' : ''}`}
+              onClick={() => setActiveTab(tab.id)}
+            >
+              <span className="wipTabIcon">{tab.icon}</span>
+              <span className="wipTabLabel">{tab.label}</span>
+            </button>
+          );
+        })}
+      </div>
+
+      {/* ── Tab panel ── */}
+      <div
+        role="tabpanel"
+        id={`wip-panel-${activeTab}`}
+        aria-labelledby={`wip-tab-${activeTab}`}
+        style={{ paddingTop: 4 }}
+      >
+        {renderTabPanel()}
+      </div>
+    </>
+  );
 }
