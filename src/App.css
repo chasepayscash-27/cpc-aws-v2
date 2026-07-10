@@ -643,6 +643,85 @@ body {
   .tcMessages { max-height: 220px; }
 }
 
+/* ─── Team WIP Tab Bar ─── */
+
+.wipTabBar {
+  display: flex;
+  gap: 4px;
+  overflow-x: auto;
+  padding: 4px 4px 0;
+  margin-bottom: 18px;
+  border-bottom: 2px solid var(--border);
+  scrollbar-width: none;
+}
+
+.wipTabBar::-webkit-scrollbar {
+  display: none;
+}
+
+.wipTab {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 16px;
+  border: none;
+  border-bottom: 3px solid transparent;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: inherit;
+  white-space: nowrap;
+  border-radius: 10px 10px 0 0;
+  margin-bottom: -2px;
+  transition: color 0.18s ease, background 0.18s ease, border-bottom-color 0.18s ease;
+}
+
+.wipTab:hover {
+  color: var(--accent);
+  background: rgba(26, 122, 60, 0.06);
+}
+
+.wipTab.active {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+  background: rgba(26, 122, 60, 0.07);
+  font-weight: 700;
+}
+
+.wipTabIcon {
+  font-size: 15px;
+  line-height: 1;
+}
+
+.wipTabLabel {
+  letter-spacing: 0.01em;
+}
+
+@media (max-width: 768px) {
+  .wipTab {
+    padding: 8px 12px;
+    font-size: 12px;
+    gap: 4px;
+  }
+  .wipTabIcon {
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 480px) {
+  .wipTabLabel {
+    display: none;
+  }
+  .wipTab {
+    padding: 8px 10px;
+  }
+  .wipTabIcon {
+    font-size: 16px;
+  }
+}
+
 /* ─── Team Chat ─── */
 
 .tcLayout {
