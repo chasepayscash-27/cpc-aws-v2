@@ -192,7 +192,6 @@ export default function ProjectDetailsModal({ project: row, onClose, onViewFullP
         @keyframes slideUp { from { opacity: 0; transform: translateY(24px) } to { opacity: 1; transform: translateY(0) } }
         .modal-close-btn:hover { background: #d4e8d8 !important; color: #1a7a3c !important; }
         .modal-close-btn:focus-visible { outline: 2px solid #1a7a3c; outline-offset: 2px; }
-        .photo-thumb:hover { transform: scale(1.03); box-shadow: 0 4px 18px rgba(26,122,60,0.18); }
         .lightbox-nav-btn:hover { background: rgba(255,255,255,0.25) !important; }
       `}</style>
       <div style={overlayStyle} onClick={onClose} role="dialog" aria-modal="true" aria-label={row.name ?? "Project details"}>
@@ -209,7 +208,7 @@ export default function ProjectDetailsModal({ project: row, onClose, onViewFullP
 
           {/* Hero image */}
           {row.featured_image_url && (
-            <div style={{ height: 260, overflow: "hidden" }}>
+            <div style={{ height: 260, overflow: "hidden", position: "relative" }}>
               <img
                 src={row.featured_image_url}
                 alt={row.name ?? "project"}
@@ -218,6 +217,38 @@ export default function ProjectDetailsModal({ project: row, onClose, onViewFullP
                   (e.currentTarget as HTMLImageElement).parentElement!.style.display = "none";
                 }}
               />
+              {photos.length > 0 && (
+                <button
+                  onClick={() => setLightboxIndex(0)}
+                  aria-label={`View all ${photos.length} photos`}
+                  style={{
+                    position: "absolute",
+                    bottom: 12,
+                    left: 12,
+                    padding: "7px 14px",
+                    borderRadius: 8,
+                    border: "1px solid rgba(255,255,255,0.5)",
+                    background: "rgba(0,0,0,0.55)",
+                    color: "#fff",
+                    fontSize: 13,
+                    fontWeight: 600,
+                    cursor: "pointer",
+                    backdropFilter: "blur(4px)",
+                    transition: "background 0.15s",
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: 6,
+                  }}
+                  onMouseEnter={(e) => {
+                    (e.currentTarget as HTMLButtonElement).style.background = "rgba(0,0,0,0.75)";
+                  }}
+                  onMouseLeave={(e) => {
+                    (e.currentTarget as HTMLButtonElement).style.background = "rgba(0,0,0,0.55)";
+                  }}
+                >
+                  📷 View All Photos
+                </button>
+              )}
             </div>
           )}
 
@@ -431,73 +462,7 @@ export default function ProjectDetailsModal({ project: row, onClose, onViewFullP
             )}
 
             {/* Photos section */}
-            {photos.length > 0 && (
-              <>
-                <div style={dividerStyle} />
-                <div style={sectionLabelStyle}>📸 Photos</div>
-                <div
-                  style={{
-                    display: "grid",
-                    gridTemplateColumns: "repeat(auto-fill, minmax(140px, 1fr))",
-                    gap: 10,
-                    marginBottom: 4,
-                  }}
-                >
-                  {photos.map((photo, idx) => (
-                    <div
-                      key={idx}
-                      className="photo-thumb"
-                      onClick={() => setLightboxIndex(idx)}
-                      style={{
-                        position: "relative",
-                        borderRadius: 12,
-                        overflow: "hidden",
-                        cursor: "pointer",
-                        border: "1px solid #d4e8d8",
-                        background: "#f0f7f1",
-                        aspectRatio: "4/3",
-                        transition: "transform 0.18s, box-shadow 0.18s",
-                      }}
-                    >
-                      <img
-                        src={photo.source_view_url}
-                        alt={photo.photo_description ?? photo.description ?? photo.category ?? "photo"}
-                        style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
-                        onError={(e) => {
-                          (e.currentTarget as HTMLImageElement).parentElement!.style.display = "none";
-                        }}
-                      />
-                      {(photo.category || photo.photo_date) && (
-                        <div
-                          style={{
-                            position: "absolute",
-                            bottom: 0,
-                            left: 0,
-                            right: 0,
-                            padding: "4px 8px",
-                            background: "linear-gradient(transparent, rgba(0,0,0,0.55))",
-                            color: "#fff",
-                            fontSize: 10,
-                            lineHeight: 1.3,
-                          }}
-                        >
-                          {photo.category && (
-                            <div style={{ fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.06em" }}>
-                              {photo.category}
-                            </div>
-                          )}
-                          {photo.photo_date && (
-                            <div style={{ opacity: 0.85 }}>
-                              {photo.photo_date.slice(0, 10)}
-                            </div>
-                          )}
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </>
-            )}
+            {/* Thumbnail strip removed — photos are accessible via the "View All Photos" button on the hero image */}
 
             {/* Financials section */}
             {row.name && (

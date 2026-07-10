@@ -132,9 +132,6 @@ export default function ConstructionWorkflowTemplate({ propertyId, propertyName,
 
   return (
     <div style={cardStyle}>
-      <div style={{ fontSize: 14, fontWeight: 700, color: "#1a7a3c", marginBottom: 4 }}>
-        🏗️ Construction Workflow
-      </div>
       <div style={{ fontSize: 12, color: "#5a7060", marginBottom: 12 }}>
         {propertyName ? `${propertyName} construction tasks.` : "Construction tasks."} These checklist items stay synced with the main property workflow.
       </div>
