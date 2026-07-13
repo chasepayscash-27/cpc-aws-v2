@@ -1,10 +1,11 @@
-import { useEffect, useState } from 'react';
+import { lazy, Suspense, useEffect, useState } from 'react';
 import { loadCsv } from '../utils/csv';
 import type { ProjectRow } from '../types/project';
 import PipelineTracker from '../components/PipelineTracker';
-import ProjectDetailsModal from '../components/ProjectDetailsModal';
 import { isArchivedStage } from '../utils/pipelineStatus';
 import '../App.css';
+
+const ProjectDetailsModal = lazy(() => import('../components/ProjectDetailsModal'));
 
 interface YTDRow {
   'Number of Houses Sold': string;
@@ -104,10 +105,12 @@ export default function YTDSummaryPage() {
   return (
     <div>
       {selectedProject && (
-        <ProjectDetailsModal
-          project={selectedProject}
-          onClose={() => setSelectedProject(null)}
-        />
+        <Suspense fallback={null}>
+          <ProjectDetailsModal
+            project={selectedProject}
+            onClose={() => setSelectedProject(null)}
+          />
+        </Suspense>
       )}
       <div className="pageHeader">
         <h1 className="h1">YTD Summary</h1>

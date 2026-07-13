@@ -34,7 +34,7 @@ function sortTasks(tasks: PropertyTask[]): PropertyTask[] {
 }
 
 function PropertyWorkflow({ propertyId }: Props) {
-  const { allTasks, isLoading: tasksContextLoading, updateTaskCompletion } = usePropertyTasks();
+  const { allTasks, error: tasksContextError, isLoading: tasksContextLoading, updateTaskCompletion } = usePropertyTasks();
   const [tasks, setTasks] = useState<PropertyTask[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -238,35 +238,29 @@ function PropertyWorkflow({ propertyId }: Props) {
     seedAttemptedRef.current = false;
     reconcileAttemptedRef.current = false;
     seedAlertPreferenceAttemptedRef.current = false;
+    setTasks([]);
     setLoading(true);
     setError("");
     setAlertStatus("");
     setNoteDraftByTaskId({});
+  }, [propertyId]);
 
-    const subscription = client.models.PropertyTask.observeQuery({
-      filter: { propertyId: { eq: propertyId } },
-    }).subscribe({
-      next: ({ items }) => {
-        const sorted = sortTasks(items);
-        setTasks(sorted);
-        setLoading(false);
+  useEffect(() => {
+    if (!propertyId || tasksContextLoading || tasksContextError) return;
 
-        if (sorted.length === 0 && !seedAttemptedRef.current) {
-          seedAttemptedRef.current = true;
-          void seedPropertyTasks();
-        } else if (sorted.length > 0 && !reconcileAttemptedRef.current) {
-          reconcileAttemptedRef.current = true;
-          void reconcilePropertyTasks(sorted);
-        }
-      },
-      error: (observeError) => {
-        setError(observeError instanceof Error ? observeError.message : "Failed to load workflow tasks.");
-        setLoading(false);
-      },
-    });
+    if (contextTasksForProperty.length === 0 && !seedAttemptedRef.current) {
+      seedAttemptedRef.current = true;
+      void seedPropertyTasks();
+      return;
+    }
 
-    return () => subscription.unsubscribe();
-  }, [propertyId, seedPropertyTasks, reconcilePropertyTasks]);
+    if (contextTasksForProperty.length > 0 && !reconcileAttemptedRef.current) {
+      reconcileAttemptedRef.current = true;
+      void reconcilePropertyTasks(contextTasksForProperty);
+    }
+  }, [contextTasksForProperty, propertyId, reconcilePropertyTasks, seedPropertyTasks, tasksContextError, tasksContextLoading]);
+
+  const visibleError = error || tasksContextError;
 
   useEffect(() => {
     if (!propertyId) return;
@@ -568,7 +562,7 @@ function PropertyWorkflow({ propertyId }: Props) {
 
       {loading && <p className="pwMuted">Loading workflow tasks…</p>}
       {!loading && tasks.length === 0 && <p className="pwMuted">Preparing default workflow…</p>}
-      {error && <p className="pwError">⚠️ {error}</p>}
+      {visibleError && <p className="pwError">⚠️ {visibleError}</p>}
       {alertStatus && <p className="pwSuccess">{alertStatus}</p>}
 
       {!loading && dedupedTasks.length > 0 && (
