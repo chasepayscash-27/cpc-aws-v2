@@ -15,6 +15,7 @@ import {
 } from "./propertyWorkflowTabs";
 import { dedupeTasksByCanonicalOrder, getWorkflowProgressCounts, normalizeWorkflowOwner } from "./propertyWorkflowNormalization";
 import { usePropertyTasks } from "../contexts/PropertyTasksContext";
+import { toTitleCase } from "../utils/titleCase";
 import "./PropertyWorkflow.css";
 
 type PropertyTask = Schema["PropertyTask"]["type"];
@@ -579,7 +580,7 @@ function PropertyWorkflow({ propertyId }: Props) {
               <div className="pwOrder">#{task.order ?? "—"}</div>
               <div className="pwContent">
                 <div className="pwTopLine">
-                  <strong>{task.stage}</strong>
+                  <strong>{toTitleCase(task.stage ?? "")}</strong>
                   <span className="pwAssigneeWrap">
                     <span className="pwAssigneeLabel">Employee</span>
                     <select
@@ -588,7 +589,7 @@ function PropertyWorkflow({ propertyId }: Props) {
                       onChange={(event) => {
                         void handleAssigneeChange(task, event.currentTarget.value || null);
                       }}
-                      aria-label={`Employee for ${task.stage}`}
+                      aria-label={`Employee for ${toTitleCase(task.stage ?? "")}`}
                     >
                       <option value="">Unassigned</option>
                       {assigneeOptions.map((option) => (
@@ -606,7 +607,7 @@ function PropertyWorkflow({ propertyId }: Props) {
                       onChange={(event) => {
                         void handleAlertRecipientChange(task, event.currentTarget.value || null);
                       }}
-                      aria-label={`Alert recipient for ${task.stage}`}
+                      aria-label={`Alert recipient for ${toTitleCase(task.stage ?? "")}`}
                     >
                       {recipients.map((recipient) => (
                         <option key={recipient.id} value={recipient.id}>
@@ -633,7 +634,7 @@ function PropertyWorkflow({ propertyId }: Props) {
                     onChange={(event) => {
                       handleTaskNoteDraftChange(task.id, event.currentTarget.value);
                     }}
-                    aria-label={`Add note for ${task.stage}`}
+                    aria-label={`Add note for ${toTitleCase(task.stage ?? "")}`}
                   />
                   <button
                     type="button"

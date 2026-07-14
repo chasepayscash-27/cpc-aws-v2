@@ -5,6 +5,7 @@ import outputs from "../../amplify/amplify_outputs.json";
 import { getConstructionWorkflowTaskGroups } from "./propertyTaskCollections";
 import { usePropertyTasks } from "../contexts/PropertyTasksContext";
 import type { ProjectRow } from "../types/project";
+import { toTitleCase } from "../utils/titleCase";
 
 interface Props {
   propertyId?: string | null;
@@ -195,7 +196,7 @@ function ConstructionWorkflowTemplate({ propertyId, propertyName, projectStage }
                       checked={!!task.isComplete}
                       disabled={updatingTaskIds.includes(task.id)}
                       style={{ marginTop: 2 }}
-                      aria-label={`Mark ${task.stage ?? "task"} ${task.isComplete ? "incomplete" : "complete"} in construction workflow`}
+                      aria-label={`Mark ${toTitleCase(task.stage ?? "task")} ${task.isComplete ? "incomplete" : "complete"} in construction workflow`}
                       onChange={(event) => {
                         void handleToggle(task, event.currentTarget.checked);
                       }}
@@ -210,7 +211,7 @@ function ConstructionWorkflowTemplate({ propertyId, propertyName, projectStage }
                           textDecoration: task.isComplete ? "line-through" : "none",
                         }}
                       >
-                        #{taskIndex + 1} {task.stage}
+                        #{taskIndex + 1} {toTitleCase(task.stage ?? "")}
                       </span>
                       {task.completedAt && (
                         <span style={{ display: "block", fontSize: 11, color: "#5a7060", marginTop: 2 }}>
