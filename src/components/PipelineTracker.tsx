@@ -8,10 +8,10 @@ import ProgressStatusBadge from './ProgressStatusBadge';
 export const ACTIVE_STAGE_ORDER = [
   'negotiation',
   'pending_purchase',
-  'under_contract',
   'under_construction',
   'punch_list',
   'active_listing',
+  'under_contract',
 ];
 
 const STAGE_COLORS: Record<string, string> = {
@@ -43,7 +43,7 @@ function toTrackerStage(rawStage?: string | null): string | null {
   if (isArchivedStage(rawStage)) return null;
   const normalized = normalizePipelineStatus(rawStage);
   if (NEGOTIATION_STAGES.has(normalized)) return 'negotiation';
-  if (normalized === 'planning permitting' || normalized === 'planning / permitting') return 'under_contract';
+  if (normalized === 'planning permitting' || normalized === 'planning / permitting' || normalized === 'pending sale') return 'under_contract';
   // Convert space-separated form back to underscore form for lookup
   const underscored = normalized.replace(/\s+/g, '_');
   if (ACTIVE_STAGE_ORDER.includes(underscored)) return underscored;
