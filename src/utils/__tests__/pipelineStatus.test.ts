@@ -89,6 +89,14 @@ describe('getPipelineStatusColor – negotiation bucket', () => {
   it('maps "appointment_set" to negotiation color', () => {
     expect(getPipelineStatusColor('appointment_set')).toBe(negotiationColor);
   });
+
+  it('maps "under_contract" to under contract color', () => {
+    expect(getPipelineStatusColor('under_contract')).toBe(PIPELINE_STATUS_COLORS.under_contract);
+  });
+
+  it('maps legacy "planning_permitting" to under contract color', () => {
+    expect(getPipelineStatusColor('planning_permitting')).toBe(PIPELINE_STATUS_COLORS.under_contract);
+  });
 });
 
 describe('getPipelineStatusLabel', () => {
@@ -102,6 +110,14 @@ describe('getPipelineStatusLabel', () => {
 
   it('returns "Under Negotiation" for "under_negotiation"', () => {
     expect(getPipelineStatusLabel('under_negotiation')).toBe('Under Negotiation');
+  });
+
+  it('returns "Under Contract" for "under_contract"', () => {
+    expect(getPipelineStatusLabel('under_contract')).toBe('Under Contract');
+  });
+
+  it('returns "Under Contract" for legacy "planning_permitting"', () => {
+    expect(getPipelineStatusLabel('planning_permitting')).toBe('Under Contract');
   });
 
   it('returns "Unknown" for empty input', () => {

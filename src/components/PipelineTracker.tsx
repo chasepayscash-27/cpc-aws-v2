@@ -8,7 +8,7 @@ import ProgressStatusBadge from './ProgressStatusBadge';
 export const ACTIVE_STAGE_ORDER = [
   'negotiation',
   'pending_purchase',
-  'planning_permitting',
+  'under_contract',
   'under_construction',
   'punch_list',
   'active_listing',
@@ -17,7 +17,7 @@ export const ACTIVE_STAGE_ORDER = [
 const STAGE_COLORS: Record<string, string> = {
   negotiation: 'rgba(234,179,8,0.85)',
   pending_purchase: 'rgba(20,184,166,0.85)',
-  planning_permitting: 'rgba(59,130,246,0.85)',
+  under_contract: 'rgba(59,130,246,0.85)',
   under_construction: 'rgba(251,146,60,0.85)',
   punch_list: 'rgba(245,158,11,0.85)',
   active_listing: 'rgba(236,72,153,0.85)',
@@ -43,6 +43,7 @@ function toTrackerStage(rawStage?: string | null): string | null {
   if (isArchivedStage(rawStage)) return null;
   const normalized = normalizePipelineStatus(rawStage);
   if (NEGOTIATION_STAGES.has(normalized)) return 'negotiation';
+  if (normalized === 'planning permitting' || normalized === 'planning / permitting') return 'under_contract';
   // Convert space-separated form back to underscore form for lookup
   const underscored = normalized.replace(/\s+/g, '_');
   if (ACTIVE_STAGE_ORDER.includes(underscored)) return underscored;
