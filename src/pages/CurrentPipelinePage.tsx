@@ -6,7 +6,7 @@ const STAGE_COLORS: Record<string, string> = {
   'Closed': '#1a7a3c',
   'Active Listing': '#d97706',
   'Under Construction': '#2563eb',
-  'Planning / Permitting': '#7c3aed',
+  'Under Contract': '#7c3aed',
 };
 
 function formatCurrency(value?: string): string {

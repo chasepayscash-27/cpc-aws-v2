@@ -10,7 +10,7 @@ interface Props {
 
 const STAGE_COLORS: Record<string, string> = {
   under_construction: "rgba(251,146,60,0.85)",
-  planning_permitting: "rgba(59,130,246,0.85)",
+  under_contract: "rgba(59,130,246,0.85)",
   completed: "rgba(34,197,94,0.85)",
   sold: "rgba(168,85,247,0.85)",
 };
