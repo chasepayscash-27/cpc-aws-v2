@@ -69,6 +69,7 @@ describe("getConstructionWorkflowTasks", () => {
       buildTask({ id: "construction-a", stage: "All items removed", order: 19 }),
       buildTask({ id: "construction-b", stage: "Gutters Installed", order: 48 }),
       buildTask({ id: "construction-c", stage: "garage doors open and shut", order: 59 }),
+      buildTask({ id: "construction-d", stage: "All Windows Open & Close", order: 75 }),
       buildTask({ id: "checklist", stage: "Tile ordered", order: 61 }),
     ];
 
@@ -76,6 +77,7 @@ describe("getConstructionWorkflowTasks", () => {
       "construction-a",
       "construction-b",
       "construction-c",
+      "construction-d",
     ]);
   });
 

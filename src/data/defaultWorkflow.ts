@@ -72,6 +72,7 @@ export const defaultWorkflow: DefaultWorkflowTask[] = [
   { order: 57, stage: "all doors shut and lock", workflowType: "Construction Workflow", subWorkflowType: "Final Walkthrough", owner: "", responsibilities: "", notes: "" },
   { order: 58, stage: "grass is cut", workflowType: "Construction Workflow", subWorkflowType: "Final Walkthrough", owner: "", responsibilities: "", notes: "" },
   { order: 59, stage: "garage doors open and shut", workflowType: "Construction Workflow", subWorkflowType: "Final Walkthrough", owner: "", responsibilities: "", notes: "" },
+  { order: 75, stage: "All Windows Open & Close", workflowType: "Construction Workflow", subWorkflowType: "Final Walkthrough", owner: "", responsibilities: "", notes: "" },
   { order: 60, stage: "Initial order ordered", workflowType: "Check List Workflow", subWorkflowType: "Ordering & Scope Checklist", owner: "", responsibilities: "", notes: "" },
   { order: 61, stage: "Tile ordered", workflowType: "Check List Workflow", subWorkflowType: "Ordering & Scope Checklist", owner: "", responsibilities: "", notes: "" },
   { order: 62, stage: "Flooring ordered", workflowType: "Check List Workflow", subWorkflowType: "Ordering & Scope Checklist", owner: "", responsibilities: "", notes: "" },
