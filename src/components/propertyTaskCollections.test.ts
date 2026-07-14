@@ -65,12 +65,12 @@ describe("getPrimaryTasksAcrossProperties", () => {
 describe("getConstructionWorkflowTasks", () => {
   it("returns only the construction-related workflow tasks in canonical order", () => {
     const tasks = [
-      buildTask({ id: "main", stage: "Make an offer", order: 1 }),
-      buildTask({ id: "construction-a", stage: "All items removed", order: 19 }),
+      buildTask({ id: "main", stage: "Make An Offer", order: 1 }),
+      buildTask({ id: "construction-a", stage: "All Items Removed", order: 19 }),
       buildTask({ id: "construction-b", stage: "Gutters Installed", order: 48 }),
-      buildTask({ id: "construction-c", stage: "garage doors open and shut", order: 59 }),
+      buildTask({ id: "construction-c", stage: "Garage Doors Open And Shut", order: 59 }),
       buildTask({ id: "construction-d", stage: "All Windows Open & Close", order: 75 }),
-      buildTask({ id: "checklist", stage: "Tile ordered", order: 61 }),
+      buildTask({ id: "checklist", stage: "Tile Ordered", order: 61 }),
     ];
 
     expect(getConstructionWorkflowTasks(tasks).map((task) => task.id)).toEqual([
@@ -83,9 +83,9 @@ describe("getConstructionWorkflowTasks", () => {
 
   it("excludes ordering/scope tasks from the construction workflow", () => {
     const tasks = [
-      buildTask({ id: "main", stage: "Make an offer", order: 1 }),
-      buildTask({ id: "demo", stage: "All items removed", order: 19 }),
-      buildTask({ id: "order-cabinets", stage: "Cabinets replaced", order: 68 }),
+      buildTask({ id: "main", stage: "Make An Offer", order: 1 }),
+      buildTask({ id: "demo", stage: "All Items Removed", order: 19 }),
+      buildTask({ id: "order-cabinets", stage: "Cabinets Replaced", order: 68 }),
     ];
 
     const grouped = getConstructionWorkflowTaskGroups(tasks);
@@ -97,18 +97,18 @@ describe("getConstructionWorkflowTasks", () => {
   it("groups tasks into independent sections so local 1-based numbering is correct per section", () => {
     const tasks = [
       // Demolition & Rough-In (orders 19-27, 9 tasks)
-      buildTask({ id: "demo-1", stage: "All items removed", order: 19 }),
-      buildTask({ id: "demo-2", stage: "all flooring out", order: 20 }),
-      buildTask({ id: "demo-3", stage: "bathrooms demo", order: 21 }),
-      buildTask({ id: "demo-4", stage: "Cabinets out", order: 22 }),
-      buildTask({ id: "demo-5", stage: "Walls taken out?", order: 23 }),
-      buildTask({ id: "demo-6", stage: "ROUGH IN", order: 24 }),
-      buildTask({ id: "demo-7", stage: "plumbers rough", order: 25 }),
-      buildTask({ id: "demo-8", stage: "Electricians rough", order: 26 }),
-      buildTask({ id: "demo-9", stage: "hvac rough", order: 27 }),
+      buildTask({ id: "demo-1", stage: "All Items Removed", order: 19 }),
+      buildTask({ id: "demo-2", stage: "All Flooring Out", order: 20 }),
+      buildTask({ id: "demo-3", stage: "Bathrooms Demo", order: 21 }),
+      buildTask({ id: "demo-4", stage: "Cabinets Out", order: 22 }),
+      buildTask({ id: "demo-5", stage: "Walls Taken Out?", order: 23 }),
+      buildTask({ id: "demo-6", stage: "Rough In", order: 24 }),
+      buildTask({ id: "demo-7", stage: "Plumbers Rough", order: 25 }),
+      buildTask({ id: "demo-8", stage: "Electricians Rough", order: 26 }),
+      buildTask({ id: "demo-9", stage: "HVAC Rough", order: 27 }),
       // Install & Finishes (orders 37-49, 13 tasks)
-      buildTask({ id: "install-1", stage: "interior painted", order: 37 }),
-      buildTask({ id: "install-2", stage: "exterior painted", order: 38 }),
+      buildTask({ id: "install-1", stage: "Interior Painted", order: 37 }),
+      buildTask({ id: "install-2", stage: "Exterior Painted", order: 38 }),
     ];
 
     const grouped = getConstructionWorkflowTaskGroups(tasks);
@@ -128,8 +128,8 @@ describe("getConstructionWorkflowTasks", () => {
 
   it("does not bleed tasks across section boundaries", () => {
     const tasks = [
-      buildTask({ id: "demo-last", stage: "hvac rough", order: 27 }),
-      buildTask({ id: "prep-first", stage: "Durarock bathrooms", order: 28 }),
+      buildTask({ id: "demo-last", stage: "HVAC Rough", order: 27 }),
+      buildTask({ id: "prep-first", stage: "Durarock Bathrooms", order: 28 }),
     ];
 
     const grouped = getConstructionWorkflowTaskGroups(tasks);
@@ -140,14 +140,28 @@ describe("getConstructionWorkflowTasks", () => {
     expect(demoSection!.tasks.map((t) => t.id)).toEqual(["demo-last"]);
     expect(prepSection!.tasks.map((t) => t.id)).toEqual(["prep-first"]);
   });
+
+  it('includes "All Windows Open & Close" in the Final Walkthrough section', () => {
+    const tasks = [
+      buildTask({ id: "fw-1", stage: "Appliances Working", order: 50 }),
+      buildTask({ id: "fw-last", stage: "All Windows Open & Close", order: 75 }),
+    ];
+
+    const grouped = getConstructionWorkflowTaskGroups(tasks);
+    const finalSection = grouped.constructionSections.find((s) => s.label === "Final Walkthrough");
+
+    expect(finalSection).toBeDefined();
+    expect(finalSection!.tasks.map((t) => t.id)).toEqual(["fw-1", "fw-last"]);
+    expect(finalSection!.tasks.map((t) => t.stage)).toContain("All Windows Open & Close");
+  });
 });
 
 describe("getChecklistWorkflowTasks", () => {
   it("returns checklist workflow items in canonical order including glass shower door", () => {
     const tasks = [
-      buildTask({ id: "main", stage: "Make an offer", order: 1 }),
-      buildTask({ id: "tile", stage: "Tile ordered", order: 61 }),
-      buildTask({ id: "glass-shower-door", stage: "glass shower door", order: 74 }),
+      buildTask({ id: "main", stage: "Make An Offer", order: 1 }),
+      buildTask({ id: "tile", stage: "Tile Ordered", order: 61 }),
+      buildTask({ id: "glass-shower-door", stage: "Glass Shower Door", order: 74 }),
     ];
 
     expect(getChecklistWorkflowTasks(tasks).map((task) => task.id)).toEqual([
@@ -160,8 +174,8 @@ describe("getChecklistWorkflowTasks", () => {
 describe("filterTasksForTeamTab", () => {
   it("excludes main workflow tasks", () => {
     const tasks = [
-      buildTask({ id: "main-1", stage: "Make an offer", order: 1 }),
-      buildTask({ id: "main-2", stage: "Staged", order: 11 }),
+      buildTask({ id: "main-1", stage: "Make An Offer", order: 1 }),
+      buildTask({ id: "main-2", stage: "Staging", order: 11 }),
     ];
 
     expect(filterTasksForTeamTab(tasks)).toHaveLength(0);
@@ -169,7 +183,7 @@ describe("filterTasksForTeamTab", () => {
 
   it("excludes construction workflow tasks", () => {
     const tasks = [
-      buildTask({ id: "construction-1", stage: "All items removed", order: 19 }),
+      buildTask({ id: "construction-1", stage: "All Items Removed", order: 19 }),
       buildTask({ id: "construction-2", stage: "Gutters Installed", order: 48 }),
     ];
 
@@ -178,7 +192,7 @@ describe("filterTasksForTeamTab", () => {
 
   it("includes checklist workflow tasks", () => {
     const tasks = [
-      buildTask({ id: "checklist-1", stage: "Tile ordered", order: 61 }),
+      buildTask({ id: "checklist-1", stage: "Tile Ordered", order: 61 }),
       buildTask({ id: "checklist-2", stage: "Appliances Ordered", order: 69 }),
     ];
 
@@ -216,9 +230,9 @@ describe("filterTasksForTeamTab", () => {
 
   it("excludes main and construction tasks while keeping checklist and team tasks", () => {
     const tasks = [
-      buildTask({ id: "main", stage: "Make an offer", order: 1 }),
-      buildTask({ id: "construction", stage: "All items removed", order: 19 }),
-      buildTask({ id: "checklist", stage: "Tile ordered", order: 61 }),
+      buildTask({ id: "main", stage: "Make An Offer", order: 1 }),
+      buildTask({ id: "construction", stage: "All Items Removed", order: 19 }),
+      buildTask({ id: "checklist", stage: "Tile Ordered", order: 61 }),
       buildTask({
         id: "team-task",
         propertyId: null,
@@ -247,9 +261,9 @@ describe("filterTasksForTeamTab", () => {
 describe("team member task derivation", () => {
   it("links checklist tasks to the correct employee using assigneeId or owner fallback", () => {
     const teamTasks = filterTasksForTeamTab(getPrimaryTasksAcrossProperties([
-      buildTask({ id: "checklist-kim", stage: "Tile ordered", order: 61, assigneeId: "", owner: "Kim" }),
+      buildTask({ id: "checklist-kim", stage: "Tile Ordered", order: 61, assigneeId: "", owner: "Kim" }),
       buildTask({ id: "checklist-lee", stage: "Appliances Ordered", order: 69, assigneeId: "Lee", owner: null }),
-      buildTask({ id: "construction", stage: "All items removed", order: 19, assigneeId: "Kim" }),
+      buildTask({ id: "construction", stage: "All Items Removed", order: 19, assigneeId: "Kim" }),
     ]));
 
     expect(getTasksForTeamMember(teamTasks, "Kim").map((task) => task.id)).toEqual(["checklist-kim"]);
@@ -258,7 +272,7 @@ describe("team member task derivation", () => {
 
   it("keeps manual team tasks alongside checklist tasks for the same employee", () => {
     const teamTasks = filterTasksForTeamTab(getPrimaryTasksAcrossProperties([
-      buildTask({ id: "checklist", stage: "Tile ordered", order: 61, assigneeId: "Kim" }),
+      buildTask({ id: "checklist", stage: "Tile Ordered", order: 61, assigneeId: "Kim" }),
       buildTask({
         id: "manual-team-task",
         propertyId: null,
@@ -269,7 +283,7 @@ describe("team member task derivation", () => {
         assigneeId: "Kim",
         owner: "Kim",
       }),
-      buildTask({ id: "main", stage: "Make an offer", order: 1, assigneeId: "Kim" }),
+      buildTask({ id: "main", stage: "Make An Offer", order: 1, assigneeId: "Kim" }),
     ]));
 
     expect(getTasksForTeamMember(teamTasks, "Kim").map((task) => task.id)).toEqual([

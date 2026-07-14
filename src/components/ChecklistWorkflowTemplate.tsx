@@ -5,6 +5,7 @@ import outputs from "../../amplify/amplify_outputs.json";
 import { getChecklistWorkflowTasks } from "./propertyTaskCollections";
 import { usePropertyTasks } from "../contexts/PropertyTasksContext";
 import type { ProjectRow } from "../types/project";
+import { toTitleCase } from "../utils/titleCase";
 
 interface Props {
   propertyId?: string | null;
@@ -182,7 +183,7 @@ function ChecklistWorkflowTemplate({ propertyId, propertyName, projectStage }: P
                 checked={!!task.isComplete}
                 disabled={updatingTaskIds.includes(task.id)}
                 style={{ marginTop: 2 }}
-                aria-label={`Mark ${task.stage ?? "task"} ${task.isComplete ? "incomplete" : "complete"} in checklist`}
+                aria-label={`Mark ${toTitleCase(task.stage ?? "task")} ${task.isComplete ? "incomplete" : "complete"} in checklist`}
                 onChange={(event) => {
                   void handleToggle(task, event.currentTarget.checked);
                 }}
@@ -197,7 +198,7 @@ function ChecklistWorkflowTemplate({ propertyId, propertyName, projectStage }: P
                     textDecoration: task.isComplete ? "line-through" : "none",
                   }}
                 >
-                  {task.stage}
+                  {toTitleCase(task.stage ?? "")}
                 </span>
                 {(task.responsibilities || task.notes) && (
                   <span style={{ display: "block", fontSize: 12, color: "#5a7060" }}>

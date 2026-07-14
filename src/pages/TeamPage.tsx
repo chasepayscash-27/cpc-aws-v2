@@ -7,6 +7,7 @@ import type { ProjectRow } from '../types/project';
 import { getPrimaryTasksAcrossProperties, filterTasksForTeamTab, getTasksForTeamMember } from '../components/propertyTaskCollections';
 import { usePropertyTasks } from '../contexts/PropertyTasksContext';
 import { buildTeamTaskCreatePayload } from './teamTaskCreatePayload';
+import { toTitleCase } from '../utils/titleCase';
 import '../App.css';
 
 interface TeamMember {
@@ -446,13 +447,13 @@ const TeamPage = () => {
                           type="checkbox"
                           checked={!!task.isComplete}
                           disabled={updatingTaskIds.includes(task.id)}
-                          aria-label={`Mark ${task.stage?.trim() || 'task'} ${task.isComplete ? 'incomplete' : 'complete'} for ${propertyLabel}`}
+                          aria-label={`Mark ${toTitleCase(task.stage?.trim() || 'task')} ${task.isComplete ? 'incomplete' : 'complete'} for ${propertyLabel}`}
                           onChange={(event) => {
                             void handleToggle(task, event.currentTarget.checked);
                           }}
                         />
                         <span className="teamTaskOrder">#{task.order ?? '—'}</span>
-                        <span className="teamTaskStage">{task.stage?.trim() || 'Unnamed task'}</span>
+                        <span className="teamTaskStage">{toTitleCase(task.stage?.trim() || 'Unnamed task')}</span>
                       </label>
                     ))}
                   </div>
