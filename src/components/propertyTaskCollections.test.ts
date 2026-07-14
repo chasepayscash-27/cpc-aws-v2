@@ -93,6 +93,53 @@ describe("getConstructionWorkflowTasks", () => {
     expect(grouped.allTasks.map((task) => task.id)).toEqual(["demo"]);
     expect(grouped.constructionSections.map((section) => section.label)).toEqual(["Demolition & Rough-In"]);
   });
+
+  it("groups tasks into independent sections so local 1-based numbering is correct per section", () => {
+    const tasks = [
+      // Demolition & Rough-In (orders 19-27, 9 tasks)
+      buildTask({ id: "demo-1", stage: "All items removed", order: 19 }),
+      buildTask({ id: "demo-2", stage: "all flooring out", order: 20 }),
+      buildTask({ id: "demo-3", stage: "bathrooms demo", order: 21 }),
+      buildTask({ id: "demo-4", stage: "Cabinets out", order: 22 }),
+      buildTask({ id: "demo-5", stage: "Walls taken out?", order: 23 }),
+      buildTask({ id: "demo-6", stage: "ROUGH IN", order: 24 }),
+      buildTask({ id: "demo-7", stage: "plumbers rough", order: 25 }),
+      buildTask({ id: "demo-8", stage: "Electricians rough", order: 26 }),
+      buildTask({ id: "demo-9", stage: "hvac rough", order: 27 }),
+      // Install & Finishes (orders 37-49, 13 tasks)
+      buildTask({ id: "install-1", stage: "interior painted", order: 37 }),
+      buildTask({ id: "install-2", stage: "exterior painted", order: 38 }),
+    ];
+
+    const grouped = getConstructionWorkflowTaskGroups(tasks);
+
+    const demoSection = grouped.constructionSections.find((s) => s.label === "Demolition & Rough-In");
+    expect(demoSection).toBeDefined();
+    expect(demoSection!.tasks).toHaveLength(9);
+    expect(demoSection!.tasks.map((t) => t.id)).toEqual([
+      "demo-1", "demo-2", "demo-3", "demo-4", "demo-5", "demo-6", "demo-7", "demo-8", "demo-9",
+    ]);
+
+    const installSection = grouped.constructionSections.find((s) => s.label === "Install & Finishes");
+    expect(installSection).toBeDefined();
+    expect(installSection!.tasks).toHaveLength(2);
+    expect(installSection!.tasks.map((t) => t.id)).toEqual(["install-1", "install-2"]);
+  });
+
+  it("does not bleed tasks across section boundaries", () => {
+    const tasks = [
+      buildTask({ id: "demo-last", stage: "hvac rough", order: 27 }),
+      buildTask({ id: "prep-first", stage: "Durarock bathrooms", order: 28 }),
+    ];
+
+    const grouped = getConstructionWorkflowTaskGroups(tasks);
+
+    const demoSection = grouped.constructionSections.find((s) => s.label === "Demolition & Rough-In");
+    const prepSection = grouped.constructionSections.find((s) => s.label === "Prep & Repairs");
+
+    expect(demoSection!.tasks.map((t) => t.id)).toEqual(["demo-last"]);
+    expect(prepSection!.tasks.map((t) => t.id)).toEqual(["prep-first"]);
+  });
 });
 
 describe("getChecklistWorkflowTasks", () => {

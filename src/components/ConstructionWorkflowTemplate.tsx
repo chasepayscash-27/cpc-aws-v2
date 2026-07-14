@@ -175,7 +175,7 @@ function ConstructionWorkflowTemplate({ propertyId, propertyName, projectStage }
                     <div style={{ width: `${sectionProgress.percent}%`, height: "100%", background: "#1a7a3c" }} />
                   </div>
                 </div>
-                {sectionVisibleTasks.map((task) => (
+                {sectionVisibleTasks.map((task, taskIndex) => (
                   <label
                     key={task.id}
                     style={{
@@ -210,13 +210,8 @@ function ConstructionWorkflowTemplate({ propertyId, propertyName, projectStage }
                           textDecoration: task.isComplete ? "line-through" : "none",
                         }}
                       >
-                        #{task.order ?? "—"} {task.stage}
+                        #{taskIndex + 1} {task.stage}
                       </span>
-                      {(task.responsibilities || task.notes) && (
-                        <span style={{ display: "block", fontSize: 12, color: "#5a7060" }}>
-                          {task.responsibilities?.trim() || task.notes?.trim()}
-                        </span>
-                      )}
                       {task.completedAt && (
                         <span style={{ display: "block", fontSize: 11, color: "#5a7060", marginTop: 2 }}>
                           Completed {new Date(task.completedAt).toLocaleString()}
