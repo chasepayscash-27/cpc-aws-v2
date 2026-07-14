@@ -7,6 +7,7 @@ import {
   getPipelineStatusLabel,
   PIPELINE_STATUS_COLORS,
 } from '../pipelineStatus';
+import { ACTIVE_STAGE_ORDER } from '../../components/PipelineTracker';
 
 describe('isArchivedStage', () => {
   it('returns true for "archived"', () => {
@@ -97,6 +98,14 @@ describe('getPipelineStatusColor – negotiation bucket', () => {
   it('maps legacy "planning_permitting" to under contract color', () => {
     expect(getPipelineStatusColor('planning_permitting')).toBe(PIPELINE_STATUS_COLORS.under_contract);
   });
+
+  it('maps "pending_sale" to under contract color', () => {
+    expect(getPipelineStatusColor('pending_sale')).toBe(PIPELINE_STATUS_COLORS.under_contract);
+  });
+
+  it('maps "Pending Sale" to under contract color', () => {
+    expect(getPipelineStatusColor('Pending Sale')).toBe(PIPELINE_STATUS_COLORS.under_contract);
+  });
 });
 
 describe('getPipelineStatusLabel', () => {
@@ -120,8 +129,31 @@ describe('getPipelineStatusLabel', () => {
     expect(getPipelineStatusLabel('planning_permitting')).toBe('Under Contract');
   });
 
+  it('returns "Under Contract" for "pending_sale"', () => {
+    expect(getPipelineStatusLabel('pending_sale')).toBe('Under Contract');
+  });
+
+  it('returns "Under Contract" for "Pending Sale"', () => {
+    expect(getPipelineStatusLabel('Pending Sale')).toBe('Under Contract');
+  });
+
   it('returns "Unknown" for empty input', () => {
     expect(getPipelineStatusLabel('')).toBe('Unknown');
     expect(getPipelineStatusLabel(null)).toBe('Unknown');
+  });
+});
+
+describe('ACTIVE_STAGE_ORDER – Home tab column ordering', () => {
+  it('places "under_contract" as the last (rightmost) column', () => {
+    expect(ACTIVE_STAGE_ORDER[ACTIVE_STAGE_ORDER.length - 1]).toBe('under_contract');
+  });
+
+  it('contains all expected pipeline stages', () => {
+    expect(ACTIVE_STAGE_ORDER).toContain('negotiation');
+    expect(ACTIVE_STAGE_ORDER).toContain('pending_purchase');
+    expect(ACTIVE_STAGE_ORDER).toContain('under_construction');
+    expect(ACTIVE_STAGE_ORDER).toContain('punch_list');
+    expect(ACTIVE_STAGE_ORDER).toContain('active_listing');
+    expect(ACTIVE_STAGE_ORDER).toContain('under_contract');
   });
 });
