@@ -2,15 +2,18 @@ import { defineBackend } from "@aws-amplify/backend";
 import { aiChat } from "./functions/ai-chat/resource";
 import { CorsHttpMethod, HttpApi, HttpMethod } from "aws-cdk-lib/aws-apigatewayv2";
 import { HttpLambdaIntegration } from "aws-cdk-lib/aws-apigatewayv2-integrations";
-import { Stack } from "aws-cdk-lib";
+import { Duration, Stack } from "aws-cdk-lib";
 import { PolicyStatement, Effect } from "aws-cdk-lib/aws-iam";
 import { Bucket, BucketEncryption, BlockPublicAccess } from "aws-cdk-lib/aws-s3";
 import { Function as LambdaFunction } from "aws-cdk-lib/aws-lambda";
+import { Rule, Schedule } from "aws-cdk-lib/aws-events";
+import { LambdaFunction as EventBridgeLambdaTarget } from "aws-cdk-lib/aws-events-targets";
 
 import { auth } from "./auth/resource";
 import { data } from "./data/resource";
 import { rdsQuery } from "./functions/rds-query/resource";
 import { worksheet } from "./functions/worksheet/resource";
+import { workflowAlertProcessor } from "./functions/workflow-alert-processor/resource";
 
 const backend = defineBackend({
   auth,
@@ -18,10 +21,51 @@ const backend = defineBackend({
   rdsQuery,
   aiChat,
   worksheet,
+  workflowAlertProcessor,
 });
 
 backend.auth.resources.cfnResources.cfnIdentityPool.allowUnauthenticatedIdentities = true;
 const region = Stack.of(backend.aiChat.resources.lambda).region;
+const workflowAlertProcessorLambda = backend.workflowAlertProcessor.resources.lambda as LambdaFunction;
+const workflowAlertEventTable = backend.data.resources.tables["WorkflowAlertEvent"];
+
+workflowAlertEventTable.grantReadWriteData(workflowAlertProcessorLambda);
+workflowAlertProcessorLambda.addToRolePolicy(
+  new PolicyStatement({
+    effect: Effect.ALLOW,
+    actions: ["ses:SendEmail", "ses:SendRawEmail", "sns:Publish"],
+    resources: ["*"],
+  }),
+);
+
+workflowAlertProcessorLambda.addEnvironment(
+  "WORKFLOW_ALERT_EVENT_TABLE_NAME",
+  workflowAlertEventTable.tableName,
+);
+workflowAlertProcessorLambda.addEnvironment(
+  "WORKFLOW_ALERT_FROM_EMAIL",
+  "alerts@chasepayscash.com",
+);
+workflowAlertProcessorLambda.addEnvironment(
+  "WORKFLOW_ALERT_BATCH_SIZE",
+  "25",
+);
+workflowAlertProcessorLambda.addEnvironment(
+  "WORKFLOW_ALERT_MAX_ATTEMPTS",
+  "3",
+);
+
+const workflowAlertRule = new Rule(
+  workflowAlertProcessorLambda.stack,
+  "WorkflowAlertProcessorSchedule",
+  {
+    schedule: Schedule.rate(Duration.minutes(1)),
+  },
+);
+
+workflowAlertRule.addTarget(
+  new EventBridgeLambdaTarget(workflowAlertProcessorLambda),
+);
 
 // ─────────────────────────────────────────────────────────────────────────────
 // BEDROCK PERMISSIONS

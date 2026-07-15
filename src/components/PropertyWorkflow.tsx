@@ -360,7 +360,7 @@ function PropertyWorkflow({ propertyId }: Props) {
             return;
           }
 
-          setAlertStatus(`Queued email + text alert to ${recipient.label} for "${task.stage}".`);
+          setAlertStatus(`Queued workflow alert to ${recipient.label} for "${task.stage}". Delivery will be attempted shortly.`);
         }
       }
     },
