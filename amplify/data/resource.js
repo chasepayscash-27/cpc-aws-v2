@@ -102,6 +102,10 @@ const schema = a.schema({
             recipientPhone: a.phone().required(),
             channels: a.string().required(),
             status: a.string().required(),
+            attemptCount: a.integer().default(0),
+            lastAttemptAt: a.datetime(),
+            sentAt: a.datetime(),
+            errorDetails: a.string(),
             triggeredAt: a.datetime().required(),
             triggeredBy: a.string(),
         })
