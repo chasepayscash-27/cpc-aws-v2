@@ -50,7 +50,7 @@ function shouldShowTask(
   if (normalizedStage.includes("roof")) {
     return hasScopeValue(worksheetFields.roof);
   }
-  if (normalizedStage.includes("windows")) {
+  if (normalizedStage === "windows replaced") {
     return hasScopeValue(worksheetFields.windows_update);
   }
   if (normalizedStage.includes("permit")) {
