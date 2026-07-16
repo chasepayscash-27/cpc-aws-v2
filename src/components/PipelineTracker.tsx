@@ -66,22 +66,20 @@ export default function PipelineTracker({ rows, onProjectClick }: PipelineTracke
     () => computeMainWorkflowProgressByProperty(allTasks),
     [allTasks],
   );
-
-  // Group active, non-archived projects by pipeline stage.
-  // Negotiation-bucket stages (lead, offer_made, etc.) are normalised to
-  // 'negotiation' so they surface correctly instead of being silently dropped.
-  const grouped: Record<string, ProjectRow[]> = {};
-  for (const stage of ACTIVE_STAGE_ORDER) {
-    grouped[stage] = [];
-  }
-  for (const row of rows) {
-    // Skip explicitly archived rows (archived_at populated OR stage === archived)
-    if (row.archived_at) continue;
-    const trackerStage = toTrackerStage(row.stage);
-    if (trackerStage) {
-      grouped[trackerStage].push(row);
+  const grouped = useMemo(() => {
+    const nextGrouped: Record<string, ProjectRow[]> = {};
+    for (const stage of ACTIVE_STAGE_ORDER) {
+      nextGrouped[stage] = [];
     }
-  }
+    for (const row of rows) {
+      if (row.archived_at) continue;
+      const trackerStage = toTrackerStage(row.stage);
+      if (trackerStage) {
+        nextGrouped[trackerStage].push(row);
+      }
+    }
+    return nextGrouped;
+  }, [rows]);
 
   return (
     <div
