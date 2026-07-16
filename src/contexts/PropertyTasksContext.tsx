@@ -1,11 +1,13 @@
-import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { generateClient } from 'aws-amplify/data';
 import type { Schema } from '../../amplify/data/resource';
 
 type PropertyTask = Schema['PropertyTask']['type'];
+type PropertyTasksByProperty = Record<string, PropertyTask[]>;
 
 interface PropertyTasksContextValue {
   allTasks: PropertyTask[];
+  tasksByProperty: PropertyTasksByProperty;
   isLoading: boolean;
   error: string;
   updateTaskCompletion: (
@@ -18,12 +20,26 @@ interface PropertyTasksContextValue {
 
 const PropertyTasksContext = createContext<PropertyTasksContextValue>({
   allTasks: [],
+  tasksByProperty: {},
   isLoading: true,
   error: '',
   updateTaskCompletion: async () => ({}),
 });
 
 const client = generateClient<Schema>();
+
+export function groupTasksByProperty(tasks: PropertyTask[]): PropertyTasksByProperty {
+  const grouped: PropertyTasksByProperty = {};
+
+  for (const task of tasks) {
+    const propertyId = task.propertyId?.trim();
+    if (!propertyId) continue;
+    grouped[propertyId] ??= [];
+    grouped[propertyId].push(task);
+  }
+
+  return grouped;
+}
 
 /**
  * Provides a single shared observeQuery subscription for ALL PropertyTasks.
@@ -36,6 +52,7 @@ export function PropertyTasksProvider({ children }: { children: ReactNode }) {
   const [allTasks, setAllTasks] = useState<PropertyTask[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
+  const tasksByProperty = useMemo(() => groupTasksByProperty(allTasks), [allTasks]);
 
   useEffect(() => {
     const subscription = client.models.PropertyTask.observeQuery().subscribe({
@@ -101,7 +118,7 @@ export function PropertyTasksProvider({ children }: { children: ReactNode }) {
   );
 
   return (
-    <PropertyTasksContext.Provider value={{ allTasks, isLoading, error, updateTaskCompletion }}>
+    <PropertyTasksContext.Provider value={{ allTasks, tasksByProperty, isLoading, error, updateTaskCompletion }}>
       {children}
     </PropertyTasksContext.Provider>
   );

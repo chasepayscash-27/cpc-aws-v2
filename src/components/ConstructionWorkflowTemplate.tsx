@@ -1,11 +1,11 @@
 import { memo, useCallback, useEffect, useMemo, useState, type CSSProperties } from "react";
 import { getCurrentUser } from "aws-amplify/auth";
 import type { Schema } from "../../amplify/data/resource";
-import outputs from "../../amplify/amplify_outputs.json";
 import { getConstructionWorkflowTaskGroups } from "./propertyTaskCollections";
 import { usePropertyTasks } from "../contexts/PropertyTasksContext";
 import type { ProjectRow } from "../types/project";
 import { toTitleCase } from "../utils/titleCase";
+import { usePropertyWorksheetFields } from "../utils/propertyWorksheetFields";
 
 interface Props {
   propertyId?: string | null;
@@ -21,12 +21,6 @@ const cardStyle: CSSProperties = {
   padding: "14px 16px",
   background: "#f0f7f1",
 };
-
-const HTTP_API_URL =
-  (outputs as { custom?: { cpcHttpApi?: { url?: string } } })?.custom?.cpcHttpApi?.url ?? "";
-const WORKSHEET_ENDPOINT = HTTP_API_URL
-  ? `${HTTP_API_URL.replace(/\/?$/, "/")}worksheet`
-  : "";
 
 const negativeWorksheetValues = new Set(["no", "none", "n/a", "na", "false", "0"]);
 
@@ -63,12 +57,12 @@ function getProgress(tasks: PropertyTask[]): { done: number; total: number; perc
 }
 
 function ConstructionWorkflowTemplate({ propertyId, propertyName, projectStage }: Props) {
-  const { allTasks, isLoading: contextLoading, error: contextError, updateTaskCompletion } = usePropertyTasks();
+  const { tasksByProperty, isLoading: contextLoading, error: contextError, updateTaskCompletion } = usePropertyTasks();
   const [toggleError, setToggleError] = useState("");
   const [notes, setNotes] = useState("");
   const [completedByUser, setCompletedByUser] = useState<string | null>(null);
   const [updatingTaskIds, setUpdatingTaskIds] = useState<string[]>([]);
-  const [worksheetFields, setWorksheetFields] = useState<Record<string, string>>({});
+  const worksheetFields = usePropertyWorksheetFields(propertyId);
 
   const error = toggleError || contextError;
 
@@ -81,36 +75,37 @@ function ConstructionWorkflowTemplate({ propertyId, propertyName, projectStage }
       .catch(() => setCompletedByUser(null));
   }, []);
 
-  useEffect(() => {
-    if (!propertyId || !WORKSHEET_ENDPOINT) {
-      return;
-    }
-
-    fetch(`${WORKSHEET_ENDPOINT}?projectId=${encodeURIComponent(propertyId)}`)
-      .then((response) => response.json())
-      .then((data: { fields?: Record<string, string> }) => {
-        setWorksheetFields(data.fields ?? {});
-      })
-      .catch(() => {
-        setWorksheetFields({});
-      });
-  }, [propertyId]);
-
   const loading = !!propertyId && contextLoading;
+  const propertyTasks = useMemo(
+    () => (propertyId ? (tasksByProperty[propertyId] ?? []) : []),
+    [propertyId, tasksByProperty],
+  );
 
   const constructionTaskGroups = useMemo(() => {
-    if (!propertyId) {
-      return { constructionTasks: [], constructionSections: [], allTasks: [] };
-    }
-    const propertyTasks = allTasks.filter((t) => t.propertyId === propertyId);
     return getConstructionWorkflowTaskGroups(propertyTasks);
-  }, [allTasks, propertyId]);
+  }, [propertyTasks]);
 
   const visibleTasks = useMemo(
     () => constructionTaskGroups.constructionTasks.filter((task) => shouldShowTask(task.stage, worksheetFields, projectStage)),
     [constructionTaskGroups, worksheetFields, projectStage]
   );
   const overallProgress = useMemo(() => getProgress(visibleTasks), [visibleTasks]);
+  const visibleSections = useMemo(
+    () =>
+      constructionTaskGroups.constructionSections
+        .map((section) => {
+          const tasks = section.tasks.filter((task) =>
+            shouldShowTask(task.stage, worksheetFields, projectStage),
+          );
+          return {
+            ...section,
+            tasks,
+            progress: getProgress(tasks),
+          };
+        })
+        .filter((section) => section.tasks.length > 0),
+    [constructionTaskGroups, projectStage, worksheetFields],
+  );
 
   const handleToggle = useCallback(
     async (task: PropertyTask, checked: boolean) => {
@@ -161,10 +156,9 @@ function ConstructionWorkflowTemplate({ propertyId, propertyName, projectStage }
 
       {!loading && !error && visibleTasks.length > 0 && (
         <div style={{ display: "grid", gap: 12 }}>
-          {constructionTaskGroups.constructionSections.map((section) => {
-            const sectionVisibleTasks = section.tasks.filter((task) => shouldShowTask(task.stage, worksheetFields, projectStage));
-            if (sectionVisibleTasks.length === 0) return null;
-            const sectionProgress = getProgress(sectionVisibleTasks);
+          {visibleSections.map((section) => {
+            const sectionVisibleTasks = section.tasks;
+            const sectionProgress = section.progress;
             return (
               <section key={section.id} style={{ display: "grid", gap: 8 }}>
                 <div style={{ display: "grid", gap: 4 }}>

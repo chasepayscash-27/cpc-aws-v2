@@ -1,11 +1,11 @@
 import { memo, useCallback, useEffect, useMemo, useState, type CSSProperties } from "react";
 import { getCurrentUser } from "aws-amplify/auth";
 import type { Schema } from "../../amplify/data/resource";
-import outputs from "../../amplify/amplify_outputs.json";
 import { getChecklistWorkflowTasks } from "./propertyTaskCollections";
 import { usePropertyTasks } from "../contexts/PropertyTasksContext";
 import type { ProjectRow } from "../types/project";
 import { toTitleCase } from "../utils/titleCase";
+import { usePropertyWorksheetFields } from "../utils/propertyWorksheetFields";
 
 interface Props {
   propertyId?: string | null;
@@ -21,12 +21,6 @@ const cardStyle: CSSProperties = {
   padding: "14px 16px",
   background: "#f0f7f1",
 };
-
-const HTTP_API_URL =
-  (outputs as { custom?: { cpcHttpApi?: { url?: string } } })?.custom?.cpcHttpApi?.url ?? "";
-const WORKSHEET_ENDPOINT = HTTP_API_URL
-  ? `${HTTP_API_URL.replace(/\/?$/, "/")}worksheet`
-  : "";
 
 const negativeWorksheetValues = new Set(["no", "none", "n/a", "na", "false", "0"]);
 
@@ -67,11 +61,11 @@ function getProgress(tasks: PropertyTask[]): { done: number; total: number; perc
 }
 
 function ChecklistWorkflowTemplate({ propertyId, propertyName, projectStage }: Props) {
-  const { allTasks, isLoading: contextLoading, error: contextError, updateTaskCompletion } = usePropertyTasks();
+  const { tasksByProperty, isLoading: contextLoading, error: contextError, updateTaskCompletion } = usePropertyTasks();
   const [toggleError, setToggleError] = useState("");
   const [completedByUser, setCompletedByUser] = useState<string | null>(null);
   const [updatingTaskIds, setUpdatingTaskIds] = useState<string[]>([]);
-  const [worksheetFields, setWorksheetFields] = useState<Record<string, string>>({});
+  const worksheetFields = usePropertyWorksheetFields(propertyId);
 
   const error = toggleError || contextError;
 
@@ -84,28 +78,15 @@ function ChecklistWorkflowTemplate({ propertyId, propertyName, projectStage }: P
       .catch(() => setCompletedByUser(null));
   }, []);
 
-  useEffect(() => {
-    if (!propertyId || !WORKSHEET_ENDPOINT) {
-      return;
-    }
-
-    fetch(`${WORKSHEET_ENDPOINT}?projectId=${encodeURIComponent(propertyId)}`)
-      .then((response) => response.json())
-      .then((data: { fields?: Record<string, string> }) => {
-        setWorksheetFields(data.fields ?? {});
-      })
-      .catch(() => {
-        setWorksheetFields({});
-      });
-  }, [propertyId]);
-
   const loading = !!propertyId && contextLoading;
+  const propertyTasks = useMemo(
+    () => (propertyId ? (tasksByProperty[propertyId] ?? []) : []),
+    [propertyId, tasksByProperty],
+  );
 
   const checklistTasks = useMemo(() => {
-    if (!propertyId) return [];
-    const propertyTasks = allTasks.filter((t) => t.propertyId === propertyId);
     return getChecklistWorkflowTasks(propertyTasks);
-  }, [allTasks, propertyId]);
+  }, [propertyTasks]);
 
   const visibleTasks = useMemo(
     () => checklistTasks.filter((task) => shouldShowTask(task.stage, worksheetFields, projectStage)),

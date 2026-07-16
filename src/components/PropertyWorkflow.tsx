@@ -35,7 +35,7 @@ function sortTasks(tasks: PropertyTask[]): PropertyTask[] {
 }
 
 function PropertyWorkflow({ propertyId }: Props) {
-  const { allTasks, error: tasksContextError, isLoading: tasksContextLoading, updateTaskCompletion } = usePropertyTasks();
+  const { tasksByProperty, error: tasksContextError, isLoading: tasksContextLoading, updateTaskCompletion } = usePropertyTasks();
   const [tasks, setTasks] = useState<PropertyTask[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -50,12 +50,13 @@ function PropertyWorkflow({ propertyId }: Props) {
   const seedingRef = useRef(false);
   const reconcileAttemptedRef = useRef(false);
   const seedAlertPreferenceAttemptedRef = useRef(false);
+  const propertyTasks = useMemo(
+    () => (propertyId ? (tasksByProperty[propertyId] ?? []) : []),
+    [propertyId, tasksByProperty],
+  );
   const contextTasksForProperty = useMemo(
-    () =>
-      sortTasks(
-        allTasks.filter((task) => task.propertyId === propertyId),
-      ),
-    [allTasks, propertyId],
+    () => sortTasks(propertyTasks),
+    [propertyTasks],
   );
 
   const seedPropertyTasks = useCallback(async () => {
