@@ -1,6 +1,7 @@
 import { CSSProperties, useState } from "react";
 import type { ProjectRow } from "../types/project";
 import ProjectDetailsModal from "./ProjectDetailsModal";
+import PropertyMainImage from "./PropertyMainImage";
 
 interface Props {
   rows: ProjectRow[];
@@ -95,36 +96,33 @@ export default function ProjectsTable({ rows, onViewFullPnL }: Props) {
               }
             >
               <td style={tdStyle}>
-                {row.featured_image_url ? (
-                  <img
-                    src={row.featured_image_url}
-                    alt={row.name ?? "project"}
-                    style={{
-                      width: 56,
-                      height: 56,
-                      objectFit: "cover",
-                      borderRadius: 10,
-                      display: "block",
-                    }}
-                    onError={(e) => {
-                      (e.currentTarget as HTMLImageElement).style.display = "none";
-                    }}
-                  />
-                ) : (
-                  <div
-                    style={{
-                      width: 56,
-                      height: 56,
-                      borderRadius: 10,
-                      background: "rgba(26,122,60,0.08)",
-                      display: "grid",
-                      placeItems: "center",
-                      fontSize: 20,
-                    }}
-                  >
-                    🏠
-                  </div>
-                )}
+                <PropertyMainImage
+                  key={row.featured_image_url ?? "table-placeholder"}
+                  imageUrl={row.featured_image_url}
+                  alt={row.name ?? "project"}
+                  style={{
+                    width: 56,
+                    height: 56,
+                    objectFit: "cover",
+                    borderRadius: 10,
+                    display: "block",
+                  }}
+                  placeholder={
+                    <div
+                      style={{
+                        width: 56,
+                        height: 56,
+                        borderRadius: 10,
+                        background: "rgba(26,122,60,0.08)",
+                        display: "grid",
+                        placeItems: "center",
+                        fontSize: 20,
+                      }}
+                    >
+                      🏠
+                    </div>
+                  }
+                />
               </td>
               <td style={{ ...tdStyle, fontWeight: 600 }}>{row.name ?? "—"}</td>
               <td style={tdStyle}>

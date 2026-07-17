@@ -1,6 +1,7 @@
 import type { CSSProperties } from "react";
 import type { ProjectRow } from "../types/project";
 import { getPipelineStatusLabel } from "../utils/pipelineStatus";
+import PropertyMainImage from "./PropertyMainImage";
 
 interface Props {
   project: ProjectRow;
@@ -36,18 +37,13 @@ export default function PropertyMapPopup({ project, statusColor, onViewDetails }
   return (
     <div className="propertyMapPopup">
       <div className="propertyMapPopupImageWrap">
-        {project.featured_image_url ? (
-          <img
-            src={project.featured_image_url}
-            alt={project.name ?? "Property image"}
-            className="propertyMapPopupImage"
-            onError={(e) => {
-              (e.currentTarget as HTMLImageElement).style.display = "none";
-            }}
-          />
-        ) : (
-          <div className="propertyMapPopupPlaceholder">🏠</div>
-        )}
+        <PropertyMainImage
+          key={project.featured_image_url ?? "map-popup-placeholder"}
+          imageUrl={project.featured_image_url}
+          alt={project.name ?? "Property image"}
+          className="propertyMapPopupImage"
+          placeholder={<div className="propertyMapPopupPlaceholder">🏠</div>}
+        />
       </div>
 
       <div className="propertyMapPopupBody">
