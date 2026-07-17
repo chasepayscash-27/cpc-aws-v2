@@ -1,3 +1,4 @@
+import './ActiveListingPage.css';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { generateClient } from 'aws-amplify/data';
 import { loadCsv } from '../utils/csv';
@@ -12,7 +13,8 @@ type ActiveListingNote = Schema['ActiveListingNote']['type'];
 
 const client = generateClient<Schema>();
 
-const ACCENT_COLOR = '#ec4899'; // matches active_listing in pipelineStatus
+type SortField = 'name' | 'city' | 'type' | 'beds';
+type SortDir = 'asc' | 'desc';
 
 function formatDateTime(isoString: string | null | undefined): string {
   if (!isoString) return '';
@@ -26,12 +28,23 @@ function formatDateTime(isoString: string | null | undefined): string {
   });
 }
 
+function toSortKey(row: ProjectRow, field: SortField): string {
+  switch (field) {
+    case 'city': return (row.city ?? '').toLowerCase();
+    case 'type': return (row.type ?? '').toLowerCase();
+    case 'beds': return String(Number(row.beds) || 0).padStart(3, '0');
+    default: return getActiveListingPropertyLabel(row).toLowerCase();
+  }
+}
+
 export default function ActiveListingPage() {
   // ─── Properties ───────────────────────────────────────────────────────────────
   const [rows, setRows] = useState<ProjectRow[]>([]);
   const [propsLoading, setPropsLoading] = useState(true);
   const [propsError, setPropsError] = useState('');
   const [search, setSearch] = useState('');
+  const [sortField, setSortField] = useState<SortField>('name');
+  const [sortDir, setSortDir] = useState<SortDir>('asc');
 
   useEffect(() => {
     loadCsv<ProjectRow>('/data/projects_v2.csv')
@@ -52,14 +65,21 @@ export default function ActiveListingPage() {
 
   const filteredRows = useMemo(() => {
     const term = search.toLowerCase();
-    if (!term) return rows;
-    return rows.filter(
-      (r) =>
-        (r.name ?? '').toLowerCase().includes(term) ||
-        (r.full_address ?? '').toLowerCase().includes(term) ||
-        (r.city ?? '').toLowerCase().includes(term),
-    );
-  }, [rows, search]);
+    const filtered = term
+      ? rows.filter(
+          (r) =>
+            (r.name ?? '').toLowerCase().includes(term) ||
+            (r.full_address ?? '').toLowerCase().includes(term) ||
+            (r.city ?? '').toLowerCase().includes(term),
+        )
+      : rows;
+    return [...filtered].sort((a, b) => {
+      const ka = toSortKey(a, sortField);
+      const kb = toSortKey(b, sortField);
+      const cmp = ka.localeCompare(kb);
+      return sortDir === 'asc' ? cmp : -cmp;
+    });
+  }, [rows, search, sortField, sortDir]);
 
   // ─── Notes ────────────────────────────────────────────────────────────────────
   const [notes, setNotes] = useState<ActiveListingNote[]>([]);
@@ -70,6 +90,7 @@ export default function ActiveListingPage() {
   const [sendError, setSendError] = useState('');
   const [selectedPropertyKey, setSelectedPropertyKey] = useState('');
   const notesBottomRef = useRef<HTMLDivElement>(null);
+  const notesPanelRef = useRef<HTMLElement>(null);
 
   const selectedProperty = useMemo(
     () =>
@@ -124,6 +145,12 @@ export default function ActiveListingPage() {
   useEffect(() => {
     setNoteInput('');
     setSendError('');
+    if (selectedPropertyKey) {
+      // Scroll notes panel into view on mobile after card selection
+      setTimeout(() => {
+        notesPanelRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }, 80);
+    }
   }, [selectedPropertyKey]);
 
   async function submitNote(e: React.FormEvent) {
@@ -156,331 +183,311 @@ export default function ActiveListingPage() {
     }
   }
 
-  // ─── Styles ───────────────────────────────────────────────────────────────────
-  const inputStyle: React.CSSProperties = {
-    padding: '7px 12px',
-    borderRadius: 10,
-    border: '1px solid rgba(236,72,153,0.20)',
-    fontSize: 13,
-    color: '#1a2e1a',
-    background: '#fdf2f8',
-    outline: 'none',
-    minWidth: 0,
-  };
+  function handleCardSelect(key: string) {
+    setSelectedPropertyKey((prev) => (prev === key ? '' : key));
+  }
+
+  function toggleSortDir() {
+    setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'));
+  }
 
   return (
     <>
+      {/* ── Page Header ─────────────────────────────────────────────────────── */}
       <div className="pageHeader">
-        <h1 className="h1">Active Listing</h1>
+        <h1 className="h1">Active Listings</h1>
         <p className="muted">
-          Properties currently listed for sale — {propsLoading ? '…' : rows.length} active{' '}
-          {rows.length === 1 ? 'property' : 'properties'}.
+          Properties currently listed for sale
+          {!propsLoading && ` — ${rows.length} active ${rows.length === 1 ? 'property' : 'properties'}`}
+          {propsLoading && ' — loading…'}
         </p>
       </div>
 
-      {/* ── Properties List ───────────────────────────────────────────────────── */}
-      <section style={{ marginBottom: 20 }}>
-        <div
-          style={{
-            display: 'flex',
-            gap: 8,
-            marginBottom: 12,
-            flexWrap: 'wrap',
-            alignItems: 'center',
-          }}
-        >
+      {/* ── Toolbar: Search + Sort ───────────────────────────────────────────── */}
+      <div className="alToolbar" role="search">
+        <div className="alSearchWrap">
+          <span className="alSearchIcon" aria-hidden="true">🔍</span>
           <input
-            type="text"
-            placeholder="Search properties…"
+            type="search"
+            className="alSearchInput"
+            placeholder="Search by address, city…"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            style={{ ...inputStyle, flex: '1 1 200px', background: '#f0f7f1', border: '1px solid rgba(26,122,60,0.15)' }}
+            aria-label="Search active listings"
           />
-          {!propsLoading && !propsError && rows.length > 0 && (
-            <span style={{ fontSize: 12, color: '#5a7060', marginLeft: 'auto' }}>
-              {filteredRows.length !== rows.length
-                ? `${filteredRows.length} of ${rows.length} properties`
-                : `${rows.length} properties`}
-            </span>
-          )}
         </div>
 
-        <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
-          {propsLoading && (
-            <div style={{ padding: 32, textAlign: 'center', color: '#5a7060' }}>
-              Loading active listings…
-            </div>
-          )}
-          {propsError && (
-            <div style={{ padding: 32, textAlign: 'center', color: 'rgba(239,68,68,0.85)' }}>
-              Error: {propsError}
-            </div>
-          )}
-          {!propsLoading && !propsError && rows.length === 0 && (
-            <div style={{ padding: 32, textAlign: 'center', color: '#5a7060' }}>
-              No active listing properties found.
-            </div>
-          )}
-          {!propsLoading && !propsError && rows.length > 0 && filteredRows.length === 0 && (
-            <div style={{ padding: 32, textAlign: 'center', color: '#5a7060' }}>
-              No properties match the search.
-            </div>
-          )}
-          {!propsLoading && !propsError && filteredRows.length > 0 && (
-            <div style={{ overflowX: 'auto' }}>
-              <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                <thead>
-                  <tr style={{ borderBottom: '1px solid var(--border)' }}>
-                    {['Property', 'City / State', 'Type', 'Beds', 'Baths', 'Sq Ft', 'Year Built'].map(
-                      (h) => (
-                        <th
-                          key={h}
-                          style={{
-                            textAlign: ['Beds', 'Baths', 'Sq Ft', 'Year Built'].includes(h)
-                              ? 'right'
-                              : 'left',
-                            padding: '10px 12px',
-                            color: ACCENT_COLOR,
-                            fontWeight: 600,
-                            fontSize: 12,
-                            letterSpacing: '0.03em',
-                            whiteSpace: 'nowrap',
-                          }}
-                        >
-                          {h}
-                        </th>
-                      ),
+        <div className="alSortWrap">
+          <span className="alSortLabel">Sort:</span>
+          <select
+            className="alSortSelect"
+            value={sortField}
+            onChange={(e) => setSortField(e.target.value as SortField)}
+            aria-label="Sort field"
+          >
+            <option value="name">Address</option>
+            <option value="city">City</option>
+            <option value="type">Type</option>
+            <option value="beds">Beds</option>
+          </select>
+          <button
+            type="button"
+            className="alSortDirBtn"
+            onClick={toggleSortDir}
+            aria-label={sortDir === 'asc' ? 'Sort ascending — click for descending' : 'Sort descending — click for ascending'}
+            title={sortDir === 'asc' ? 'Ascending' : 'Descending'}
+          >
+            {sortDir === 'asc' ? '↑' : '↓'}
+          </button>
+        </div>
+
+        {!propsLoading && !propsError && rows.length > 0 && (
+          <span className="alCount" aria-live="polite">
+            {filteredRows.length !== rows.length
+              ? `${filteredRows.length} of ${rows.length}`
+              : `${rows.length} ${rows.length === 1 ? 'property' : 'properties'}`}
+          </span>
+        )}
+      </div>
+
+      {/* ── Card Grid ───────────────────────────────────────────────────────── */}
+      <section aria-label="Active listing properties" style={{ marginBottom: 24 }}>
+        {propsLoading && (
+          <div className="alStateBox">
+            <div className="alStateIcon">🏠</div>
+            <p className="alStateTitle">Loading listings…</p>
+            <p className="alStateDesc">Fetching your active properties.</p>
+          </div>
+        )}
+
+        {propsError && (
+          <div className="alStateBox">
+            <div className="alStateIcon">⚠️</div>
+            <p className="alStateTitle">Could not load listings</p>
+            <p className="alStateDesc">{propsError}</p>
+          </div>
+        )}
+
+        {!propsLoading && !propsError && rows.length === 0 && (
+          <div className="alStateBox">
+            <div className="alStateIcon">🏡</div>
+            <p className="alStateTitle">No active listings</p>
+            <p className="alStateDesc">There are currently no properties at the Active Listing stage.</p>
+          </div>
+        )}
+
+        {!propsLoading && !propsError && rows.length > 0 && filteredRows.length === 0 && (
+          <div className="alStateBox">
+            <div className="alStateIcon">🔍</div>
+            <p className="alStateTitle">No results found</p>
+            <p className="alStateDesc">Try a different search term.</p>
+          </div>
+        )}
+
+        {!propsLoading && !propsError && filteredRows.length > 0 && (
+          <div className="alGrid">
+            {filteredRows.map((row, idx) => {
+              const propertyKey = getActiveListingPropertyKey(row, idx);
+              const propertyLabel = getActiveListingPropertyLabel(row);
+              const isSelected = propertyKey === selectedPropertyKey;
+              const location = [row.city, row.state].filter(Boolean).join(', ');
+              const sqFt = row.square_feet && !isNaN(Number(row.square_feet))
+                ? Number(row.square_feet).toLocaleString()
+                : '—';
+
+              return (
+                <article
+                  key={propertyKey}
+                  className={`alCard${isSelected ? ' selected' : ''}`}
+                  onClick={() => handleCardSelect(propertyKey)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      handleCardSelect(propertyKey);
+                    }
+                  }}
+                  tabIndex={0}
+                  role="button"
+                  aria-pressed={isSelected}
+                  aria-label={`${propertyLabel}${location ? `, ${location}` : ''} — click to ${isSelected ? 'deselect and close notes' : 'select and view notes'}`}
+                >
+                  {/* Image / Placeholder */}
+                  <div className="alCardImg">
+                    {row.featured_image_url ? (
+                      <img
+                        src={row.featured_image_url}
+                        alt={propertyLabel}
+                        className="alCardImgEl"
+                        onError={(e) => {
+                          (e.currentTarget as HTMLImageElement).style.display = 'none';
+                        }}
+                      />
+                    ) : (
+                      <div className="alCardImgPlaceholder" aria-hidden="true">🏠</div>
                     )}
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredRows.map((row, idx) => {
-                    const propertyKey = getActiveListingPropertyKey(row, idx);
-                    const propertyLabel = getActiveListingPropertyLabel(row);
-                    const isSelected = propertyKey === selectedPropertyKey;
 
-                    return (
-                      <tr
-                        key={propertyKey}
-                        onClick={() => setSelectedPropertyKey(propertyKey)}
-                        onKeyDown={(e) => {
-                          if (e.key === 'Enter' || e.key === ' ') {
-                            e.preventDefault();
-                            setSelectedPropertyKey(propertyKey);
-                          }
-                        }}
-                        tabIndex={0}
-                        aria-selected={isSelected}
-                        style={{
-                          borderBottom: '1px solid #fce7f3',
-                          background: isSelected ? '#fdf2f8' : undefined,
-                          cursor: 'pointer',
-                          outline: 'none',
-                        }}
-                      >
-                        <td style={{ padding: '10px 12px', fontWeight: 500, fontSize: 14 }}>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
-                            <span>{propertyLabel}</span>
-                            {isSelected && (
-                              <span
-                                style={{
-                                  fontSize: 11,
-                                  color: '#be185d',
-                                  background: 'rgba(236,72,153,0.10)',
-                                  borderRadius: 999,
-                                  padding: '2px 8px',
-                                }}
-                              >
-                                Selected
-                              </span>
-                            )}
-                          </div>
-                        </td>
-                        <td style={{ padding: '10px 12px', color: 'var(--muted)', fontSize: 13 }}>
-                          {row.city ?? '—'}
-                          {row.state ? `, ${row.state}` : ''}
-                        </td>
-                        <td style={{ padding: '10px 12px', fontSize: 13 }}>{row.type ?? '—'}</td>
-                        <td style={{ padding: '10px 12px', textAlign: 'right', fontSize: 13 }}>
-                          {row.beds ?? '—'}
-                        </td>
-                        <td style={{ padding: '10px 12px', textAlign: 'right', fontSize: 13 }}>
-                          {row.baths ?? '—'}
-                        </td>
-                        <td style={{ padding: '10px 12px', textAlign: 'right', fontSize: 13 }}>
-                          {row.square_feet ? Number(row.square_feet).toLocaleString() : '—'}
-                        </td>
-                        <td style={{ padding: '10px 12px', textAlign: 'right', fontSize: 13 }}>
-                          {row.year_built ?? '—'}
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </div>
+                    {/* Active Listing badge */}
+                    <span className="alStatusBadge">
+                      <span className="alStatusDot" aria-hidden="true" />
+                      Active Listing
+                    </span>
+
+                    {/* Selected indicator */}
+                    {isSelected && (
+                      <span className="alSelectedBadge" aria-hidden="true">✓ Selected</span>
+                    )}
+                  </div>
+
+                  {/* Card Body */}
+                  <div className="alCardBody">
+                    <h3 className="alCardName" title={propertyLabel}>{propertyLabel}</h3>
+
+                    {location && (
+                      <div className="alCardLocation">
+                        <span className="alCardLocationIcon" aria-hidden="true">📍</span>
+                        {location}
+                      </div>
+                    )}
+
+                    {/* Type / strategy chips */}
+                    {(row.type || row.investment_strategy) && (
+                      <div className="alCardBadges">
+                        {row.type && (
+                          <span className="alTypeBadge">{row.type}</span>
+                        )}
+                        {row.investment_strategy && (
+                          <span className="alStrategyBadge">
+                            {row.investment_strategy.replace(/_/g, ' ')}
+                          </span>
+                        )}
+                      </div>
+                    )}
+
+                    {/* Stats */}
+                    <div className="alCardStats">
+                      <div className="alCardStat">
+                        <span className="alCardStatLabel">Beds</span>
+                        <span className="alCardStatValue">{row.beds ?? '—'}</span>
+                      </div>
+                      <div className="alCardStat">
+                        <span className="alCardStatLabel">Baths</span>
+                        <span className="alCardStatValue">{row.baths ?? '—'}</span>
+                      </div>
+                      <div className="alCardStat">
+                        <span className="alCardStatLabel">Sq Ft</span>
+                        <span className="alCardStatValue">{sqFt}</span>
+                      </div>
+                      <div className="alCardStat">
+                        <span className="alCardStatLabel">Built</span>
+                        <span className="alCardStatValue">{row.year_built ?? '—'}</span>
+                      </div>
+                    </div>
+
+                    {/* CTA */}
+                    <button
+                      type="button"
+                      className="alViewNotesBtn"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleCardSelect(propertyKey);
+                      }}
+                      aria-expanded={isSelected}
+                      tabIndex={-1}
+                    >
+                      {isSelected ? '✕ Close Notes' : '📝 View Notes'}
+                    </button>
+                  </div>
+                </article>
+              );
+            })}
+          </div>
+        )}
       </section>
 
-      {/* ── Notes Section ─────────────────────────────────────────────────────── */}
-      <section>
-        <h2
-          style={{
-            fontSize: 14,
-            fontWeight: 700,
-            color: ACCENT_COLOR,
-            marginBottom: 10,
-            letterSpacing: '0.04em',
-            textTransform: 'uppercase',
-          }}
-        >
-          Notes
-        </h2>
-
-        <p className="muted" style={{ fontSize: 13, margin: '0 0 10px' }}>
+      {/* ── Notes Panel ─────────────────────────────────────────────────────── */}
+      <section ref={notesPanelRef} aria-label="Property notes">
+        <div className="alNotesLabel">
+          <span className="alNotesLabelText">📝 Notes</span>
+        </div>
+        <p className="alNotesLabelHint muted">
           {selectedPropertyLabel
-            ? `Viewing and editing notes for ${selectedPropertyLabel}.`
-            : 'Select a property from the table above to view or add notes.'}
+            ? `Showing notes for ${selectedPropertyLabel}.`
+            : 'Select a listing card above to view or add notes.'}
         </p>
 
-        <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
+        <div className="alNotesPanel">
           {!selectedPropertyLabel ? (
-            <div style={{ padding: '20px 16px', color: '#5a7060', fontSize: 14 }}>
-              Choose an active listing property to open its notes.
+            <div className="alNotesPrompt">
+              <div className="alNotesPromptIcon" aria-hidden="true">🏠</div>
+              <p className="alNotesPromptText">
+                Click a property card above to open its notes.
+              </p>
             </div>
           ) : (
             <>
-              <div
-                style={{
-                  padding: '12px 16px',
-                  borderBottom: '1px solid rgba(236,72,153,0.12)',
-                  background: 'rgba(236,72,153,0.05)',
-                }}
-              >
-                <div style={{ fontSize: 15, fontWeight: 700, color: '#831843' }}>{selectedPropertyLabel}</div>
-                {selectedProperty && (selectedProperty.city || selectedProperty.state) && (
-                  <div style={{ marginTop: 4, fontSize: 12, color: '#9d174d' }}>
-                    {[selectedProperty.city, selectedProperty.state].filter(Boolean).join(', ')}
-                  </div>
-                )}
+              {/* Panel header */}
+              <div className="alNotesPanelHeader">
+                <div className="alNotesPanelIcon" aria-hidden="true">📋</div>
+                <div>
+                  <p className="alNotesPanelTitle">{selectedPropertyLabel}</p>
+                  {selectedProperty && (selectedProperty.city || selectedProperty.state) && (
+                    <p className="alNotesPanelSub">
+                      {[selectedProperty.city, selectedProperty.state].filter(Boolean).join(', ')}
+                    </p>
+                  )}
+                </div>
               </div>
 
               {/* Notes list */}
-              <div
-                style={{
-                  maxHeight: 320,
-                  overflowY: 'auto',
-                  padding: '12px 16px',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: 10,
-                }}
-              >
+              <div className="alNotesList" role="log" aria-label="Notes list" aria-live="polite">
                 {notesLoading && (
-                  <p className="muted" style={{ fontSize: 13 }}>
-                    Loading notes…
-                  </p>
+                  <p className="muted" style={{ fontSize: 13, margin: 0 }}>Loading notes…</p>
                 )}
                 {notesError && (
-                  <p style={{ color: '#dc2626', fontSize: 13 }}>{notesError}</p>
+                  <p style={{ color: '#dc2626', fontSize: 13, margin: 0 }}>{notesError}</p>
                 )}
                 {!notesLoading && !notesError && notes.length === 0 && (
-                  <p className="muted" style={{ fontSize: 13 }}>
-                    No notes yet. Add one below.
-                  </p>
+                  <div className="alNoteEmpty">
+                    <div className="alNoteEmptyIcon" aria-hidden="true">✏️</div>
+                    <p className="alNoteEmptyText">No notes yet — add the first one below.</p>
+                  </div>
                 )}
                 {notes.map((note) => (
-                  <div
-                    key={note.id}
-                    style={{
-                      background: '#fdf2f8',
-                      border: '1px solid rgba(236,72,153,0.15)',
-                      borderRadius: 10,
-                      padding: '10px 14px',
-                    }}
-                  >
-                    <p style={{ margin: '0 0 6px', fontSize: 14, color: '#1a2e1a', whiteSpace: 'pre-wrap' }}>
-                      {note.content}
-                    </p>
-                    <div
-                      style={{
-                        display: 'flex',
-                        gap: 8,
-                        alignItems: 'center',
-                        flexWrap: 'wrap',
-                      }}
-                    >
-                      <span style={{ fontSize: 11, color: '#9d174d', fontWeight: 500 }}>
-                        🕐 {formatDateTime(note.createdAt)}
-                      </span>
-                      {note.propertyAddress && (
-                        <span
-                          style={{
-                            fontSize: 11,
-                            color: '#be185d',
-                            background: 'rgba(236,72,153,0.10)',
-                            borderRadius: 6,
-                            padding: '1px 6px',
-                          }}
-                        >
-                          📍 {note.propertyAddress}
-                        </span>
-                      )}
+                  <div key={note.id} className="alNoteItem">
+                    <p className="alNoteContent">{note.content}</p>
+                    <div className="alNoteMeta">
+                      <span className="alNoteTime">🕐 {formatDateTime(note.createdAt)}</span>
                     </div>
                   </div>
                 ))}
                 <div ref={notesBottomRef} />
               </div>
 
-              {/* Divider */}
-              <div style={{ borderTop: '1px solid rgba(236,72,153,0.12)' }} />
+              <div className="alNotesDivider" role="separator" />
 
-              {/* Note input */}
-              <form onSubmit={submitNote} style={{ padding: '12px 16px', display: 'flex', gap: 8 }}>
+              {/* Input form */}
+              <form onSubmit={submitNote} className="alNotesForm">
                 <textarea
                   rows={2}
                   value={noteInput}
                   onChange={(e) => setNoteInput(e.target.value)}
                   onKeyDown={handleNoteKeyDown}
-                  placeholder={`Add a note for ${selectedPropertyLabel}… (Enter to save, Shift+Enter for new line)`}
+                  placeholder={`Add a note… (Enter to save, Shift+Enter for new line)`}
                   disabled={sending}
-                  style={{
-                    flex: 1,
-                    padding: '8px 12px',
-                    borderRadius: 10,
-                    border: '1px solid rgba(236,72,153,0.20)',
-                    fontSize: 13,
-                    color: '#1a2e1a',
-                    background: '#fdf2f8',
-                    resize: 'none',
-                    fontFamily: 'inherit',
-                    outline: 'none',
-                  }}
+                  className="alNotesTextarea"
+                  aria-label={`Note for ${selectedPropertyLabel}`}
                 />
                 <button
                   type="submit"
                   disabled={sending || !noteInput.trim() || !selectedPropertyLabel}
-                  style={{
-                    alignSelf: 'flex-end',
-                    padding: '8px 16px',
-                    borderRadius: 10,
-                    border: 'none',
-                    background: ACCENT_COLOR,
-                    color: '#fff',
-                    fontWeight: 700,
-                    fontSize: 13,
-                    cursor:
-                      sending || !noteInput.trim() || !selectedPropertyLabel ? 'not-allowed' : 'pointer',
-                    opacity: sending || !noteInput.trim() || !selectedPropertyLabel ? 0.6 : 1,
-                    whiteSpace: 'nowrap',
-                  }}
+                  className="alNotesSendBtn"
                 >
-                  {sending ? '…' : 'Save Note'}
+                  {sending ? '…' : 'Save'}
                 </button>
               </form>
+
               {sendError && (
-                <p style={{ margin: '0 16px 10px', color: '#dc2626', fontSize: 12 }}>{sendError}</p>
+                <p className="alNotesSendError" role="alert">{sendError}</p>
               )}
             </>
           )}
