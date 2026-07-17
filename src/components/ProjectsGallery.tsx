@@ -2,6 +2,7 @@ import { CSSProperties, useState } from "react";
 import type { ProjectRow } from "../types/project";
 import ProjectDetailsModal from "./ProjectDetailsModal";
 import { generatePropertyPdf } from "../utils/generatePropertyPdf";
+import PropertyMainImage from "./PropertyMainImage";
 
 interface Props {
   rows: ProjectRow[];
@@ -76,29 +77,26 @@ export default function ProjectsGallery({ rows, onViewFullPnL }: Props) {
         >
           {/* Image */}
           <div style={{ position: "relative", height: 180, background: "#f0f7f1" }}>
-            {row.featured_image_url ? (
-              <img
-                src={row.featured_image_url}
-                alt={row.name ?? "project"}
-                style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
-                onError={(e) => {
-                  (e.currentTarget as HTMLImageElement).style.display = "none";
-                }}
-              />
-            ) : (
-              <div
-                style={{
-                  width: "100%",
-                  height: "100%",
-                  display: "grid",
-                  placeItems: "center",
-                  fontSize: 40,
-                  color: "rgba(26,122,60,0.20)",
-                }}
-              >
-                🏠
-              </div>
-            )}
+            <PropertyMainImage
+              key={row.featured_image_url ?? "gallery-placeholder"}
+              imageUrl={row.featured_image_url}
+              alt={row.name ?? "project"}
+              style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+              placeholder={
+                <div
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    display: "grid",
+                    placeItems: "center",
+                    fontSize: 40,
+                    color: "rgba(26,122,60,0.20)",
+                  }}
+                >
+                  🏠
+                </div>
+              }
+            />
             {/* Stage badge overlay */}
             {row.stage && (
               <div

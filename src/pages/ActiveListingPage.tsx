@@ -4,6 +4,7 @@ import { generateClient } from 'aws-amplify/data';
 import { loadCsv } from '../utils/csv';
 import type { ProjectRow } from '../types/project';
 import type { Schema } from '../../amplify/data/resource';
+import PropertyMainImage from '../components/PropertyMainImage';
 import {
   getActiveListingPropertyKey,
   getActiveListingPropertyLabel,
@@ -313,18 +314,13 @@ export default function ActiveListingPage() {
                 >
                   {/* Image / Placeholder */}
                   <div className="alCardImg">
-                    {row.featured_image_url ? (
-                      <img
-                        src={row.featured_image_url}
-                        alt={propertyLabel}
-                        className="alCardImgEl"
-                        onError={(e) => {
-                          (e.currentTarget as HTMLImageElement).style.display = 'none';
-                        }}
-                      />
-                    ) : (
-                      <div className="alCardImgPlaceholder" aria-hidden="true">🏠</div>
-                    )}
+                    <PropertyMainImage
+                      key={row.featured_image_url ?? `active-listing-placeholder-${propertyKey}`}
+                      imageUrl={row.featured_image_url}
+                      alt={propertyLabel}
+                      className="alCardImgEl"
+                      placeholder={<div className="alCardImgPlaceholder" aria-hidden="true">🏠</div>}
+                    />
 
                     {/* Active Listing badge */}
                     <span className="alStatusBadge">

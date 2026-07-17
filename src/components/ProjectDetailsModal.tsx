@@ -7,6 +7,7 @@ import PropertyWorksheet from "./PropertyWorksheet";
 import PropertyWorkflow from "./PropertyWorkflow";
 import ConstructionWorkflowTemplate from "./ConstructionWorkflowTemplate";
 import ChecklistWorkflowTemplate from "./ChecklistWorkflowTemplate";
+import PropertyMainImage from "./PropertyMainImage";
 
 interface Props {
   project: ProjectRow;
@@ -219,13 +220,12 @@ export default function ProjectDetailsModal({ project: row, onClose, onViewFullP
           {/* Hero image */}
           {row.featured_image_url && (
             <div style={{ height: 260, overflow: "hidden", position: "relative" }}>
-              <img
-                src={row.featured_image_url}
+              <PropertyMainImage
+                key={row.featured_image_url}
+                imageUrl={row.featured_image_url}
                 alt={row.name ?? "project"}
                 style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
-                onError={(e) => {
-                  (e.currentTarget as HTMLImageElement).parentElement!.style.display = "none";
-                }}
+                loading="eager"
               />
               {photos.length > 0 && (
                 <button
