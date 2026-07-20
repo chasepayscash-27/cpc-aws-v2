@@ -16,10 +16,10 @@ interface Props {
 type PropertyTask = Schema["PropertyTask"]["type"];
 
 const cardStyle: CSSProperties = {
-  border: "1px solid #d4e8d8",
+  border: "1px solid var(--border)",
   borderRadius: 12,
   padding: "14px 16px",
-  background: "#f0f7f1",
+  background: "var(--panel2)",
 };
 
 const negativeWorksheetValues = new Set(["no", "none", "n/a", "na", "false", "0"]);
@@ -116,30 +116,30 @@ function ChecklistWorkflowTemplate({ propertyId, propertyName, projectStage }: P
 
   return (
     <div style={cardStyle}>
-      <div style={{ fontSize: 14, fontWeight: 700, color: "#1a7a3c", marginBottom: 4 }}>
+      <div style={{ fontSize: 14, fontWeight: 700, color: "var(--accent)", marginBottom: 4 }}>
         ✅ Checklist
       </div>
-      <div style={{ fontSize: 12, color: "#5a7060", marginBottom: 12 }}>
+      <div style={{ fontSize: 12, color: "var(--muted)", marginBottom: 12 }}>
         {propertyName ? `${propertyName} ordering and scope checklist.` : "Ordering and scope checklist."} Track materials ordered and special project items.
       </div>
 
-      {loading && <div style={{ fontSize: 12, color: "#5a7060", marginBottom: 12 }}>Loading checklist…</div>}
-      {!loading && error && <div style={{ fontSize: 12, color: "#8f2d2d", marginBottom: 12 }}>⚠️ {error}</div>}
+      {loading && <div style={{ fontSize: 12, color: "var(--muted)", marginBottom: 12 }}>Loading checklist…</div>}
+      {!loading && error && <div style={{ fontSize: 12, color: "var(--danger)", marginBottom: 12 }}>⚠️ {error}</div>}
 
       {!loading && !error && visibleTasks.length > 0 && (
         <div style={{ marginBottom: 12 }}>
-          <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11, color: "#5a7060", marginBottom: 4 }}>
+          <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11, color: "var(--muted)", marginBottom: 4 }}>
             <span>Checklist progress</span>
             <span>{progress.done}/{progress.total} ({progress.percent}%)</span>
           </div>
-          <div style={{ height: 8, borderRadius: 999, background: "#dbeadf", overflow: "hidden" }}>
-            <div style={{ width: `${progress.percent}%`, height: "100%", background: "#1a7a3c" }} />
+          <div style={{ height: 8, borderRadius: 999, background: "var(--panel3)", overflow: "hidden" }}>
+            <div style={{ width: `${progress.percent}%`, height: "100%", background: "var(--accent)" }} />
           </div>
         </div>
       )}
 
       {!loading && !error && visibleTasks.length === 0 && (
-        <div style={{ fontSize: 12, color: "#5a7060", marginBottom: 12 }}>No checklist tasks available yet.</div>
+        <div style={{ fontSize: 12, color: "var(--muted)", marginBottom: 12 }}>No checklist tasks available yet.</div>
       )}
 
       {!loading && !error && visibleTasks.length > 0 && (
@@ -151,9 +151,9 @@ function ChecklistWorkflowTemplate({ propertyId, propertyName, projectStage }: P
                 display: "flex",
                 alignItems: "flex-start",
                 gap: 10,
-                border: "1px solid #d4e8d8",
+                border: "1px solid var(--border)",
                 borderRadius: 10,
-                background: task.isComplete ? "rgba(26,122,60,0.12)" : "#ffffff",
+                background: task.isComplete ? "rgba(63,185,80,0.08)" : "var(--panel3)",
                 padding: "10px 12px",
                 textAlign: "left",
                 cursor: updatingTaskIds.includes(task.id) ? "progress" : "pointer",
@@ -163,7 +163,7 @@ function ChecklistWorkflowTemplate({ propertyId, propertyName, projectStage }: P
                 type="checkbox"
                 checked={!!task.isComplete}
                 disabled={updatingTaskIds.includes(task.id)}
-                style={{ marginTop: 2 }}
+                style={{ marginTop: 2, accentColor: "var(--accent)" }}
                 aria-label={`Mark ${toTitleCase(task.stage ?? "task")} ${task.isComplete ? "incomplete" : "complete"} in checklist`}
                 onChange={(event) => {
                   void handleToggle(task, event.currentTarget.checked);
@@ -175,19 +175,19 @@ function ChecklistWorkflowTemplate({ propertyId, propertyName, projectStage }: P
                     display: "block",
                     fontSize: 13,
                     fontWeight: 600,
-                    color: "#1a2e1a",
+                    color: "var(--text)",
                     textDecoration: task.isComplete ? "line-through" : "none",
                   }}
                 >
                   {toTitleCase(task.stage ?? "")}
                 </span>
                 {(task.responsibilities || task.notes) && (
-                  <span style={{ display: "block", fontSize: 12, color: "#5a7060" }}>
+                  <span style={{ display: "block", fontSize: 12, color: "var(--muted)" }}>
                     {task.responsibilities?.trim() || task.notes?.trim()}
                   </span>
                 )}
                 {task.completedAt && (
-                  <span style={{ display: "block", fontSize: 11, color: "#5a7060", marginTop: 2 }}>
+                  <span style={{ display: "block", fontSize: 11, color: "var(--muted)", marginTop: 2 }}>
                     Completed {new Date(task.completedAt).toLocaleString()}
                   </span>
                 )}

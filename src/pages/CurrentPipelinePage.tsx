@@ -3,10 +3,10 @@ import { loadCsv } from '../utils/csv';
 import type { PipelineRow } from '../types/pipeline';
 
 const STAGE_COLORS: Record<string, string> = {
-  'Closed': '#1a7a3c',
-  'Active Listing': '#d97706',
-  'Under Construction': '#2563eb',
-  'Under Contract': '#7c3aed',
+  'Closed': '#3fb950',
+  'Active Listing': '#d29922',
+  'Under Construction': '#58a6ff',
+  'Under Contract': '#bc8cff',
 };
 
 function formatCurrency(value?: string): string {
@@ -75,7 +75,7 @@ export default function CurrentPipelinePage() {
   if (error) {
     return (
       <div className="pageHeader">
-        <p style={{ color: '#dc2626' }}>Error: {error}</p>
+        <p style={{ color: 'var(--danger)' }}>Error: {error}</p>
       </div>
     );
   }
@@ -99,7 +99,7 @@ export default function CurrentPipelinePage() {
         </div>
         <div className="card">
           <div className="cardLabel">Expected Profit</div>
-          <div className="cardValue" style={{ color: totalExpectedProfit >= 0 ? '#1a7a3c' : '#dc2626' }}>
+          <div className="cardValue" style={{ color: totalExpectedProfit >= 0 ? 'var(--accent)' : 'var(--danger)' }}>
             {formatCurrency(String(totalExpectedProfit))}
           </div>
         </div>
@@ -120,7 +120,7 @@ export default function CurrentPipelinePage() {
                 padding: '8px 12px',
                 borderRadius: '8px',
                 border: '1px solid var(--border)',
-                background: '#f0f7f1',
+                background: 'var(--panel2)',
                 color: 'var(--text)',
                 cursor: 'pointer',
               }}
@@ -145,7 +145,7 @@ export default function CurrentPipelinePage() {
                 padding: '8px 12px',
                 borderRadius: '8px',
                 border: '1px solid var(--border)',
-                background: '#f0f7f1',
+                background: 'var(--panel2)',
                 color: 'var(--text)',
               }}
             />
@@ -183,7 +183,7 @@ export default function CurrentPipelinePage() {
                 const stageColor = STAGE_COLORS[row.stage ?? ''] ?? 'var(--muted)';
                 const profit = parseFloat(row.expected_profit ?? '0') || 0;
                 return (
-                  <tr key={idx} style={{ borderBottom: '1px solid #eaf4ec' }}>
+                  <tr key={idx} style={{ borderBottom: '1px solid var(--border)' }}>
                     <td style={{ padding: '8px', fontWeight: '500' }}>{row.property_address ?? '—'}</td>
                     <td style={{ padding: '8px', color: 'var(--muted)', fontSize: '13px' }}>
                       {row.city ?? '—'}{row.state ? `, ${row.state}` : ''}
@@ -207,7 +207,7 @@ export default function CurrentPipelinePage() {
                     <td style={{ padding: '8px', textAlign: 'right' }}>{formatCurrency(row.purchase_price)}</td>
                     <td style={{ padding: '8px', textAlign: 'right' }}>{formatCurrency(row.arv)}</td>
                     <td style={{ padding: '8px', textAlign: 'right' }}>{formatCurrency(row.total_investment)}</td>
-                    <td style={{ padding: '8px', textAlign: 'right', color: profit >= 0 ? '#1a7a3c' : '#dc2626', fontWeight: '600' }}>
+                    <td style={{ padding: '8px', textAlign: 'right', color: profit >= 0 ? 'var(--accent)' : 'var(--danger)', fontWeight: '600' }}>
                       {formatCurrency(row.expected_profit)}
                     </td>
                     <td style={{ padding: '8px', textAlign: 'right' }}>{row.days_in_pipeline ?? '—'}</td>

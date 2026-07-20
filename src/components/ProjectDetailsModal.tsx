@@ -46,10 +46,10 @@ function DetailRow({ label, value }: { label: string; value?: string | null }) {
   if (!value) return null;
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
-      <span style={{ fontSize: 10, fontWeight: 600, color: "#5a7060", textTransform: "uppercase", letterSpacing: "0.06em" }}>
+      <span style={{ fontSize: 10, fontWeight: 600, color: "var(--muted)", textTransform: "uppercase", letterSpacing: "0.06em" }}>
         {label}
       </span>
-      <span style={{ fontSize: 14, color: "#1a2e1a" }}>{value}</span>
+      <span style={{ fontSize: 14, color: "var(--text)" }}>{value}</span>
     </div>
   );
 }
@@ -133,8 +133,8 @@ export default function ProjectDetailsModal({ project: row, onClose, onViewFullP
   };
 
   const modalStyle: CSSProperties = {
-    background: "#ffffff",
-    border: "1px solid #d4e8d8",
+    background: "var(--panel)",
+    border: "1px solid var(--border)",
     borderRadius: 0,
     width: "100vw",
     height: "100vh",
@@ -153,9 +153,9 @@ export default function ProjectDetailsModal({ project: row, onClose, onViewFullP
     width: 36,
     height: 36,
     borderRadius: "50%",
-    border: "1px solid #d4e8d8",
-    background: "#f0f7f1",
-    color: "#5a7060",
+    border: "1px solid var(--border)",
+    background: "var(--panel2)",
+    color: "var(--muted)",
     fontSize: 18,
     lineHeight: 1,
     cursor: "pointer",
@@ -169,14 +169,14 @@ export default function ProjectDetailsModal({ project: row, onClose, onViewFullP
   const sectionLabelStyle: CSSProperties = {
     fontSize: 11,
     fontWeight: 700,
-    color: "#1a7a3c",
+    color: "var(--accent)",
     textTransform: "uppercase",
     letterSpacing: "0.08em",
     marginBottom: 12,
   };
 
   const dividerStyle: CSSProperties = {
-    borderTop: "1px solid #eaf4ec",
+    borderTop: "1px solid var(--border)",
     margin: "20px 0",
   };
 
@@ -201,8 +201,8 @@ export default function ProjectDetailsModal({ project: row, onClose, onViewFullP
       <style>{`
         @keyframes fadeIn { from { opacity: 0 } to { opacity: 1 } }
         @keyframes slideUp { from { opacity: 0; transform: translateY(24px) } to { opacity: 1; transform: translateY(0) } }
-        .modal-close-btn:hover { background: #d4e8d8 !important; color: #1a7a3c !important; }
-        .modal-close-btn:focus-visible { outline: 2px solid #1a7a3c; outline-offset: 2px; }
+        .modal-close-btn:hover { background: var(--accent-dim) !important; color: var(--accent) !important; }
+        .modal-close-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
         .lightbox-nav-btn:hover { background: rgba(255,255,255,0.25) !important; }
       `}</style>
       <div style={overlayStyle} onClick={onClose} role="dialog" aria-modal="true" aria-label={row.name ?? "Project details"}>
@@ -270,8 +270,8 @@ export default function ProjectDetailsModal({ project: row, onClose, onViewFullP
                 <div
                   key={label}
                   style={{
-                    background: "#f0f7f1",
-                    border: "1px solid #d4e8d8",
+                    background: "var(--panel2)",
+                    border: "1px solid var(--border)",
                     borderRadius: 12,
                     padding: "12px 14px",
                     display: "flex",
@@ -279,10 +279,10 @@ export default function ProjectDetailsModal({ project: row, onClose, onViewFullP
                     gap: 4,
                   }}
                 >
-                  <span style={{ fontSize: 10, fontWeight: 600, color: "#5a7060", textTransform: "uppercase", letterSpacing: "0.06em" }}>
+                  <span style={{ fontSize: 10, fontWeight: 600, color: "var(--muted)", textTransform: "uppercase", letterSpacing: "0.06em" }}>
                     {label}
                   </span>
-                  <span style={{ fontSize: 18, fontWeight: 700, color: "#1a7a3c" }}>
+                  <span style={{ fontSize: 18, fontWeight: 700, color: "var(--accent)" }}>
                     ${costSummary[i].toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                   </span>
                 </div>
@@ -295,7 +295,7 @@ export default function ProjectDetailsModal({ project: row, onClose, onViewFullP
                 {row.name ?? "Unnamed Project"}
               </h2>
               {cityStateZip && (
-                <p style={{ margin: 0, fontSize: 14, color: "#5a7060" }}>
+                <p style={{ margin: 0, fontSize: 14, color: "var(--muted)" }}>
                   {cityStateZip}
                 </p>
               )}
@@ -324,9 +324,9 @@ export default function ProjectDetailsModal({ project: row, onClose, onViewFullP
                 style={{
                   padding: "8px 18px",
                   borderRadius: 12,
-                  border: "1px solid #1a7a3c",
-                  background: worksheetOpen ? "#1a7a3c" : "#f0f7f1",
-                  color: worksheetOpen ? "#ffffff" : "#1a7a3c",
+                  border: "1px solid var(--accent)",
+                  background: worksheetOpen ? "var(--accent)" : "var(--panel2)",
+                  color: worksheetOpen ? "#0d1117" : "var(--accent)",
                   fontSize: 13,
                   fontWeight: 600,
                   cursor: "pointer",
@@ -337,14 +337,14 @@ export default function ProjectDetailsModal({ project: row, onClose, onViewFullP
                 }}
                 onMouseEnter={(e) => {
                   if (!worksheetOpen) {
-                    (e.currentTarget as HTMLButtonElement).style.background = "#1a7a3c";
-                    (e.currentTarget as HTMLButtonElement).style.color = "#ffffff";
+                    (e.currentTarget as HTMLButtonElement).style.background = "var(--accent)";
+                    (e.currentTarget as HTMLButtonElement).style.color = "#0d1117";
                   }
                 }}
                 onMouseLeave={(e) => {
                   if (!worksheetOpen) {
-                    (e.currentTarget as HTMLButtonElement).style.background = "#f0f7f1";
-                    (e.currentTarget as HTMLButtonElement).style.color = "#1a7a3c";
+                    (e.currentTarget as HTMLButtonElement).style.background = "var(--panel2)";
+                    (e.currentTarget as HTMLButtonElement).style.color = "var(--accent)";
                   }
                 }}
                 aria-expanded={worksheetOpen}
@@ -370,17 +370,17 @@ export default function ProjectDetailsModal({ project: row, onClose, onViewFullP
                   alignItems: "start",
                 }}
               >
-                <section style={{ background: "#f9fcf9", border: "1px solid #d4e8d8", borderRadius: 12, padding: 12 }}>
+                <section style={{ background: "var(--panel2)", border: "1px solid var(--border)", borderRadius: 12, padding: 12 }}>
                   <div style={sectionLabelStyle}>Main Workflow</div>
                   <PropertyWorkflow propertyId={propertyId} />
                 </section>
 
-                <section style={{ background: "#f9fcf9", border: "1px solid #d4e8d8", borderRadius: 12, padding: 12 }}>
+                <section style={{ background: "var(--panel2)", border: "1px solid var(--border)", borderRadius: 12, padding: 12 }}>
                   <div style={sectionLabelStyle}>Construction Workflow</div>
                   <ConstructionWorkflowTemplate key={`${propertyId}-construction`} propertyId={propertyId} propertyName={row.name} projectStage={row.stage} />
                 </section>
 
-                <section style={{ background: "#f9fcf9", border: "1px solid #d4e8d8", borderRadius: 12, padding: 12 }}>
+                <section style={{ background: "var(--panel2)", border: "1px solid var(--border)", borderRadius: 12, padding: 12 }}>
                   <div style={sectionLabelStyle}>Checklist Workflow</div>
                   <ChecklistWorkflowTemplate key={`${propertyId}-checklist`} propertyId={propertyId} propertyName={row.name} projectStage={row.stage} />
                 </section>
@@ -395,8 +395,8 @@ export default function ProjectDetailsModal({ project: row, onClose, onViewFullP
                     display: "grid",
                     gridTemplateColumns: "repeat(auto-fill, minmax(100px, 1fr))",
                     gap: 12,
-                    background: "#f0f7f1",
-                    border: "1px solid #d4e8d8",
+                    background: "var(--panel2)",
+                    border: "1px solid var(--border)",
                     borderRadius: 12,
                     padding: "14px 16px",
                     marginBottom: 20,
@@ -405,13 +405,13 @@ export default function ProjectDetailsModal({ project: row, onClose, onViewFullP
                   {row.beds && (
                     <div style={{ textAlign: "center" }}>
                       <div style={{ fontSize: 20, fontWeight: 700 }}>{row.beds}</div>
-                      <div style={{ fontSize: 10, color: "#5a7060", textTransform: "uppercase" }}>Beds</div>
+                      <div style={{ fontSize: 10, color: "var(--muted)", textTransform: "uppercase" }}>Beds</div>
                     </div>
                   )}
                   {row.baths && (
                     <div style={{ textAlign: "center" }}>
                       <div style={{ fontSize: 20, fontWeight: 700 }}>{row.baths}</div>
-                      <div style={{ fontSize: 10, color: "#5a7060", textTransform: "uppercase" }}>Baths</div>
+                      <div style={{ fontSize: 10, color: "var(--muted)", textTransform: "uppercase" }}>Baths</div>
                     </div>
                   )}
                   {sqft && (
@@ -419,13 +419,13 @@ export default function ProjectDetailsModal({ project: row, onClose, onViewFullP
                       <div style={{ fontSize: 20, fontWeight: 700 }}>
                         {sqftFormatted}
                       </div>
-                      <div style={{ fontSize: 10, color: "#5a7060", textTransform: "uppercase" }}>Sq Ft</div>
+                      <div style={{ fontSize: 10, color: "var(--muted)", textTransform: "uppercase" }}>Sq Ft</div>
                     </div>
                   )}
                   {row.year_built && (
                     <div style={{ textAlign: "center" }}>
                       <div style={{ fontSize: 20, fontWeight: 700 }}>{row.year_built}</div>
-                      <div style={{ fontSize: 10, color: "#5a7060", textTransform: "uppercase" }}>Year Built</div>
+                      <div style={{ fontSize: 10, color: "var(--muted)", textTransform: "uppercase" }}>Year Built</div>
                     </div>
                   )}
                 </div>
@@ -545,7 +545,7 @@ export default function ProjectDetailsModal({ project: row, onClose, onViewFullP
             {(photos[lightboxIndex].category || photos[lightboxIndex].description || photos[lightboxIndex].photo_date) && (
               <div style={{ marginTop: 14, textAlign: "center", color: "#fff" }}>
                 {photos[lightboxIndex].category && (
-                  <div style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", color: "#7de0a0", marginBottom: 4 }}>
+                  <div style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--accent-light)", marginBottom: 4 }}>
                     {photos[lightboxIndex].category}
                   </div>
                 )}

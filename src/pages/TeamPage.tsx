@@ -465,8 +465,8 @@ const TeamPage = () => {
 
       <style>{`
         .teamCard {
-          border: 1px solid rgba(26, 122, 60, 0.25);
-          background: linear-gradient(135deg, rgba(26, 122, 60, 0.08), rgba(40, 168, 82, 0.04));
+          border: 1px solid var(--border);
+          background: var(--panel2);
           min-height: 132px;
           display: flex;
           flex-direction: column;
@@ -474,9 +474,9 @@ const TeamPage = () => {
         }
 
         .teamCard:hover {
-          background: linear-gradient(135deg, rgba(26, 122, 60, 0.14), rgba(40, 168, 82, 0.08));
-          border-color: rgba(26, 122, 60, 0.40);
-          box-shadow: 0 4px 12px rgba(26, 122, 60, 0.12);
+          background: var(--panel3);
+          border-color: rgba(63, 185, 80, 0.35);
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
         }
 
         .teamNameButton {
@@ -490,36 +490,36 @@ const TeamPage = () => {
         .teamName {
           font-size: 18px;
           font-weight: 800;
-          color: #1a7a3c;
+          color: var(--accent);
         }
 
         .teamTaskCount {
           font-size: 12px;
           font-weight: 600;
-          color: #5a7060;
+          color: var(--muted);
         }
 
         .teamPosition {
-          color: #1a2e1a;
+          color: var(--text);
           font-weight: 600;
         }
 
         .teamEmail {
-          color: #1a7a3c;
+          color: var(--accent);
           text-decoration: none;
           font-weight: 600;
           word-break: break-word;
         }
 
         .teamEmail:hover {
-          color: #28a852;
+          color: var(--accent-light);
           text-decoration: underline;
         }
 
         .teamTaskModalOverlay {
           position: fixed;
           inset: 0;
-          background: rgba(17, 24, 39, 0.45);
+          background: rgba(0, 0, 0, 0.65);
           display: flex;
           align-items: center;
           justify-content: center;
@@ -531,11 +531,11 @@ const TeamPage = () => {
           width: min(760px, 100%);
           max-height: min(80vh, 760px);
           overflow: auto;
-          background: #ffffff;
+          background: var(--panel);
         }
 
         .teamTaskModal:hover {
-          background: #ffffff;
+          background: var(--panel);
           border-color: var(--border);
           box-shadow: none;
         }
@@ -551,13 +551,13 @@ const TeamPage = () => {
         .teamTaskModalHeader h2 {
           margin: 0;
           font-size: 20px;
-          color: #1a2e1a;
+          color: var(--text);
         }
 
         .teamTaskModalSummary {
           margin: 4px 0 0;
           font-size: 12px;
-          color: #5a7060;
+          color: var(--muted);
         }
 
         .teamTaskComposer {
@@ -565,7 +565,7 @@ const TeamPage = () => {
           gap: 8px;
           margin-bottom: 14px;
           padding-bottom: 12px;
-          border-bottom: 1px solid rgba(26, 122, 60, 0.18);
+          border-bottom: 1px solid var(--border);
         }
 
         .teamTaskComposerRow {
@@ -575,23 +575,37 @@ const TeamPage = () => {
         }
 
         .teamTaskInput {
-          border: 1px solid rgba(26, 122, 60, 0.22);
+          border: 1px solid var(--border);
           border-radius: 10px;
           padding: 8px 10px;
           font-size: 13px;
           font-family: inherit;
-          color: #1a2e1a;
-          background: #ffffff;
+          color: var(--text);
+          background: var(--panel2);
+          outline: none;
+          transition: border-color 0.18s ease;
+        }
+
+        .teamTaskInput:focus {
+          border-color: var(--accent);
         }
 
         .teamTaskCreateButton {
-          border: 1px solid rgba(26, 122, 60, 0.3);
-          background: #f0f7f1;
-          color: #1a7a3c;
+          border: 1px solid var(--border);
+          background: var(--accent-dim);
+          color: var(--accent);
           border-radius: 10px;
           padding: 8px 12px;
           font-weight: 700;
           cursor: pointer;
+          font-family: inherit;
+          transition: all 0.18s ease;
+        }
+
+        .teamTaskCreateButton:hover {
+          background: var(--accent);
+          color: #0d1117;
+          border-color: var(--accent);
         }
 
         .teamTaskPersonalToggle {
@@ -600,28 +614,35 @@ const TeamPage = () => {
           gap: 6px;
           font-size: 12px;
           font-weight: 600;
-          color: #1a7a3c;
+          color: var(--accent);
         }
 
         .teamTaskModalClose {
-          border: 1px solid rgba(26, 122, 60, 0.3);
-          background: #f0f7f1;
-          color: #1a7a3c;
+          border: 1px solid var(--border);
+          background: var(--panel2);
+          color: var(--muted);
           border-radius: 10px;
           padding: 6px 10px;
           font-weight: 600;
           cursor: pointer;
+          font-family: inherit;
+          transition: all 0.18s ease;
+        }
+
+        .teamTaskModalClose:hover {
+          border-color: var(--accent);
+          color: var(--accent);
         }
 
         .teamTaskPropertyGroup + .teamTaskPropertyGroup {
           margin-top: 14px;
           padding-top: 14px;
-          border-top: 1px solid rgba(26, 122, 60, 0.18);
+          border-top: 1px solid var(--border);
         }
 
         .teamTaskPropertyGroup h3 {
           margin: 0 0 8px;
-          color: #1a7a3c;
+          color: var(--accent);
           font-size: 16px;
         }
 
@@ -635,22 +656,27 @@ const TeamPage = () => {
           grid-template-columns: auto auto 1fr;
           align-items: center;
           gap: 10px;
-          border: 1px solid rgba(26, 122, 60, 0.18);
+          border: 1px solid var(--border);
           border-radius: 10px;
-          background: #ffffff;
+          background: var(--panel2);
           padding: 10px 12px;
-          color: #1a2e1a;
+          color: var(--text);
+          transition: border-color 0.18s ease;
+        }
+
+        .teamTaskRow:hover {
+          border-color: rgba(63, 185, 80, 0.30);
         }
 
         .teamTaskRow.completed {
-          background: #f5faf6;
-          color: #5a7060;
+          background: rgba(63, 185, 80, 0.05);
+          color: var(--muted);
         }
 
         .teamTaskOrder {
           font-size: 12px;
           font-weight: 700;
-          color: #1a7a3c;
+          color: var(--accent);
         }
 
         .teamTaskRow.completed .teamTaskOrder,

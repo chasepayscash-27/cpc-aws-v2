@@ -103,24 +103,24 @@ export default function ProjectsPage({ onViewFullPnL }: Props) {
   }, [rows, search, stageFilter, strategyFilter, sortField]);
 
   const activeTabStyle = {
-    background: "rgba(26,122,60,0.15)",
-    borderColor: "rgba(26,122,60,0.50)",
-    color: "#1a7a3c",
+    background: "var(--accent-dim)",
+    borderColor: "var(--accent)",
+    color: "var(--accent)",
   };
 
   const inactiveTabStyle = {
     background: "transparent",
-    borderColor: "rgba(26,122,60,0.15)",
-    color: "#5a7060",
+    borderColor: "var(--border)",
+    color: "var(--muted)",
   };
 
   const inputStyle: React.CSSProperties = {
     padding: "7px 12px",
     borderRadius: 12,
-    border: "1px solid rgba(26,122,60,0.15)",
+    border: "1px solid var(--border)",
     fontSize: 13,
-    color: "#1a2e1a",
-    background: "#f0f7f1",
+    color: "var(--text)",
+    background: "var(--panel2)",
     outline: "none",
     minWidth: 0,
   };
@@ -171,7 +171,7 @@ export default function ProjectsPage({ onViewFullPnL }: Props) {
               marginLeft: "auto",
               alignSelf: "center",
               fontSize: 12,
-              color: "#5a7060",
+              color: "var(--muted)",
             }}
           >
             {filteredRows.length !== rows.length
@@ -247,7 +247,7 @@ export default function ProjectsPage({ onViewFullPnL }: Props) {
             style={{
               padding: 40,
               textAlign: "center",
-              color: "#5a7060",
+              color: "var(--muted)",
             }}
           >
             Loading projects…
@@ -269,7 +269,7 @@ export default function ProjectsPage({ onViewFullPnL }: Props) {
             style={{
               padding: 40,
               textAlign: "center",
-              color: "#5a7060",
+              color: "var(--muted)",
             }}
           >
             No projects found.
@@ -280,7 +280,7 @@ export default function ProjectsPage({ onViewFullPnL }: Props) {
             style={{
               padding: 40,
               textAlign: "center",
-              color: "#5a7060",
+              color: "var(--muted)",
             }}
           >
             No projects match the current filters.

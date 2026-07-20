@@ -16,10 +16,10 @@ interface Props {
 type PropertyTask = Schema["PropertyTask"]["type"];
 
 const cardStyle: CSSProperties = {
-  border: "1px solid #d4e8d8",
+  border: "1px solid var(--border)",
   borderRadius: 12,
   padding: "14px 16px",
-  background: "#f0f7f1",
+  background: "var(--panel2)",
 };
 
 const negativeWorksheetValues = new Set(["no", "none", "n/a", "na", "false", "0"]);
@@ -128,22 +128,22 @@ function ConstructionWorkflowTemplate({ propertyId, propertyName, projectStage }
 
   return (
     <div style={cardStyle}>
-      <div style={{ fontSize: 12, color: "#5a7060", marginBottom: 12 }}>
+      <div style={{ fontSize: 12, color: "var(--muted)", marginBottom: 12 }}>
         {propertyName ? `${propertyName} construction tasks.` : "Construction tasks."} These checklist items stay synced with the main property workflow.
       </div>
 
-      {loading && <div style={{ fontSize: 12, color: "#5a7060", marginBottom: 12 }}>Loading construction workflow…</div>}
-      {!loading && error && <div style={{ fontSize: 12, color: "#8f2d2d", marginBottom: 12 }}>⚠️ {error}</div>}
+      {loading && <div style={{ fontSize: 12, color: "var(--muted)", marginBottom: 12 }}>Loading construction workflow…</div>}
+      {!loading && error && <div style={{ fontSize: 12, color: "var(--danger)", marginBottom: 12 }}>⚠️ {error}</div>}
       {!loading && !error && visibleTasks.length > 0 && (
         <div style={{ display: "grid", gap: 8, marginBottom: 12 }}>
           {[{ label: "Overall", ...overallProgress }].map((item) => (
             <div key={item.label}>
-              <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11, color: "#5a7060", marginBottom: 4 }}>
+              <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11, color: "var(--muted)", marginBottom: 4 }}>
                 <span>{item.label} progress</span>
                 <span>{item.done}/{item.total} ({item.percent}%)</span>
               </div>
-              <div style={{ height: 8, borderRadius: 999, background: "#dbeadf", overflow: "hidden" }}>
-                <div style={{ width: `${item.percent}%`, height: "100%", background: "#1a7a3c" }} />
+              <div style={{ height: 8, borderRadius: 999, background: "var(--panel3)", overflow: "hidden" }}>
+                <div style={{ width: `${item.percent}%`, height: "100%", background: "var(--accent)" }} />
               </div>
             </div>
           ))}
@@ -151,7 +151,7 @@ function ConstructionWorkflowTemplate({ propertyId, propertyName, projectStage }
       )}
 
       {!loading && !error && visibleTasks.length === 0 && (
-        <div style={{ fontSize: 12, color: "#5a7060", marginBottom: 12 }}>No construction workflow tasks available yet.</div>
+        <div style={{ fontSize: 12, color: "var(--muted)", marginBottom: 12 }}>No construction workflow tasks available yet.</div>
       )}
 
       {!loading && !error && visibleTasks.length > 0 && (
@@ -163,11 +163,11 @@ function ConstructionWorkflowTemplate({ propertyId, propertyName, projectStage }
               <section key={section.id} style={{ display: "grid", gap: 8 }}>
                 <div style={{ display: "grid", gap: 4 }}>
                   <div style={{ display: "flex", justifyContent: "space-between", gap: 8 }}>
-                    <strong style={{ fontSize: 12, color: "#1a7a3c", textTransform: "uppercase", letterSpacing: "0.04em" }}>{section.label}</strong>
-                    <span style={{ fontSize: 11, color: "#5a7060" }}>{sectionProgress.done}/{sectionProgress.total}</span>
+                    <strong style={{ fontSize: 12, color: "var(--accent)", textTransform: "uppercase", letterSpacing: "0.04em" }}>{section.label}</strong>
+                    <span style={{ fontSize: 11, color: "var(--muted)" }}>{sectionProgress.done}/{sectionProgress.total}</span>
                   </div>
-                  <div style={{ height: 6, borderRadius: 999, background: "#dbeadf", overflow: "hidden" }}>
-                    <div style={{ width: `${sectionProgress.percent}%`, height: "100%", background: "#1a7a3c" }} />
+                  <div style={{ height: 6, borderRadius: 999, background: "var(--panel3)", overflow: "hidden" }}>
+                    <div style={{ width: `${sectionProgress.percent}%`, height: "100%", background: "var(--accent)" }} />
                   </div>
                 </div>
                 {sectionVisibleTasks.map((task, taskIndex) => (
@@ -177,9 +177,9 @@ function ConstructionWorkflowTemplate({ propertyId, propertyName, projectStage }
                       display: "flex",
                       alignItems: "flex-start",
                       gap: 10,
-                      border: "1px solid #d4e8d8",
+                      border: "1px solid var(--border)",
                       borderRadius: 10,
-                      background: task.isComplete ? "rgba(26,122,60,0.12)" : "#ffffff",
+                      background: task.isComplete ? "rgba(63,185,80,0.08)" : "var(--panel3)",
                       padding: "10px 12px",
                       textAlign: "left",
                       cursor: updatingTaskIds.includes(task.id) ? "progress" : "pointer",
@@ -201,14 +201,14 @@ function ConstructionWorkflowTemplate({ propertyId, propertyName, projectStage }
                           display: "block",
                           fontSize: 13,
                           fontWeight: 600,
-                          color: "#1a2e1a",
+                          color: "var(--text)",
                           textDecoration: task.isComplete ? "line-through" : "none",
                         }}
                       >
                         #{taskIndex + 1} {toTitleCase(task.stage ?? "")}
                       </span>
                       {task.completedAt && (
-                        <span style={{ display: "block", fontSize: 11, color: "#5a7060", marginTop: 2 }}>
+                        <span style={{ display: "block", fontSize: 11, color: "var(--muted)", marginTop: 2 }}>
                           Completed {new Date(task.completedAt).toLocaleString()}
                         </span>
                       )}
@@ -222,7 +222,7 @@ function ConstructionWorkflowTemplate({ propertyId, propertyName, projectStage }
       )}
 
       <div style={{ marginTop: 12 }}>
-        <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#1a7a3c", marginBottom: 6, textTransform: "uppercase", letterSpacing: "0.06em" }}>
+        <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "var(--accent)", marginBottom: 6, textTransform: "uppercase", letterSpacing: "0.06em" }}>
           Notes
         </label>
         <textarea
@@ -233,13 +233,13 @@ function ConstructionWorkflowTemplate({ propertyId, propertyName, projectStage }
           style={{
             width: "100%",
             borderRadius: 10,
-            border: "1px solid #c7ddcc",
+            border: "1px solid var(--border)",
             padding: "8px 10px",
             fontSize: 12,
             resize: "vertical",
             fontFamily: "inherit",
-            color: "#1a2e1a",
-            background: "#ffffff",
+            color: "var(--text)",
+            background: "var(--panel3)",
           }}
         />
       </div>

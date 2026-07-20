@@ -1,13 +1,25 @@
 :root {
-  --bg: #f5f7f5;
-  --panel: #ffffff;
-  --panel2: #f0f7f1;
-  --text: #1a2e1a;
-  --muted: #5a7060;
-  --border: #d4e8d8;
-  --accent: #1a7a3c;
-  --accent-light: #28a852;
-  --gold: #d97706;
+  /* ── Dark theme tokens ──────────────────────────────────── */
+  --bg:           #0d1117;   /* page background               */
+  --panel:        #161b22;   /* card / sidebar surface        */
+  --panel2:       #1c2128;   /* secondary surface / inputs    */
+  --panel3:       #21262d;   /* hover / elevated surface      */
+  --text:         #e6edf3;   /* primary text                  */
+  --muted:        #8b949e;   /* secondary / placeholder text  */
+  --border:       #30363d;   /* subtle divider / border       */
+  --accent:       #3fb950;   /* brand green (accessible on dark) */
+  --accent-light: #56d364;   /* brighter green for gradients  */
+  --accent-dim:   rgba(63, 185, 80, 0.15); /* tinted bg */
+  --gold:         #d29922;   /* gold / warning accent         */
+  --danger:       #f85149;   /* error / destructive           */
+  --danger-dim:   rgba(248, 81, 73, 0.12);
+  --success:      #3fb950;
+  --focus-ring:   rgba(63, 185, 80, 0.30);
+  --shadow-sm:    0 1px 3px rgba(0,0,0,0.4), 0 1px 2px rgba(0,0,0,0.3);
+  --shadow-md:    0 4px 12px rgba(0,0,0,0.5), 0 2px 4px rgba(0,0,0,0.3);
+  --radius-sm:    10px;
+  --radius-md:    14px;
+  --radius-lg:    18px;
   --chat-bubble-max-width: 78%;
 }
 
@@ -17,11 +29,9 @@ html, body {
 
 body {
   margin: 0;
-  background: linear-gradient(135deg, rgba(26, 122, 60, 0.06) 0%, rgba(40, 168, 82, 0.03) 50%, rgba(217, 119, 6, 0.04) 100%),
-              radial-gradient(circle at 80% 20%, rgba(26, 122, 60, 0.05), transparent 50%),
-              var(--bg);
+  background: var(--bg);
   color: var(--text);
-  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
 }
 
 .appShell { min-height: 100vh; }
@@ -32,8 +42,8 @@ body {
   justify-content: space-between;
   padding: 14px 18px;
   border-bottom: 1px solid var(--border);
-  background: #ffffff;
-  box-shadow: 0 1px 4px rgba(26, 122, 60, 0.08);
+  background: var(--panel);
+  box-shadow: var(--shadow-sm);
   position: sticky;
   top: 0;
   z-index: 10;
@@ -48,7 +58,7 @@ body {
   width: 34px;
   height: 34px;
   padding: 0;
-  border-radius: 10px;
+  border-radius: var(--radius-sm);
   border: 1px solid var(--border);
   background: var(--panel2);
   color: var(--muted);
@@ -59,20 +69,20 @@ body {
 }
 
 .sidebarToggle:hover {
-  background: rgba(26, 122, 60, 0.08);
-  border-color: rgba(26, 122, 60, 0.25);
+  background: var(--accent-dim);
+  border-color: var(--accent);
   color: var(--accent);
 }
 
 .brand { display: flex; gap: 12px; align-items: center; }
 .brandMark {
   width: 40px; height: 40px;
-  border-radius: 14px;
+  border-radius: var(--radius-md);
   background: linear-gradient(135deg, var(--accent) 0%, var(--accent-light) 100%);
   display: grid; place-items: center;
   font-weight: 800;
   letter-spacing: .5px;
-  color: white;
+  color: #0d1117;
 }
 .brandTitle { font-weight: 700; line-height: 1.1; color: var(--text); }
 .brandSub { font-size: 12px; color: var(--muted); margin-top: 2px; }
@@ -84,26 +94,30 @@ body {
   background: var(--panel2);
   color: var(--text);
   padding: 10px 12px;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
   font-weight: 600;
+  font-family: inherit;
+  font-size: 14px;
 }
 
 .btn:hover {
-  background: rgba(26, 122, 60, 0.10);
+  background: var(--panel3);
   border-color: var(--accent);
+  color: var(--accent);
 }
 
 .btnPrimary {
   background: linear-gradient(135deg, var(--accent) 0%, var(--accent-light) 100%);
-  border: 1px solid rgba(26, 122, 60, 0.3);
-  color: white;
+  border: 1px solid transparent;
+  color: #0d1117;
   font-weight: 700;
 }
 
 .btnPrimary:hover {
-  box-shadow: 0 8px 20px rgba(26, 122, 60, 0.25);
+  box-shadow: 0 0 0 3px var(--focus-ring);
+  filter: brightness(1.1);
 }
 
 .body {
@@ -121,13 +135,13 @@ body {
 .sidebar {
   border: 1px solid var(--border);
   background: var(--panel);
-  border-radius: 18px;
+  border-radius: var(--radius-lg);
   padding: 10px;
   height: calc(100vh - 86px);
   position: sticky;
   top: 72px;
   overflow: auto;
-  box-shadow: 0 2px 8px rgba(26, 122, 60, 0.06);
+  box-shadow: var(--shadow-sm);
   transition: all 0.25s ease;
   overflow-x: hidden;
 }
@@ -156,13 +170,13 @@ body {
   width: 100%;
   text-align: left;
   padding: 8px 10px;
-  border-radius: 12px;
+  border-radius: var(--radius-sm);
   border: 1px solid transparent;
   background: transparent;
   color: var(--text);
   cursor: pointer;
   margin-bottom: 2px;
-  transition: all 0.2s ease;
+  transition: all 0.18s ease;
   font-weight: 500;
   font-size: 14px;
   display: flex;
@@ -181,11 +195,12 @@ body {
   text-overflow: ellipsis;
 }
 .navItem:hover { 
-  background: rgba(26, 122, 60, 0.08);
-  border-color: rgba(26, 122, 60, 0.20);
+  background: var(--accent-dim);
+  border-color: rgba(63, 185, 80, 0.20);
+  color: var(--accent-light);
 }
 .navItem.active {
-  background: rgba(26, 122, 60, 0.12);
+  background: var(--accent-dim);
   border-color: var(--accent);
   color: var(--accent);
   font-weight: 700;
@@ -194,10 +209,10 @@ body {
 .content {
   border: 1px solid var(--border);
   background: var(--panel);
-  border-radius: 18px;
+  border-radius: var(--radius-lg);
   padding: 18px;
   min-height: calc(100vh - 86px);
-  box-shadow: 0 2px 8px rgba(26, 122, 60, 0.06);
+  box-shadow: var(--shadow-sm);
 }
 
 .pageHeader { margin-bottom: 14px; }
@@ -219,15 +234,15 @@ body {
 .card {
   border: 1px solid var(--border);
   background: var(--panel2);
-  border-radius: 18px;
+  border-radius: var(--radius-lg);
   padding: 14px;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
 }
 
 .card:hover {
-  background: rgba(26, 122, 60, 0.05);
-  border-color: rgba(26, 122, 60, 0.30);
-  box-shadow: 0 4px 12px rgba(26, 122, 60, 0.08);
+  background: var(--panel3);
+  border-color: rgba(63, 185, 80, 0.30);
+  box-shadow: var(--shadow-md);
 }
 
 .cardLabel { font-size: 12px; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
@@ -244,7 +259,7 @@ body {
   margin-top: 12px;
   height: 260px;
   border-radius: 16px;
-  border: 1px dashed rgba(26, 122, 60, 0.25);
+  border: 1px dashed var(--border);
   display: grid;
   place-items: center;
   color: var(--muted);
@@ -284,13 +299,13 @@ body {
 .chatAvatar {
   width: 46px;
   height: 46px;
-  border-radius: 14px;
+  border-radius: var(--radius-md);
   background: linear-gradient(135deg, var(--accent) 0%, var(--accent-light) 100%);
   display: grid;
   place-items: center;
   font-size: 22px;
   flex-shrink: 0;
-  box-shadow: 0 2px 10px rgba(26, 122, 60, 0.25);
+  box-shadow: 0 2px 10px rgba(63, 185, 80, 0.25);
 }
 
 .chatHeaderTitle {
@@ -313,9 +328,9 @@ body {
   gap: 5px;
   font-size: 11px;
   font-weight: 600;
-  color: #16a34a;
-  background: rgba(22, 163, 74, 0.10);
-  border: 1px solid rgba(22, 163, 74, 0.20);
+  color: var(--accent);
+  background: var(--accent-dim);
+  border: 1px solid rgba(63, 185, 80, 0.25);
   border-radius: 99px;
   padding: 2px 8px;
   margin-top: 4px;
@@ -325,7 +340,7 @@ body {
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: #16a34a;
+  background: var(--accent);
   animation: chatPulse 2s infinite;
 }
 
@@ -368,13 +383,13 @@ body {
 .chatEmptyIcon {
   width: 56px;
   height: 56px;
-  border-radius: 18px;
-  background: var(--panel2);
+  border-radius: var(--radius-lg);
+  background: var(--panel3);
   border: 1px solid var(--border);
   display: grid;
   place-items: center;
   font-size: 26px;
-  box-shadow: 0 2px 8px rgba(26, 122, 60, 0.08);
+  box-shadow: var(--shadow-sm);
 }
 
 .chatEmptyTitle {
@@ -406,9 +421,9 @@ body {
 
 .chatBubble.user {
   background: linear-gradient(135deg, var(--accent) 0%, var(--accent-light) 100%);
-  color: #fff;
+  color: #0d1117;
   border-radius: 18px 18px 4px 18px;
-  box-shadow: 0 2px 10px rgba(26, 122, 60, 0.22);
+  box-shadow: 0 2px 10px rgba(63, 185, 80, 0.22);
 }
 
 .chatBubble.assistant {
@@ -416,7 +431,7 @@ body {
   color: var(--text);
   border: 1px solid var(--border);
   border-radius: 18px 18px 18px 4px;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+  box-shadow: var(--shadow-sm);
 }
 
 .chatTypingDots {
@@ -444,15 +459,15 @@ body {
 }
 
 .chatError {
-  background: rgba(220, 38, 38, 0.06);
-  border: 1px solid rgba(220, 38, 38, 0.20);
-  border-radius: 12px;
+  background: var(--danger-dim);
+  border: 1px solid rgba(248, 81, 73, 0.25);
+  border-radius: var(--radius-sm);
   padding: 10px 14px;
   margin: 8px 0;
 }
 
 .chatErrorText {
-  color: #dc2626;
+  color: var(--danger);
   font-size: 13px;
   margin: 0 0 8px;
   line-height: 1.5;
@@ -476,9 +491,9 @@ body {
 .chatTextarea {
   flex: 1;
   padding: 10px 14px;
-  border-radius: 14px;
+  border-radius: var(--radius-md);
   border: 1.5px solid var(--border);
-  background: var(--panel);
+  background: var(--panel2);
   color: var(--text);
   font-size: 14px;
   resize: none;
@@ -490,7 +505,7 @@ body {
 
 .chatTextarea:focus {
   border-color: var(--accent);
-  box-shadow: 0 0 0 3px rgba(26, 122, 60, 0.12);
+  box-shadow: 0 0 0 3px var(--focus-ring);
 }
 
 .chatTextarea::placeholder { color: var(--muted); opacity: 0.8; }
@@ -498,11 +513,11 @@ body {
 
 .chatSendBtn {
   background: linear-gradient(135deg, var(--accent) 0%, var(--accent-light) 100%);
-  border: 1px solid rgba(26, 122, 60, 0.3);
-  color: white;
+  border: 1px solid transparent;
+  color: #0d1117;
   font-weight: 700;
   padding: 10px 20px;
-  border-radius: 14px;
+  border-radius: var(--radius-md);
   cursor: pointer;
   transition: all 0.2s ease;
   align-self: flex-end;
@@ -513,7 +528,8 @@ body {
 }
 
 .chatSendBtn:hover:not(:disabled) {
-  box-shadow: 0 4px 14px rgba(26, 122, 60, 0.32);
+  box-shadow: 0 0 0 3px var(--focus-ring);
+  filter: brightness(1.08);
   transform: translateY(-1px);
 }
 
@@ -574,7 +590,7 @@ body {
   /* Sidebar is visible when body does NOT have sidebarCollapsed */
   .body:not(.sidebarCollapsed) .sidebar {
     transform: translateX(0);
-    box-shadow: 4px 0 24px rgba(0, 0, 0, 0.18);
+    box-shadow: 6px 0 32px rgba(0, 0, 0, 0.55);
   }
 
   /* Overlay backdrop */
@@ -680,13 +696,13 @@ body {
 
 .wipTab:hover {
   color: var(--accent);
-  background: rgba(26, 122, 60, 0.06);
+  background: var(--accent-dim);
 }
 
 .wipTab.active {
   color: var(--accent);
   border-bottom-color: var(--accent);
-  background: rgba(26, 122, 60, 0.07);
+  background: var(--accent-dim);
   font-weight: 700;
 }
 
@@ -766,17 +782,17 @@ body {
 
 .tcInput {
   padding: 8px 10px;
-  border-radius: 10px;
+  border-radius: var(--radius-sm);
   border: 1.5px solid var(--border);
-  background: var(--panel);
+  background: var(--panel3);
   color: var(--text);
   font-size: 13px;
   font-family: inherit;
   outline: none;
-  transition: border-color 0.2s ease;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
-.tcInput:focus { border-color: var(--accent); }
+.tcInput:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--focus-ring); }
 
 .tcRoomItems {
   flex: 1;
@@ -801,12 +817,12 @@ body {
 }
 
 .tcRoomItem:hover {
-  background: rgba(26, 122, 60, 0.08);
-  border-color: rgba(26, 122, 60, 0.15);
+  background: var(--accent-dim);
+  border-color: rgba(63, 185, 80, 0.20);
 }
 
 .tcRoomItem.active {
-  background: rgba(26, 122, 60, 0.12);
+  background: var(--accent-dim);
   border-color: var(--accent);
 }
 

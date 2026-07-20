@@ -417,7 +417,7 @@ function OverviewPanel({
       {/* ── Overdue panel (full-width) ── */}
       {overdue.length > 0 && (
         <section className="card" style={{ marginTop: 14 }} aria-labelledby="wip-overdue-heading">
-          <h2 id="wip-overdue-heading" style={{ margin: '0 0 10px', fontSize: 16, color: '#dc2626' }}>
+          <h2 id="wip-overdue-heading" style={{ margin: '0 0 10px', fontSize: 16, color: 'var(--danger)' }}>
             🔴 Overdue Tasks — Action Required ({overdue.length})
           </h2>
           <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
@@ -595,7 +595,7 @@ export default function TeamWipPage() {
           marginBottom: 20,
         }}
       >
-        <KpiCard label="Overdue" count={overdue.length} icon="🔴" accentColor="#dc2626" />
+        <KpiCard label="Overdue" count={overdue.length} icon="🔴" accentColor="var(--danger)" />
         <KpiCard label="Due Today" count={dueToday.length} icon="🟡" accentColor="#d97706" />
         <KpiCard label="Upcoming" count={upcoming.length} icon="🟢" accentColor="var(--accent)" />
         <KpiCard label="Blocked" count={blocked.length} icon="🚧" accentColor="#7c3aed" />

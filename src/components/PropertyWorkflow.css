@@ -1,7 +1,7 @@
 .propertyWorkflow {
-  border: 1px solid #d4e8d8;
+  border: 1px solid var(--border);
   border-radius: 12px;
-  background: #f8fcf9;
+  background: var(--panel2);
   padding: 14px;
 }
 
@@ -15,13 +15,13 @@
 .propertyWorkflowHeader h3 {
   margin: 0;
   font-size: 15px;
-  color: #1a2e1a;
+  color: var(--text);
 }
 
 .propertyWorkflowHeader p {
   margin: 0;
   font-size: 12px;
-  color: #5a7060;
+  color: var(--muted);
 }
 
 .pwProgressBar {
@@ -29,14 +29,14 @@
   height: 8px;
   border-radius: 999px;
   overflow: hidden;
-  background: #e6f2e8;
+  background: var(--panel3);
   margin: 10px 0 12px;
 }
 
 .pwProgressBar span {
   display: block;
   height: 100%;
-  background: linear-gradient(90deg, #1a7a3c, #28a852);
+  background: linear-gradient(90deg, var(--accent), var(--accent-light));
   transition: width 0.2s ease;
 }
 
@@ -50,7 +50,7 @@
   gap: 8px;
   font-size: 12px;
   font-weight: 600;
-  color: #1a2e1a;
+  color: var(--text);
 }
 
 .pwTabs {
@@ -62,21 +62,22 @@
 }
 
 .pwTab {
-  border: 1px solid #cde8d5;
-  background: #fff;
-  color: #1a7a3c;
+  border: 1px solid var(--border);
+  background: var(--panel3);
+  color: var(--accent);
   border-radius: 999px;
   padding: 6px 12px;
   font-size: 12px;
   font-weight: 600;
   cursor: pointer;
   white-space: nowrap;
+  transition: all 0.18s ease;
 }
 
 .pwTab.active {
-  background: #1a7a3c;
-  color: #fff;
-  border-color: #1a7a3c;
+  background: var(--accent);
+  color: #0d1117;
+  border-color: var(--accent);
 }
 
 .pwChecklist {
@@ -90,22 +91,28 @@
   grid-template-columns: auto auto 1fr;
   gap: 10px;
   align-items: flex-start;
-  border: 1px solid #deede2;
+  border: 1px solid var(--border);
   border-radius: 10px;
-  background: #fff;
+  background: var(--panel3);
   padding: 10px;
+  transition: border-color 0.18s ease;
+}
+
+.pwRow:hover {
+  border-color: rgba(63, 185, 80, 0.30);
 }
 
 .pwRow.completed {
-  background: #f3faf4;
+  background: rgba(63, 185, 80, 0.06);
 }
 
 .pwRow input[type="checkbox"] {
   margin-top: 2px;
+  accent-color: var(--accent);
 }
 
 .pwOrder {
-  color: #1a7a3c;
+  color: var(--accent);
   font-size: 12px;
   font-weight: 700;
   min-width: 24px;
@@ -126,23 +133,29 @@
 
 .pwAssigneeLabel {
   font-size: 11px;
-  color: #5a7060;
+  color: var(--muted);
 }
 
 .pwAssigneeSelect {
-  border: 1px solid #cde8d5;
+  border: 1px solid var(--border);
   border-radius: 8px;
-  background: #fff;
-  color: #1a2e1a;
+  background: var(--panel2);
+  color: var(--text);
   font-size: 12px;
   padding: 2px 6px;
+  outline: none;
+  transition: border-color 0.18s ease;
+}
+
+.pwAssigneeSelect:focus {
+  border-color: var(--accent);
 }
 
 .pwBadge {
   display: inline-block;
-  background: #e9f7ec;
-  border: 1px solid #cde8d5;
-  color: #1a7a3c;
+  background: var(--accent-dim);
+  border: 1px solid rgba(63, 185, 80, 0.30);
+  color: var(--accent);
   border-radius: 999px;
   padding: 2px 8px;
   font-size: 11px;
@@ -152,23 +165,23 @@
 .pwContent p {
   margin: 5px 0 0;
   font-size: 13px;
-  color: #1a2e1a;
+  color: var(--text);
 }
 
 .pwNotes {
-  color: #5a7060 !important;
+  color: var(--muted) !important;
   font-size: 12px !important;
 }
 
 .pwTaskNote {
   margin: 6px 0 0 !important;
   font-size: 12px !important;
-  color: #1a2e1a !important;
+  color: var(--text) !important;
 }
 
 .pwTaskNoteMeta {
   display: block;
-  color: #5a7060;
+  color: var(--muted);
   font-size: 11px;
   margin-top: 2px;
 }
@@ -183,23 +196,37 @@
 .pwTaskNoteInput {
   flex: 1;
   min-width: 180px;
-  border: 1px solid #cde8d5;
+  border: 1px solid var(--border);
   border-radius: 8px;
-  background: #fff;
-  color: #1a2e1a;
+  background: var(--panel2);
+  color: var(--text);
   font-size: 12px;
   padding: 5px 8px;
+  outline: none;
+  transition: border-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.pwTaskNoteInput:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--focus-ring);
 }
 
 .pwTaskNoteButton {
-  border: 1px solid #cde8d5;
-  background: #f0f7f1;
-  color: #1a7a3c;
+  border: 1px solid var(--border);
+  background: var(--panel3);
+  color: var(--accent);
   border-radius: 8px;
   padding: 5px 8px;
   font-size: 12px;
   font-weight: 600;
   cursor: pointer;
+  transition: all 0.18s ease;
+  font-family: inherit;
+}
+
+.pwTaskNoteButton:hover:not(:disabled) {
+  background: var(--accent-dim);
+  border-color: var(--accent);
 }
 
 .pwTaskNoteButton:disabled {
@@ -209,18 +236,18 @@
 
 .pwMuted {
   margin: 0;
-  color: #5a7060;
+  color: var(--muted);
   font-size: 12px;
 }
 
 .pwError {
   margin: 0 0 8px;
-  color: #c0392b;
+  color: var(--danger);
   font-size: 12px;
 }
 
 .pwSuccess {
   margin: 0 0 8px;
-  color: #1a7a3c;
+  color: var(--accent);
   font-size: 12px;
 }
