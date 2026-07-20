@@ -53,15 +53,15 @@ export default function ProjectsByStatusChart() {
 
   return (
     <div style={{ background: '#f5f7f5', borderRadius: '14px', padding: '16px' }}>
-      <h2 style={{ marginBottom: '16px', fontSize: '18px', fontWeight: 600, color: '#1a7a3c' }}>Projects by Status</h2>
+      <h2 style={{ marginBottom: '16px', fontSize: '18px', fontWeight: 600, color: 'var(--accent)' }}>Projects by Status</h2>
       <div style={{ width: "100%", height: 350 }}>
         <ResponsiveContainer>
           <BarChart data={data}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#d4e8d8" />
-            <XAxis dataKey="status" stroke="#5a7060" tick={{ fill: "#1a2e1a" }} />
-            <YAxis stroke="#5a7060" allowDecimals={false} tick={{ fill: "#1a2e1a" }} />
-            <Tooltip contentStyle={{ backgroundColor: '#ffffff', border: '1px solid #d4e8d8', color: '#1a2e1a' }} />
-            <Bar dataKey="count" fill="#1a7a3c" radius={[4,4,4,4]} />
+            <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
+            <XAxis dataKey="status" stroke="var(--muted)" tick={{ fill: "var(--text)" }} />
+            <YAxis stroke="var(--muted)" allowDecimals={false} tick={{ fill: "var(--text)" }} />
+            <Tooltip contentStyle={{ backgroundColor: '#161b22', border: '1px solid var(--border)', color: 'var(--text)' }} />
+            <Bar dataKey="count" fill="var(--accent)" radius={[4,4,4,4]} />
           </BarChart>
         </ResponsiveContainer>
       </div>

@@ -46,11 +46,11 @@ const ResourcesPage: React.FC = () => {
           text-decoration: none;
           color: inherit;
           display: block;
-          transition: all 0.3s ease;
+          transition: all 0.2s ease;
         }
 
         .resourceLink:hover {
-          transform: translateY(-4px);
+          transform: translateY(-3px);
         }
 
         .resourceCard {
@@ -59,35 +59,35 @@ const ResourcesPage: React.FC = () => {
           justify-content: space-between;
           padding: 16px 18px;
           cursor: pointer;
-          border: 1px solid rgba(26, 122, 60, 0.25);
-          background: linear-gradient(135deg, rgba(26, 122, 60, 0.06), rgba(40, 168, 82, 0.04));
-          transition: all 0.3s ease;
+          border: 1px solid var(--border);
+          background: var(--panel2);
+          transition: all 0.2s ease;
           min-height: 60px;
         }
 
         .resourceCard:hover {
-          border: 1px solid rgba(26, 122, 60, 0.50);
-          background: linear-gradient(135deg, rgba(26, 122, 60, 0.10), rgba(40, 168, 82, 0.08));
-          box-shadow: 0 8px 16px rgba(26, 122, 60, 0.12);
+          border-color: rgba(63, 185, 80, 0.40);
+          background: var(--panel3);
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
         }
 
         .resourceLinkText {
           font-weight: 500;
           font-size: 14px;
-          color: #1a2e1a;
+          color: var(--text);
           flex: 1;
         }
 
         .resourceArrow {
           font-size: 18px;
-          color: rgba(26, 122, 60, 0.7);
+          color: var(--muted);
           margin-left: 12px;
-          transition: all 0.3s ease;
+          transition: all 0.2s ease;
           font-weight: 600;
         }
 
         .resourceLink:hover .resourceArrow {
-          color: #1a7a3c;
+          color: var(--accent);
           transform: translateX(4px);
         }
       `}</style>

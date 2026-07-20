@@ -226,7 +226,7 @@ ${JSON.stringify(metrics, null, 2)}
 
       {error && (
         <div style={{ marginTop: "8px" }}>
-          <p style={{ color: "#dc2626", fontSize: "13px", margin: "0 0 6px" }}>
+          <p style={{ color: "var(--danger)", fontSize: "13px", margin: "0 0 6px" }}>
             {error}
           </p>
         </div>

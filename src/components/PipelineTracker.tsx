@@ -50,9 +50,9 @@ function toTrackerStage(rawStage?: string | null): string | null {
   return null;
 }
 
-const TILE_DEFAULT_BG = '#f0f7f1';
-const TILE_HOVER_BG = '#d4e8d8';
-const TILE_DEFAULT_BORDER = '#d4e8d8';
+const TILE_DEFAULT_BG = 'var(--panel2)';
+const TILE_HOVER_BG = 'var(--panel3)';
+const TILE_DEFAULT_BORDER = 'var(--border)';
 const TILE_HOVER_BORDER = 'rgba(26,122,60,0.50)';
 
 interface PipelineTrackerProps {
@@ -87,21 +87,21 @@ export default function PipelineTracker({ rows, onProjectClick }: PipelineTracke
         display: 'grid',
         gridTemplateColumns: `repeat(${ACTIVE_STAGE_ORDER.length}, minmax(0, 1fr))`,
         gap: 0,
-        border: '1.5px solid #d4e8d8',
+        border: '1.5px solid var(--border)',
         borderRadius: 18,
         overflow: 'hidden',
         background: '#fff',
       }}
     >
       {ACTIVE_STAGE_ORDER.map((stage, idx) => {
-        const color = STAGE_COLORS[stage] ?? '#1a7a3c';
+        const color = STAGE_COLORS[stage] ?? 'var(--accent)';
         const projects = grouped[stage];
         const isLast = idx === ACTIVE_STAGE_ORDER.length - 1;
         return (
           <div
             key={stage}
             style={{
-              borderRight: isLast ? 'none' : '1.5px solid #d4e8d8',
+              borderRight: isLast ? 'none' : '1.5px solid var(--border)',
               display: 'flex',
               flexDirection: 'column',
               minHeight: 220,
@@ -173,7 +173,7 @@ export default function PipelineTracker({ rows, onProjectClick }: PipelineTracke
                 <p
                   style={{
                     fontSize: 12,
-                    color: '#5a7060',
+                    color: 'var(--muted)',
                     fontStyle: 'italic',
                     margin: 0,
                   }}
@@ -194,8 +194,8 @@ export default function PipelineTracker({ rows, onProjectClick }: PipelineTracke
                       onClick={onProjectClick ? () => onProjectClick(p) : undefined}
                       onKeyDown={onProjectClick ? (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onProjectClick(p); } } : undefined}
                       style={{
-                        background: '#f0f7f1',
-                        border: '1px solid #d4e8d8',
+                        background: 'var(--panel2)',
+                        border: '1px solid var(--border)',
                         borderRadius: 8,
                         padding: '6px 8px',
                         cursor: onProjectClick ? 'pointer' : 'default',
@@ -240,7 +240,7 @@ export default function PipelineTracker({ rows, onProjectClick }: PipelineTracke
                         <div
                           style={{
                             fontSize: 11,
-                            color: '#5a7060',
+                            color: 'var(--muted)',
                             marginTop: 2,
                             lineHeight: 1.2,
                           }}
