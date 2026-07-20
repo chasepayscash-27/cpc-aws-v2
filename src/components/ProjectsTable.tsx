@@ -44,16 +44,16 @@ export default function ProjectsTable({ rows, onViewFullPnL }: Props) {
     textAlign: "left",
     fontSize: 11,
     fontWeight: 700,
-    color: "#1a7a3c",
+    color: "var(--accent)",
     letterSpacing: "0.08em",
     textTransform: "uppercase",
-    borderBottom: "1px solid #d4e8d8",
+    borderBottom: "1px solid var(--border)",
     whiteSpace: "nowrap",
   };
 
   const tdStyle: CSSProperties = {
     padding: "10px 12px",
-    borderBottom: "1px solid #eaf4ec",
+    borderBottom: "1px solid var(--border)",
     fontSize: 13,
     verticalAlign: "middle",
   };
@@ -128,7 +128,7 @@ export default function ProjectsTable({ rows, onViewFullPnL }: Props) {
               <td style={tdStyle}>
                 <div>{row.city && row.state ? `${row.city}, ${row.state}` : row.full_address ?? "—"}</div>
                 {row.postal_code && (
-                  <div style={{ fontSize: 11, color: "#5a7060" }}>{row.postal_code}</div>
+                  <div style={{ fontSize: 11, color: "var(--muted)" }}>{row.postal_code}</div>
                 )}
               </td>
               <td style={tdStyle}>{badge(row.stage, STAGE_COLORS)}</td>

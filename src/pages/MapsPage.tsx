@@ -132,7 +132,7 @@ export default function MapsPage() {
       </div>
 
       {loading && (
-        <div className="card" style={{ padding: 40, textAlign: "center", color: "#5a7060" }}>
+        <div className="card" style={{ padding: 40, textAlign: "center", color: "var(--muted)" }}>
           Loading map…
         </div>
       )}
@@ -144,7 +144,7 @@ export default function MapsPage() {
       )}
 
       {!loading && !error && mappedProjects.length === 0 && (
-        <div className="card" style={{ padding: 40, textAlign: "center", color: "#5a7060" }}>
+        <div className="card" style={{ padding: 40, textAlign: "center", color: "var(--muted)" }}>
           No properties with coordinates to display yet.
         </div>
       )}

@@ -440,7 +440,7 @@ export default function ActiveListingPage() {
                   <p className="muted" style={{ fontSize: 13, margin: 0 }}>Loading notes…</p>
                 )}
                 {notesError && (
-                  <p style={{ color: '#dc2626', fontSize: 13, margin: 0 }}>{notesError}</p>
+                  <p style={{ color: 'var(--danger)', fontSize: 13, margin: 0 }}>{notesError}</p>
                 )}
                 {!notesLoading && !notesError && notes.length === 0 && (
                   <div className="alNoteEmpty">

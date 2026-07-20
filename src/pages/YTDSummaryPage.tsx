@@ -71,7 +71,7 @@ export default function YTDSummaryPage() {
   if (error) {
     return (
       <div className="pageHeader">
-        <p style={{ color: '#dc2626' }}>Error: {error}</p>
+        <p style={{ color: 'var(--danger)' }}>Error: {error}</p>
       </div>
     );
   }
@@ -140,7 +140,7 @@ export default function YTDSummaryPage() {
           <div className="cardValue">{data['Average Profit']}</div>
           <div className="cardSub" style={{ color: 'var(--muted)' }}>Goal: {data['Average Profit Goal']}</div>
         </div>
-        <div className="card" style={{ borderTop: '3px solid #1a7a3c' }}>
+        <div className="card" style={{ borderTop: '3px solid var(--accent)' }}>
           <div className="cardLabel">Total in Pipeline</div>
           <div className="cardValue">{stagesLoading ? '—' : totalPipelineCount}</div>
           <div className="cardSub" style={{ color: 'var(--muted)' }}>Active projects</div>
@@ -174,7 +174,7 @@ export default function YTDSummaryPage() {
 
       {/* Pipeline by Stage — horizontal tracker */}
       <section style={{ margin: '0 0 14px' }}>
-        <h2 style={{ fontSize: 14, fontWeight: 700, color: '#1a7a3c', marginBottom: 10, letterSpacing: '0.04em', textTransform: 'uppercase' }}>
+        <h2 style={{ fontSize: 14, fontWeight: 700, color: 'var(--accent)', marginBottom: 10, letterSpacing: '0.04em', textTransform: 'uppercase' }}>
           Pipeline by Stage
         </h2>
         {stagesLoading ? (

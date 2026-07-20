@@ -64,7 +64,7 @@ export default function DaysInInventoryChart() {
 
   return (
     <div style={{ width: "100%", maxHeight: "80vh", overflowY: "auto" }}>
-      <h2 style={{ color: "#1a2e1a" }}>Properties by Days in Inventory</h2>
+      <h2 style={{ color: "var(--text)" }}>Properties by Days in Inventory</h2>
 
       <div style={{ width: "100%", height: chartHeight }}>
       <ResponsiveContainer width="100%" height="100%">
@@ -73,20 +73,20 @@ export default function DaysInInventoryChart() {
           data={data}
           margin={{ top: 10, right: 20, left: 200, bottom: 10 }}
         >
-          <CartesianGrid stroke="#d4e8d8" strokeDasharray="3 3" />
+          <CartesianGrid stroke="var(--border)" strokeDasharray="3 3" />
 
           <XAxis
             type="number"
-            stroke="#5a7060"
-            tick={{ fill: "#1a2e1a" }}
+            stroke="var(--muted)"
+            tick={{ fill: "var(--text)" }}
           />
 
           <YAxis
             type="category"
             dataKey="house"
             width={250}
-            stroke="#5a7060"
-            tick={{ fill: "#1a2e1a", fontSize: 12 }}
+            stroke="var(--muted)"
+            tick={{ fill: "var(--text)", fontSize: 12 }}
             interval={0}
           />
 
@@ -94,7 +94,7 @@ export default function DaysInInventoryChart() {
             contentStyle={{
               backgroundColor: "#ffffff",
               border: "1px solid #d4e8d8",
-              color: "#1a2e1a",
+              color: "var(--text)",
             }}
             formatter={(value) => [
               `${String(value)} days`,
@@ -104,7 +104,7 @@ export default function DaysInInventoryChart() {
 
           <Bar
             dataKey="daysInInventory"
-            fill="#1a7a3c"
+            fill="var(--accent)"
             radius={[4, 4, 4, 4]}
           />
         </BarChart>

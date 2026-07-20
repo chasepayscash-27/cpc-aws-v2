@@ -136,7 +136,7 @@ const propertyData = useMemo(
 
   if (loading) {
     return (
-      <div style={{ padding: '16px', textAlign: 'center', color: '#5a7060', fontSize: 13 }}>
+      <div style={{ padding: '16px', textAlign: 'center', color: 'var(--muted)', fontSize: 13 }}>
         Loading financials…
       </div>
     );
@@ -144,7 +144,7 @@ const propertyData = useMemo(
 
   if (error) {
     return (
-      <div style={{ padding: '16px', textAlign: 'center', color: '#dc2626', fontSize: 13 }}>
+      <div style={{ padding: '16px', textAlign: 'center', color: 'var(--danger)', fontSize: 13 }}>
         {error}
       </div>
     );
@@ -152,7 +152,7 @@ const propertyData = useMemo(
 
   if (propertyData.length === 0) {
     return (
-      <div style={{ padding: '16px', textAlign: 'center', color: '#5a7060', fontSize: 13 }}>
+      <div style={{ padding: '16px', textAlign: 'center', color: 'var(--muted)', fontSize: 13 }}>
         No financial data available for this property.
       </div>
     );
@@ -173,13 +173,13 @@ const propertyData = useMemo(
           <div
             key={label}
             style={{
-              background: '#f0f7f1',
+              background: 'var(--panel2)',
               border: '1px solid #d4e8d8',
               borderRadius: 12,
               padding: '12px 14px',
             }}
           >
-            <div style={{ fontSize: 11, color: '#5a7060', marginBottom: 6 }}>{label}</div>
+            <div style={{ fontSize: 11, color: 'var(--muted)', marginBottom: 6 }}>{label}</div>
             <div
               style={{
                 fontSize: 16,
@@ -187,9 +187,9 @@ const propertyData = useMemo(
                 color:
                   label === 'Net Profit'
                     ? value < 0
-                      ? '#dc2626'
-                      : '#1a7a3c'
-                    : '#1a7a3c',
+                      ? 'var(--danger)'
+                      : 'var(--accent)'
+                    : 'var(--accent)',
               }}
             >
               {fmt(value)}
@@ -220,8 +220,8 @@ const propertyData = useMemo(
                 fontSize: 13,
               }}
             >
-              <span style={{ color: '#1a2e1a' }}>{record.account}</span>
-              <span style={{ color: '#5a7060' }}>{fmt(record.amount)}</span>
+              <span style={{ color: 'var(--text)' }}>{record.account}</span>
+              <span style={{ color: 'var(--muted)' }}>{fmt(record.amount)}</span>
             </div>
           ))}
         </div>
@@ -239,7 +239,7 @@ const propertyData = useMemo(
               padding: '6px 14px',
               fontSize: 12,
               fontWeight: 600,
-              color: '#1a7a3c',
+              color: 'var(--accent)',
               cursor: 'pointer',
               transition: 'background 0.15s',
             }}

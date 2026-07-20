@@ -45,10 +45,10 @@ export default function ProjectsGallery({ rows, onViewFullPnL }: Props) {
   };
 
   const cardStyle: CSSProperties = {
-    border: "1px solid #d4e8d8",
+    border: "1px solid var(--border)",
     borderRadius: 18,
     overflow: "hidden",
-    background: "#ffffff",
+    background: "var(--panel)",
     transition: "transform 0.15s, border-color 0.15s, box-shadow 0.15s",
     cursor: "pointer",
   };
@@ -71,12 +71,12 @@ export default function ProjectsGallery({ rows, onViewFullPnL }: Props) {
           }}
           onMouseLeave={(e) => {
             (e.currentTarget as HTMLDivElement).style.transform = "";
-            (e.currentTarget as HTMLDivElement).style.borderColor = "#d4e8d8";
+            (e.currentTarget as HTMLDivElement).style.borderColor = "var(--border)";
             (e.currentTarget as HTMLDivElement).style.boxShadow = "";
           }}
         >
           {/* Image */}
-          <div style={{ position: "relative", height: 180, background: "#f0f7f1" }}>
+          <div style={{ position: "relative", height: 180, background: "var(--panel2)" }}>
             <PropertyMainImage
               key={row.featured_image_url ?? "gallery-placeholder"}
               imageUrl={row.featured_image_url}
@@ -119,7 +119,7 @@ export default function ProjectsGallery({ rows, onViewFullPnL }: Props) {
             <div style={{ fontWeight: 700, fontSize: 14, marginBottom: 4, lineHeight: 1.3 }}>
               {row.name ?? "Unnamed Project"}
             </div>
-            <div style={{ fontSize: 12, color: "#5a7060", marginBottom: 10 }}>
+            <div style={{ fontSize: 12, color: "var(--muted)", marginBottom: 10 }}>
               {row.city && row.state
                 ? `${row.city}, ${row.state}${row.postal_code ? " " + row.postal_code : ""}`
                 : row.full_address ?? ""}
@@ -139,20 +139,20 @@ export default function ProjectsGallery({ rows, onViewFullPnL }: Props) {
                 gridTemplateColumns: "1fr 1fr 1fr",
                 gap: 4,
                 fontSize: 12,
-                borderTop: "1px solid #eaf4ec",
+                borderTop: "1px solid var(--border)",
                 paddingTop: 10,
               }}
             >
               <div>
-                <div style={{ color: "#5a7060", fontSize: 10, marginBottom: 2 }}>BEDS</div>
+                <div style={{ color: "var(--muted)", fontSize: 10, marginBottom: 2 }}>BEDS</div>
                 <div style={{ fontWeight: 600 }}>{row.beds ?? "—"}</div>
               </div>
               <div>
-                <div style={{ color: "#5a7060", fontSize: 10, marginBottom: 2 }}>BATHS</div>
+                <div style={{ color: "var(--muted)", fontSize: 10, marginBottom: 2 }}>BATHS</div>
                 <div style={{ fontWeight: 600 }}>{row.baths ?? "—"}</div>
               </div>
               <div>
-                <div style={{ color: "#5a7060", fontSize: 10, marginBottom: 2 }}>SQ FT</div>
+                <div style={{ color: "var(--muted)", fontSize: 10, marginBottom: 2 }}>SQ FT</div>
                 <div style={{ fontWeight: 600 }}>
                   {row.square_feet && !isNaN(Number(row.square_feet))
                     ? Number(row.square_feet).toLocaleString()
@@ -172,9 +172,9 @@ export default function ProjectsGallery({ rows, onViewFullPnL }: Props) {
                 width: "100%",
                 padding: "7px 0",
                 borderRadius: 10,
-                border: "1px solid #1a7a3c",
-                background: "#f0f7f1",
-                color: "#1a7a3c",
+                border: "1px solid var(--accent)",
+                background: "var(--panel2)",
+                color: "var(--accent)",
                 fontSize: 12,
                 fontWeight: 600,
                 cursor: "pointer",
@@ -185,12 +185,12 @@ export default function ProjectsGallery({ rows, onViewFullPnL }: Props) {
                 transition: "background 0.15s, color 0.15s",
               }}
               onMouseEnter={(e) => {
-                (e.currentTarget as HTMLButtonElement).style.background = "#1a7a3c";
-                (e.currentTarget as HTMLButtonElement).style.color = "#ffffff";
+                (e.currentTarget as HTMLButtonElement).style.background = "var(--accent)";
+                (e.currentTarget as HTMLButtonElement).style.color = "#0d1117";
               }}
               onMouseLeave={(e) => {
-                (e.currentTarget as HTMLButtonElement).style.background = "#f0f7f1";
-                (e.currentTarget as HTMLButtonElement).style.color = "#1a7a3c";
+                (e.currentTarget as HTMLButtonElement).style.background = "var(--panel2)";
+                (e.currentTarget as HTMLButtonElement).style.color = "var(--accent)";
               }}
               aria-label="Download editable PDF report"
             >

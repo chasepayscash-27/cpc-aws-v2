@@ -28,23 +28,23 @@ export default function PullManifestTable() {
 
   return (
     <div style={{ background: '#f5f7f5', borderRadius: '14px', padding: '16px' }}>
-      <h2 style={{ marginBottom: '16px', fontSize: '18px', fontWeight: 600, color: '#1a7a3c' }}>Pull Manifest</h2>
+      <h2 style={{ marginBottom: '16px', fontSize: '18px', fontWeight: 600, color: 'var(--accent)' }}>Pull Manifest</h2>
 
       <div style={{ overflowX: 'auto' }}>
-        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px', color: '#1a2e1a' }}>
+        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px', color: 'var(--text)' }}>
           <thead>
-            <tr style={{ borderBottom: '1px solid #d4e8d8' }}>
-              <th style={{ padding: '8px 12px', textAlign: 'left', color: '#1a7a3c', fontWeight: 700, textTransform: 'uppercase', fontSize: 11, letterSpacing: '0.08em' }}>Source</th>
-              <th style={{ padding: '8px 12px', textAlign: 'left', color: '#1a7a3c', fontWeight: 700, textTransform: 'uppercase', fontSize: 11, letterSpacing: '0.08em' }}>File</th>
-              <th style={{ padding: '8px 12px', textAlign: 'left', color: '#1a7a3c', fontWeight: 700, textTransform: 'uppercase', fontSize: 11, letterSpacing: '0.08em' }}>Pull Date</th>
-              <th style={{ padding: '8px 12px', textAlign: 'left', color: '#1a7a3c', fontWeight: 700, textTransform: 'uppercase', fontSize: 11, letterSpacing: '0.08em' }}>Loaded At</th>
-              <th style={{ padding: '8px 12px', textAlign: 'left', color: '#1a7a3c', fontWeight: 700, textTransform: 'uppercase', fontSize: 11, letterSpacing: '0.08em' }}>Record Count</th>
-              <th style={{ padding: '8px 12px', textAlign: 'left', color: '#1a7a3c', fontWeight: 700, textTransform: 'uppercase', fontSize: 11, letterSpacing: '0.08em' }}>Status</th>
+            <tr style={{ borderBottom: '1px solid var(--border)' }}>
+              <th style={{ padding: '8px 12px', textAlign: 'left', color: 'var(--accent)', fontWeight: 700, textTransform: 'uppercase', fontSize: 11, letterSpacing: '0.08em' }}>Source</th>
+              <th style={{ padding: '8px 12px', textAlign: 'left', color: 'var(--accent)', fontWeight: 700, textTransform: 'uppercase', fontSize: 11, letterSpacing: '0.08em' }}>File</th>
+              <th style={{ padding: '8px 12px', textAlign: 'left', color: 'var(--accent)', fontWeight: 700, textTransform: 'uppercase', fontSize: 11, letterSpacing: '0.08em' }}>Pull Date</th>
+              <th style={{ padding: '8px 12px', textAlign: 'left', color: 'var(--accent)', fontWeight: 700, textTransform: 'uppercase', fontSize: 11, letterSpacing: '0.08em' }}>Loaded At</th>
+              <th style={{ padding: '8px 12px', textAlign: 'left', color: 'var(--accent)', fontWeight: 700, textTransform: 'uppercase', fontSize: 11, letterSpacing: '0.08em' }}>Record Count</th>
+              <th style={{ padding: '8px 12px', textAlign: 'left', color: 'var(--accent)', fontWeight: 700, textTransform: 'uppercase', fontSize: 11, letterSpacing: '0.08em' }}>Status</th>
             </tr>
           </thead>
           <tbody>
             {rows.map((row, index) => (
-              <tr key={index} style={{ borderBottom: '1px solid #eaf4ec' }}>
+              <tr key={index} style={{ borderBottom: '1px solid var(--border)' }}>
                 <td style={{ padding: '8px 12px' }}>{row.source_name || "-"}</td>
                 <td style={{ padding: '8px 12px' }}>{row.file_name || "-"}</td>
                 <td style={{ padding: '8px 12px' }}>{row.pull_date || "-"}</td>

@@ -121,7 +121,7 @@ const FinancialsPage: React.FC<Props> = ({ initialProperty }) => {
         </div>
         <div className="card">
           <div className="cardLabel">Net Profit</div>
-          <div className="cardValue" style={{ color: netProfit < 0 ? '#dc2626' : '#1a7a3c' }}>
+          <div className="cardValue" style={{ color: netProfit < 0 ? 'var(--danger)' : 'var(--accent)' }}>
             ${netProfit.toLocaleString('en-US', { maximumFractionDigits: 2 })}
           </div>
         </div>
@@ -141,7 +141,7 @@ const FinancialsPage: React.FC<Props> = ({ initialProperty }) => {
                 padding: '8px 12px',
                 borderRadius: '8px',
                 border: '1px solid var(--border)',
-                background: '#f0f7f1',
+                background: 'var(--panel2)',
                 color: 'var(--text)',
                 cursor: 'pointer',
               }}
@@ -166,7 +166,7 @@ const FinancialsPage: React.FC<Props> = ({ initialProperty }) => {
                 padding: '8px 12px',
                 borderRadius: '8px',
                 border: '1px solid var(--border)',
-                background: '#f0f7f1',
+                background: 'var(--panel2)',
                 color: 'var(--text)',
               }}
             />
@@ -187,7 +187,7 @@ const FinancialsPage: React.FC<Props> = ({ initialProperty }) => {
             </thead>
             <tbody>
               {filteredData.map((record, idx) => (
-                <tr key={idx} style={{ borderBottom: '1px solid #eaf4ec' }}>
+                <tr key={idx} style={{ borderBottom: '1px solid var(--border)' }}>
                   <td style={{ padding: '8px' }}>{record.account}</td>
                   <td style={{ padding: '8px', color: 'var(--muted)', fontSize: '12px' }}>{record.property_name}</td>
                   <td style={{ textAlign: 'right', padding: '8px' }}>

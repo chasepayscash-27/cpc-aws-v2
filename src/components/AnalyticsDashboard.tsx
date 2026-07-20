@@ -21,15 +21,15 @@ import type { PropertyData } from "./AiInsightsPanel";
 
 export type { PropertyData };
 
-const COLORS = ["#1a7a3c", "#28a852", "#3dbd68", "#52d27e", "#67e794"];
+const COLORS = ["#3fb950", "#56d364", "#7ee787", "#a5f3a5", "#d2ffd2"];
 
-// Color scheme matching green real estate theme
+// Color scheme matching dark theme
 const colors = {
-  lightGreen: "#f0f7f1",
-  darkGreen: "#1a2e1a",
-  accentGreen: "#1a7a3c",
-  white: "#FFFFFF",
-  green: "#28a852",
+  lightGreen: "var(--accent-dim)",
+  darkGreen: "var(--text)",
+  accentGreen: "var(--accent)",
+  white: "var(--panel)",
+  green: "var(--accent-light)",
 };
 
 export function AnalyticsDashboard({ refreshKey = 0 }: { refreshKey?: number }) {
@@ -94,7 +94,7 @@ export function AnalyticsDashboard({ refreshKey = 0 }: { refreshKey?: number }) 
     return (
       <div style={{ 
         padding: "40px", 
-        color: "#dc2626", 
+        color: "var(--danger)", 
         textAlign: "center",
         fontSize: "16px"
       }}>
@@ -432,7 +432,7 @@ export function AnalyticsDashboard({ refreshKey = 0 }: { refreshKey?: number }) 
                         color:
                           prop.gross_profit_num > 0
                             ? colors.green
-                            : "#dc2626",
+                            : "var(--danger)",
                         fontWeight: "600",
                       }}
                     >

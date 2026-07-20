@@ -1,11 +1,13 @@
 :root {
-  --bg: #f3f4f6;          /* light gray */
-  --panel: #ffffff;       /* white cards */
-  --text: #111827;        /* near-black */
-  --muted: #6b7280;       /* gray text */
-  --border: #e5e7eb;      /* light border */
-  --accent: #f97316;      /* orange */
-  --accent-2: #fb923c;    /* lighter orange */
+  --bg:           #0d1117;
+  --panel:        #161b22;
+  --panel2:       #1c2128;
+  --panel3:       #21262d;
+  --text:         #e6edf3;
+  --muted:        #8b949e;
+  --border:       #30363d;
+  --accent:       #3fb950;
+  --accent-2:     #56d364;
 }
 
 * { box-sizing: border-box; }
@@ -36,8 +38,8 @@ body::before {
   background-size: 900px;
   background-attachment: fixed;
 
-  /* controls how faint it is */
-  opacity: 0.08;
+  /* lighter opacity for dark bg */
+  opacity: 0.04;
 }
 
 /* ensure app sits above the watermark */
@@ -51,13 +53,13 @@ body::before {
 
 /* Header */
 .header {
-  background: #0b0f19;
-  color: white;
+  background: #161b22;
+  color: #e6edf3;
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 0 20px;
-  border-bottom: 1px solid rgba(255,255,255,0.06);
+  border-bottom: 1px solid #30363d;
 }
 
 .brand {
@@ -80,7 +82,7 @@ body::before {
 
 .brand-subtitle {
   font-size: 12px;
-  color: rgba(255,255,255,0.70);
+  color: var(--muted);
 }
 
 .header-actions {
@@ -124,12 +126,14 @@ body::before {
 }
 
 .nav a:hover {
-  background: #f9fafb;
+  background: rgba(63, 185, 80, 0.10);
+  color: var(--accent);
 }
 
 .nav a.active {
-  background: #fff7ed;
-  border: 1px solid #fed7aa;
+  background: rgba(63, 185, 80, 0.15);
+  border: 1px solid rgba(63, 185, 80, 0.30);
+  color: var(--accent);
 }
 
 .main {
@@ -148,6 +152,7 @@ body::before {
 .card h2 {
   margin: 0 0 6px;
   font-size: 18px;
+  color: var(--text);
 }
 
 .card p {
@@ -158,29 +163,36 @@ body::before {
 /* Buttons */
 button {
   border-radius: 10px;
-  border: 1px solid transparent;
+  border: 1px solid var(--border);
   padding: 10px 14px;
   font-size: 14px;
   font-weight: 700;
   font-family: inherit;
-  background-color: #111827;
+  background-color: var(--panel2);
   cursor: pointer;
-  color: white;
+  color: var(--text);
+  transition: all 0.18s ease;
 }
 
-button:hover { border-color: var(--accent); }
+button:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  background-color: rgba(63, 185, 80, 0.10);
+}
 button:focus, button:focus-visible { outline: 4px auto -webkit-focus-ring-color; }
 
 button.accent {
   background: var(--accent);
-  color: #111827;
+  color: #0d1117;
+  border-color: transparent;
 }
 
 button.accent:hover {
-  border-color: #111827;
+  filter: brightness(1.1);
+  box-shadow: 0 0 0 3px rgba(63, 185, 80, 0.30);
 }
 
-/* Todo list */
+/* List items */
 ul {
   padding: 0;
   margin: 10px 0 0;
@@ -193,16 +205,15 @@ li {
   border: 1px solid var(--border);
   border-radius: 12px;
   padding: 10px 12px;
-  background: #fff;
+  background: var(--panel);
 }
 
-li:hover { border-color: #cbd5e1; }
+li:hover { border-color: var(--accent); }
 
 /* Responsive */
 @media (max-width: 900px) {
   .container { grid-template-columns: 1fr; }
 
-  /* Optional: scale watermark down on mobile */
   body::before {
     background-size: 520px;
     background-position: center 80px;

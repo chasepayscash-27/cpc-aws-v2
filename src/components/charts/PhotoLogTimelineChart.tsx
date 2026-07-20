@@ -55,15 +55,15 @@ export default function PhotoLogTimelineChart() {
 
   return (
     <div style={{ background: '#f5f7f5', borderRadius: '14px', padding: '16px' }}>
-      <h2 style={{ marginBottom: '16px', fontSize: '18px', fontWeight: 600, color: '#1a7a3c' }}>Photo Log Timeline</h2>
+      <h2 style={{ marginBottom: '16px', fontSize: '18px', fontWeight: 600, color: 'var(--accent)' }}>Photo Log Timeline</h2>
       <div style={{ width: "100%", height: 350 }}>
         <ResponsiveContainer>
           <LineChart data={data}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#d4e8d8" />
-            <XAxis dataKey="date" stroke="#5a7060" tick={{ fill: "#1a2e1a" }} />
-            <YAxis stroke="#5a7060" allowDecimals={false} tick={{ fill: "#1a2e1a" }} />
-            <Tooltip contentStyle={{ backgroundColor: '#ffffff', border: '1px solid #d4e8d8', color: '#1a2e1a' }} />
-            <Line type="monotone" dataKey="count" stroke="#1a7a3c" strokeWidth={3} />
+            <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
+            <XAxis dataKey="date" stroke="var(--muted)" tick={{ fill: "var(--text)" }} />
+            <YAxis stroke="var(--muted)" allowDecimals={false} tick={{ fill: "var(--text)" }} />
+            <Tooltip contentStyle={{ backgroundColor: '#161b22', border: '1px solid var(--border)', color: 'var(--text)' }} />
+            <Line type="monotone" dataKey="count" stroke="var(--accent)" strokeWidth={3} />
           </LineChart>
         </ResponsiveContainer>
       </div>

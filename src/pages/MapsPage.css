@@ -6,7 +6,7 @@
   width: 100%;
   min-height: 70vh;
   height: 70vh;
-  border: 1px solid #d4e8d8;
+  border: 1px solid var(--border);
   border-radius: 18px;
   overflow: hidden;
 }
@@ -16,19 +16,20 @@
   right: 12px;
   bottom: 12px;
   z-index: 500;
-  background: rgba(255, 255, 255, 0.95);
-  border: 1px solid #d4e8d8;
+  background: rgba(22, 27, 34, 0.95);
+  border: 1px solid var(--border);
   border-radius: 12px;
   padding: 10px 12px;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.45);
   min-width: 170px;
+  backdrop-filter: blur(6px);
 }
 
 .mapsPageLegendTitle {
   font-size: 11px;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: #1a7a3c;
+  color: var(--accent);
   font-weight: 700;
   margin-bottom: 8px;
 }
@@ -45,7 +46,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  color: #1a2e1a;
+  color: var(--text);
   font-size: 12px;
 }
 
@@ -53,7 +54,7 @@
   width: 10px;
   height: 10px;
   border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.3);
   flex-shrink: 0;
 }
 
@@ -62,7 +63,7 @@
   height: 14px;
   border-radius: 999px;
   border: 2px solid #fff;
-  box-shadow: 0 0 0 1px rgba(26, 46, 26, 0.25);
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.4);
 }
 
 .leaflet-div-icon {
@@ -79,7 +80,7 @@
   height: 110px;
   border-radius: 10px;
   overflow: hidden;
-  background: #f0f7f1;
+  background: var(--panel3);
   margin-bottom: 8px;
 }
 
@@ -95,22 +96,24 @@
   place-items: center;
   width: 100%;
   height: 100%;
-  color: rgba(26, 122, 60, 0.35);
+  color: var(--muted);
   font-size: 28px;
+  opacity: 0.5;
 }
 
 .propertyMapPopupBody {
-  color: #1a2e1a;
+  color: var(--text);
 }
 
 .propertyMapPopupTitle {
   font-size: 14px;
   font-weight: 700;
   margin-bottom: 4px;
+  color: var(--text);
 }
 
 .propertyMapPopupAddress {
-  color: #5a7060;
+  color: var(--muted);
   font-size: 12px;
   margin-bottom: 8px;
 }
@@ -118,24 +121,26 @@
 .propertyMapPopupStats {
   display: grid;
   gap: 2px;
-  color: #1a2e1a;
+  color: var(--text);
   font-size: 11px;
   margin-bottom: 10px;
 }
 
 .propertyMapPopupButton {
   width: 100%;
-  border: 1px solid #1a7a3c;
+  border: 1px solid var(--accent);
   border-radius: 9px;
-  background: #f0f7f1;
-  color: #1a7a3c;
+  background: var(--accent-dim);
+  color: var(--accent);
   font-weight: 600;
   font-size: 12px;
   cursor: pointer;
   padding: 6px 10px;
+  font-family: inherit;
+  transition: all 0.18s ease;
 }
 
 .propertyMapPopupButton:hover {
-  background: #1a7a3c;
-  color: #fff;
+  background: var(--accent);
+  color: #0d1117;
 }
