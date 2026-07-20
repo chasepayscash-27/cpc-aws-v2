@@ -33,7 +33,8 @@ const navGroups: NavGroup[] = [
   {
     title: 'Intelligence',
     items: [
-      { icon: '📊', label: 'Analytics', path: '/analytics' },
+      // Temporarily hidden: analytics nav can be re-enabled by uncommenting this entry.
+      // { icon: '📊', label: 'Analytics', path: '/analytics' },
       // Temporarily hidden: financials nav can be re-enabled by uncommenting this entry.
       // { icon: '💰', label: 'Financials', path: '/financials' },
       { icon: '🤖', label: 'AI Chat', path: '/chat' },

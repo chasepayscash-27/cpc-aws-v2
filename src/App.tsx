@@ -66,7 +66,10 @@ const App = () => {
               <Route path="/financials" element={<FinancialsPage />} />
               <Route path="/resources" element={<ResourcesPage />} />
               <Route path="/team" element={<TeamPage />} />
-              <Route path="/analytics" element={<AnalyticsPage />} />
+              {/* Analytics route temporarily disabled for production. To re-enable:
+                  1. Uncomment the Analytics nav item in src/components/Navigation.tsx
+                  2. Restore this route: <Route path="/analytics" element={<AnalyticsPage />} /> */}
+              <Route path="/analytics" element={<Navigate to="/" replace />} />
               <Route path="/chat" element={<ChatPage />} />
               <Route path="/workflow" element={<WorkflowPage />} />
               <Route path="/team-chat" element={<TeamChatPage />} />
