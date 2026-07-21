@@ -128,6 +128,31 @@ const schema = a.schema({
       allow.guest(),
       allow.publicApiKey(),
     ]),
+
+  // ─── Property Stage Overrides ──────────────────────────────────────────────
+  // Interim solution: allows team members to drag-and-drop properties to a
+  // different pipeline stage on the website without touching Flipper Force.
+  // The effective stage for display is:
+  //   overriddenStage (if present) › otherwise the Flipper Force stage from CSV.
+  // Remove this model once Flipper Force is fully deprecated and the app owns
+  // stage data end-to-end.
+
+  PropertyStageOverride: a
+    .model({
+      // Stable identifier — maps to project_uuid in projects_v2.csv
+      propertyId: a.string().required(),
+      // One of the ACTIVE_STAGE_ORDER values defined in PipelineTracker.tsx
+      overriddenStage: a.string().required(),
+      // Original Flipper Force stage value kept for audit / rollback reference
+      flipperForceStage: a.string(),
+      // Who made the change (Cognito sub or display name when available)
+      updatedBy: a.string(),
+    })
+    .authorization((allow) => [
+      allow.authenticated("identityPool"),
+      allow.guest(),
+      allow.publicApiKey(),
+    ]),
 });
 
 export type Schema = ClientSchema<typeof schema>;

@@ -2,6 +2,7 @@ import { lazy, Suspense, useState } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import Navigation from './components/Navigation';
 import { PropertyTasksProvider } from './contexts/PropertyTasksContext';
+import { StageOverrideProvider } from './contexts/StageOverrideContext';
 import './App.css';
 
 // Lazy-load each page so Vite emits a separate chunk per route.
@@ -57,6 +58,7 @@ const App = () => {
       <div className={`body${sidebarOpen ? '' : ' sidebarCollapsed'}`}>
         <Navigation collapsed={!sidebarOpen} />
         <main className="content">
+          <StageOverrideProvider>
           <PropertyTasksProvider>
           <Suspense fallback={<div className="pageHeader" role="status" aria-live="polite"><p className="muted">Loading…</p></div>}>
             <Routes>
@@ -80,6 +82,7 @@ const App = () => {
             </Routes>
           </Suspense>
           </PropertyTasksProvider>
+          </StageOverrideProvider>
         </main>
       </div>
     </div>
