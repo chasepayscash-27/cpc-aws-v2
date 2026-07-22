@@ -62,7 +62,7 @@ interface PipelineTrackerProps {
 
 export default function PipelineTracker({ rows, onProjectClick }: PipelineTrackerProps) {
   const { allTasks, isLoading: tasksLoading } = usePropertyTasks();
-  const { overrides, setOverride } = useStageOverrides();
+  const { overrides, setOverride, clearOverride } = useStageOverrides();
   const progressByProperty = useMemo(
     () => computeMainWorkflowProgressByProperty(allTasks),
     [allTasks],
@@ -77,6 +77,8 @@ export default function PipelineTracker({ rows, onProjectClick }: PipelineTracke
   const [optimisticOverrides, setOptimisticOverrides] = useState<Record<string, string>>({});
   // Error banner shown when a save fails.
   const [dragError, setDragError] = useState<string | null>(null);
+  // Track which propertyId is being optimistically cleared (reset).
+  const [clearingIds, setClearingIds] = useState<Record<string, true>>({});
   // Ref so async drop handlers can read the latest rows without stale closures.
 
 
@@ -97,8 +99,10 @@ export default function PipelineTracker({ rows, onProjectClick }: PipelineTracke
     for (const row of rows) {
       if (row.archived_at) continue;
       // Prefer merged override (optimistic + persisted) over CSV stage.
+      // If this card is being optimistically cleared, fall back to CSV stage.
+      const isClearingThisRow = row.project_uuid ? clearingIds[row.project_uuid] : false;
       const overriddenStage =
-        row.project_uuid ? mergedOverrides[row.project_uuid] : undefined;
+        !isClearingThisRow && row.project_uuid ? mergedOverrides[row.project_uuid] : undefined;
       const trackerStage =
         overriddenStage && ACTIVE_STAGE_ORDER.includes(overriddenStage)
           ? overriddenStage
@@ -108,7 +112,7 @@ export default function PipelineTracker({ rows, onProjectClick }: PipelineTracke
       }
     }
     return nextGrouped;
-  }, [rows, mergedOverrides]);
+  }, [rows, mergedOverrides, clearingIds]);
 
   // ── Drag handlers ─────────────────────────────────────────────────────────
   const handleDragStart = useCallback(
@@ -197,6 +201,32 @@ export default function PipelineTracker({ rows, onProjectClick }: PipelineTracke
       }
     },
     [draggedId, mergedOverrides, rows, setOverride],
+  );
+
+  // ── Reset (clear override) handler ────────────────────────────────────────
+  const handleReset = useCallback(
+    async (e: React.MouseEvent, projectId: string) => {
+      e.stopPropagation(); // Don't bubble to the card's onClick (drill-in).
+      setDragError(null);
+      // Optimistic: hide the override badge immediately.
+      setClearingIds((prev) => ({ ...prev, [projectId]: true }));
+      const error = await clearOverride(projectId);
+      if (error) {
+        setClearingIds((prev) => {
+          const next = { ...prev };
+          delete next[projectId];
+          return next;
+        });
+        setDragError(`Failed to reset stage: ${error}`);
+      } else {
+        setClearingIds((prev) => {
+          const next = { ...prev };
+          delete next[projectId];
+          return next;
+        });
+      }
+    },
+    [clearOverride],
   );
 
   // ── Render ─────────────────────────────────────────────────────────────────
@@ -366,7 +396,8 @@ export default function PipelineTracker({ rows, onProjectClick }: PipelineTracke
                   const isDragging = draggedId === p.project_uuid;
                   const hasOverride =
                     p.project_uuid !== undefined &&
-                    overrides[p.project_uuid] !== undefined;
+                    overrides[p.project_uuid] !== undefined &&
+                    !clearingIds[p.project_uuid];
                   return (
                     <div
                       key={p.project_uuid ?? i}
@@ -464,16 +495,45 @@ export default function PipelineTracker({ rows, onProjectClick }: PipelineTracke
                       )}
                       {hasOverride && (
                         <div
-                          title="Stage overridden locally — not from Flipper Force"
                           style={{
-                            fontSize: 10,
-                            color: 'rgba(59,130,246,0.8)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 4,
                             marginTop: 2,
-                            lineHeight: 1.2,
-                            fontStyle: 'italic',
                           }}
                         >
-                          ✎ stage overridden
+                          <span
+                            title="Stage overridden locally — not from Flipper Force"
+                            style={{
+                              fontSize: 10,
+                              color: 'rgba(59,130,246,0.8)',
+                              lineHeight: 1.2,
+                              fontStyle: 'italic',
+                              flex: 1,
+                            }}
+                          >
+                            ✎ stage overridden
+                          </span>
+                          {p.project_uuid && (
+                            <button
+                              aria-label={`Reset ${label} to original Flipper Force stage`}
+                              title="Reset to original stage"
+                              onClick={(e) => { void handleReset(e, p.project_uuid!); }}
+                              style={{
+                                background: 'none',
+                                border: '1px solid rgba(59,130,246,0.4)',
+                                borderRadius: 4,
+                                cursor: 'pointer',
+                                fontSize: 9,
+                                color: 'rgba(59,130,246,0.8)',
+                                padding: '1px 4px',
+                                lineHeight: 1.4,
+                                flexShrink: 0,
+                              }}
+                            >
+                              Reset
+                            </button>
+                          )}
                         </div>
                       )}
                     </div>
