@@ -49,10 +49,12 @@ const MISSING_STAGE_OVERRIDE_MODEL_ERROR =
 
 export function StageOverrideProvider({ children }: { children: ReactNode }) {
   const client = useMemo(() => getAmplifyDataClient(), []);
-  const [records, setRecords] = useState<PropertyStageOverride[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState('');
   const stageOverrideModel = client.models.PropertyStageOverride;
+  const [records, setRecords] = useState<PropertyStageOverride[]>([]);
+  const [isLoading, setIsLoading] = useState(() => !!stageOverrideModel);
+  const [error, setError] = useState(() =>
+    stageOverrideModel ? '' : MISSING_STAGE_OVERRIDE_MODEL_ERROR,
+  );
 
   // Build a fast lookup map from the records array.
   const overrides = useMemo(() => {
@@ -67,30 +69,22 @@ export function StageOverrideProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (!stageOverrideModel) {
-      setError(MISSING_STAGE_OVERRIDE_MODEL_ERROR);
-      setIsLoading(false);
       return;
     }
 
-    try {
-      const subscription = stageOverrideModel.observeQuery().subscribe({
-        next: ({ items }) => {
-          setRecords([...items]);
-          setError('');
-          setIsLoading(false);
-        },
-        error: (err: unknown) => {
-          const msg = err instanceof Error ? err.message : 'Failed to load stage overrides';
-          setError(msg);
-          setIsLoading(false);
-        },
-      });
-      return () => subscription.unsubscribe();
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : 'Failed to load stage overrides';
-      setError(msg);
-      setIsLoading(false);
-    }
+    const subscription = stageOverrideModel.observeQuery().subscribe({
+      next: ({ items }) => {
+        setRecords([...items]);
+        setError('');
+        setIsLoading(false);
+      },
+      error: (err: unknown) => {
+        const msg = err instanceof Error ? err.message : 'Failed to load stage overrides';
+        setError(msg);
+        setIsLoading(false);
+      },
+    });
+    return () => subscription.unsubscribe();
   }, [stageOverrideModel]);
 
   const setOverride = useCallback(
