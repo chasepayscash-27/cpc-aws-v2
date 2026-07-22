@@ -1,6 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
-import { generateClient } from 'aws-amplify/data';
 import type { Schema } from '../../amplify/data/resource';
+import { getAmplifyDataClient } from '../utils/amplifyDataClient';
 
 type PropertyTask = Schema['PropertyTask']['type'];
 type PropertyTasksByProperty = Record<string, PropertyTask[]>;
@@ -26,8 +26,6 @@ const PropertyTasksContext = createContext<PropertyTasksContextValue>({
   updateTaskCompletion: async () => ({}),
 });
 
-const client = generateClient<Schema>();
-
 export function groupTasksByProperty(tasks: PropertyTask[]): PropertyTasksByProperty {
   const grouped: PropertyTasksByProperty = {};
 
@@ -49,6 +47,7 @@ export function groupTasksByProperty(tasks: PropertyTask[]): PropertyTasksByProp
  * other's task-completion updates.
  */
 export function PropertyTasksProvider({ children }: { children: ReactNode }) {
+  const client = useMemo(() => getAmplifyDataClient(), []);
   const [allTasks, setAllTasks] = useState<PropertyTask[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
@@ -71,7 +70,7 @@ export function PropertyTasksProvider({ children }: { children: ReactNode }) {
       },
     });
     return () => subscription.unsubscribe();
-  }, []);
+  }, [client]);
 
   /**
    * Optimistically toggles a task's completion state in the shared snapshot,
@@ -114,7 +113,7 @@ export function PropertyTasksProvider({ children }: { children: ReactNode }) {
 
       return {};
     },
-    []
+    [client]
   );
 
   return (

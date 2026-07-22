@@ -62,7 +62,7 @@ interface PipelineTrackerProps {
 
 export default function PipelineTracker({ rows, onProjectClick }: PipelineTrackerProps) {
   const { allTasks, isLoading: tasksLoading } = usePropertyTasks();
-  const { overrides, setOverride, clearOverride } = useStageOverrides();
+  const { overrides, setOverride, clearOverride, error: overrideError } = useStageOverrides();
   const progressByProperty = useMemo(
     () => computeMainWorkflowProgressByProperty(allTasks),
     [allTasks],
@@ -266,6 +266,22 @@ export default function PipelineTracker({ rows, onProjectClick }: PipelineTracke
           </button>
         </div>
       )}
+      {overrideError && (
+        <div
+          role="status"
+          style={{
+            background: 'rgba(245,158,11,0.14)',
+            border: '1px solid rgba(245,158,11,0.45)',
+            borderRadius: 8,
+            padding: '8px 12px',
+            marginBottom: 10,
+            fontSize: 13,
+            color: 'var(--text)',
+          }}
+        >
+          Drag-and-drop unavailable: {overrideError}
+        </div>
+      )}
       <div
         style={{
           display: 'grid',
@@ -401,7 +417,7 @@ export default function PipelineTracker({ rows, onProjectClick }: PipelineTracke
                   return (
                     <div
                       key={p.project_uuid ?? i}
-                      draggable={!!p.project_uuid}
+                      draggable={!!p.project_uuid && !overrideError}
                       onDragStart={
                         p.project_uuid
                           ? (e) => handleDragStart(e, p.project_uuid!)
@@ -431,7 +447,12 @@ export default function PipelineTracker({ rows, onProjectClick }: PipelineTracke
                         border: `1px solid ${isDragging ? DROP_TARGET_BORDER : 'var(--border)'}`,
                         borderRadius: 8,
                         padding: '6px 8px',
-                        cursor: p.project_uuid ? 'grab' : onProjectClick ? 'pointer' : 'default',
+                        cursor:
+                          p.project_uuid && !overrideError
+                            ? 'grab'
+                            : onProjectClick
+                              ? 'pointer'
+                              : 'default',
                         opacity: isDragging ? 0.45 : 1,
                         transition: 'background 0.15s, border-color 0.15s, opacity 0.15s',
                         userSelect: 'none',
