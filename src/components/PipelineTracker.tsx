@@ -488,7 +488,7 @@ export default function PipelineTracker({ rows, onProjectClick }: PipelineTracke
                           style={{
                             fontSize: 12,
                             fontWeight: 600,
-                            color: '#1a3a22',
+                            color: 'var(--text)',
                             lineHeight: 1.3,
                             flex: 1,
                             minWidth: 0,
