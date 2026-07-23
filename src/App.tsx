@@ -1,4 +1,4 @@
-import { lazy, Suspense, useState } from 'react';
+import { lazy, Suspense, useState, useEffect } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import Navigation from './components/Navigation';
 import { PropertyTasksProvider } from './contexts/PropertyTasksContext';
@@ -24,6 +24,22 @@ const App = () => {
   const [sidebarOpen, setSidebarOpen] = useState(
     () => typeof window !== 'undefined' && window.innerWidth > 768,
   );
+
+  const [theme, setTheme] = useState<'dark' | 'light'>(() => {
+    if (typeof window === 'undefined') return 'dark';
+    const saved = localStorage.getItem('theme');
+    if (saved === 'light' || saved === 'dark') return saved;
+    return window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+  });
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('theme', theme);
+  }, [theme]);
+
+  function toggleTheme() {
+    setTheme(t => (t === 'dark' ? 'light' : 'dark'));
+  }
 
   return (
     <div className="appShell">
@@ -52,6 +68,16 @@ const App = () => {
               <div className="brandSub">Analytics Dashboard</div>
             </div>
           </div>
+        </div>
+        <div className="topbarActions">
+          <button
+            className="themeToggle"
+            onClick={toggleTheme}
+            aria-label={theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'}
+            title={theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'}
+          >
+            {theme === 'dark' ? '☀️' : '🌙'}
+          </button>
         </div>
       </header>
       <div className={`body${sidebarOpen ? '' : ' sidebarCollapsed'}`}>
