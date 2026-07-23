@@ -1,5 +1,5 @@
 :root {
-  /* ── Dark theme tokens ──────────────────────────────────── */
+  /* ── Dark theme tokens (default) ───────────────────────── */
   --bg:           #0d1117;   /* page background               */
   --panel:        #161b22;   /* card / sidebar surface        */
   --panel2:       #1c2128;   /* secondary surface / inputs    */
@@ -21,6 +21,27 @@
   --radius-md:    14px;
   --radius-lg:    18px;
   --chat-bubble-max-width: 78%;
+}
+
+/* ── Light theme overrides ──────────────────────────────── */
+[data-theme="light"] {
+  --bg:           #f6f8fa;
+  --panel:        #ffffff;
+  --panel2:       #f0f2f5;
+  --panel3:       #e8eaed;
+  --text:         #1c2128;
+  --muted:        #57606a;
+  --border:       #d0d7de;
+  --accent:       #2da44e;
+  --accent-light: #3fb950;
+  --accent-dim:   rgba(45, 164, 78, 0.12);
+  --gold:         #9a6700;
+  --danger:       #cf222e;
+  --danger-dim:   rgba(207, 34, 46, 0.10);
+  --success:      #2da44e;
+  --focus-ring:   rgba(45, 164, 78, 0.30);
+  --shadow-sm:    0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.08);
+  --shadow-md:    0 4px 12px rgba(0,0,0,0.15), 0 2px 4px rgba(0,0,0,0.10);
 }
 
 html, body {
@@ -72,6 +93,34 @@ body {
   background: var(--accent-dim);
   border-color: var(--accent);
   color: var(--accent);
+}
+
+.themeToggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--panel2);
+  color: var(--text);
+  cursor: pointer;
+  font-size: 16px;
+  line-height: 1;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+}
+
+.themeToggle:hover {
+  background: var(--accent-dim);
+  border-color: var(--accent);
+}
+
+.themeToggle:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
 }
 
 .brand { display: flex; gap: 12px; align-items: center; }
