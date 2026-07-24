@@ -118,26 +118,11 @@ export default function YTDSummaryPage() {
       </div>
 
       {/* Properties Sold topline tile */}
-      <section style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '12px', margin: '12px 0 14px' }}>
-        <div className="card" style={{ borderTop: '3px solid var(--accent)' }}>
+      <section style={{ margin: '12px 0 14px' }}>
+        <div className="card" style={{ borderTop: '3px solid var(--accent)', maxWidth: 220 }}>
           <div className="cardLabel">Properties Sold</div>
           <div className="cardValue">{Number(data['Number of Houses Sold']).toLocaleString()}</div>
           <div className="cardSub" style={{ color: 'var(--muted)' }}>Goal: {data['Houses Sold Goal']}</div>
-        </div>
-        <div className="card">
-          <div className="cardLabel">YTD Sold</div>
-          <div className="cardValue">{data['YTD Sold']}</div>
-          <div className="cardSub" style={{ color: 'var(--muted)' }}>Goal: {data['YTD Sold Goal']}</div>
-        </div>
-        <div className="card">
-          <div className="cardLabel">YTD Profit</div>
-          <div className="cardValue">{data['YTD Profit']}</div>
-          <div className="cardSub" style={{ color: 'var(--muted)' }}>Goal: {data['YTD Profit Goal']}</div>
-        </div>
-        <div className="card">
-          <div className="cardLabel">Average Profit</div>
-          <div className="cardValue">{data['Average Profit']}</div>
-          <div className="cardSub" style={{ color: 'var(--muted)' }}>Goal: {data['Average Profit Goal']}</div>
         </div>
       </section>
 
