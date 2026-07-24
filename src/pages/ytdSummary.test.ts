@@ -59,22 +59,25 @@ describe('YTD CSV field mapping', () => {
     expect(parsePercent(sampleRow['Houses Sold % Obtained'])).toBeCloseTo(28.75);
   });
 
-  it('all required YTD fields are present in the row type', () => {
-    const requiredFields: (keyof YTDRow)[] = [
+  it('topline section only requires Properties Sold fields', () => {
+    // Only the Properties Sold tile is displayed in the topline section.
+    // Profit-related tiles (YTD Sold, YTD Profit, Average Profit) have been removed.
+    const toplineFields: (keyof YTDRow)[] = [
       'Number of Houses Sold',
-      'YTD Sold',
-      'YTD Profit',
-      'Average Profit',
       'Houses Sold Goal',
-      'YTD Sold Goal',
-      'YTD Profit Goal',
-      'Average Profit Goal',
-      'Houses Sold % Obtained',
-      'YTD Sold % Obtained',
-      'YTD Profit % Obtained',
     ];
-    for (const field of requiredFields) {
+    for (const field of toplineFields) {
       expect(sampleRow[field]).toBeDefined();
+    }
+  });
+
+  it('profit metric fields are not required for topline rendering', () => {
+    // These fields exist in the CSV but are no longer shown as topline tiles.
+    const removedTileLabels = ['YTD Sold', 'YTD Profit', 'Average Profit'] as const;
+    // The test asserts these are not among the topline tile labels.
+    const toplineTileLabels = ['Properties Sold'];
+    for (const label of removedTileLabels) {
+      expect(toplineTileLabels).not.toContain(label);
     }
   });
 });
