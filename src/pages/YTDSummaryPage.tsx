@@ -117,12 +117,11 @@ export default function YTDSummaryPage() {
         <p className="muted">Year-to-date performance summary of properties flipped.</p>
       </div>
 
-      {/* Temporarily hidden: top financial summary cards can be re-enabled by restoring this section. */}
-      {/*
-      <section style={{ display: 'grid', gridTemplateColumns: 'repeat(5, minmax(0, 1fr))', gap: '12px', margin: '12px 0 14px' }}>
-        <div className="card">
-          <div className="cardLabel">Houses Sold</div>
-          <div className="cardValue">{data['Number of Houses Sold']}</div>
+      {/* Properties Sold topline tile */}
+      <section style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '12px', margin: '12px 0 14px' }}>
+        <div className="card" style={{ borderTop: '3px solid var(--accent)' }}>
+          <div className="cardLabel">Properties Sold</div>
+          <div className="cardValue">{Number(data['Number of Houses Sold']).toLocaleString()}</div>
           <div className="cardSub" style={{ color: 'var(--muted)' }}>Goal: {data['Houses Sold Goal']}</div>
         </div>
         <div className="card">
@@ -140,13 +139,7 @@ export default function YTDSummaryPage() {
           <div className="cardValue">{data['Average Profit']}</div>
           <div className="cardSub" style={{ color: 'var(--muted)' }}>Goal: {data['Average Profit Goal']}</div>
         </div>
-        <div className="card" style={{ borderTop: '3px solid var(--accent)' }}>
-          <div className="cardLabel">Total in Pipeline</div>
-          <div className="cardValue">{stagesLoading ? '—' : totalPipelineCount}</div>
-          <div className="cardSub" style={{ color: 'var(--muted)' }}>Active projects</div>
-        </div>
       </section>
-      */}
 
       {/* Goal Progress Cards */}
       <section className="grid">
