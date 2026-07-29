@@ -7,6 +7,7 @@ type PropertyTask = Schema["PropertyTask"]["type"];
 export type WorkflowTab = { id: string; label: string; workflowType: WorkflowType };
 export type WorkflowAlertRecipient = { id: string; label: string; email: string; phone: string };
 export type TaskNotePayload = { taskNote: string; taskNoteCreatedAt: string };
+export type TaskNoteUpdatePayload = { taskNote: string | null; taskNoteCreatedAt: string | null };
 
 export function normalizePhoneToE164(raw: string | null | undefined): string | null {
   if (!raw) return null;
@@ -90,6 +91,21 @@ export function updateTask(tasks: PropertyTask[], id: string, updates: Partial<P
 export function createTaskNotePayload(noteDraft: string, timestamp: Date = new Date()): TaskNotePayload | null {
   const taskNote = noteDraft.trim();
   if (!taskNote) return null;
+  return {
+    taskNote,
+    taskNoteCreatedAt: timestamp.toISOString(),
+  };
+}
+
+export function createTaskNoteUpdatePayload(
+  noteDraft: string,
+  existingTaskNote: string | null | undefined,
+  timestamp: Date = new Date(),
+): TaskNoteUpdatePayload | null {
+  const taskNote = noteDraft.trim();
+  if (!taskNote) {
+    return existingTaskNote?.trim() ? { taskNote: null, taskNoteCreatedAt: null } : null;
+  }
   return {
     taskNote,
     taskNoteCreatedAt: timestamp.toISOString(),

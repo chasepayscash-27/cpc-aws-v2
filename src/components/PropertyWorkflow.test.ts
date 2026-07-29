@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import type { Schema } from "../../amplify/data/resource";
 import {
   createTaskNotePayload,
+  createTaskNoteUpdatePayload,
   deriveRecipientFromRow,
   getTasksForTab,
   getWorkflowTabs,
@@ -99,6 +100,27 @@ describe("PropertyWorkflow tab helpers", () => {
 
     it("returns null for empty drafts", () => {
       expect(createTaskNotePayload("   ")).toBeNull();
+    });
+  });
+
+  describe("createTaskNoteUpdatePayload", () => {
+    it("creates a trimmed note payload when note text is provided", () => {
+      const timestamp = new Date("2026-06-25T18:30:00.000Z");
+      expect(createTaskNoteUpdatePayload("  Need permit follow-up  ", null, timestamp)).toEqual({
+        taskNote: "Need permit follow-up",
+        taskNoteCreatedAt: "2026-06-25T18:30:00.000Z",
+      });
+    });
+
+    it("returns a clear payload when draft is blank and a note already exists", () => {
+      expect(createTaskNoteUpdatePayload("   ", "Existing note")).toEqual({
+        taskNote: null,
+        taskNoteCreatedAt: null,
+      });
+    });
+
+    it("returns null when draft is blank and no note exists", () => {
+      expect(createTaskNoteUpdatePayload("   ", null)).toBeNull();
     });
   });
 });

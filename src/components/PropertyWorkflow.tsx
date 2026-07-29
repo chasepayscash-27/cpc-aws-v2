@@ -5,6 +5,7 @@ import type { Schema } from "../../amplify/data/resource";
 import { defaultWorkflow } from "../data/defaultWorkflow";
 import {
   createTaskNotePayload,
+  createTaskNoteUpdatePayload,
   getTasksForTab,
   getWorkflowTabs,
   loadWorkflowAlertRecipients,
@@ -35,7 +36,7 @@ function sortTasks(tasks: PropertyTask[]): PropertyTask[] {
 }
 
 function PropertyWorkflow({ propertyId }: Props) {
-  const { tasksByProperty, error: tasksContextError, isLoading: tasksContextLoading, updateTaskCompletion } = usePropertyTasks();
+  const { tasksByProperty, error: tasksContextError, isLoading: tasksContextLoading, updateTaskCompletion, updateTaskNote } = usePropertyTasks();
   const [tasks, setTasks] = useState<PropertyTask[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -435,19 +436,16 @@ function PropertyWorkflow({ propertyId }: Props) {
     setNoteDraftByTaskId((current) => ({ ...current, [taskId]: value }));
   }, []);
 
-  const handleTaskNoteCreate = useCallback(async (task: PropertyTask) => {
-    const payload = createTaskNotePayload(noteDraftByTaskId[task.id] ?? "");
+  const handleTaskNoteCreate = useCallback(async (task: PropertyTask, noteDraft: string = noteDraftByTaskId[task.id] ?? "") => {
+    const payload = createTaskNoteUpdatePayload(noteDraft, task.taskNote);
     if (!payload) return;
 
     setError("");
+    const previousDraft = noteDraftByTaskId[task.id] ?? "";
     setTasks((currentTasks) => updateTask(currentTasks, task.id, payload));
     setNoteDraftByTaskId((current) => ({ ...current, [task.id]: "" }));
 
-    const { errors } = await client.models.PropertyTask.update({
-      id: task.id,
-      taskNote: payload.taskNote,
-      taskNoteCreatedAt: payload.taskNoteCreatedAt,
-    });
+    const { errors } = await updateTaskNote(task, payload.taskNote, payload.taskNoteCreatedAt);
 
     if (errors?.length) {
       setTasks((currentTasks) =>
@@ -456,10 +454,10 @@ function PropertyWorkflow({ propertyId }: Props) {
           taskNoteCreatedAt: task.taskNoteCreatedAt ?? null,
         })
       );
-      setNoteDraftByTaskId((current) => ({ ...current, [task.id]: payload.taskNote }));
+      setNoteDraftByTaskId((current) => ({ ...current, [task.id]: previousDraft }));
       setError(errors.map((item) => item.message).join("; "));
     }
-  }, [noteDraftByTaskId]);
+  }, [noteDraftByTaskId, updateTaskNote]);
 
   const tabs = useMemo(() => getWorkflowTabs(dedupedTasks), [dedupedTasks]);
   const activeTab = useMemo(
@@ -647,6 +645,17 @@ function PropertyWorkflow({ propertyId }: Props) {
                   >
                     Save note
                   </button>
+                  {task.taskNote && (
+                    <button
+                      type="button"
+                      className="pwTaskNoteButton"
+                      onClick={() => {
+                        void handleTaskNoteCreate(task, "");
+                      }}
+                    >
+                      Remove note
+                    </button>
+                  )}
                 </div>
               </div>
             </label>
