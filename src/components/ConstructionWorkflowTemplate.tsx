@@ -2,6 +2,7 @@ import { memo, useCallback, useEffect, useMemo, useState, type CSSProperties } f
 import { getCurrentUser } from "aws-amplify/auth";
 import type { Schema } from "../../amplify/data/resource";
 import { getConstructionWorkflowTaskGroups } from "./propertyTaskCollections";
+import { createTaskNotePayload, createTaskNoteUpdatePayload } from "./propertyWorkflowTabs";
 import { usePropertyTasks } from "../contexts/PropertyTasksContext";
 import type { ProjectRow } from "../types/project";
 import { toTitleCase } from "../utils/titleCase";
@@ -57,11 +58,11 @@ function getProgress(tasks: PropertyTask[]): { done: number; total: number; perc
 }
 
 function ConstructionWorkflowTemplate({ propertyId, propertyName, projectStage }: Props) {
-  const { tasksByProperty, isLoading: contextLoading, error: contextError, updateTaskCompletion } = usePropertyTasks();
+  const { tasksByProperty, isLoading: contextLoading, error: contextError, updateTaskCompletion, updateTaskNote } = usePropertyTasks();
   const [toggleError, setToggleError] = useState("");
-  const [notes, setNotes] = useState("");
   const [completedByUser, setCompletedByUser] = useState<string | null>(null);
   const [updatingTaskIds, setUpdatingTaskIds] = useState<string[]>([]);
+  const [noteDraftByTaskId, setNoteDraftByTaskId] = useState<Record<string, string>>({});
   const worksheetFields = usePropertyWorksheetFields(propertyId);
 
   const error = toggleError || contextError;
@@ -124,6 +125,29 @@ function ConstructionWorkflowTemplate({ propertyId, propertyName, projectStage }
       }
     },
     [completedByUser, updateTaskCompletion]
+  );
+
+  const handleTaskNoteDraftChange = useCallback((taskId: string, value: string) => {
+    setNoteDraftByTaskId((current) => ({ ...current, [taskId]: value }));
+  }, []);
+
+  const handleTaskNoteSave = useCallback(
+    async (task: PropertyTask, noteDraft: string = noteDraftByTaskId[task.id] ?? "") => {
+      setToggleError("");
+      const payload = createTaskNoteUpdatePayload(noteDraft, task.taskNote);
+      if (!payload) return;
+
+      const previousDraft = noteDraftByTaskId[task.id] ?? "";
+      setNoteDraftByTaskId((current) => ({ ...current, [task.id]: "" }));
+
+      const { errors } = await updateTaskNote(task, payload.taskNote, payload.taskNoteCreatedAt);
+
+      if (errors?.length) {
+        setNoteDraftByTaskId((current) => ({ ...current, [task.id]: previousDraft }));
+        setToggleError(errors.map((item) => item.message).join("; "));
+      }
+    },
+    [noteDraftByTaskId, updateTaskNote]
   );
 
   return (
@@ -212,6 +236,75 @@ function ConstructionWorkflowTemplate({ propertyId, propertyName, projectStage }
                           Completed {new Date(task.completedAt).toLocaleString()}
                         </span>
                       )}
+                      {task.taskNote && (
+                        <span style={{ display: "block", fontSize: 12, color: "var(--text)", marginTop: 4 }}>
+                          {task.taskNote}
+                          {task.taskNoteCreatedAt && (
+                            <span style={{ display: "block", fontSize: 11, color: "var(--muted)" }}>
+                              Added {new Date(task.taskNoteCreatedAt).toLocaleString()}
+                            </span>
+                          )}
+                        </span>
+                      )}
+                      <span style={{ display: "flex", gap: 6, marginTop: 6, flexWrap: "wrap" }}>
+                        <input
+                          type="text"
+                          value={noteDraftByTaskId[task.id] ?? ""}
+                          onChange={(event) => {
+                            handleTaskNoteDraftChange(task.id, event.currentTarget.value);
+                          }}
+                          placeholder="Add note"
+                          aria-label={`Add note for ${toTitleCase(task.stage ?? "")} in construction workflow`}
+                          style={{
+                            borderRadius: 8,
+                            border: "1px solid var(--border)",
+                            padding: "5px 8px",
+                            fontSize: 12,
+                            flex: "1 1 180px",
+                            color: "var(--text)",
+                            background: "var(--panel2)",
+                          }}
+                        />
+                        <button
+                          type="button"
+                          disabled={!createTaskNotePayload(noteDraftByTaskId[task.id] ?? "")}
+                          onClick={() => {
+                            void handleTaskNoteSave(task);
+                          }}
+                          style={{
+                            borderRadius: 8,
+                            border: "1px solid var(--border)",
+                            background: "var(--panel2)",
+                            color: "var(--text)",
+                            padding: "5px 10px",
+                            fontSize: 11,
+                            fontWeight: 600,
+                            cursor: "pointer",
+                          }}
+                        >
+                          Save note
+                        </button>
+                        {task.taskNote && (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              void handleTaskNoteSave(task, "");
+                            }}
+                            style={{
+                              borderRadius: 8,
+                              border: "1px solid var(--border)",
+                              background: "var(--panel2)",
+                              color: "var(--text)",
+                              padding: "5px 10px",
+                              fontSize: 11,
+                              fontWeight: 600,
+                              cursor: "pointer",
+                            }}
+                          >
+                            Remove note
+                          </button>
+                        )}
+                      </span>
                     </span>
                   </label>
                 ))}
@@ -221,28 +314,6 @@ function ConstructionWorkflowTemplate({ propertyId, propertyName, projectStage }
         </div>
       )}
 
-      <div style={{ marginTop: 12 }}>
-        <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "var(--accent)", marginBottom: 6, textTransform: "uppercase", letterSpacing: "0.06em" }}>
-          Notes
-        </label>
-        <textarea
-          value={notes}
-          onChange={(e) => setNotes(e.target.value)}
-          placeholder="Add construction notes, milestones, or handoff items..."
-          rows={3}
-          style={{
-            width: "100%",
-            borderRadius: 10,
-            border: "1px solid var(--border)",
-            padding: "8px 10px",
-            fontSize: 12,
-            resize: "vertical",
-            fontFamily: "inherit",
-            color: "var(--text)",
-            background: "var(--panel3)",
-          }}
-        />
-      </div>
     </div>
   );
 }

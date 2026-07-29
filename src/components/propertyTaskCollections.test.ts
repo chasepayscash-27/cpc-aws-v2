@@ -20,6 +20,8 @@ function buildTask(overrides: Partial<PropertyTask>): PropertyTask {
     completedBy: overrides.completedBy ?? null,
     assigneeId: overrides.assigneeId ?? null,
     alertRecipientId: overrides.alertRecipientId ?? null,
+    taskNote: overrides.taskNote ?? null,
+    taskNoteCreatedAt: overrides.taskNoteCreatedAt ?? null,
     createdAt: overrides.createdAt ?? new Date().toISOString(),
     updatedAt: overrides.updatedAt ?? new Date().toISOString(),
   } as PropertyTask;
@@ -410,5 +412,66 @@ describe("getTeamTabTasks checklist completion sync", () => {
 
     expect(getTasksForTeamMember(initial, "Kim")[0].isComplete).toBe(true);
     expect(getTasksForTeamMember(afterUncheck, "Kim")[0].isComplete).toBe(false);
+  });
+
+  it("uses canonical checklist notes for Team property checklist assignments", () => {
+    const tasks = getTeamTabTasks([
+      buildTask({
+        id: "canonical-tile",
+        propertyId: "property-1",
+        stage: "Tile Ordered",
+        order: 61,
+        taskNote: "Verify tile color before delivery",
+        taskNoteCreatedAt: "2026-06-25T18:30:00.000Z",
+      }),
+      buildTask({
+        id: "legacy-team-tile",
+        propertyId: "property-1",
+        stage: "Tile",
+        order: 10001,
+        workflowType: "Team Task",
+        subWorkflowType: "Property Checklist",
+        assigneeId: "Kim",
+        owner: "Kim",
+        taskNote: "Legacy note",
+        taskNoteCreatedAt: "2026-01-01T00:00:00.000Z",
+      }),
+    ]);
+
+    const kimTasks = getTasksForTeamMember(tasks, "Kim");
+    expect(kimTasks).toHaveLength(1);
+    expect(kimTasks[0].id).toBe("canonical-tile");
+    expect(kimTasks[0].taskNote).toBe("Verify tile color before delivery");
+    expect(kimTasks[0].taskNoteCreatedAt).toBe("2026-06-25T18:30:00.000Z");
+  });
+
+  it("keeps canonical completion state while checklist note changes", () => {
+    const tasks = getTeamTabTasks([
+      buildTask({
+        id: "canonical-appliances",
+        propertyId: "property-1",
+        stage: "Appliances Ordered",
+        order: 69,
+        isComplete: true,
+        taskNote: "Confirm refrigerator dimensions",
+      }),
+      buildTask({
+        id: "legacy-team-appliances",
+        propertyId: "property-1",
+        stage: "Appliances",
+        order: 10002,
+        workflowType: "Team Task",
+        subWorkflowType: "Property Checklist",
+        assigneeId: "Lee",
+        owner: "Lee",
+        isComplete: false,
+      }),
+    ]);
+
+    const leeTasks = getTasksForTeamMember(tasks, "Lee");
+    expect(leeTasks).toHaveLength(1);
+    expect(leeTasks[0].id).toBe("canonical-appliances");
+    expect(leeTasks[0].isComplete).toBe(true);
+    expect(leeTasks[0].taskNote).toBe("Confirm refrigerator dimensions");
   });
 });

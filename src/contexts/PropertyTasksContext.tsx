@@ -16,6 +16,11 @@ interface PropertyTasksContextValue {
     completedAt: string | null,
     completedBy: string | null
   ) => Promise<{ errors?: Array<{ message: string }> }>;
+  updateTaskNote: (
+    task: PropertyTask,
+    taskNote: string | null,
+    taskNoteCreatedAt: string | null
+  ) => Promise<{ errors?: Array<{ message: string }> }>;
 }
 
 const PropertyTasksContext = createContext<PropertyTasksContextValue>({
@@ -24,6 +29,7 @@ const PropertyTasksContext = createContext<PropertyTasksContextValue>({
   isLoading: true,
   error: '',
   updateTaskCompletion: async () => ({}),
+  updateTaskNote: async () => ({}),
 });
 
 export function groupTasksByProperty(tasks: PropertyTask[]): PropertyTasksByProperty {
@@ -116,8 +122,44 @@ export function PropertyTasksProvider({ children }: { children: ReactNode }) {
     [client]
   );
 
+  const updateTaskNote = useCallback(
+    async (
+      task: PropertyTask,
+      taskNote: string | null,
+      taskNoteCreatedAt: string | null
+    ): Promise<{ errors?: Array<{ message: string }> }> => {
+      setAllTasks((prev) =>
+        prev.map((t) => (t.id === task.id ? { ...t, taskNote, taskNoteCreatedAt } : t))
+      );
+
+      const { errors } = await client.models.PropertyTask.update({
+        id: task.id,
+        taskNote,
+        taskNoteCreatedAt,
+      });
+
+      if (errors?.length) {
+        setAllTasks((prev) =>
+          prev.map((t) =>
+            t.id === task.id
+              ? {
+                  ...t,
+                  taskNote: task.taskNote ?? null,
+                  taskNoteCreatedAt: task.taskNoteCreatedAt ?? null,
+                }
+              : t
+          )
+        );
+        return { errors };
+      }
+
+      return {};
+    },
+    [client]
+  );
+
   return (
-    <PropertyTasksContext.Provider value={{ allTasks, tasksByProperty, isLoading, error, updateTaskCompletion }}>
+    <PropertyTasksContext.Provider value={{ allTasks, tasksByProperty, isLoading, error, updateTaskCompletion, updateTaskNote }}>
       {children}
     </PropertyTasksContext.Provider>
   );
