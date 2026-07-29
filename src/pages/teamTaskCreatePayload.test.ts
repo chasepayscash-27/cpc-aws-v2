@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { buildTeamTaskCreatePayload } from './teamTaskCreatePayload';
+import { buildTeamTaskCreatePayload, TEAM_TASK_EMPLOYEE_CHECKLIST_SUBTYPE } from './teamTaskCreatePayload';
 
 describe('buildTeamTaskCreatePayload', () => {
   it('omits propertyId for general team tasks when no property is selected', () => {
@@ -42,5 +42,35 @@ describe('buildTeamTaskCreatePayload', () => {
 
     expect(payload.propertyId).toBe('property-123');
   });
+
+  it('uses the provided subWorkflowType override when supplied', () => {
+    const payload = buildTeamTaskCreatePayload({
+      propertyId: '',
+      stage: 'Initial Order',
+      order: 10004,
+      isPersonal: false,
+      assignee: 'Zach Cato',
+      createdById: 'owner@example.com',
+      subWorkflowType: TEAM_TASK_EMPLOYEE_CHECKLIST_SUBTYPE,
+    });
+
+    expect(payload.subWorkflowType).toBe('Employee Checklist');
+    expect(payload.workflowType).toBe('Team Task');
+    expect(payload.assigneeId).toBe('Zach Cato');
+  });
+
+  it('falls back to General Team Task when subWorkflowType is not provided and isPersonal is false', () => {
+    const payload = buildTeamTaskCreatePayload({
+      propertyId: '',
+      stage: 'Check in',
+      order: 10005,
+      isPersonal: false,
+      assignee: 'Sam',
+      createdById: null,
+    });
+
+    expect(payload.subWorkflowType).toBe('General Team Task');
+  });
 });
+
 

@@ -6,7 +6,8 @@ import { loadCsv } from '../utils/csv';
 import type { ProjectRow } from '../types/project';
 import { getPrimaryTasksAcrossProperties, filterTasksForTeamTab, getTasksForTeamMember } from '../components/propertyTaskCollections';
 import { usePropertyTasks } from '../contexts/PropertyTasksContext';
-import { buildTeamTaskCreatePayload } from './teamTaskCreatePayload';
+import { buildTeamTaskCreatePayload, TEAM_TASK_EMPLOYEE_CHECKLIST_SUBTYPE } from './teamTaskCreatePayload';
+import { getDefaultChecklistForEmployee } from '../data/defaultEmployeeChecklist';
 import { toTitleCase } from '../utils/titleCase';
 import '../App.css';
 
@@ -122,6 +123,8 @@ const TeamPage = () => {
   const [newTaskPropertyId, setNewTaskPropertyId] = useState('');
   const [newTaskAssignee, setNewTaskAssignee] = useState('');
   const [newTaskIsPersonal, setNewTaskIsPersonal] = useState(false);
+  const [isAssigningChecklist, setIsAssigningChecklist] = useState(false);
+  const [checklistAssignStatus, setChecklistAssignStatus] = useState('');
 
   const taskError = contextTaskError || toggleError;
   const tasks = useMemo(() => filterTasksForTeamTab(getPrimaryTasksAcrossProperties(allTasks)), [allTasks]);
@@ -197,6 +200,7 @@ const TeamPage = () => {
     setNewTaskPropertyId('');
     setNewTaskIsPersonal(false);
     setNewTaskAssignee(member.name);
+    setChecklistAssignStatus('');
     setSelectedMember(member);
   }, []);
 
@@ -294,6 +298,58 @@ const TeamPage = () => {
     setNewTaskStage('');
     setNewTaskPropertyId('');
   }, [completedByUser, isSelectedMemberCurrentUser, newTaskAssignee, newTaskIsPersonal, newTaskPropertyId, newTaskStage, selectedMember]);
+
+  const handleAssignDefaultChecklist = useCallback(async () => {
+    if (!selectedMember) return;
+
+    const checklistItems = getDefaultChecklistForEmployee(selectedMember.name);
+    if (checklistItems.length === 0) {
+      setChecklistAssignStatus('No default checklist items are defined for this employee.');
+      return;
+    }
+
+    // Detect already-assigned items by normalizing stage names (case-insensitive, trimmed).
+    const existingStages = new Set(
+      selectedMemberTasks.map(({ task }) => task.stage?.trim().toLowerCase() ?? ''),
+    );
+    const missing = checklistItems.filter(
+      (item) => !existingStages.has(item.task.trim().toLowerCase()),
+    );
+
+    if (missing.length === 0) {
+      setChecklistAssignStatus('All default checklist items are already assigned.');
+      return;
+    }
+
+    setChecklistAssignStatus('');
+    setIsAssigningChecklist(true);
+
+    const baseOrder = buildGeneralTaskOrder();
+    const results = await Promise.all(
+      missing.map((item, index) =>
+        client.models.PropertyTask.create(
+          buildTeamTaskCreatePayload({
+            propertyId: '',
+            stage: item.task,
+            order: baseOrder + index,
+            isPersonal: false,
+            assignee: selectedMember.name,
+            createdById: completedByUser,
+            subWorkflowType: TEAM_TASK_EMPLOYEE_CHECKLIST_SUBTYPE,
+          }),
+        ),
+      ),
+    );
+
+    setIsAssigningChecklist(false);
+
+    const errors = results.flatMap((result) => result.errors ?? []);
+    if (errors.length > 0) {
+      setChecklistAssignStatus(`Error assigning checklist: ${errors.map((e) => e.message).join('; ')}`);
+    } else {
+      setChecklistAssignStatus(`${missing.length} checklist item${missing.length === 1 ? '' : 's'} assigned.`);
+    }
+  }, [completedByUser, selectedMember, selectedMemberTasks]);
 
   const selectedMemberTaskGroups = useMemo(() => {
     const groups = new Map<string, TeamTaskView[]>();
@@ -429,6 +485,19 @@ const TeamPage = () => {
                 </label>
               )}
               {createError && <p className="muted">{createError}</p>}
+              <div className="teamTaskChecklistRow">
+                <button
+                  type="button"
+                  className="teamTaskChecklistButton"
+                  disabled={isAssigningChecklist}
+                  onClick={() => void handleAssignDefaultChecklist()}
+                >
+                  {isAssigningChecklist ? 'Assigning…' : '📋 Assign Default Checklist'}
+                </button>
+                {checklistAssignStatus && (
+                  <span className="teamTaskChecklistStatus">{checklistAssignStatus}</span>
+                )}
+              </div>
             </div>
             {isTaskLoading && <p className="muted">Loading workflow tasks...</p>}
             {!isTaskLoading && taskError && <p className="muted">{taskError}</p>}
@@ -687,6 +756,42 @@ const TeamPage = () => {
         .teamTaskStage {
           font-size: 14px;
           font-weight: 600;
+        }
+
+        .teamTaskChecklistRow {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          flex-wrap: wrap;
+          margin-top: 4px;
+        }
+
+        .teamTaskChecklistButton {
+          border: 1px solid var(--border);
+          background: var(--panel2);
+          color: var(--text);
+          border-radius: 10px;
+          padding: 7px 12px;
+          font-size: 13px;
+          font-weight: 600;
+          cursor: pointer;
+          font-family: inherit;
+          transition: all 0.18s ease;
+        }
+
+        .teamTaskChecklistButton:hover:not(:disabled) {
+          border-color: var(--accent);
+          color: var(--accent);
+        }
+
+        .teamTaskChecklistButton:disabled {
+          opacity: 0.6;
+          cursor: not-allowed;
+        }
+
+        .teamTaskChecklistStatus {
+          font-size: 12px;
+          color: var(--muted);
         }
       `}</style>
     </>

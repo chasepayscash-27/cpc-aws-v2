@@ -1,6 +1,7 @@
 const TEAM_TASK_WORKFLOW_TYPE = 'Team Task';
 const TEAM_TASK_GENERAL_SUBTYPE = 'General Team Task';
 const TEAM_TASK_PERSONAL_SUBTYPE = 'Personal Task';
+export const TEAM_TASK_EMPLOYEE_CHECKLIST_SUBTYPE = 'Employee Checklist';
 
 interface BuildTeamTaskCreatePayloadInput {
   propertyId: string;
@@ -9,6 +10,8 @@ interface BuildTeamTaskCreatePayloadInput {
   isPersonal: boolean;
   assignee: string;
   createdById: string | null;
+  /** Optional subWorkflowType override. Defaults to 'Personal Task' or 'General Team Task'. */
+  subWorkflowType?: string;
 }
 
 export function buildTeamTaskCreatePayload({
@@ -18,15 +21,18 @@ export function buildTeamTaskCreatePayload({
   isPersonal,
   assignee,
   createdById,
+  subWorkflowType,
 }: BuildTeamTaskCreatePayloadInput) {
   const trimmedPropertyId = propertyId.trim();
+  const resolvedSubWorkflowType =
+    subWorkflowType ?? (isPersonal ? TEAM_TASK_PERSONAL_SUBTYPE : TEAM_TASK_GENERAL_SUBTYPE);
 
   return {
     ...(trimmedPropertyId ? { propertyId: trimmedPropertyId } : {}),
     stage,
     order,
     workflowType: TEAM_TASK_WORKFLOW_TYPE,
-    subWorkflowType: isPersonal ? TEAM_TASK_PERSONAL_SUBTYPE : TEAM_TASK_GENERAL_SUBTYPE,
+    subWorkflowType: resolvedSubWorkflowType,
     owner: assignee,
     responsibilities: null,
     notes: null,
