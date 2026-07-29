@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { Schema } from "../../amplify/data/resource";
-import { filterTasksForTeamTab, getChecklistWorkflowTasks, getConstructionWorkflowTaskGroups, getConstructionWorkflowTasks, getPrimaryTasksAcrossProperties, getTasksForTeamMember, resolveTeamTaskAssignee } from "./propertyTaskCollections";
+import { filterTasksForTeamTab, getChecklistWorkflowTasks, getConstructionWorkflowTaskGroups, getConstructionWorkflowTasks, getPrimaryTasksAcrossProperties, getTasksForTeamMember, getTeamTabTasks, resolveTeamTaskAssignee } from "./propertyTaskCollections";
 
 type PropertyTask = Schema["PropertyTask"]["type"];
 
@@ -305,5 +305,110 @@ describe("team member task derivation", () => {
     expect(resolveTeamTaskAssignee(task)).toBe("Kevin/Matt");
     expect(getTasksForTeamMember([task], "Kevin")).toEqual([task]);
     expect(getTasksForTeamMember([task], "Matt")).toEqual([task]);
+  });
+});
+
+describe("getTeamTabTasks checklist completion sync", () => {
+  it("uses canonical checklist completion state for Team property checklist assignments", () => {
+    const tasks = getTeamTabTasks([
+      buildTask({
+        id: "canonical-tile",
+        propertyId: "property-1",
+        stage: "Tile Ordered",
+        order: 61,
+        isComplete: true,
+      }),
+      buildTask({
+        id: "legacy-team-tile",
+        propertyId: "property-1",
+        stage: "Tile",
+        order: 10001,
+        workflowType: "Team Task",
+        subWorkflowType: "Property Checklist",
+        assigneeId: "Kim",
+        owner: "Kim",
+        isComplete: false,
+      }),
+    ]);
+
+    const kimTasks = getTasksForTeamMember(tasks, "Kim");
+    expect(kimTasks).toHaveLength(1);
+    expect(kimTasks[0].id).toBe("canonical-tile");
+    expect(kimTasks[0].isComplete).toBe(true);
+  });
+
+  it("keeps Team toggles pointed at the canonical checklist task id", () => {
+    const tasks = getTeamTabTasks([
+      buildTask({
+        id: "canonical-appliances",
+        propertyId: "property-1",
+        stage: "Appliances Ordered",
+        order: 69,
+        isComplete: false,
+      }),
+      buildTask({
+        id: "legacy-team-appliances",
+        propertyId: "property-1",
+        stage: "Appliances",
+        order: 10002,
+        workflowType: "Team Task",
+        subWorkflowType: "Property Checklist",
+        assigneeId: "Lee",
+        owner: "Lee",
+        isComplete: true,
+      }),
+    ]);
+
+    const leeTasks = getTasksForTeamMember(tasks, "Lee");
+    expect(leeTasks).toHaveLength(1);
+    expect(leeTasks[0].id).toBe("canonical-appliances");
+    expect(leeTasks[0].isComplete).toBe(false);
+  });
+
+  it("rehydrates from persisted canonical updates on subsequent snapshots", () => {
+    const initial = getTeamTabTasks([
+      buildTask({
+        id: "canonical-flooring",
+        propertyId: "property-1",
+        stage: "Flooring Ordered",
+        order: 62,
+        isComplete: true,
+      }),
+      buildTask({
+        id: "legacy-team-flooring",
+        propertyId: "property-1",
+        stage: "Flooring",
+        order: 10003,
+        workflowType: "Team Task",
+        subWorkflowType: "Property Checklist",
+        assigneeId: "Kim",
+        owner: "Kim",
+        isComplete: false,
+      }),
+    ]);
+
+    const afterUncheck = getTeamTabTasks([
+      buildTask({
+        id: "canonical-flooring",
+        propertyId: "property-1",
+        stage: "Flooring Ordered",
+        order: 62,
+        isComplete: false,
+      }),
+      buildTask({
+        id: "legacy-team-flooring",
+        propertyId: "property-1",
+        stage: "Flooring",
+        order: 10003,
+        workflowType: "Team Task",
+        subWorkflowType: "Property Checklist",
+        assigneeId: "Kim",
+        owner: "Kim",
+        isComplete: true,
+      }),
+    ]);
+
+    expect(getTasksForTeamMember(initial, "Kim")[0].isComplete).toBe(true);
+    expect(getTasksForTeamMember(afterUncheck, "Kim")[0].isComplete).toBe(false);
   });
 });

@@ -4,7 +4,7 @@ import { generateClient } from 'aws-amplify/data';
 import type { Schema } from '../../amplify/data/resource';
 import { loadCsv } from '../utils/csv';
 import type { ProjectRow } from '../types/project';
-import { getPrimaryTasksAcrossProperties, filterTasksForTeamTab, getTasksForTeamMember } from '../components/propertyTaskCollections';
+import { getTasksForTeamMember, getTeamTabTasks } from '../components/propertyTaskCollections';
 import { usePropertyTasks } from '../contexts/PropertyTasksContext';
 import {
   buildTeamTaskCreatePayload,
@@ -131,7 +131,7 @@ const TeamPage = () => {
   const [checklistAssignStatus, setChecklistAssignStatus] = useState('');
 
   const taskError = contextTaskError || toggleError;
-  const tasks = useMemo(() => filterTasksForTeamTab(getPrimaryTasksAcrossProperties(allTasks)), [allTasks]);
+  const tasks = useMemo(() => getTeamTabTasks(allTasks), [allTasks]);
 
   useEffect(() => {
     getCurrentUser()
