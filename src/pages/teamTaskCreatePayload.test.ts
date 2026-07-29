@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import { buildTeamTaskCreatePayload, TEAM_TASK_EMPLOYEE_CHECKLIST_SUBTYPE } from './teamTaskCreatePayload';
+import {
+  buildTeamTaskCreatePayload,
+  TEAM_TASK_EMPLOYEE_CHECKLIST_SUBTYPE,
+  TEAM_TASK_PROPERTY_CHECKLIST_SUBTYPE,
+} from './teamTaskCreatePayload';
 
 describe('buildTeamTaskCreatePayload', () => {
   it('omits propertyId for general team tasks when no property is selected', () => {
@@ -71,6 +75,20 @@ describe('buildTeamTaskCreatePayload', () => {
 
     expect(payload.subWorkflowType).toBe('General Team Task');
   });
-});
 
+  it('supports property-level checklist subtype overrides', () => {
+    const payload = buildTeamTaskCreatePayload({
+      propertyId: 'property-xyz',
+      stage: 'Tile',
+      order: 10006,
+      isPersonal: false,
+      assignee: 'Zach Cato',
+      createdById: 'owner@example.com',
+      subWorkflowType: TEAM_TASK_PROPERTY_CHECKLIST_SUBTYPE,
+    });
+
+    expect(payload.propertyId).toBe('property-xyz');
+    expect(payload.subWorkflowType).toBe('Property Checklist');
+  });
+});
 

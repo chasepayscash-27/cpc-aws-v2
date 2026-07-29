@@ -6,8 +6,12 @@ import { loadCsv } from '../utils/csv';
 import type { ProjectRow } from '../types/project';
 import { getPrimaryTasksAcrossProperties, filterTasksForTeamTab, getTasksForTeamMember } from '../components/propertyTaskCollections';
 import { usePropertyTasks } from '../contexts/PropertyTasksContext';
-import { buildTeamTaskCreatePayload, TEAM_TASK_EMPLOYEE_CHECKLIST_SUBTYPE } from './teamTaskCreatePayload';
-import { getDefaultChecklistForEmployee } from '../data/defaultEmployeeChecklist';
+import {
+  buildTeamTaskCreatePayload,
+  TEAM_TASK_PROPERTY_CHECKLIST_SUBTYPE,
+} from './teamTaskCreatePayload';
+import { defaultEmployeeChecklist } from '../data/defaultEmployeeChecklist';
+import { buildPropertyChecklistAssignmentPlan } from './defaultChecklistAssignment';
 import { toTitleCase } from '../utils/titleCase';
 import '../App.css';
 
@@ -300,24 +304,26 @@ const TeamPage = () => {
   }, [completedByUser, isSelectedMemberCurrentUser, newTaskAssignee, newTaskIsPersonal, newTaskPropertyId, newTaskStage, selectedMember]);
 
   const handleAssignDefaultChecklist = useCallback(async () => {
-    if (!selectedMember) return;
+    const plan = buildPropertyChecklistAssignmentPlan(
+      projectOptions.map(({ id }) => id),
+      defaultEmployeeChecklist,
+      tasks,
+    );
 
-    const checklistItems = getDefaultChecklistForEmployee(selectedMember.name);
-    if (checklistItems.length === 0) {
-      setChecklistAssignStatus('No default checklist items are defined for this employee.');
+    if (plan.hasNoDefaults) {
+      setChecklistAssignStatus('No default checklist items are defined.');
       return;
     }
 
-    // Detect already-assigned items by normalizing stage names (case-insensitive, trimmed).
-    const existingStages = new Set(
-      selectedMemberTasks.map(({ task }) => task.stage?.trim().toLowerCase() ?? ''),
-    );
-    const missing = checklistItems.filter(
-      (item) => !existingStages.has(item.task.trim().toLowerCase()),
-    );
+    if (plan.hasNoProperties) {
+      setChecklistAssignStatus('No properties are available for default checklist assignment.');
+      return;
+    }
 
-    if (missing.length === 0) {
-      setChecklistAssignStatus('All default checklist items are already assigned.');
+    if (plan.toCreate.length === 0) {
+      setChecklistAssignStatus(
+        `All default checklist tasks already exist for ${plan.propertyCount} propert${plan.propertyCount === 1 ? 'y' : 'ies'} (${plan.alreadyExistsCount} existing).`,
+      );
       return;
     }
 
@@ -326,16 +332,16 @@ const TeamPage = () => {
 
     const baseOrder = buildGeneralTaskOrder();
     const results = await Promise.all(
-      missing.map((item, index) =>
+      plan.toCreate.map((item, index) =>
         client.models.PropertyTask.create(
           buildTeamTaskCreatePayload({
-            propertyId: '',
-            stage: item.task,
+            propertyId: item.propertyId,
+            stage: item.stage,
             order: baseOrder + index,
             isPersonal: false,
-            assignee: selectedMember.name,
+            assignee: item.assignee,
             createdById: completedByUser,
-            subWorkflowType: TEAM_TASK_EMPLOYEE_CHECKLIST_SUBTYPE,
+            subWorkflowType: TEAM_TASK_PROPERTY_CHECKLIST_SUBTYPE,
           }),
         ),
       ),
@@ -344,12 +350,18 @@ const TeamPage = () => {
     setIsAssigningChecklist(false);
 
     const errors = results.flatMap((result) => result.errors ?? []);
+    const createdCount = results.length - errors.length;
     if (errors.length > 0) {
-      setChecklistAssignStatus(`Error assigning checklist: ${errors.map((e) => e.message).join('; ')}`);
-    } else {
-      setChecklistAssignStatus(`${missing.length} checklist item${missing.length === 1 ? '' : 's'} assigned.`);
+      setChecklistAssignStatus(
+        `Assigned ${createdCount} default checklist task${createdCount === 1 ? '' : 's'} across ${plan.propertyCount} propert${plan.propertyCount === 1 ? 'y' : 'ies'}; ${plan.alreadyExistsCount} already existed; ${errors.length} error${errors.length === 1 ? '' : 's'}: ${errors.map((e) => e.message).join('; ')}`,
+      );
+      return;
     }
-  }, [completedByUser, selectedMember, selectedMemberTasks]);
+
+    setChecklistAssignStatus(
+      `Assigned ${createdCount} default checklist task${createdCount === 1 ? '' : 's'} across ${plan.propertyCount} propert${plan.propertyCount === 1 ? 'y' : 'ies'}; ${plan.alreadyExistsCount} already existed.`,
+    );
+  }, [completedByUser, projectOptions, tasks]);
 
   const selectedMemberTaskGroups = useMemo(() => {
     const groups = new Map<string, TeamTaskView[]>();
@@ -369,6 +381,21 @@ const TeamPage = () => {
         <h1 className="h1">Team</h1>
         <p className="muted">Meet our team members.</p>
       </div>
+      <section className="card">
+        <div className="teamTaskChecklistRow">
+          <button
+            type="button"
+            className="teamTaskChecklistButton"
+            disabled={isAssigningChecklist || isLoading || !!error}
+            onClick={() => void handleAssignDefaultChecklist()}
+          >
+            {isAssigningChecklist ? 'Assigning…' : '📋 Assign Default Checklist to Every Property'}
+          </button>
+          {checklistAssignStatus && (
+            <span className="teamTaskChecklistStatus">{checklistAssignStatus}</span>
+          )}
+        </div>
+      </section>
 
       <section className="grid">
         {isLoading && (
@@ -485,19 +512,6 @@ const TeamPage = () => {
                 </label>
               )}
               {createError && <p className="muted">{createError}</p>}
-              <div className="teamTaskChecklistRow">
-                <button
-                  type="button"
-                  className="teamTaskChecklistButton"
-                  disabled={isAssigningChecklist}
-                  onClick={() => void handleAssignDefaultChecklist()}
-                >
-                  {isAssigningChecklist ? 'Assigning…' : '📋 Assign Default Checklist'}
-                </button>
-                {checklistAssignStatus && (
-                  <span className="teamTaskChecklistStatus">{checklistAssignStatus}</span>
-                )}
-              </div>
             </div>
             {isTaskLoading && <p className="muted">Loading workflow tasks...</p>}
             {!isTaskLoading && taskError && <p className="muted">{taskError}</p>}
