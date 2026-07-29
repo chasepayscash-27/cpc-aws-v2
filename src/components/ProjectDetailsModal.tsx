@@ -58,6 +58,7 @@ const COST_LABELS = ["Labor", "Materials", "3rd Party"] as const;
 
 export default function ProjectDetailsModal({ project: row, onClose, onViewFullPnL }: Props) {
   const [photos, setPhotos] = useState<PhotoLogRow[]>([]);
+  const [galleryOpen, setGalleryOpen] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
   const [worksheetOpen, setWorksheetOpen] = useState(false);
   const [costSummary, setCostSummary] = useState<[number, number, number]>([0, 0, 0]);
@@ -84,11 +85,13 @@ export default function ProjectDetailsModal({ project: row, onClose, onViewFullP
         if (e.key === "Escape") { closeLightbox(); return; }
         if (e.key === "ArrowRight") { setLightboxIndex((i: number | null) => (i === null ? 0 : (i + 1) % photos.length)); return; }
         if (e.key === "ArrowLeft") { setLightboxIndex((i: number | null) => (i === null ? 0 : (i - 1 + photos.length) % photos.length)); return; }
+      } else if (galleryOpen) {
+        if (e.key === "Escape") { setGalleryOpen(false); return; }
       } else {
         if (e.key === "Escape") onClose();
       }
     },
-    [isLightboxOpen, onClose, closeLightbox, photos.length]
+    [isLightboxOpen, galleryOpen, onClose, closeLightbox, photos.length]
   );
 
   useEffect(() => {
@@ -204,6 +207,9 @@ export default function ProjectDetailsModal({ project: row, onClose, onViewFullP
         .modal-close-btn:hover { background: var(--accent-dim) !important; color: var(--accent) !important; }
         .modal-close-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
         .lightbox-nav-btn:hover { background: rgba(255,255,255,0.25) !important; }
+        .gallery-thumb-btn:hover { border-color: rgba(255,255,255,0.6) !important; transform: scale(1.04) !important; }
+        .gallery-thumb-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+        .gallery-close-btn:hover { background: rgba(255,255,255,0.25) !important; }
       `}</style>
       <div style={overlayStyle} onClick={onClose} role="dialog" aria-modal="true" aria-label={row.name ?? "Project details"}>
         <div style={modalStyle} onClick={(e) => e.stopPropagation()}>
@@ -229,7 +235,7 @@ export default function ProjectDetailsModal({ project: row, onClose, onViewFullP
               />
               {photos.length > 0 && (
                 <button
-                  onClick={() => setLightboxIndex(0)}
+                  onClick={() => setGalleryOpen(true)}
                   aria-label={`View all ${photos.length} photos`}
                   style={{
                     position: "absolute",
@@ -489,6 +495,122 @@ export default function ProjectDetailsModal({ project: row, onClose, onViewFullP
           </div>
         </div>
       </div>
+
+      {/* Gallery overlay — thumbnail grid */}
+      {galleryOpen && (
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            background: "rgba(0,0,0,0.88)",
+            backdropFilter: "blur(8px)",
+            zIndex: 1050,
+            display: "flex",
+            flexDirection: "column",
+            animation: "fadeIn 0.18s ease",
+          }}
+          onClick={() => setGalleryOpen(false)}
+          role="dialog"
+          aria-modal="true"
+          aria-label={`Photo gallery — ${row.name ?? "property"}`}
+        >
+          <div
+            style={{ display: "flex", flexDirection: "column", height: "100%", overflow: "hidden" }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Gallery header */}
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                padding: "14px 20px",
+                borderBottom: "1px solid rgba(255,255,255,0.12)",
+                flexShrink: 0,
+              }}
+            >
+              <span style={{ color: "#fff", fontSize: 16, fontWeight: 700 }}>
+                📷 All Photos ({photos.length})
+              </span>
+              <button
+                className="gallery-close-btn"
+                onClick={() => setGalleryOpen(false)}
+                aria-label="Close photo gallery"
+                style={{
+                  width: 36,
+                  height: 36,
+                  borderRadius: "50%",
+                  border: "1px solid rgba(255,255,255,0.3)",
+                  background: "rgba(255,255,255,0.12)",
+                  color: "#fff",
+                  fontSize: 20,
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  transition: "background 0.15s",
+                }}
+              >
+                ×
+              </button>
+            </div>
+
+            {/* Thumbnail grid */}
+            <div
+              style={{
+                flex: 1,
+                overflowY: "auto",
+                padding: 20,
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))",
+                gap: 12,
+                alignContent: "start",
+              }}
+            >
+              {photos.map((photo, index) => {
+                const altText =
+                  photo.photo_description ?? photo.description ?? photo.category ?? `Photo ${index + 1}`;
+                const isSelected = lightboxIndex === index;
+                return (
+                  <button
+                    key={index}
+                    className="gallery-thumb-btn"
+                    onClick={() => setLightboxIndex(index)}
+                    aria-label={`View photo ${index + 1}: ${altText}`}
+                    aria-pressed={isSelected}
+                    style={{
+                      padding: 0,
+                      border: isSelected
+                        ? "3px solid var(--accent)"
+                        : "2px solid rgba(255,255,255,0.18)",
+                      borderRadius: 8,
+                      overflow: "hidden",
+                      cursor: "pointer",
+                      background: "rgba(255,255,255,0.06)",
+                      aspectRatio: "4 / 3",
+                      display: "block",
+                      transition: "border-color 0.15s, transform 0.15s",
+                    }}
+                  >
+                    <img
+                      src={photo.preview_thumbnail_url ?? photo.source_view_url}
+                      alt={altText}
+                      loading="lazy"
+                      decoding="async"
+                      style={{
+                        width: "100%",
+                        height: "100%",
+                        objectFit: "cover",
+                        display: "block",
+                      }}
+                    />
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Lightbox overlay */}
       {isLightboxOpen && lightboxIndex !== null && photos[lightboxIndex] && (
