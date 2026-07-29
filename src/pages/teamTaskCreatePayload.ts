@@ -2,6 +2,7 @@ const TEAM_TASK_WORKFLOW_TYPE = 'Team Task';
 const TEAM_TASK_GENERAL_SUBTYPE = 'General Team Task';
 const TEAM_TASK_PERSONAL_SUBTYPE = 'Personal Task';
 export const TEAM_TASK_EMPLOYEE_CHECKLIST_SUBTYPE = 'Employee Checklist';
+export const TEAM_TASK_PROPERTY_CHECKLIST_SUBTYPE = 'Property Checklist';
 
 interface BuildTeamTaskCreatePayloadInput {
   propertyId: string;
@@ -44,4 +45,3 @@ export function buildTeamTaskCreatePayload({
     createdById,
   };
 }
-
