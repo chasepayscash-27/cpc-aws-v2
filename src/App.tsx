@@ -3,11 +3,7 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import Navigation from './components/Navigation';
 import { PropertyTasksProvider } from './contexts/PropertyTasksContext';
 import { StageOverrideProvider } from './contexts/StageOverrideContext';
-import AuthGate from './components/AuthGate';
-import { useAuth } from './contexts/AuthContext';
 import './App.css';
-
-const LoginPage = lazy(() => import('./pages/LoginPage'));
 
 // Lazy-load each page so Vite emits a separate chunk per route.
 // The browser only downloads a page's chunk when the user navigates to it.
@@ -25,7 +21,6 @@ const SalesMeetingsPage   = lazy(() => import('./pages/SalesMeetingsPage'));
 const TeamWipPage         = lazy(() => import('./pages/TeamWipPage'));
 
 const App = () => {
-  const { user, signOut, step } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(
     () => typeof window !== 'undefined' && window.innerWidth > 768,
   );
@@ -44,20 +39,6 @@ const App = () => {
 
   function toggleTheme() {
     setTheme(t => (t === 'dark' ? 'light' : 'dark'));
-  }
-
-  // While the auth state is loading, render nothing to avoid a login flash.
-  if (step === 'LOADING') return null;
-
-  // Unauthenticated (or mid-challenge) users see only the login page.
-  if (step !== 'SIGNED_IN') {
-    return (
-      <Suspense fallback={null}>
-        <Routes>
-          <Route path="*" element={<LoginPage />} />
-        </Routes>
-      </Suspense>
-    );
   }
 
   return (
@@ -97,16 +78,6 @@ const App = () => {
           >
             {theme === 'dark' ? '☀️' : '🌙'}
           </button>
-          {user && (
-            <button
-              className="themeToggle"
-              onClick={signOut}
-              aria-label="Sign out"
-              title={`Signed in as ${user.email} — click to sign out`}
-            >
-              Sign out
-            </button>
-          )}
         </div>
       </header>
       <div className={`body${sidebarOpen ? '' : ' sidebarCollapsed'}`}>
@@ -115,7 +86,6 @@ const App = () => {
           <StageOverrideProvider>
           <PropertyTasksProvider>
           <Suspense fallback={<div className="pageHeader" role="status" aria-live="polite"><p className="muted">Loading…</p></div>}>
-            <AuthGate>
               <Routes>
                 <Route path="/" element={<YTDSummaryPage />} />
                 <Route path="/projects" element={<ProjectsPage />} />
@@ -135,7 +105,6 @@ const App = () => {
                 <Route path="/team-wip" element={<TeamWipPage />} />
                 <Route path="*" element={<Navigate to="/" replace />} />
               </Routes>
-            </AuthGate>
           </Suspense>
           </PropertyTasksProvider>
           </StageOverrideProvider>
