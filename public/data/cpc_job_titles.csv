@@ -1,8 +1,8 @@
-﻿employee_name,employee_email,employee_job_title
-Chase Smith,chase@chasepayscash.com,President & CEO
-Alex Henderson,ahenderson@chasepayscash.com,Director of Reporting
-Matt Cody,matt@chasepayscash.com,Construction Manager
-Kevin Renfrow,kevin@chasepayscash.com,Chief Operating Officer
-Justin Moore,acquisitions@chasepayscash.com,Acquisitions Manager
-Devin Self,devin@chasepayscash.com,Director of Administration
-Zach Cato, zach@chasepayscash.com, Materials Manager
+﻿employee_name,employee_email,employee_job_title,phone_number,default_password
+Chase Smith,chase@chasepayscash.com,President & CEO,205-500-1784,cpc2026
+Alex Henderson,ahenderson@chasepayscash.com,Director of Reporting,205-914-1329,cpc2026
+Matt Cody,matt@chasepayscash.com,Construction Manager,205-566-1004,cpc2026
+Kevin Renfrow,kevin@chasepayscash.com,Chief Operating Officer,205-612-7792,cpc2026
+Justin Moore,acquisitions@chasepayscash.com,Acquisitions Manager,205-789-2358,cpc2026
+Devin Self,devin@chasepayscash.com,Director of Administration,205-908-0792,cpc2026
+Zach Cato,zach@chasepayscash.com,Materials Manager,205-999-9999,cpc2026
