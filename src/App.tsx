@@ -3,7 +3,11 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import Navigation from './components/Navigation';
 import { PropertyTasksProvider } from './contexts/PropertyTasksContext';
 import { StageOverrideProvider } from './contexts/StageOverrideContext';
+import AuthGate from './components/AuthGate';
+import { useAuth } from './contexts/AuthContext';
 import './App.css';
+
+const LoginPage = lazy(() => import('./pages/LoginPage'));
 
 // Lazy-load each page so Vite emits a separate chunk per route.
 // The browser only downloads a page's chunk when the user navigates to it.
@@ -21,6 +25,7 @@ const SalesMeetingsPage   = lazy(() => import('./pages/SalesMeetingsPage'));
 const TeamWipPage         = lazy(() => import('./pages/TeamWipPage'));
 
 const App = () => {
+  const { user, signOut, step } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(
     () => typeof window !== 'undefined' && window.innerWidth > 768,
   );
@@ -39,6 +44,20 @@ const App = () => {
 
   function toggleTheme() {
     setTheme(t => (t === 'dark' ? 'light' : 'dark'));
+  }
+
+  // While the auth state is loading, render nothing to avoid a login flash.
+  if (step === 'LOADING') return null;
+
+  // Unauthenticated (or mid-challenge) users see only the login page.
+  if (step !== 'SIGNED_IN') {
+    return (
+      <Suspense fallback={null}>
+        <Routes>
+          <Route path="*" element={<LoginPage />} />
+        </Routes>
+      </Suspense>
+    );
   }
 
   return (
@@ -78,6 +97,16 @@ const App = () => {
           >
             {theme === 'dark' ? '☀️' : '🌙'}
           </button>
+          {user && (
+            <button
+              className="themeToggle"
+              onClick={signOut}
+              aria-label="Sign out"
+              title={`Signed in as ${user.email} — click to sign out`}
+            >
+              Sign out
+            </button>
+          )}
         </div>
       </header>
       <div className={`body${sidebarOpen ? '' : ' sidebarCollapsed'}`}>
@@ -86,25 +115,27 @@ const App = () => {
           <StageOverrideProvider>
           <PropertyTasksProvider>
           <Suspense fallback={<div className="pageHeader" role="status" aria-live="polite"><p className="muted">Loading…</p></div>}>
-            <Routes>
-              <Route path="/" element={<YTDSummaryPage />} />
-              <Route path="/projects" element={<ProjectsPage />} />
-              <Route path="/maps" element={<MapsPage />} />
-              <Route path="/financials" element={<FinancialsPage />} />
-              <Route path="/resources" element={<ResourcesPage />} />
-              <Route path="/team" element={<TeamPage />} />
-              {/* Analytics route temporarily disabled for production. To re-enable:
-                  1. Uncomment the Analytics nav item in src/components/Navigation.tsx
-                  2. Restore this route: <Route path="/analytics" element={<AnalyticsPage />} /> */}
-              <Route path="/analytics" element={<Navigate to="/" replace />} />
-              <Route path="/chat" element={<ChatPage />} />
-              <Route path="/workflow" element={<WorkflowPage />} />
-              <Route path="/team-chat" element={<TeamChatPage />} />
-              <Route path="/active-listing" element={<ActiveListingPage />} />
-              <Route path="/sales-meetings" element={<SalesMeetingsPage />} />
-              <Route path="/team-wip" element={<TeamWipPage />} />
-              <Route path="*" element={<Navigate to="/" replace />} />
-            </Routes>
+            <AuthGate>
+              <Routes>
+                <Route path="/" element={<YTDSummaryPage />} />
+                <Route path="/projects" element={<ProjectsPage />} />
+                <Route path="/maps" element={<MapsPage />} />
+                <Route path="/financials" element={<FinancialsPage />} />
+                <Route path="/resources" element={<ResourcesPage />} />
+                <Route path="/team" element={<TeamPage />} />
+                {/* Analytics route temporarily disabled for production. To re-enable:
+                    1. Uncomment the Analytics nav item in src/components/Navigation.tsx
+                    2. Restore this route: <Route path="/analytics" element={<AnalyticsPage />} /> */}
+                <Route path="/analytics" element={<Navigate to="/" replace />} />
+                <Route path="/chat" element={<ChatPage />} />
+                <Route path="/workflow" element={<WorkflowPage />} />
+                <Route path="/team-chat" element={<TeamChatPage />} />
+                <Route path="/active-listing" element={<ActiveListingPage />} />
+                <Route path="/sales-meetings" element={<SalesMeetingsPage />} />
+                <Route path="/team-wip" element={<TeamWipPage />} />
+                <Route path="*" element={<Navigate to="/" replace />} />
+              </Routes>
+            </AuthGate>
           </Suspense>
           </PropertyTasksProvider>
           </StageOverrideProvider>

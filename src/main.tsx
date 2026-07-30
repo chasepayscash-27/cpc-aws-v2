@@ -4,6 +4,7 @@ import { BrowserRouter } from "react-router-dom";
 import { Amplify } from "aws-amplify";
 import outputs from "../amplify/amplify_outputs.json";
 import App from "./App";
+import { AuthProvider } from "./contexts/AuthContext";
 import "leaflet/dist/leaflet.css";
 
 // Allow environment-variable overrides for the AppSync endpoint and API key.
@@ -48,7 +49,9 @@ if (import.meta.env.DEV) {
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <BrowserRouter>
-      <App />
+      <AuthProvider>
+        <App />
+      </AuthProvider>
     </BrowserRouter>
   </React.StrictMode>
 );
