@@ -40,14 +40,12 @@ try {
     user_pool_id: cog.userPoolId,
     user_pool_client_id: cog.clientId,
     aws_region: cog.region,
-    loginWith: {
-      oauth: {
-        domain: cog.domain.replace(/^https?:\/\//, ''),
-        scopes: ['email', 'openid', 'profile'],
-        redirectSignIn: [cog.redirectSignIn],
-        redirectSignOut: [cog.redirectSignOut],
-        responseType: 'code',
-      },
+    oauth: {
+      domain: cog.domain.replace(/^https?:\/\//, ''),
+      scopes: ['email', 'openid', 'profile'],
+      redirectSignIn: [cog.redirectSignIn],
+      redirectSignOut: [cog.redirectSignOut],
+      responseType: 'code',
     },
   };
 } catch (err) {
