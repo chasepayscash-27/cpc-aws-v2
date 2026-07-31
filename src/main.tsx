@@ -40,18 +40,9 @@ try {
     user_pool_id: cog.userPoolId,
     user_pool_client_id: cog.clientId,
     aws_region: cog.region,
-    // @ts-expect-error — oauth is not in the generated outputs type but is a
-    // valid Amplify Auth configuration key for Hosted UI.
-    oauth: {
-      domain: cog.domain,
-      scope: ['email', 'openid', 'profile'],
-      redirectSignIn: [cog.redirectSignIn],
-      redirectSignOut: [cog.redirectSignOut],
-      responseType: 'code',
-    },
     loginWith: {
       oauth: {
-        domain: cog.domain,
+        domain: cog.domain.replace(/^https?:\/\//, ''),
         scopes: ['email', 'openid', 'profile'],
         redirectSignIn: [cog.redirectSignIn],
         redirectSignOut: [cog.redirectSignOut],
