@@ -2,8 +2,8 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
 import { Amplify } from "aws-amplify";
-import outputs from "../amplify/amplify_outputs.json";
 import { AuthProvider } from "./contexts/AuthContext";
+import { buildAmplifyConfig } from "./config/amplify";
 import { getCognitoConfig } from "./config/cognito";
 import App from "./App";
 import "leaflet/dist/leaflet.css";
@@ -13,41 +13,22 @@ import "leaflet/dist/leaflet.css";
 // Console → Environment variables to inject credentials without touching
 // amplify_outputs.json.  Useful when the committed file's key becomes stale
 // between backend deploys.
-const amplifyConfig = {
-  ...outputs,
-  data: {
-    ...outputs.data,
-    ...(import.meta.env.VITE_APPSYNC_URL
-      ? { url: import.meta.env.VITE_APPSYNC_URL }
-      : {}),
-    ...(import.meta.env.VITE_APPSYNC_API_KEY
-      ? { api_key: import.meta.env.VITE_APPSYNC_API_KEY }
-      : {}),
-  },
+const envOverrides = {
+  appSyncUrl: import.meta.env.VITE_APPSYNC_URL,
+  appSyncApiKey: import.meta.env.VITE_APPSYNC_API_KEY,
 };
+
+let amplifyConfig = buildAmplifyConfig(envOverrides);
 
 // Configure Cognito Hosted UI (OAuth / Authorization Code + PKCE) when the
 // required env vars are present.  If they are missing (e.g. during initial
 // setup or unit tests) Amplify still initialises with the base outputs — auth
 // features will be unavailable until the vars are set.
 try {
-  const cog = getCognitoConfig();
-  amplifyConfig.auth = {
-    ...amplifyConfig.auth,
-    // Override the user pool with the one specified via env vars so that the
-    // Hosted UI domain and app client settings are used instead of the default
-    // amplify_outputs values.
-    user_pool_id: cog.userPoolId,
-    user_pool_client_id: cog.clientId,
-    aws_region: cog.region,
-    oauth: {
-      domain: cog.domain.replace(/^https?:\/\//, ''),
-      scopes: ['email', 'openid', 'profile'],
-      redirectSignIn: [cog.redirectSignIn],
-      redirectSignOut: [cog.redirectSignOut],
-      responseType: 'code',
-    },
-  };
+  amplifyConfig = buildAmplifyConfig({
+    ...envOverrides,
+    cognitoConfig: getCognitoConfig(),
+  });
 } catch (err) {
   console.warn(
     "[main] Cognito Hosted UI env vars not set — auth will be limited. " +
