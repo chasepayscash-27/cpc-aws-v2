@@ -3,6 +3,8 @@ import ReactDOM from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
 import { Amplify } from "aws-amplify";
 import outputs from "../amplify/amplify_outputs.json";
+import { AuthProvider } from "./contexts/AuthContext";
+import { getCognitoConfig } from "./config/cognito";
 import App from "./App";
 import "leaflet/dist/leaflet.css";
 
@@ -23,6 +25,47 @@ const amplifyConfig = {
       : {}),
   },
 };
+
+// Configure Cognito Hosted UI (OAuth / Authorization Code + PKCE) when the
+// required env vars are present.  If they are missing (e.g. during initial
+// setup or unit tests) Amplify still initialises with the base outputs — auth
+// features will be unavailable until the vars are set.
+try {
+  const cog = getCognitoConfig();
+  amplifyConfig.auth = {
+    ...amplifyConfig.auth,
+    // Override the user pool with the one specified via env vars so that the
+    // Hosted UI domain and app client settings are used instead of the default
+    // amplify_outputs values.
+    user_pool_id: cog.userPoolId,
+    user_pool_client_id: cog.clientId,
+    aws_region: cog.region,
+    // @ts-expect-error — oauth is not in the generated outputs type but is a
+    // valid Amplify Auth configuration key for Hosted UI.
+    oauth: {
+      domain: cog.domain,
+      scope: ['email', 'openid', 'profile'],
+      redirectSignIn: [cog.redirectSignIn],
+      redirectSignOut: [cog.redirectSignOut],
+      responseType: 'code',
+    },
+    loginWith: {
+      oauth: {
+        domain: cog.domain,
+        scopes: ['email', 'openid', 'profile'],
+        redirectSignIn: [cog.redirectSignIn],
+        redirectSignOut: [cog.redirectSignOut],
+        responseType: 'code',
+      },
+    },
+  };
+} catch (err) {
+  console.warn(
+    "[main] Cognito Hosted UI env vars not set — auth will be limited. " +
+    "Copy .env.example to .env.local and fill in the VITE_COGNITO_* values.",
+    err,
+  );
+}
 
 Amplify.configure(amplifyConfig);
 
@@ -48,7 +91,9 @@ if (import.meta.env.DEV) {
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <BrowserRouter>
-      <App />
+      <AuthProvider>
+        <App />
+      </AuthProvider>
     </BrowserRouter>
   </React.StrictMode>
 );

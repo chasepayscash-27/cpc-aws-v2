@@ -8,10 +8,77 @@ This template equips you with a foundational React application integrated with A
 
 ## Features
 
-- **Authentication**: Setup with Amazon Cognito for secure user authentication.
+- **Authentication**: AWS Cognito Hosted UI (Authorization Code + PKCE) — email-only sign-in, no MFA.
 - **API**: Ready-to-use GraphQL endpoint with AWS AppSync.
 - **Database**: Real-time database powered by Amazon DynamoDB.
 - **AI Chat & Insights**: Public chat widget and AI insights panel call a Lambda-backed HTTP API (`POST /chat`) that invokes Claude 3 Haiku in Bedrock.
+
+## Authentication — Cognito Hosted UI
+
+All app pages are protected behind authentication.  Users are redirected to the
+AWS Cognito Hosted UI login page and returned to the app after a successful sign-in.
+
+### How it works
+
+1. Unauthenticated user navigates to any app page → redirected to `/login`.
+2. User clicks **Sign in** → browser redirects to the Cognito Hosted UI.
+3. User authenticates (email + password) → Cognito redirects to `/auth/callback`.
+4. The callback page exchanges the authorization code for tokens (PKCE) via Amplify.
+5. Session is established; the user is returned to their original destination.
+6. The **Sign out** button in the top-right header clears the local session and
+   redirects to the Cognito logout endpoint, revoking the tokens server-side.
+
+### Cognito App Client setup (one-time, in the AWS Console)
+
+1. Open your User Pool in the [Cognito Console](https://console.aws.amazon.com/cognito/v2/).
+   - User Pool ID: `us-east-1_ba4UX341U`  (region: `us-east-1`)
+2. **App integration → Domain** — configure a Hosted UI domain:
+   - e.g. `my-app.auth.us-east-1.amazoncognito.com`
+3. **App clients** — create (or edit) an app client:
+   - **Public client** (no client secret — required for browser SPAs).
+   - **Allowed callback URLs**: add your redirect URI(s):
+     - Local dev: `http://localhost:5173/auth/callback`
+     - Production: `https://<your-domain>/auth/callback`
+   - **Allowed sign-out URLs**: add your logout URI(s):
+     - Local dev: `http://localhost:5173`
+     - Production: `https://<your-domain>`
+   - **OAuth 2.0 grant types**: enable **Authorization code grant**.
+   - **OpenID Connect scopes**: `email`, `openid`, `profile`.
+4. **Sign-in experience** — set **Sign-in options** to **Email only**.
+5. **MFA and verifications** — leave MFA **off**.
+
+### Environment variables
+
+All five `VITE_COGNITO_*` variables are **required** for auth to work.
+
+| Variable | Description | Example |
+|---|---|---|
+| `VITE_COGNITO_REGION` | AWS region | `us-east-1` |
+| `VITE_COGNITO_USER_POOL_ID` | User Pool ID | `us-east-1_ba4UX341U` |
+| `VITE_COGNITO_CLIENT_ID` | App Client ID (no secret) | `abc123xyz` |
+| `VITE_COGNITO_DOMAIN` | Full Hosted UI domain (no trailing `/`) | `https://my-app.auth.us-east-1.amazoncognito.com` |
+| `VITE_COGNITO_REDIRECT_URI` | OAuth callback URL (must match App Client) | `http://localhost:5173/auth/callback` |
+| `VITE_COGNITO_LOGOUT_URI` | Post-logout redirect URL (must match App Client) | `http://localhost:5173` |
+
+### Local development
+
+```bash
+# 1. Copy the example env file and fill in your Cognito values
+cp .env.example .env.local
+# Edit .env.local with your VITE_COGNITO_* values (see table above)
+
+# 2. Start the dev server
+npm run dev
+# Open http://localhost:5173 — you will be prompted to sign in
+```
+
+> **.env.local is gitignored** — never commit your Cognito client ID or domain to the repo.
+
+### Production / CI-CD
+
+Add the five `VITE_COGNITO_*` variables to the AWS Amplify Console under
+**App settings → Environment variables** (not in `.env.example`).  They will be
+injected at build time and baked into the static bundle.
 
 ## AI Feature Requirements
 
