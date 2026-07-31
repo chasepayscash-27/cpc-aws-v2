@@ -1,7 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import { generateClient } from "aws-amplify/data";
 import { getCurrentUser } from "aws-amplify/auth";
-import { Authenticator, useAuthenticator } from "@aws-amplify/ui-react";
+// TODO(auth-disabled): Authenticator and useAuthenticator imports removed while
+// auth is bypassed. Restore them and re-wrap TeamChatInner in <Authenticator>
+// when auth is re-enabled.
 import "@aws-amplify/ui-react/styles.css";
 import type { Schema } from "../../amplify/data/resource";
 
@@ -338,7 +340,8 @@ function ChatRoomView({ room, authorId, authorName }: ChatRoomViewProps) {
 // ─── Main TeamChatPage ─────────────────────────────────────────────────────────
 
 function TeamChatInner() {
-  const { user } = useAuthenticator();
+  // TODO(auth-disabled): useAuthenticator removed; getCurrentUser falls back to
+  // "guest" identity. Restore useAuthenticator when auth is re-enabled.
   const [rooms, setRooms] = useState<ChatRoom[]>([]);
   const [selectedRoom, setSelectedRoom] = useState<ChatRoom | null>(null);
   const [roomsLoading, setRoomsLoading] = useState(true);
@@ -356,10 +359,13 @@ function TeamChatInner() {
         );
       })
       .catch(() => {
-        setAuthorId(user?.username ?? "unknown");
-        setAuthorName(user?.username ?? "Team Member");
+        // TODO(auth-disabled): getCurrentUser fails when auth is bypassed;
+        // fall back to a guest identity. Restore real user resolution when
+        // auth is re-enabled.
+        setAuthorId("guest");
+        setAuthorName("Team Member");
       });
-  }, [user]);
+  }, []);
 
   // Load rooms + subscribe to new rooms
   useEffect(() => {
@@ -450,10 +456,8 @@ function TeamChatInner() {
   );
 }
 
+// TODO(auth-disabled): Authenticator wrapper removed. Restore when auth is
+// re-enabled: wrap TeamChatInner in <Authenticator>{() => <TeamChatInner />}</Authenticator>
 export default function TeamChatPage() {
-  return (
-    <Authenticator>
-      {() => <TeamChatInner />}
-    </Authenticator>
-  );
+  return <TeamChatInner />;
 }
