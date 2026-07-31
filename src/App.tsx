@@ -1,8 +1,10 @@
 import { lazy, Suspense, useState, useEffect } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import Navigation from './components/Navigation';
+import ProtectedRoute from './components/ProtectedRoute';
 import { PropertyTasksProvider } from './contexts/PropertyTasksContext';
 import { StageOverrideProvider } from './contexts/StageOverrideContext';
+import { useAuth } from './contexts/AuthContext';
 import './App.css';
 
 // Lazy-load each page so Vite emits a separate chunk per route.
@@ -19,6 +21,8 @@ const TeamChatPage        = lazy(() => import('./pages/TeamChatPage'));
 const ActiveListingPage   = lazy(() => import('./pages/ActiveListingPage'));
 const SalesMeetingsPage   = lazy(() => import('./pages/SalesMeetingsPage'));
 const TeamWipPage         = lazy(() => import('./pages/TeamWipPage'));
+const LoginPage           = lazy(() => import('./pages/LoginPage'));
+const AuthCallbackPage    = lazy(() => import('./pages/AuthCallbackPage'));
 
 const App = () => {
   const [sidebarOpen, setSidebarOpen] = useState(
@@ -40,6 +44,8 @@ const App = () => {
   function toggleTheme() {
     setTheme(t => (t === 'dark' ? 'light' : 'dark'));
   }
+
+  const { isAuthenticated, logout, user } = useAuth();
 
   return (
     <div className="appShell">
@@ -78,6 +84,16 @@ const App = () => {
           >
             {theme === 'dark' ? '☀️' : '🌙'}
           </button>
+          {isAuthenticated && (
+            <button
+              className="themeToggle"
+              onClick={() => void logout()}
+              aria-label={`Sign out${user?.username ? ` (${user.username})` : ''}`}
+              title={`Sign out${user?.username ? ` (${user.username})` : ''}`}
+            >
+              Sign out
+            </button>
+          )}
         </div>
       </header>
       <div className={`body${sidebarOpen ? '' : ' sidebarCollapsed'}`}>
@@ -87,22 +103,30 @@ const App = () => {
           <PropertyTasksProvider>
           <Suspense fallback={<div className="pageHeader" role="status" aria-live="polite"><p className="muted">Loading…</p></div>}>
               <Routes>
-                <Route path="/" element={<YTDSummaryPage />} />
-                <Route path="/projects" element={<ProjectsPage />} />
-                <Route path="/maps" element={<MapsPage />} />
-                <Route path="/financials" element={<FinancialsPage />} />
-                <Route path="/resources" element={<ResourcesPage />} />
-                <Route path="/team" element={<TeamPage />} />
-                {/* Analytics route temporarily disabled for production. To re-enable:
-                    1. Uncomment the Analytics nav item in src/components/Navigation.tsx
-                    2. Restore this route: <Route path="/analytics" element={<AnalyticsPage />} /> */}
-                <Route path="/analytics" element={<Navigate to="/" replace />} />
-                <Route path="/chat" element={<ChatPage />} />
-                <Route path="/workflow" element={<WorkflowPage />} />
-                <Route path="/team-chat" element={<TeamChatPage />} />
-                <Route path="/active-listing" element={<ActiveListingPage />} />
-                <Route path="/sales-meetings" element={<SalesMeetingsPage />} />
-                <Route path="/team-wip" element={<TeamWipPage />} />
+                {/* Public routes */}
+                <Route path="/login" element={<LoginPage />} />
+                <Route path="/auth/callback" element={<AuthCallbackPage />} />
+
+                {/* Protected routes — all app pages require authentication */}
+                <Route element={<ProtectedRoute />}>
+                  <Route path="/" element={<YTDSummaryPage />} />
+                  <Route path="/projects" element={<ProjectsPage />} />
+                  <Route path="/maps" element={<MapsPage />} />
+                  <Route path="/financials" element={<FinancialsPage />} />
+                  <Route path="/resources" element={<ResourcesPage />} />
+                  <Route path="/team" element={<TeamPage />} />
+                  {/* Analytics route temporarily disabled for production. To re-enable:
+                      1. Uncomment the Analytics nav item in src/components/Navigation.tsx
+                      2. Restore this route: <Route path="/analytics" element={<AnalyticsPage />} /> */}
+                  <Route path="/analytics" element={<Navigate to="/" replace />} />
+                  <Route path="/chat" element={<ChatPage />} />
+                  <Route path="/workflow" element={<WorkflowPage />} />
+                  <Route path="/team-chat" element={<TeamChatPage />} />
+                  <Route path="/active-listing" element={<ActiveListingPage />} />
+                  <Route path="/sales-meetings" element={<SalesMeetingsPage />} />
+                  <Route path="/team-wip" element={<TeamWipPage />} />
+                </Route>
+
                 <Route path="*" element={<Navigate to="/" replace />} />
               </Routes>
           </Suspense>
