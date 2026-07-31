@@ -32,7 +32,7 @@ interface AuthContextValue {
   /** True once the initial check is complete and a valid session was found. */
   isAuthenticated: boolean;
   /** Redirects the browser to the Cognito Hosted UI sign-in page. */
-  login: () => void;
+  login: () => Promise<void>;
   /** Signs the user out of Amplify and redirects to the Cognito logout endpoint. */
   logout: () => Promise<void>;
 }
@@ -41,7 +41,7 @@ const AuthContext = createContext<AuthContextValue>({
   user: null,
   isLoading: true,
   isAuthenticated: false,
-  login: () => undefined,
+  login: async () => undefined,
   logout: async () => undefined,
 });
 
@@ -92,8 +92,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return unsubscribe;
   }, [refresh]);
 
-  const login = useCallback(() => {
-    signInWithRedirect();
+  const login = useCallback(async () => {
+    try {
+      await signInWithRedirect();
+    } catch (err) {
+      console.error('[auth] signInWithRedirect failed', err);
+      throw err;
+    }
   }, []);
 
   const logout = useCallback(async () => {
