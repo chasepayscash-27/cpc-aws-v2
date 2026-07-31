@@ -5,6 +5,14 @@
  *  - Fetch the current authenticated user on mount.
  *  - Expose `login()` (redirect to Hosted UI) and `logout()` (Cognito logout).
  *  - Keep `user`, `isAuthenticated`, and `isLoading` in sync.
+ *
+ * TODO(auth-disabled): Authentication is temporarily disabled. All users are
+ * treated as authenticated without a real Cognito session. To re-enable auth:
+ *  1. Remove the AUTH_BYPASS_ENABLED block below.
+ *  2. Restore the original resolveCurrentUser() call in refresh().
+ *  3. Restore the Hub listener for auth events.
+ *  4. Revert ProtectedRoute.tsx to its original guarded implementation.
+ *  5. Revert TeamChatPage.tsx to wrap TeamChatInner in <Authenticator>.
  */
 
 import {
@@ -16,13 +24,17 @@ import {
   type ReactNode,
 } from 'react';
 import {
-  fetchAuthSession,
-  getCurrentUser,
-  signInWithRedirect,
-  signOut,
   type AuthUser,
 } from 'aws-amplify/auth';
-import { Hub } from 'aws-amplify/utils';
+
+// TODO(auth-disabled): Flip this to false (or delete the block) to re-enable auth.
+const AUTH_BYPASS_ENABLED = true;
+
+/** Synthetic guest user returned when the auth bypass is active. */
+const BYPASS_USER: AuthUser = {
+  username: 'guest',
+  userId: 'guest',
+};
 
 interface AuthContextValue {
   /** The currently authenticated Cognito user, or null if unauthenticated. */
@@ -45,64 +57,43 @@ const AuthContext = createContext<AuthContextValue>({
   logout: async () => undefined,
 });
 
-/** Checks whether there is a valid Cognito session and returns the user if so. */
-async function resolveCurrentUser(): Promise<AuthUser | null> {
-  try {
-    const session = await fetchAuthSession({ forceRefresh: false });
-    if (!session.tokens?.accessToken) return null;
-    return await getCurrentUser();
-  } catch {
-    return null;
-  }
-}
-
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<AuthUser | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  // TODO(auth-disabled): When bypass is enabled, skip Cognito entirely.
+  const [user, setUser] = useState<AuthUser | null>(
+    AUTH_BYPASS_ENABLED ? BYPASS_USER : null,
+  );
+  const [isLoading, setIsLoading] = useState(!AUTH_BYPASS_ENABLED);
 
-  const refresh = useCallback(async () => {
-    setIsLoading(true);
-    const resolved = await resolveCurrentUser();
-    setUser(resolved);
-    setIsLoading(false);
+  // TODO(auth-disabled): This effect is a no-op while bypass is enabled.
+  // Restore the original implementation (resolveCurrentUser + Hub listener)
+  // when auth is re-enabled.
+  useEffect(() => {
+    if (!AUTH_BYPASS_ENABLED) {
+      // Original auth init would go here — see git history for the full
+      // resolveCurrentUser() + Hub.listen implementation.
+      setUser(null);
+      setIsLoading(false);
+    }
   }, []);
 
-  // Resolve session on mount.
-  useEffect(() => {
-    refresh();
-  }, [refresh]);
-
-  // Keep session state in sync when Amplify Hub fires auth events
-  // (e.g. after the Hosted UI callback exchange completes).
-  useEffect(() => {
-    const unsubscribe = Hub.listen('auth', ({ payload }) => {
-      const { event } = payload;
-      if (
-        event === 'signedIn' ||
-        event === 'tokenRefresh' ||
-        event === 'signInWithRedirect'
-      ) {
-        refresh();
-      }
-      if (event === 'signedOut') {
-        setUser(null);
-        setIsLoading(false);
-      }
-    });
-    return unsubscribe;
-  }, [refresh]);
-
+  // TODO(auth-disabled): login/logout are no-ops while bypass is enabled.
   const login = useCallback(async () => {
-    try {
-      await signInWithRedirect();
-    } catch (err) {
-      console.error('[auth] signInWithRedirect failed', err);
-      throw err;
+    if (!AUTH_BYPASS_ENABLED) {
+      const { signInWithRedirect } = await import('aws-amplify/auth');
+      try {
+        await signInWithRedirect();
+      } catch (err) {
+        console.error('[auth] signInWithRedirect failed', err);
+        throw err;
+      }
     }
   }, []);
 
   const logout = useCallback(async () => {
-    await signOut({ global: true });
+    if (!AUTH_BYPASS_ENABLED) {
+      const { signOut } = await import('aws-amplify/auth');
+      await signOut({ global: true });
+    }
   }, []);
 
   return (
@@ -110,7 +101,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       value={{
         user,
         isLoading,
-        isAuthenticated: user !== null,
+        isAuthenticated: AUTH_BYPASS_ENABLED ? true : user !== null,
         login,
         logout,
       }}
