@@ -1,8 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { generateClient } from "aws-amplify/data";
 import { getCurrentUser } from "aws-amplify/auth";
-import { Authenticator, useAuthenticator } from "@aws-amplify/ui-react";
-import "@aws-amplify/ui-react/styles.css";
 import type { Schema } from "../../amplify/data/resource";
 
 type ChatRoom = Schema["ChatRoom"]["type"];
@@ -338,7 +336,6 @@ function ChatRoomView({ room, authorId, authorName }: ChatRoomViewProps) {
 // ─── Main TeamChatPage ─────────────────────────────────────────────────────────
 
 function TeamChatInner() {
-  const { user } = useAuthenticator();
   const [rooms, setRooms] = useState<ChatRoom[]>([]);
   const [selectedRoom, setSelectedRoom] = useState<ChatRoom | null>(null);
   const [roomsLoading, setRoomsLoading] = useState(true);
@@ -356,10 +353,10 @@ function TeamChatInner() {
         );
       })
       .catch(() => {
-        setAuthorId(user?.username ?? "unknown");
-        setAuthorName(user?.username ?? "Team Member");
+        setAuthorId("unknown");
+        setAuthorName("Team Member");
       });
-  }, [user]);
+  }, []);
 
   // Load rooms + subscribe to new rooms
   useEffect(() => {
@@ -451,9 +448,5 @@ function TeamChatInner() {
 }
 
 export default function TeamChatPage() {
-  return (
-    <Authenticator>
-      {() => <TeamChatInner />}
-    </Authenticator>
-  );
+  return <TeamChatInner />;
 }
