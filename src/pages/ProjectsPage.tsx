@@ -4,6 +4,8 @@ import type { ProjectRow } from "../types/project";
 import ProjectsTable from "../components/ProjectsTable";
 import ProjectsGallery from "../components/ProjectsGallery";
 import { isArchivedStage } from "../utils/pipelineStatus";
+import ProjectUploadModal from "../components/ProjectUploadModal";
+import { loadCustomProjects, saveCustomProjects } from "../utils/customProjects";
 
 type ViewMode = "table" | "gallery";
 
@@ -26,14 +28,19 @@ function formatLabel(value: string): string {
 }
 
 export default function ProjectsPage({ onViewFullPnL }: Props) {
-  const [rows, setRows] = useState<ProjectRow[]>([]);
+  const [csvRows, setCsvRows] = useState<ProjectRow[]>([]);
+  const [customRows, setCustomRows] = useState<ProjectRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [viewMode, setViewMode] = useState<ViewMode>("gallery");
+  const [uploadOpen, setUploadOpen] = useState(false);
+  const [editingProject, setEditingProject] = useState<ProjectRow | null>(null);
   const [search, setSearch] = useState("");
   const [stageFilter, setStageFilter] = useState("all");
   const [strategyFilter, setStrategyFilter] = useState("all");
   const [sortField, setSortField] = useState<SortField>("name_asc");
+
+  const rows = useMemo(() => [...csvRows, ...customRows], [csvRows, customRows]);
 
   useEffect(() => {
     async function fetchData() {
@@ -41,7 +48,10 @@ export default function ProjectsPage({ onViewFullPnL }: Props) {
         setLoading(true);
         const data = await loadCsv<ProjectRow>("/data/projects_v2.csv");
         // Exclude archived projects; they should not appear in any active view.
-        setRows(data.filter((r) => !r.archived_at && !isArchivedStage(r.stage)));
+        setCsvRows(data.filter((r) => !r.archived_at && !isArchivedStage(r.stage)));
+        setCustomRows(
+          loadCustomProjects().filter((r) => !r.archived_at && !isArchivedStage(r.stage))
+        );
       } catch (err) {
         setError(err instanceof Error ? err.message : "Failed to load projects");
       } finally {
@@ -125,15 +135,52 @@ export default function ProjectsPage({ onViewFullPnL }: Props) {
     minWidth: 0,
   };
 
+  function handleSaveProject(project: ProjectRow) {
+    setCustomRows((prev) => {
+      const next = prev.some((row) => row.project_uuid === project.project_uuid)
+        ? prev.map((row) => (row.project_uuid === project.project_uuid ? project : row))
+        : [project, ...prev];
+      saveCustomProjects(next);
+      return next;
+    });
+    setUploadOpen(false);
+    setEditingProject(null);
+  }
+
   return (
     <>
+      {(uploadOpen || editingProject) && (
+        <ProjectUploadModal
+          initialProject={editingProject}
+          onClose={() => {
+            setUploadOpen(false);
+            setEditingProject(null);
+          }}
+          onSave={handleSaveProject}
+        />
+      )}
       <div className="pageHeader">
         <h1 className="h1">Projects</h1>
-        <p className="muted">All active and completed projects from Flipper Force.</p>
+        <p className="muted">All active and completed projects from Flipper Force, plus uploaded custom projects.</p>
       </div>
 
       {/* View toggle */}
       <div style={{ display: "flex", gap: 8, marginBottom: 12, flexWrap: "wrap" }}>
+        <button
+          style={{
+            padding: "8px 18px",
+            borderRadius: 12,
+            border: "1px solid var(--accent)",
+            cursor: "pointer",
+            fontWeight: 600,
+            fontSize: 13,
+            background: "var(--accent)",
+            color: "#0d1117",
+          }}
+          onClick={() => setUploadOpen(true)}
+        >
+          ＋ Upload Project
+        </button>
         <button
           style={{
             padding: "8px 18px",
@@ -287,10 +334,18 @@ export default function ProjectsPage({ onViewFullPnL }: Props) {
           </div>
         )}
         {!loading && !error && filteredRows.length > 0 && viewMode === "table" && (
-          <ProjectsTable rows={filteredRows} onViewFullPnL={onViewFullPnL} />
+          <ProjectsTable
+            rows={filteredRows}
+            onViewFullPnL={onViewFullPnL}
+            onEditCustomProject={(project) => setEditingProject(project)}
+          />
         )}
         {!loading && !error && filteredRows.length > 0 && viewMode === "gallery" && (
-          <ProjectsGallery rows={filteredRows} onViewFullPnL={onViewFullPnL} />
+          <ProjectsGallery
+            rows={filteredRows}
+            onViewFullPnL={onViewFullPnL}
+            onEditCustomProject={(project) => setEditingProject(project)}
+          />
         )}
       </div>
     </>

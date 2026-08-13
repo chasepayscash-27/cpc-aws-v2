@@ -1,3 +1,15 @@
+export type CustomAttachmentType = "photo" | "video" | "file";
+
+export interface CustomProjectAttachment {
+  id: string;
+  name: string;
+  mime_type: string;
+  size: number;
+  attachment_type: CustomAttachmentType;
+  data_url: string;
+  created_at: string;
+}
+
 export interface ProjectRow {
   project_uuid?: string;
   workspace_uuid?: string;
@@ -24,4 +36,6 @@ export interface ProjectRow {
   year_built?: string;
   featured_image_url?: string;
   permissions_json?: string;
+  custom_project?: string;
+  custom_attachments_json?: string;
 }

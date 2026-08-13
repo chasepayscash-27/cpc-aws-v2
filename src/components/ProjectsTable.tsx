@@ -6,6 +6,7 @@ import PropertyMainImage from "./PropertyMainImage";
 interface Props {
   rows: ProjectRow[];
   onViewFullPnL?: (propertyName: string) => void;
+  onEditCustomProject?: (project: ProjectRow) => void;
 }
 
 const STAGE_COLORS: Record<string, string> = {
@@ -37,7 +38,7 @@ function badge(value: string | undefined, colorMap: Record<string, string>) {
   return <span style={style}>{label}</span>;
 }
 
-export default function ProjectsTable({ rows, onViewFullPnL }: Props) {
+export default function ProjectsTable({ rows, onViewFullPnL, onEditCustomProject }: Props) {
   const [selectedProject, setSelectedProject] = useState<ProjectRow | null>(null);
   const thStyle: CSSProperties = {
     padding: "8px 12px",
@@ -65,6 +66,7 @@ export default function ProjectsTable({ rows, onViewFullPnL }: Props) {
           project={selectedProject}
           onClose={() => setSelectedProject(null)}
           onViewFullPnL={onViewFullPnL}
+          onEditCustomProject={onEditCustomProject}
         />
       )}
       <div style={{ overflowX: "auto" }}>
