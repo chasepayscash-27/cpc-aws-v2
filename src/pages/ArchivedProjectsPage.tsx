@@ -7,6 +7,8 @@ import {
 import { getPipelineStatusColor, getPipelineStatusLabel } from "../utils/pipelineStatus";
 import PropertyMainImage from "../components/PropertyMainImage";
 import ProjectDetailsModal from "../components/ProjectDetailsModal";
+import ReturnToPipelineModal from "../components/ReturnToPipelineModal";
+import { useStageOverrides } from "../contexts/StageOverrideContext";
 
 function formatDate(iso?: string): string {
   if (!iso) return "—";
@@ -26,6 +28,8 @@ export default function ArchivedProjectsPage() {
     loadArchivedProjects()
   );
   const [selectedProject, setSelectedProject] = useState<ProjectRow | null>(null);
+  const [returnProject, setReturnProject] = useState<ProjectRow | null>(null);
+  const { setOverride } = useStageOverrides();
 
   function handleUnarchive(project: ProjectRow) {
     setArchived((prev) => {
@@ -33,6 +37,19 @@ export default function ArchivedProjectsPage() {
       saveArchivedProjects(next);
       return next;
     });
+  }
+
+  async function handleReturnToPipeline(project: ProjectRow, stage: string) {
+    // Persist the chosen pipeline stage as a stage override so it appears
+    // in the correct column in Home / Projects dashboards immediately.
+    if (project.project_uuid) {
+      await setOverride(project.project_uuid, stage, {
+        flipperForceStage: project.stage,
+        updatedBy: "archived-page",
+      });
+    }
+    handleUnarchive(project);
+    setReturnProject(null);
   }
 
   const gridStyle: CSSProperties = {
@@ -57,6 +74,14 @@ export default function ArchivedProjectsPage() {
         <ProjectDetailsModal
           project={selectedProject}
           onClose={() => setSelectedProject(null)}
+        />
+      )}
+
+      {returnProject && (
+        <ReturnToPipelineModal
+          project={returnProject}
+          onConfirm={(stage) => handleReturnToPipeline(returnProject, stage)}
+          onCancel={() => setReturnProject(null)}
         />
       )}
 
@@ -225,6 +250,50 @@ export default function ArchivedProjectsPage() {
                       >
                         Archived {formatDate(row.archived_at)}
                       </div>
+
+                      {/* Return To Pipeline button */}
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setReturnProject(row);
+                        }}
+                        style={{
+                          width: "100%",
+                          padding: "7px 0",
+                          borderRadius: 10,
+                          border: "1px solid var(--border)",
+                          background: "var(--panel2)",
+                          color: "var(--muted)",
+                          fontSize: 12,
+                          fontWeight: 600,
+                          cursor: "pointer",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          gap: 5,
+                          transition: "background 0.15s, color 0.15s, border-color 0.15s",
+                          marginBottom: 6,
+                        }}
+                        onMouseEnter={(e) => {
+                          (e.currentTarget as HTMLButtonElement).style.background =
+                            "rgba(59,130,246,0.1)";
+                          (e.currentTarget as HTMLButtonElement).style.color =
+                            "rgb(59,130,246)";
+                          (e.currentTarget as HTMLButtonElement).style.borderColor =
+                            "rgb(59,130,246)";
+                        }}
+                        onMouseLeave={(e) => {
+                          (e.currentTarget as HTMLButtonElement).style.background =
+                            "var(--panel2)";
+                          (e.currentTarget as HTMLButtonElement).style.color =
+                            "var(--muted)";
+                          (e.currentTarget as HTMLButtonElement).style.borderColor =
+                            "var(--border)";
+                        }}
+                        aria-label="Return project to pipeline"
+                      >
+                        🔄 Return To Pipeline
+                      </button>
 
                       {/* Restore button */}
                       <button
