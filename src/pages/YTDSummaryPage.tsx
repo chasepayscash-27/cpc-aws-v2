@@ -5,7 +5,7 @@ import PipelineTracker from '../components/PipelineTracker';
 import { isArchivedStage } from '../utils/pipelineStatus';
 import ProjectUploadModal from '../components/ProjectUploadModal';
 import { saveCustomProjects, loadCustomProjects } from '../utils/customProjects';
-import { archiveProject } from '../utils/archivedProjects';
+import { archiveProject, getArchivedProjectUuidSet } from '../utils/archivedProjects';
 import '../App.css';
 
 const ProjectDetailsModal = lazy(() => import('../components/ProjectDetailsModal'));
@@ -67,9 +67,13 @@ export default function YTDSummaryPage() {
   useEffect(() => {
     loadCsv<ProjectRow>('/data/projects_v2.csv')
       .then((rows) => {
+        const archivedProjectUuids = getArchivedProjectUuidSet();
         // Exclude archived projects so they do not appear in the active pipeline.
         const active = rows.filter(
-          (r) => !r.archived_at && !isArchivedStage(r.stage)
+          (r) =>
+            !r.archived_at &&
+            !isArchivedStage(r.stage) &&
+            (!r.project_uuid || !archivedProjectUuids.has(r.project_uuid))
         );
         setProjectRows(active);
         setStagesLoading(false);

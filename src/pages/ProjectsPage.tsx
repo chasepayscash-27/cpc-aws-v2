@@ -6,7 +6,7 @@ import ProjectsGallery from "../components/ProjectsGallery";
 import { isArchivedStage } from "../utils/pipelineStatus";
 import ProjectUploadModal from "../components/ProjectUploadModal";
 import { loadCustomProjects, saveCustomProjects } from "../utils/customProjects";
-import { archiveProject } from "../utils/archivedProjects";
+import { archiveProject, getArchivedProjectUuidSet } from "../utils/archivedProjects";
 
 type ViewMode = "table" | "gallery";
 
@@ -47,10 +47,23 @@ export default function ProjectsPage({ onViewFullPnL }: Props) {
       try {
         setLoading(true);
         const data = await loadCsv<ProjectRow>("/data/projects_v2.csv");
+        const archivedProjectUuids = getArchivedProjectUuidSet();
         // Exclude archived projects; they should not appear in any active view.
-        setCsvRows(data.filter((r) => !r.archived_at && !isArchivedStage(r.stage)));
+        setCsvRows(
+          data.filter(
+            (r) =>
+              !r.archived_at &&
+              !isArchivedStage(r.stage) &&
+              (!r.project_uuid || !archivedProjectUuids.has(r.project_uuid))
+          )
+        );
         setCustomRows(
-          loadCustomProjects().filter((r) => !r.archived_at && !isArchivedStage(r.stage))
+          loadCustomProjects().filter(
+            (r) =>
+              !r.archived_at &&
+              !isArchivedStage(r.stage) &&
+              (!r.project_uuid || !archivedProjectUuids.has(r.project_uuid))
+          )
         );
       } catch (err) {
         setError(err instanceof Error ? err.message : "Failed to load projects");
