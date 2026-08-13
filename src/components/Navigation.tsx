@@ -48,6 +48,12 @@ const navGroups: NavGroup[] = [
       { icon: '🚧', label: 'Team - WIP', path: '/team-wip' },
     ],
   },
+  {
+    title: 'Archive',
+    items: [
+      { icon: '🗃️', label: 'Archived Projects', path: '/archived-projects' },
+    ],
+  },
 ];
 
 interface NavigationProps {
