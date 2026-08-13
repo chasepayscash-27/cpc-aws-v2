@@ -58,9 +58,10 @@ const DROP_TARGET_BORDER = 'rgba(59,130,246,0.70)';
 interface PipelineTrackerProps {
   rows: ProjectRow[];
   onProjectClick?: (project: ProjectRow) => void;
+  onArchive?: (project: ProjectRow) => void;
 }
 
-export default function PipelineTracker({ rows, onProjectClick }: PipelineTrackerProps) {
+export default function PipelineTracker({ rows, onProjectClick, onArchive }: PipelineTrackerProps) {
   const { allTasks, isLoading: tasksLoading } = usePropertyTasks();
   const { overrides, setOverride, clearOverride, error: overrideError } = useStageOverrides();
   const progressByProperty = useMemo(
@@ -556,6 +557,31 @@ export default function PipelineTracker({ rows, onProjectClick }: PipelineTracke
                             </button>
                           )}
                         </div>
+                      )}
+                      {onArchive && (
+                        <button
+                          aria-label={`Archive ${label}`}
+                          title="Archive project"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onArchive(p);
+                          }}
+                          style={{
+                            marginTop: 4,
+                            width: '100%',
+                            padding: '3px 0',
+                            borderRadius: 6,
+                            border: '1px solid rgba(239,68,68,0.5)',
+                            background: 'var(--panel2)',
+                            color: 'rgba(239,68,68,0.9)',
+                            cursor: 'pointer',
+                            fontSize: 10,
+                            fontWeight: 600,
+                            letterSpacing: '0.03em',
+                          }}
+                        >
+                          🗃️ Archive
+                        </button>
                       )}
                     </div>
                   );

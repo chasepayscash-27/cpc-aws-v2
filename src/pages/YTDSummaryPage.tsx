@@ -5,6 +5,7 @@ import PipelineTracker from '../components/PipelineTracker';
 import { isArchivedStage } from '../utils/pipelineStatus';
 import ProjectUploadModal from '../components/ProjectUploadModal';
 import { saveCustomProjects, loadCustomProjects } from '../utils/customProjects';
+import { archiveProject } from '../utils/archivedProjects';
 import '../App.css';
 
 const ProjectDetailsModal = lazy(() => import('../components/ProjectDetailsModal'));
@@ -43,6 +44,11 @@ export default function YTDSummaryPage() {
       : [project, ...prev];
     saveCustomProjects(next);
     setUploadOpen(false);
+  }
+
+  function handleArchive(project: ProjectRow) {
+    archiveProject(project);
+    setProjectRows((prev) => prev.filter((r) => r.project_uuid !== project.project_uuid));
   }
 
 
@@ -200,7 +206,7 @@ export default function YTDSummaryPage() {
         ) : projectRows.length === 0 ? (
           <p className="muted" style={{ fontSize: 13 }}>No stage data available.</p>
         ) : (
-          <PipelineTracker rows={projectRows} onProjectClick={setSelectedProject} />
+          <PipelineTracker rows={projectRows} onProjectClick={setSelectedProject} onArchive={handleArchive} />
         )}
       </section>
     </div>
