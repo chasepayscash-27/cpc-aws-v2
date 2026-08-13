@@ -18,6 +18,20 @@ export function saveArchivedProjects(rows: ProjectRow[]): void {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(rows));
 }
 
+export function getArchivedProjectUuidSet(): Set<string> {
+  const archived = loadArchivedProjects();
+  return new Set(
+    archived
+      .map((row) => row.project_uuid)
+      .filter((projectUuid): projectUuid is string => typeof projectUuid === "string" && projectUuid.length > 0)
+  );
+}
+
+export function isProjectArchived(projectUuid?: string): boolean {
+  if (!projectUuid) return false;
+  return getArchivedProjectUuidSet().has(projectUuid);
+}
+
 export function archiveProject(project: ProjectRow): void {
   const archived = loadArchivedProjects();
   const alreadyArchived = archived.some((r) => r.project_uuid && r.project_uuid === project.project_uuid);
