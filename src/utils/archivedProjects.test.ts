@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
   getArchivedProjectUuidSet,
   isProjectArchived,
@@ -7,7 +7,24 @@ import {
 import type { ProjectRow } from "../types/project";
 
 describe("archivedProjects helpers", () => {
+  const localStorageMock = {
+    store: new Map<string, string>(),
+    getItem(key: string) {
+      return this.store.has(key) ? this.store.get(key)! : null;
+    },
+    setItem(key: string, value: string) {
+      this.store.set(key, value);
+    },
+    removeItem(key: string) {
+      this.store.delete(key);
+    },
+    clear() {
+      this.store.clear();
+    },
+  };
+
   beforeEach(() => {
+    vi.stubGlobal("localStorage", localStorageMock);
     localStorage.clear();
   });
 
