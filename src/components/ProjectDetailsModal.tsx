@@ -1,5 +1,5 @@
-import { CSSProperties, useEffect, useCallback, useState } from "react";
-import type { ProjectRow } from "../types/project";
+import { CSSProperties, useEffect, useCallback, useMemo, useState } from "react";
+import type { CustomProjectAttachment, ProjectRow } from "../types/project";
 import type { PhotoLogRow } from "../types/photoLog";
 import { loadCsv } from "../utils/csv";
 import PropertyFinancials from "./PropertyFinancials";
@@ -13,6 +13,7 @@ interface Props {
   project: ProjectRow;
   onClose: () => void;
   onViewFullPnL?: (propertyName: string) => void;
+  onEditCustomProject?: (project: ProjectRow) => void;
 }
 
 const STAGE_COLORS: Record<string, string> = {
@@ -56,11 +57,33 @@ function DetailRow({ label, value }: { label: string; value?: string | null }) {
 
 const COST_LABELS = ["Labor", "Materials", "3rd Party"] as const;
 
-export default function ProjectDetailsModal({ project: row, onClose, onViewFullPnL }: Props) {
+export default function ProjectDetailsModal({ project: row, onClose, onViewFullPnL, onEditCustomProject }: Props) {
   const [photos, setPhotos] = useState<PhotoLogRow[]>([]);
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
   const [worksheetOpen, setWorksheetOpen] = useState(false);
   const [costSummary, setCostSummary] = useState<[number, number, number]>([0, 0, 0]);
+
+  const customAttachments = useMemo<CustomProjectAttachment[]>(() => {
+    if (!row.custom_attachments_json) return [];
+    try {
+      const parsed = JSON.parse(row.custom_attachments_json);
+      return Array.isArray(parsed) ? parsed : [];
+    } catch {
+      return [];
+    }
+  }, [row.custom_attachments_json]);
+
+  const galleryPhotos = useMemo<PhotoLogRow[]>(() => {
+    const uploadedPhotos = customAttachments
+      .filter((attachment) => attachment.attachment_type === "photo" && attachment.data_url)
+      .map((attachment) => ({
+        source_view_url: attachment.data_url,
+        description: attachment.name,
+        photo_description: attachment.name,
+        uploaded_at: attachment.created_at,
+      }));
+    return [...photos, ...uploadedPhotos];
+  }, [customAttachments, photos]);
 
   const handleFinancialSummary = useCallback(
     (labor: number, materials: number, thirdParty: number) => {
@@ -82,13 +105,13 @@ export default function ProjectDetailsModal({ project: row, onClose, onViewFullP
     (e: KeyboardEvent) => {
       if (isLightboxOpen) {
         if (e.key === "Escape") { closeLightbox(); return; }
-        if (e.key === "ArrowRight") { setLightboxIndex((i: number | null) => (i === null ? 0 : (i + 1) % photos.length)); return; }
-        if (e.key === "ArrowLeft") { setLightboxIndex((i: number | null) => (i === null ? 0 : (i - 1 + photos.length) % photos.length)); return; }
+        if (e.key === "ArrowRight") { setLightboxIndex((i: number | null) => (i === null ? 0 : (i + 1) % galleryPhotos.length)); return; }
+        if (e.key === "ArrowLeft") { setLightboxIndex((i: number | null) => (i === null ? 0 : (i - 1 + galleryPhotos.length) % galleryPhotos.length)); return; }
       } else {
         if (e.key === "Escape") onClose();
       }
     },
-    [isLightboxOpen, onClose, closeLightbox, photos.length]
+    [galleryPhotos.length, isLightboxOpen, onClose, closeLightbox]
   );
 
   useEffect(() => {
@@ -227,10 +250,10 @@ export default function ProjectDetailsModal({ project: row, onClose, onViewFullP
                 style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
                 loading="eager"
               />
-              {photos.length > 0 && (
+              {galleryPhotos.length > 0 && (
                 <button
                   onClick={() => setLightboxIndex(0)}
-                  aria-label={`View all ${photos.length} photos`}
+                  aria-label={`View all ${galleryPhotos.length} photos`}
                   style={{
                     position: "absolute",
                     bottom: 12,
@@ -319,6 +342,26 @@ export default function ProjectDetailsModal({ project: row, onClose, onViewFullP
 
             {/* Worksheet toggle */}
             <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: worksheetOpen ? 12 : 20 }}>
+              {row.custom_project === "true" && onEditCustomProject && (
+                <button
+                  onClick={() => {
+                    onClose();
+                    onEditCustomProject(row);
+                  }}
+                  style={{
+                    padding: "8px 18px",
+                    borderRadius: 12,
+                    border: "1px solid var(--accent)",
+                    background: "var(--panel2)",
+                    color: "var(--accent)",
+                    fontSize: 13,
+                    fontWeight: 600,
+                    cursor: "pointer",
+                  }}
+                >
+                  ✏️ Edit Project Details
+                </button>
+              )}
               <button
                 onClick={() => setWorksheetOpen((v) => !v)}
                 style={{
@@ -471,8 +514,50 @@ export default function ProjectDetailsModal({ project: row, onClose, onViewFullP
               </>
             )}
 
-            {/* Photos section */}
-            {/* Thumbnail strip removed — photos are accessible via the "View All Photos" button on the hero image */}
+            {customAttachments.length > 0 && (
+              <>
+                <div style={dividerStyle} />
+                <div style={sectionLabelStyle}>📎 Attachments</div>
+                <div style={{ display: "grid", gap: 10 }}>
+                  {customAttachments.map((attachment) => (
+                    <div
+                      key={attachment.id}
+                      style={{
+                        border: "1px solid var(--border)",
+                        borderRadius: 12,
+                        padding: 12,
+                        background: "var(--panel2)",
+                      }}
+                    >
+                      <div style={{ fontSize: 12, fontWeight: 700, marginBottom: 8 }}>
+                        {attachment.attachment_type.toUpperCase()} • {attachment.name}
+                      </div>
+                      {attachment.attachment_type === "video" && (
+                        <video
+                          src={attachment.data_url}
+                          controls
+                          style={{ width: "100%", maxHeight: 260, borderRadius: 10, background: "#000" }}
+                        />
+                      )}
+                      {attachment.attachment_type === "photo" && (
+                        <img
+                          src={attachment.data_url}
+                          alt={attachment.name}
+                          style={{ width: "100%", maxHeight: 260, objectFit: "cover", borderRadius: 10 }}
+                        />
+                      )}
+                      <a
+                        href={attachment.data_url}
+                        download={attachment.name}
+                        style={{ display: "inline-block", marginTop: 8, fontSize: 12, color: "var(--accent)" }}
+                      >
+                        Download attachment
+                      </a>
+                    </div>
+                  ))}
+                </div>
+              </>
+            )}
 
             {/* Financials section */}
             {row.name && (
@@ -491,7 +576,7 @@ export default function ProjectDetailsModal({ project: row, onClose, onViewFullP
       </div>
 
       {/* Lightbox overlay */}
-      {isLightboxOpen && lightboxIndex !== null && photos[lightboxIndex] && (
+      {isLightboxOpen && lightboxIndex !== null && galleryPhotos[lightboxIndex] && (
         <div
           style={{
             position: "fixed",
@@ -536,40 +621,40 @@ export default function ProjectDetailsModal({ project: row, onClose, onViewFullP
 
             {/* Image */}
             <img
-              src={photos[lightboxIndex].source_view_url}
-              alt={photos[lightboxIndex].photo_description ?? photos[lightboxIndex].description ?? photos[lightboxIndex].category ?? "photo"}
+              src={galleryPhotos[lightboxIndex].source_view_url}
+              alt={galleryPhotos[lightboxIndex].photo_description ?? galleryPhotos[lightboxIndex].description ?? galleryPhotos[lightboxIndex].category ?? "photo"}
               style={{ maxWidth: "85vw", maxHeight: "72vh", borderRadius: 14, objectFit: "contain", boxShadow: "0 8px 48px rgba(0,0,0,0.5)" }}
             />
 
             {/* Caption */}
-            {(photos[lightboxIndex].category || photos[lightboxIndex].description || photos[lightboxIndex].photo_date) && (
+            {(galleryPhotos[lightboxIndex].category || galleryPhotos[lightboxIndex].description || galleryPhotos[lightboxIndex].photo_date) && (
               <div style={{ marginTop: 14, textAlign: "center", color: "#fff" }}>
-                {photos[lightboxIndex].category && (
+                {galleryPhotos[lightboxIndex].category && (
                   <div style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--accent-light)", marginBottom: 4 }}>
-                    {photos[lightboxIndex].category}
+                    {galleryPhotos[lightboxIndex].category}
                   </div>
                 )}
-                {photos[lightboxIndex].description && (
-                  <div style={{ fontSize: 14, marginBottom: 4 }}>{photos[lightboxIndex].description}</div>
+                {galleryPhotos[lightboxIndex].description && (
+                  <div style={{ fontSize: 14, marginBottom: 4 }}>{galleryPhotos[lightboxIndex].description}</div>
                 )}
-                {photos[lightboxIndex].photo_date && (
-                  <div style={{ fontSize: 12, opacity: 0.7 }}>{photos[lightboxIndex].photo_date.slice(0, 10)}</div>
+                {galleryPhotos[lightboxIndex].photo_date && (
+                  <div style={{ fontSize: 12, opacity: 0.7 }}>{galleryPhotos[lightboxIndex].photo_date.slice(0, 10)}</div>
                 )}
               </div>
             )}
 
             {/* Counter */}
             <div style={{ marginTop: 10, fontSize: 12, color: "rgba(255,255,255,0.55)" }}>
-              {lightboxIndex + 1} / {photos.length}
+              {lightboxIndex + 1} / {galleryPhotos.length}
             </div>
           </div>
 
           {/* Prev / Next buttons */}
-          {photos.length > 1 && (
+          {galleryPhotos.length > 1 && (
             <>
               <button
                 className="lightbox-nav-btn"
-                onClick={(e) => { e.stopPropagation(); setLightboxIndex((i: number | null) => (i === null ? 0 : (i - 1 + photos.length) % photos.length)); }}
+                onClick={(e) => { e.stopPropagation(); setLightboxIndex((i: number | null) => (i === null ? 0 : (i - 1 + galleryPhotos.length) % galleryPhotos.length)); }}
                 aria-label="Previous photo"
                 style={{
                   position: "fixed",
@@ -594,7 +679,7 @@ export default function ProjectDetailsModal({ project: row, onClose, onViewFullP
               </button>
               <button
                 className="lightbox-nav-btn"
-                onClick={(e) => { e.stopPropagation(); setLightboxIndex((i: number | null) => (i === null ? 0 : (i + 1) % photos.length)); }}
+                onClick={(e) => { e.stopPropagation(); setLightboxIndex((i: number | null) => (i === null ? 0 : (i + 1) % galleryPhotos.length)); }}
                 aria-label="Next photo"
                 style={{
                   position: "fixed",

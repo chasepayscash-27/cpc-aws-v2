@@ -7,6 +7,7 @@ import PropertyMainImage from "./PropertyMainImage";
 interface Props {
   rows: ProjectRow[];
   onViewFullPnL?: (propertyName: string) => void;
+  onEditCustomProject?: (project: ProjectRow) => void;
 }
 
 const STAGE_COLORS: Record<string, string> = {
@@ -35,7 +36,7 @@ function badgeStyle(value: string | undefined, colorMap: Record<string, string>)
   };
 }
 
-export default function ProjectsGallery({ rows, onViewFullPnL }: Props) {
+export default function ProjectsGallery({ rows, onViewFullPnL, onEditCustomProject }: Props) {
   const [selectedProject, setSelectedProject] = useState<ProjectRow | null>(null);
 
   const gridStyle: CSSProperties = {
@@ -56,7 +57,12 @@ export default function ProjectsGallery({ rows, onViewFullPnL }: Props) {
   return (
     <>
       {selectedProject && (
-        <ProjectDetailsModal project={selectedProject} onClose={() => setSelectedProject(null)} onViewFullPnL={onViewFullPnL} />
+        <ProjectDetailsModal
+          project={selectedProject}
+          onClose={() => setSelectedProject(null)}
+          onViewFullPnL={onViewFullPnL}
+          onEditCustomProject={onEditCustomProject}
+        />
       )}
       <div style={gridStyle}>
         {rows.map((row, i) => (
