@@ -3,6 +3,8 @@ import { loadCsv } from '../utils/csv';
 import type { ProjectRow } from '../types/project';
 import PipelineTracker from '../components/PipelineTracker';
 import { isArchivedStage } from '../utils/pipelineStatus';
+import ProjectUploadModal from '../components/ProjectUploadModal';
+import { saveCustomProjects, loadCustomProjects } from '../utils/customProjects';
 import '../App.css';
 
 const ProjectDetailsModal = lazy(() => import('../components/ProjectDetailsModal'));
@@ -32,6 +34,17 @@ export default function YTDSummaryPage() {
   const [projectRows, setProjectRows] = useState<ProjectRow[]>([]);
   const [stagesLoading, setStagesLoading] = useState(true);
   const [selectedProject, setSelectedProject] = useState<ProjectRow | null>(null);
+  const [uploadOpen, setUploadOpen] = useState(false);
+
+  function handleSaveProject(project: ProjectRow) {
+    const prev = loadCustomProjects();
+    const next = prev.some((row) => row.project_uuid === project.project_uuid)
+      ? prev.map((row) => (row.project_uuid === project.project_uuid ? project : row))
+      : [project, ...prev];
+    saveCustomProjects(next);
+    setUploadOpen(false);
+  }
+
 
   useEffect(() => {
     loadCsv<YTDRow>('/data/ytd_csv_looker.csv')
@@ -104,6 +117,13 @@ export default function YTDSummaryPage() {
 
   return (
     <div>
+      {uploadOpen && (
+        <ProjectUploadModal
+          initialProject={null}
+          onClose={() => setUploadOpen(false)}
+          onSave={handleSaveProject}
+        />
+      )}
       {selectedProject && (
         <Suspense fallback={null}>
           <ProjectDetailsModal
@@ -113,8 +133,28 @@ export default function YTDSummaryPage() {
         </Suspense>
       )}
       <div className="pageHeader">
-        <h1 className="h1">YTD Summary</h1>
-        <p className="muted">Year-to-date performance summary of properties flipped.</p>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 }}>
+          <div>
+            <h1 className="h1">YTD Summary</h1>
+            <p className="muted">Year-to-date performance summary of properties flipped.</p>
+          </div>
+          <button
+            style={{
+              padding: '8px 18px',
+              borderRadius: 12,
+              border: '1px solid var(--accent)',
+              cursor: 'pointer',
+              fontWeight: 600,
+              fontSize: 13,
+              background: 'var(--accent)',
+              color: '#0d1117',
+              whiteSpace: 'nowrap',
+            }}
+            onClick={() => setUploadOpen(true)}
+          >
+            ＋ Upload Project
+          </button>
+        </div>
       </div>
 
       {/* Properties Sold topline tile */}

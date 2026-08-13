@@ -33,7 +33,6 @@ export default function ProjectsPage({ onViewFullPnL }: Props) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [viewMode, setViewMode] = useState<ViewMode>("gallery");
-  const [uploadOpen, setUploadOpen] = useState(false);
   const [editingProject, setEditingProject] = useState<ProjectRow | null>(null);
   const [search, setSearch] = useState("");
   const [stageFilter, setStageFilter] = useState("all");
@@ -143,17 +142,15 @@ export default function ProjectsPage({ onViewFullPnL }: Props) {
       saveCustomProjects(next);
       return next;
     });
-    setUploadOpen(false);
     setEditingProject(null);
   }
 
   return (
     <>
-      {(uploadOpen || editingProject) && (
+      {editingProject && (
         <ProjectUploadModal
           initialProject={editingProject}
           onClose={() => {
-            setUploadOpen(false);
             setEditingProject(null);
           }}
           onSave={handleSaveProject}
@@ -166,21 +163,6 @@ export default function ProjectsPage({ onViewFullPnL }: Props) {
 
       {/* View toggle */}
       <div style={{ display: "flex", gap: 8, marginBottom: 12, flexWrap: "wrap" }}>
-        <button
-          style={{
-            padding: "8px 18px",
-            borderRadius: 12,
-            border: "1px solid var(--accent)",
-            cursor: "pointer",
-            fontWeight: 600,
-            fontSize: 13,
-            background: "var(--accent)",
-            color: "#0d1117",
-          }}
-          onClick={() => setUploadOpen(true)}
-        >
-          ＋ Upload Project
-        </button>
         <button
           style={{
             padding: "8px 18px",
