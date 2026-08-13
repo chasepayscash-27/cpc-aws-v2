@@ -8,6 +8,7 @@ interface Props {
   rows: ProjectRow[];
   onViewFullPnL?: (propertyName: string) => void;
   onEditCustomProject?: (project: ProjectRow) => void;
+  onArchive?: (project: ProjectRow) => void;
 }
 
 const STAGE_COLORS: Record<string, string> = {
@@ -36,7 +37,7 @@ function badgeStyle(value: string | undefined, colorMap: Record<string, string>)
   };
 }
 
-export default function ProjectsGallery({ rows, onViewFullPnL, onEditCustomProject }: Props) {
+export default function ProjectsGallery({ rows, onViewFullPnL, onEditCustomProject, onArchive }: Props) {
   const [selectedProject, setSelectedProject] = useState<ProjectRow | null>(null);
 
   const gridStyle: CSSProperties = {
@@ -202,6 +203,41 @@ export default function ProjectsGallery({ rows, onViewFullPnL, onEditCustomProje
             >
               📄 Download Editable PDF
             </button>
+            {/* Archive button */}
+            {onArchive && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onArchive(row);
+                }}
+                style={{
+                  marginTop: 6,
+                  width: "100%",
+                  padding: "7px 0",
+                  borderRadius: 10,
+                  border: "1px solid rgba(239,68,68,0.5)",
+                  background: "var(--panel2)",
+                  color: "rgba(239,68,68,0.9)",
+                  fontSize: 12,
+                  fontWeight: 600,
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: 5,
+                  transition: "background 0.15s, color 0.15s",
+                }}
+                onMouseEnter={(e) => {
+                  (e.currentTarget as HTMLButtonElement).style.background = "rgba(239,68,68,0.12)";
+                }}
+                onMouseLeave={(e) => {
+                  (e.currentTarget as HTMLButtonElement).style.background = "var(--panel2)";
+                }}
+                aria-label="Archive project"
+              >
+                🗃️ Archive Project
+              </button>
+            )}
           </div>
         </div>
       ))}

@@ -6,6 +6,7 @@ import ProjectsGallery from "../components/ProjectsGallery";
 import { isArchivedStage } from "../utils/pipelineStatus";
 import ProjectUploadModal from "../components/ProjectUploadModal";
 import { loadCustomProjects, saveCustomProjects } from "../utils/customProjects";
+import { archiveProject } from "../utils/archivedProjects";
 
 type ViewMode = "table" | "gallery";
 
@@ -143,6 +144,20 @@ export default function ProjectsPage({ onViewFullPnL }: Props) {
       return next;
     });
     setEditingProject(null);
+  }
+
+  function handleArchive(project: ProjectRow) {
+    archiveProject(project);
+    // Remove from current view
+    if (project.custom_project) {
+      setCustomRows((prev) => {
+        const next = prev.filter((r) => r.project_uuid !== project.project_uuid);
+        saveCustomProjects(next);
+        return next;
+      });
+    } else {
+      setCsvRows((prev) => prev.filter((r) => r.project_uuid !== project.project_uuid));
+    }
   }
 
   return (
@@ -320,6 +335,7 @@ export default function ProjectsPage({ onViewFullPnL }: Props) {
             rows={filteredRows}
             onViewFullPnL={onViewFullPnL}
             onEditCustomProject={(project) => setEditingProject(project)}
+            onArchive={handleArchive}
           />
         )}
         {!loading && !error && filteredRows.length > 0 && viewMode === "gallery" && (
@@ -327,6 +343,7 @@ export default function ProjectsPage({ onViewFullPnL }: Props) {
             rows={filteredRows}
             onViewFullPnL={onViewFullPnL}
             onEditCustomProject={(project) => setEditingProject(project)}
+            onArchive={handleArchive}
           />
         )}
       </div>
