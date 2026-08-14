@@ -208,11 +208,11 @@ export default function MapsPage() {
             })}
           </MapContainer>
 
-          <div className="mapsPageLegend">
+          <div className="mapsPageLegend" style={{ color: "#e6edf3" }}>
             <div className="mapsPageLegendTitle">Pipeline Status</div>
             <ul className="mapsPageLegendList">
               {PIPELINE_STATUS_LEGEND.map((item) => (
-                <li key={item.key} className="mapsPageLegendItem">
+                <li key={item.key} className="mapsPageLegendItem" style={{ color: "#e6edf3" }}>
                   <span className="mapsPageLegendDot" style={{ background: item.color }} />
                   {item.label}
                 </li>
