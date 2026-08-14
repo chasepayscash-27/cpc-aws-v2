@@ -15,8 +15,14 @@ export function loadArchivedProjects(): ProjectRow[] {
   }
 }
 
+export const ARCHIVE_CHANGE_EVENT = "cpc:archivechange";
+
 export function saveArchivedProjects(rows: ProjectRow[]): void {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(rows));
+  // Dispatch a same-tab custom event so components that are mounted (or will
+  // mount after navigation) can react immediately.  Cross-tab updates are
+  // already handled via the native `window.storage` event.
+  window.dispatchEvent(new CustomEvent(ARCHIVE_CHANGE_EVENT));
 }
 
 export function getArchivedProjectUuidSet(): Set<string> {

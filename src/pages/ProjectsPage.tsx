@@ -6,7 +6,7 @@ import ProjectsGallery from "../components/ProjectsGallery";
 import { isArchivedStage } from "../utils/pipelineStatus";
 import ProjectUploadModal from "../components/ProjectUploadModal";
 import { loadCustomProjects, saveCustomProjects } from "../utils/customProjects";
-import { archiveProject, getArchivedProjectUuidSet } from "../utils/archivedProjects";
+import { archiveProject, getArchivedProjectUuidSet, ARCHIVED_PROJECTS_STORAGE_KEY, ARCHIVE_CHANGE_EVENT } from "../utils/archivedProjects";
 
 type ViewMode = "table" | "gallery";
 
@@ -39,6 +39,8 @@ export default function ProjectsPage({ onViewFullPnL }: Props) {
   const [stageFilter, setStageFilter] = useState("all");
   const [strategyFilter, setStrategyFilter] = useState("all");
   const [sortField, setSortField] = useState<SortField>("name_asc");
+  // Incremented whenever localStorage archive changes so the fetch effect re-runs.
+  const [archiveVersion, setArchiveVersion] = useState(0);
 
   const rows = useMemo(() => [...csvRows, ...customRows], [csvRows, customRows]);
 
@@ -73,6 +75,25 @@ export default function ProjectsPage({ onViewFullPnL }: Props) {
     }
 
     fetchData();
+  }, [archiveVersion]);
+
+  // Listen for same-tab and cross-tab archive changes so the list stays
+  // current without requiring a page reload.
+  useEffect(() => {
+    function handleArchiveChange() {
+      setArchiveVersion((v) => v + 1);
+    }
+    window.addEventListener(ARCHIVE_CHANGE_EVENT, handleArchiveChange);
+    function handleStorageChange(e: StorageEvent) {
+      if (e.key === ARCHIVED_PROJECTS_STORAGE_KEY) {
+        setArchiveVersion((v) => v + 1);
+      }
+    }
+    window.addEventListener("storage", handleStorageChange);
+    return () => {
+      window.removeEventListener(ARCHIVE_CHANGE_EVENT, handleArchiveChange);
+      window.removeEventListener("storage", handleStorageChange);
+    };
   }, []);
 
   const stages = useMemo(() => {

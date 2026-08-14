@@ -5,7 +5,7 @@ import PipelineTracker from '../components/PipelineTracker';
 import { isArchivedStage } from '../utils/pipelineStatus';
 import ProjectUploadModal from '../components/ProjectUploadModal';
 import { saveCustomProjects, loadCustomProjects } from '../utils/customProjects';
-import { archiveProject, getArchivedProjectUuidSet, ARCHIVED_PROJECTS_STORAGE_KEY } from '../utils/archivedProjects';
+import { archiveProject, getArchivedProjectUuidSet, ARCHIVED_PROJECTS_STORAGE_KEY, ARCHIVE_CHANGE_EVENT } from '../utils/archivedProjects';
 import '../App.css';
 
 const ProjectDetailsModal = lazy(() => import('../components/ProjectDetailsModal'));
@@ -97,13 +97,23 @@ export default function YTDSummaryPage() {
   // Re-derive active rows when a project is returned to the pipeline from
   // the Archived Projects page (which updates localStorage in the same tab).
   useEffect(() => {
+    function handleArchiveChange() {
+      setProjectRows(buildActiveRows(allCsvRows));
+    }
+    // ARCHIVE_CHANGE_EVENT covers same-tab changes (e.g. navigating back from
+    // ArchivedProjectsPage after clicking "Return To Pipeline").
+    window.addEventListener(ARCHIVE_CHANGE_EVENT, handleArchiveChange);
+    // The native storage event covers cross-tab changes.
     function handleStorageChange(e: StorageEvent) {
       if (e.key === ARCHIVED_PROJECTS_STORAGE_KEY) {
         setProjectRows(buildActiveRows(allCsvRows));
       }
     }
     window.addEventListener('storage', handleStorageChange);
-    return () => window.removeEventListener('storage', handleStorageChange);
+    return () => {
+      window.removeEventListener(ARCHIVE_CHANGE_EVENT, handleArchiveChange);
+      window.removeEventListener('storage', handleStorageChange);
+    };
   }, [allCsvRows]);
 
   if (loading) {
