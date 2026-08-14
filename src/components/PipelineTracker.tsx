@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { ProjectRow } from '../types/project';
 import { isArchivedStage, NEGOTIATION_STAGES, normalizePipelineStatus } from '../utils/pipelineStatus';
 import { usePropertyTasks } from '../contexts/PropertyTasksContext';
@@ -68,6 +68,15 @@ export default function PipelineTracker({ rows, onProjectClick, onArchive }: Pip
     () => computeMainWorkflowProgressByProperty(allTasks),
     [allTasks],
   );
+
+  // ── Responsive layout ─────────────────────────────────────────────────────
+  const [isMobile, setIsMobile] = useState(() => window.innerWidth < 768);
+  useEffect(() => {
+    const mq = window.matchMedia('(max-width: 767px)');
+    const handler = (e: MediaQueryListEvent) => setIsMobile(e.matches);
+    mq.addEventListener('change', handler);
+    return () => mq.removeEventListener('change', handler);
+  }, []);
 
   // ── Drag-and-drop state ────────────────────────────────────────────────────
   // draggedId: project_uuid of the card being dragged
@@ -285,13 +294,14 @@ export default function PipelineTracker({ rows, onProjectClick, onArchive }: Pip
       )}
       <div
         style={{
-          display: 'grid',
-          gridTemplateColumns: `repeat(${ACTIVE_STAGE_ORDER.length}, minmax(0, 1fr))`,
+          display: isMobile ? 'flex' : 'grid',
+          gridTemplateColumns: isMobile ? undefined : `repeat(${ACTIVE_STAGE_ORDER.length}, minmax(0, 1fr))`,
           gap: 0,
           border: '1.5px solid var(--border)',
           borderRadius: 18,
-          overflow: 'hidden',
+          overflow: isMobile ? 'auto' : 'hidden',
           background: '#fff',
+          WebkitOverflowScrolling: 'touch',
         }}
       >
         {ACTIVE_STAGE_ORDER.map((stage, idx) => {
@@ -310,6 +320,7 @@ export default function PipelineTracker({ rows, onProjectClick, onArchive }: Pip
                 display: 'flex',
                 flexDirection: 'column',
                 minHeight: 220,
+                ...(isMobile ? { minWidth: 180, flex: '0 0 180px' } : {}),
                 outline: isDropTarget ? `2px dashed ${DROP_TARGET_BORDER}` : undefined,
                 outlineOffset: -3,
                 transition: 'outline 0.1s',

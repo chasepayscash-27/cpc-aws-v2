@@ -60,6 +60,7 @@ const COST_LABELS = ["Labor", "Materials", "3rd Party"] as const;
 export default function ProjectDetailsModal({ project: row, onClose, onViewFullPnL, onEditCustomProject }: Props) {
   const [photos, setPhotos] = useState<PhotoLogRow[]>([]);
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
+  const [showPhotoGrid, setShowPhotoGrid] = useState(false);
   const [worksheetOpen, setWorksheetOpen] = useState(false);
   const [costSummary, setCostSummary] = useState<[number, number, number]>([0, 0, 0]);
 
@@ -95,6 +96,7 @@ export default function ProjectDetailsModal({ project: row, onClose, onViewFullP
   const isLightboxOpen = lightboxIndex !== null;
 
   const closeLightbox = useCallback(() => setLightboxIndex(null), []);
+  const closePhotoGrid = useCallback(() => setShowPhotoGrid(false), []);
   const handleViewFullPnL = useCallback(() => {
     if (!onViewFullPnL || !row.name) return;
     onViewFullPnL(row.name);
@@ -107,11 +109,13 @@ export default function ProjectDetailsModal({ project: row, onClose, onViewFullP
         if (e.key === "Escape") { closeLightbox(); return; }
         if (e.key === "ArrowRight") { setLightboxIndex((i: number | null) => (i === null ? 0 : (i + 1) % galleryPhotos.length)); return; }
         if (e.key === "ArrowLeft") { setLightboxIndex((i: number | null) => (i === null ? 0 : (i - 1 + galleryPhotos.length) % galleryPhotos.length)); return; }
+      } else if (showPhotoGrid) {
+        if (e.key === "Escape") { closePhotoGrid(); return; }
       } else {
         if (e.key === "Escape") onClose();
       }
     },
-    [galleryPhotos.length, isLightboxOpen, onClose, closeLightbox]
+    [galleryPhotos.length, isLightboxOpen, showPhotoGrid, onClose, closeLightbox, closePhotoGrid]
   );
 
   useEffect(() => {
@@ -252,7 +256,7 @@ export default function ProjectDetailsModal({ project: row, onClose, onViewFullP
               />
               {galleryPhotos.length > 0 && (
                 <button
-                  onClick={() => setLightboxIndex(0)}
+                  onClick={() => setShowPhotoGrid(true)}
                   aria-label={`View all ${galleryPhotos.length} photos`}
                   style={{
                     position: "absolute",
@@ -574,6 +578,100 @@ export default function ProjectDetailsModal({ project: row, onClose, onViewFullP
           </div>
         </div>
       </div>
+
+      {/* Photo grid overlay */}
+      {showPhotoGrid && (
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            background: "rgba(0,0,0,0.92)",
+            backdropFilter: "blur(6px)",
+            zIndex: 1100,
+            display: "flex",
+            flexDirection: "column",
+            animation: "fadeIn 0.18s ease",
+          }}
+          onClick={closePhotoGrid}
+        >
+          <div
+            style={{ flex: 1, overflowY: "auto", padding: "56px 24px 24px" }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header */}
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20 }}>
+              <span style={{ color: "#fff", fontSize: 18, fontWeight: 700 }}>
+                📷 All Photos ({galleryPhotos.length})
+              </span>
+              <button
+                onClick={closePhotoGrid}
+                aria-label="Close photo grid"
+                style={{
+                  width: 36,
+                  height: 36,
+                  borderRadius: "50%",
+                  border: "1px solid rgba(255,255,255,0.3)",
+                  background: "rgba(255,255,255,0.12)",
+                  color: "#fff",
+                  fontSize: 20,
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                ×
+              </button>
+            </div>
+
+            {/* Thumbnail grid */}
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))",
+                gap: 10,
+              }}
+            >
+              {galleryPhotos.map((photo, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => {
+                    setLightboxIndex(idx);
+                    setShowPhotoGrid(false);
+                  }}
+                  aria-label={photo.photo_description ?? photo.description ?? photo.category ?? `Photo ${idx + 1}`}
+                  style={{
+                    padding: 0,
+                    border: "2px solid transparent",
+                    borderRadius: 10,
+                    overflow: "hidden",
+                    cursor: "pointer",
+                    background: "rgba(255,255,255,0.08)",
+                    aspectRatio: "4/3",
+                    transition: "border-color 0.15s, transform 0.15s",
+                    display: "block",
+                  }}
+                  onMouseEnter={(e) => {
+                    (e.currentTarget as HTMLButtonElement).style.borderColor = "rgba(63,185,80,0.8)";
+                    (e.currentTarget as HTMLButtonElement).style.transform = "scale(1.03)";
+                  }}
+                  onMouseLeave={(e) => {
+                    (e.currentTarget as HTMLButtonElement).style.borderColor = "transparent";
+                    (e.currentTarget as HTMLButtonElement).style.transform = "scale(1)";
+                  }}
+                >
+                  <img
+                    src={photo.source_view_url}
+                    alt={photo.photo_description ?? photo.description ?? photo.category ?? `Photo ${idx + 1}`}
+                    style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+                    loading="lazy"
+                  />
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Lightbox overlay */}
       {isLightboxOpen && lightboxIndex !== null && galleryPhotos[lightboxIndex] && (
