@@ -51,6 +51,7 @@ const navGroups: NavGroup[] = [
   {
     title: 'Archive',
     items: [
+      { icon: '✅', label: 'Completed Projects', path: '/completed-projects' },
       { icon: '🗃️', label: 'Archived Projects', path: '/archived-projects' },
     ],
   },

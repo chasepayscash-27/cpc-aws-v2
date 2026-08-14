@@ -9,6 +9,7 @@ interface Props {
   onViewFullPnL?: (propertyName: string) => void;
   onEditCustomProject?: (project: ProjectRow) => void;
   onArchive?: (project: ProjectRow) => void;
+  onMarkCompleted?: (project: ProjectRow) => void;
 }
 
 const STAGE_COLORS: Record<string, string> = {
@@ -37,7 +38,7 @@ function badgeStyle(value: string | undefined, colorMap: Record<string, string>)
   };
 }
 
-export default function ProjectsGallery({ rows, onViewFullPnL, onEditCustomProject, onArchive }: Props) {
+export default function ProjectsGallery({ rows, onViewFullPnL, onEditCustomProject, onArchive, onMarkCompleted }: Props) {
   const [selectedProject, setSelectedProject] = useState<ProjectRow | null>(null);
 
   const gridStyle: CSSProperties = {
@@ -236,6 +237,41 @@ export default function ProjectsGallery({ rows, onViewFullPnL, onEditCustomProje
                 aria-label="Archive project"
               >
                 🗃️ Archive Project
+              </button>
+            )}
+            {/* Mark Completed button */}
+            {onMarkCompleted && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onMarkCompleted(row);
+                }}
+                style={{
+                  marginTop: 6,
+                  width: "100%",
+                  padding: "7px 0",
+                  borderRadius: 10,
+                  border: "1px solid rgba(34,197,94,0.5)",
+                  background: "var(--panel2)",
+                  color: "rgba(34,197,94,0.9)",
+                  fontSize: 12,
+                  fontWeight: 600,
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: 5,
+                  transition: "background 0.15s, color 0.15s",
+                }}
+                onMouseEnter={(e) => {
+                  (e.currentTarget as HTMLButtonElement).style.background = "rgba(34,197,94,0.12)";
+                }}
+                onMouseLeave={(e) => {
+                  (e.currentTarget as HTMLButtonElement).style.background = "var(--panel2)";
+                }}
+                aria-label="Mark project as completed"
+              >
+                ✅ Mark Completed
               </button>
             )}
           </div>

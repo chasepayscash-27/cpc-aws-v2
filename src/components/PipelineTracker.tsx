@@ -59,9 +59,10 @@ interface PipelineTrackerProps {
   rows: ProjectRow[];
   onProjectClick?: (project: ProjectRow) => void;
   onArchive?: (project: ProjectRow) => void;
+  onMarkCompleted?: (project: ProjectRow) => void;
 }
 
-export default function PipelineTracker({ rows, onProjectClick, onArchive }: PipelineTrackerProps) {
+export default function PipelineTracker({ rows, onProjectClick, onArchive, onMarkCompleted }: PipelineTrackerProps) {
   const { allTasks, isLoading: tasksLoading } = usePropertyTasks();
   const { overrides, setOverride, clearOverride, error: overrideError } = useStageOverrides();
   const progressByProperty = useMemo(
@@ -592,6 +593,31 @@ export default function PipelineTracker({ rows, onProjectClick, onArchive }: Pip
                           }}
                         >
                           🗃️ Archive
+                        </button>
+                      )}
+                      {onMarkCompleted && (
+                        <button
+                          aria-label={`Mark ${label} as completed`}
+                          title="Mark project as completed"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onMarkCompleted(p);
+                          }}
+                          style={{
+                            marginTop: 4,
+                            width: '100%',
+                            padding: '3px 0',
+                            borderRadius: 6,
+                            border: '1px solid rgba(34,197,94,0.5)',
+                            background: 'var(--panel2)',
+                            color: 'rgba(34,197,94,0.9)',
+                            cursor: 'pointer',
+                            fontSize: 10,
+                            fontWeight: 600,
+                            letterSpacing: '0.03em',
+                          }}
+                        >
+                          ✅ Complete
                         </button>
                       )}
                     </div>

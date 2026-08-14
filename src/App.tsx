@@ -21,6 +21,7 @@ const ActiveListingPage   = lazy(() => import('./pages/ActiveListingPage'));
 const SalesMeetingsPage   = lazy(() => import('./pages/SalesMeetingsPage'));
 const TeamWipPage         = lazy(() => import('./pages/TeamWipPage'));
 const ArchivedProjectsPage = lazy(() => import('./pages/ArchivedProjectsPage'));
+const CompletedProjectsPage = lazy(() => import('./pages/CompletedProjectsPage'));
 const LoginPage           = lazy(() => import('./pages/LoginPage'));
 const AuthCallbackPage    = lazy(() => import('./pages/AuthCallbackPage'));
 
@@ -125,6 +126,7 @@ const App = () => {
                 <Route path="/sales-meetings" element={<SalesMeetingsPage />} />
                 <Route path="/team-wip" element={<TeamWipPage />} />
                 <Route path="/archived-projects" element={<ArchivedProjectsPage />} />
+                <Route path="/completed-projects" element={<CompletedProjectsPage />} />
 
                 <Route path="*" element={<Navigate to="/" replace />} />
               </Routes>

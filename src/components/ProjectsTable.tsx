@@ -8,6 +8,7 @@ interface Props {
   onViewFullPnL?: (propertyName: string) => void;
   onEditCustomProject?: (project: ProjectRow) => void;
   onArchive?: (project: ProjectRow) => void;
+  onMarkCompleted?: (project: ProjectRow) => void;
 }
 
 const STAGE_COLORS: Record<string, string> = {
@@ -39,7 +40,7 @@ function badge(value: string | undefined, colorMap: Record<string, string>) {
   return <span style={style}>{label}</span>;
 }
 
-export default function ProjectsTable({ rows, onViewFullPnL, onEditCustomProject, onArchive }: Props) {
+export default function ProjectsTable({ rows, onViewFullPnL, onEditCustomProject, onArchive, onMarkCompleted }: Props) {
   const [selectedProject, setSelectedProject] = useState<ProjectRow | null>(null);
   const thStyle: CSSProperties = {
     padding: "8px 12px",
@@ -83,6 +84,7 @@ export default function ProjectsTable({ rows, onViewFullPnL, onEditCustomProject
             <th style={{ ...thStyle, textAlign: "right" }}>Beds / Baths</th>
             <th style={{ ...thStyle, textAlign: "right" }}>Year Built</th>
             {onArchive && <th style={thStyle}></th>}
+            {onMarkCompleted && <th style={thStyle}></th>}
           </tr>
         </thead>
         <tbody>
@@ -167,6 +169,30 @@ export default function ProjectsTable({ rows, onViewFullPnL, onEditCustomProject
                     aria-label="Archive project"
                   >
                     🗃️ Archive
+                  </button>
+                </td>
+              )}
+              {onMarkCompleted && (
+                <td style={{ ...tdStyle, textAlign: "right" }}>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onMarkCompleted(row);
+                    }}
+                    style={{
+                      padding: "5px 10px",
+                      borderRadius: 8,
+                      border: "1px solid rgba(34,197,94,0.5)",
+                      background: "transparent",
+                      color: "rgba(34,197,94,0.9)",
+                      fontSize: 11,
+                      fontWeight: 600,
+                      cursor: "pointer",
+                      whiteSpace: "nowrap",
+                    }}
+                    aria-label="Mark project as completed"
+                  >
+                    ✅ Complete
                   </button>
                 </td>
               )}
