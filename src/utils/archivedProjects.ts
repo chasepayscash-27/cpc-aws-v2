@@ -1,6 +1,7 @@
 import type { ProjectRow } from "../types/project";
 
-const STORAGE_KEY = "cpc_archived_projects_v1";
+export const ARCHIVED_PROJECTS_STORAGE_KEY = "cpc_archived_projects_v1";
+const STORAGE_KEY = ARCHIVED_PROJECTS_STORAGE_KEY;
 
 export function loadArchivedProjects(): ProjectRow[] {
   try {
