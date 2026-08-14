@@ -16,6 +16,7 @@ export interface ProjectRow {
   created_at?: string;
   updated_at?: string;
   archived_at?: string;
+  completed_at?: string;
   name?: string;
   full_address?: string;
   address_1?: string;
