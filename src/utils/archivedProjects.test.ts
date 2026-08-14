@@ -3,6 +3,7 @@ import {
   getArchivedProjectUuidSet,
   isProjectArchived,
   saveArchivedProjects,
+  ARCHIVE_CHANGE_EVENT,
 } from "./archivedProjects";
 import type { ProjectRow } from "../types/project";
 
@@ -49,5 +50,15 @@ describe("archivedProjects helpers", () => {
     expect(isProjectArchived("p-100")).toBe(true);
     expect(isProjectArchived("p-200")).toBe(false);
     expect(isProjectArchived(undefined)).toBe(false);
+  });
+
+  it("dispatches ARCHIVE_CHANGE_EVENT on the window when saving", () => {
+    const dispatchSpy = vi.spyOn(window, "dispatchEvent");
+    saveArchivedProjects([{ project_uuid: "p-1", name: "One" }]);
+    const customEvents = dispatchSpy.mock.calls
+      .map((args) => args[0])
+      .filter((e): e is CustomEvent => e instanceof CustomEvent);
+    expect(customEvents.some((e) => e.type === ARCHIVE_CHANGE_EVENT)).toBe(true);
+    dispatchSpy.mockRestore();
   });
 });
