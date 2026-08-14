@@ -39,10 +39,17 @@ export default function YTDSummaryPage() {
 
   function handleSaveProject(project: ProjectRow) {
     const prev = loadCustomProjects();
-    const next = prev.some((row) => row.project_uuid === project.project_uuid)
+    const isUpdate = prev.some((row) => row.project_uuid === project.project_uuid);
+    const next = isUpdate
       ? prev.map((row) => (row.project_uuid === project.project_uuid ? project : row))
       : [project, ...prev];
     saveCustomProjects(next);
+    setProjectRows((prevRows) => {
+      if (isUpdate) {
+        return prevRows.map((r) => (r.project_uuid === project.project_uuid ? project : r));
+      }
+      return [project, ...prevRows];
+    });
     setUploadOpen(false);
   }
 

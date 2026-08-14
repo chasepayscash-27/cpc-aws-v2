@@ -205,7 +205,15 @@ export default function ProjectUploadModal({ initialProject, onClose, onSave }: 
           <input placeholder="State" value={form.state} onChange={(e) => updateField("state", e.target.value)} style={inputStyle} />
           <input placeholder="Postal Code" value={form.postal_code} onChange={(e) => updateField("postal_code", e.target.value)} style={inputStyle} />
           <input placeholder="Country" value={form.country} onChange={(e) => updateField("country", e.target.value)} style={inputStyle} />
-          <input placeholder="Stage (e.g. under_construction)" value={form.stage} onChange={(e) => updateField("stage", e.target.value)} style={inputStyle} />
+          <select value={form.stage} onChange={(e) => updateField("stage", e.target.value)} style={inputStyle}>
+            <option value="">— Select Stage —</option>
+            <option value="negotiation">Negotiation</option>
+            <option value="pending_purchase">Pending Purchase</option>
+            <option value="under_contract">Under Contract</option>
+            <option value="under_construction">Under Construction</option>
+            <option value="punch_list">Punch List</option>
+            <option value="active_listing">Active Listing</option>
+          </select>
           <input placeholder="Strategy (e.g. fix_and_flip)" value={form.investment_strategy} onChange={(e) => updateField("investment_strategy", e.target.value)} style={inputStyle} />
           <input placeholder="Type" value={form.type} onChange={(e) => updateField("type", e.target.value)} style={inputStyle} />
           <input placeholder="Style" value={form.style} onChange={(e) => updateField("style", e.target.value)} style={inputStyle} />
