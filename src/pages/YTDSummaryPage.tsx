@@ -5,7 +5,7 @@ import PipelineTracker from '../components/PipelineTracker';
 import { isArchivedStage } from '../utils/pipelineStatus';
 import ProjectUploadModal from '../components/ProjectUploadModal';
 import { saveCustomProjects, loadCustomProjects } from '../utils/customProjects';
-import { archiveProject, getArchivedProjectUuidSet } from '../utils/archivedProjects';
+import { archiveProject, getArchivedProjectUuidSet, ARCHIVED_PROJECTS_STORAGE_KEY } from '../utils/archivedProjects';
 import '../App.css';
 
 const ProjectDetailsModal = lazy(() => import('../components/ProjectDetailsModal'));
@@ -32,6 +32,7 @@ export default function YTDSummaryPage() {
   const [data, setData] = useState<YTDRow | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [allCsvRows, setAllCsvRows] = useState<ProjectRow[]>([]);
   const [projectRows, setProjectRows] = useState<ProjectRow[]>([]);
   const [stagesLoading, setStagesLoading] = useState(true);
   const [selectedProject, setSelectedProject] = useState<ProjectRow | null>(null);
@@ -58,6 +59,15 @@ export default function YTDSummaryPage() {
     setProjectRows((prev) => prev.filter((r) => r.project_uuid !== project.project_uuid));
   }
 
+  function buildActiveRows(csvRows: ProjectRow[]): ProjectRow[] {
+    const archivedProjectUuids = getArchivedProjectUuidSet();
+    return csvRows.filter(
+      (r) =>
+        !r.archived_at &&
+        !isArchivedStage(r.stage) &&
+        (!r.project_uuid || !archivedProjectUuids.has(r.project_uuid))
+    );
+  }
 
   useEffect(() => {
     loadCsv<YTDRow>('/data/ytd_csv_looker.csv')
@@ -74,21 +84,27 @@ export default function YTDSummaryPage() {
   useEffect(() => {
     loadCsv<ProjectRow>('/data/projects_v2.csv')
       .then((rows) => {
-        const archivedProjectUuids = getArchivedProjectUuidSet();
+        setAllCsvRows(rows);
         // Exclude archived projects so they do not appear in the active pipeline.
-        const active = rows.filter(
-          (r) =>
-            !r.archived_at &&
-            !isArchivedStage(r.stage) &&
-            (!r.project_uuid || !archivedProjectUuids.has(r.project_uuid))
-        );
-        setProjectRows(active);
+        setProjectRows(buildActiveRows(rows));
         setStagesLoading(false);
       })
       .catch(() => {
         setStagesLoading(false);
       });
   }, []);
+
+  // Re-derive active rows when a project is returned to the pipeline from
+  // the Archived Projects page (which updates localStorage in the same tab).
+  useEffect(() => {
+    function handleStorageChange(e: StorageEvent) {
+      if (e.key === ARCHIVED_PROJECTS_STORAGE_KEY) {
+        setProjectRows(buildActiveRows(allCsvRows));
+      }
+    }
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, [allCsvRows]);
 
   if (loading) {
     return (
