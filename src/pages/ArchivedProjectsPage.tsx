@@ -1,6 +1,8 @@
-import { CSSProperties, useState } from "react";
+import { CSSProperties, useEffect, useState } from "react";
 import type { ProjectRow } from "../types/project";
 import {
+  ARCHIVE_CHANGE_EVENT,
+  ARCHIVED_PROJECTS_STORAGE_KEY,
   loadArchivedProjects,
   saveArchivedProjects,
 } from "../utils/archivedProjects";
@@ -30,6 +32,24 @@ export default function ArchivedProjectsPage() {
   const [selectedProject, setSelectedProject] = useState<ProjectRow | null>(null);
   const [returnProject, setReturnProject] = useState<ProjectRow | null>(null);
   const { setOverride } = useStageOverrides();
+
+  // Keep the archived list in sync when projects are archived/unarchived from
+  // other pages in the same tab (ARCHIVE_CHANGE_EVENT) or from another tab
+  // (native storage event).
+  useEffect(() => {
+    function refresh() {
+      setArchived(loadArchivedProjects());
+    }
+    window.addEventListener(ARCHIVE_CHANGE_EVENT, refresh);
+    function handleStorageChange(e: StorageEvent) {
+      if (e.key === ARCHIVED_PROJECTS_STORAGE_KEY) refresh();
+    }
+    window.addEventListener("storage", handleStorageChange);
+    return () => {
+      window.removeEventListener(ARCHIVE_CHANGE_EVENT, refresh);
+      window.removeEventListener("storage", handleStorageChange);
+    };
+  }, []);
 
   function handleUnarchive(project: ProjectRow) {
     setArchived((prev) => {
