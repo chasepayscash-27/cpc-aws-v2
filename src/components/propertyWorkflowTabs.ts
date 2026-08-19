@@ -8,6 +8,67 @@ export type WorkflowTab = { id: string; label: string; workflowType: WorkflowTyp
 export type WorkflowAlertRecipient = { id: string; label: string; email: string; phone: string };
 export type TaskNotePayload = { taskNote: string; taskNoteCreatedAt: string };
 export type TaskNoteUpdatePayload = { taskNote: string | null; taskNoteCreatedAt: string | null };
+export type TaskNoteEntry = { text: string; createdAt: string };
+
+/**
+ * Parses the taskNote field into an array of note entries.
+ * Supports the new JSON-array format as well as the legacy plain-string format
+ * (stored before multi-note support was added).
+ */
+export function parseTaskNotes(
+  taskNote: string | null | undefined,
+  taskNoteCreatedAt?: string | null,
+): TaskNoteEntry[] {
+  if (!taskNote?.trim()) return [];
+  try {
+    const parsed: unknown = JSON.parse(taskNote);
+    if (
+      Array.isArray(parsed) &&
+      parsed.every(
+        (item): item is TaskNoteEntry =>
+          typeof item === "object" &&
+          item !== null &&
+          typeof (item as Record<string, unknown>).text === "string" &&
+          typeof (item as Record<string, unknown>).createdAt === "string",
+      )
+    ) {
+      return parsed;
+    }
+  } catch {
+    // not JSON — fall through to legacy handling
+  }
+  // Legacy: plain string stored directly in taskNote
+  return [{ text: taskNote.trim(), createdAt: taskNoteCreatedAt ?? new Date().toISOString() }];
+}
+
+/**
+ * Returns a new taskNote JSON string with the given text appended as a new entry.
+ */
+export function appendTaskNote(
+  existing: string | null | undefined,
+  newText: string,
+  taskNoteCreatedAt?: string | null,
+  timestamp: Date = new Date(),
+): string {
+  const trimmed = newText.trim();
+  if (!trimmed) throw new Error("Note text must not be empty");
+  const entries = parseTaskNotes(existing, taskNoteCreatedAt);
+  return JSON.stringify([...entries, { text: trimmed, createdAt: timestamp.toISOString() }]);
+}
+
+/**
+ * Returns a new taskNote JSON string with the entry at the given index removed,
+ * or null if the list becomes empty.
+ */
+export function removeTaskNote(
+  existing: string | null | undefined,
+  index: number,
+  taskNoteCreatedAt?: string | null,
+): string | null {
+  const entries = parseTaskNotes(existing, taskNoteCreatedAt);
+  const updated = entries.filter((_, i) => i !== index);
+  return updated.length > 0 ? JSON.stringify(updated) : null;
+}
 
 export function normalizePhoneToE164(raw: string | null | undefined): string | null {
   if (!raw) return null;

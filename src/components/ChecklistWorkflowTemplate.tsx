@@ -2,7 +2,7 @@ import { memo, useCallback, useEffect, useMemo, useState, type CSSProperties } f
 import { getCurrentUser } from "aws-amplify/auth";
 import type { Schema } from "../../amplify/data/resource";
 import { getChecklistWorkflowTasks } from "./propertyTaskCollections";
-import { createTaskNotePayload, createTaskNoteUpdatePayload } from "./propertyWorkflowTabs";
+import { createTaskNotePayload, appendTaskNote, removeTaskNote, parseTaskNotes } from "./propertyWorkflowTabs";
 import { usePropertyTasks } from "../contexts/PropertyTasksContext";
 import type { ProjectRow } from "../types/project";
 import { toTitleCase } from "../utils/titleCase";
@@ -121,15 +121,16 @@ function ChecklistWorkflowTemplate({ propertyId, propertyName, projectStage }: P
   }, []);
 
   const handleTaskNoteSave = useCallback(
-    async (task: PropertyTask, noteDraft: string = noteDraftByTaskId[task.id] ?? "") => {
-      setToggleError("");
-      const payload = createTaskNoteUpdatePayload(noteDraft, task.taskNote);
-      if (!payload) return;
+    async (task: PropertyTask) => {
+      const draft = noteDraftByTaskId[task.id] ?? "";
+      if (!draft.trim()) return;
 
-      const previousDraft = noteDraftByTaskId[task.id] ?? "";
+      setToggleError("");
+      const newTaskNote = appendTaskNote(task.taskNote, draft, task.taskNoteCreatedAt);
+      const previousDraft = draft;
       setNoteDraftByTaskId((current) => ({ ...current, [task.id]: "" }));
 
-      const { errors } = await updateTaskNote(task, payload.taskNote, payload.taskNoteCreatedAt);
+      const { errors } = await updateTaskNote(task, newTaskNote, null);
 
       if (errors?.length) {
         setNoteDraftByTaskId((current) => ({ ...current, [task.id]: previousDraft }));
@@ -137,6 +138,20 @@ function ChecklistWorkflowTemplate({ propertyId, propertyName, projectStage }: P
       }
     },
     [noteDraftByTaskId, updateTaskNote]
+  );
+
+  const handleTaskNoteRemove = useCallback(
+    async (task: PropertyTask, index: number) => {
+      setToggleError("");
+      const newTaskNote = removeTaskNote(task.taskNote, index, task.taskNoteCreatedAt);
+
+      const { errors } = await updateTaskNote(task, newTaskNote, null);
+
+      if (errors?.length) {
+        setToggleError(errors.map((item) => item.message).join("; "));
+      }
+    },
+    [updateTaskNote]
   );
 
   return (
@@ -211,16 +226,32 @@ function ChecklistWorkflowTemplate({ propertyId, propertyName, projectStage }: P
                     {task.responsibilities?.trim() || task.notes?.trim()}
                   </span>
                 )}
-                {task.taskNote && (
-                  <span style={{ display: "block", fontSize: 12, color: "var(--text)", marginTop: 4 }}>
-                    {task.taskNote}
-                    {task.taskNoteCreatedAt && (
-                      <span style={{ display: "block", fontSize: 11, color: "var(--muted)" }}>
-                        Added {new Date(task.taskNoteCreatedAt).toLocaleString()}
-                      </span>
-                    )}
+                {parseTaskNotes(task.taskNote, task.taskNoteCreatedAt).map((entry, index) => (
+                  <span key={index} style={{ display: "block", fontSize: 12, color: "var(--text)", marginTop: 4 }}>
+                    {entry.text}
+                    <span style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 11, color: "var(--muted)", marginTop: 2 }}>
+                      Added {new Date(entry.createdAt).toLocaleString()}
+                      <button
+                        type="button"
+                        aria-label={`Remove note ${index + 1} for ${toTitleCase(task.stage ?? "")} in checklist`}
+                        onClick={() => {
+                          void handleTaskNoteRemove(task, index);
+                        }}
+                        style={{
+                          background: "none",
+                          border: "none",
+                          color: "var(--muted)",
+                          cursor: "pointer",
+                          fontSize: 13,
+                          lineHeight: 1,
+                          padding: "0 2px",
+                        }}
+                      >
+                        ×
+                      </button>
+                    </span>
                   </span>
-                )}
+                ))}
                 <span style={{ display: "flex", gap: 6, marginTop: 6, flexWrap: "wrap" }}>
                   <input
                     type="text"
@@ -257,28 +288,8 @@ function ChecklistWorkflowTemplate({ propertyId, propertyName, projectStage }: P
                       cursor: "pointer",
                     }}
                   >
-                    Save note
+                    Add note
                   </button>
-                  {task.taskNote && (
-                    <button
-                      type="button"
-                      onClick={() => {
-                        void handleTaskNoteSave(task, "");
-                      }}
-                      style={{
-                        borderRadius: 8,
-                        border: "1px solid var(--border)",
-                        background: "var(--panel2)",
-                        color: "var(--text)",
-                        padding: "5px 10px",
-                        fontSize: 11,
-                        fontWeight: 600,
-                        cursor: "pointer",
-                      }}
-                    >
-                      Remove note
-                    </button>
-                  )}
                 </span>
                 {task.completedAt && (
                   <span style={{ display: "block", fontSize: 11, color: "var(--muted)", marginTop: 2 }}>

@@ -180,10 +180,27 @@
 }
 
 .pwTaskNoteMeta {
-  display: block;
+  display: flex;
+  align-items: center;
+  gap: 6px;
   color: var(--muted);
   font-size: 11px;
   margin-top: 2px;
+}
+
+.pwTaskNoteRemove {
+  background: none;
+  border: none;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1;
+  padding: 0 2px;
+  transition: color 0.15s ease;
+}
+
+.pwTaskNoteRemove:hover {
+  color: var(--danger);
 }
 
 .pwTaskNoteComposer {
