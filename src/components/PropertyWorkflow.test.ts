@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import type { Schema } from "../../amplify/data/resource";
 import {
+  appendTaskNote,
   createTaskNotePayload,
   createTaskNoteUpdatePayload,
   deriveRecipientFromRow,
@@ -8,6 +9,8 @@ import {
   getWorkflowTabs,
   normalizeAlertRecipient,
   normalizePhoneToE164,
+  parseTaskNotes,
+  removeTaskNote,
 } from "./propertyWorkflowTabs";
 
 type PropertyTask = Schema["PropertyTask"]["type"];
@@ -88,6 +91,99 @@ describe("PropertyWorkflow tab helpers", () => {
     expect(normalizeAlertRecipient("")).toBeNull();
     expect(normalizeAlertRecipient(null)).toBeNull();
   });
+
+  describe("parseTaskNotes", () => {
+    it("returns empty array for null", () => {
+      expect(parseTaskNotes(null)).toEqual([]);
+    });
+
+    it("returns empty array for whitespace-only string", () => {
+      expect(parseTaskNotes("   ")).toEqual([]);
+    });
+
+    it("parses a JSON array of note entries", () => {
+      const notes = JSON.stringify([
+        { text: "Note one", createdAt: "2026-01-01T00:00:00.000Z" },
+        { text: "Note two", createdAt: "2026-01-02T00:00:00.000Z" },
+      ]);
+      expect(parseTaskNotes(notes)).toEqual([
+        { text: "Note one", createdAt: "2026-01-01T00:00:00.000Z" },
+        { text: "Note two", createdAt: "2026-01-02T00:00:00.000Z" },
+      ]);
+    });
+
+    it("treats a legacy plain string as a single entry using taskNoteCreatedAt", () => {
+      expect(parseTaskNotes("Legacy note", "2026-03-01T00:00:00.000Z")).toEqual([
+        { text: "Legacy note", createdAt: "2026-03-01T00:00:00.000Z" },
+      ]);
+    });
+
+    it("falls back gracefully for invalid JSON (non-array)", () => {
+      expect(parseTaskNotes('{"text":"bad"}', "2026-03-01T00:00:00.000Z")).toEqual([
+        { text: '{"text":"bad"}', createdAt: "2026-03-01T00:00:00.000Z" },
+      ]);
+    });
+  });
+
+  describe("appendTaskNote", () => {
+    it("appends to an empty note field", () => {
+      const timestamp = new Date("2026-06-25T18:30:00.000Z");
+      const result = JSON.parse(appendTaskNote(null, "First note", null, timestamp));
+      expect(result).toEqual([{ text: "First note", createdAt: "2026-06-25T18:30:00.000Z" }]);
+    });
+
+    it("appends to an existing JSON array", () => {
+      const existing = JSON.stringify([{ text: "Existing", createdAt: "2026-01-01T00:00:00.000Z" }]);
+      const timestamp = new Date("2026-06-25T18:30:00.000Z");
+      const result = JSON.parse(appendTaskNote(existing, "  New note  ", null, timestamp));
+      expect(result).toEqual([
+        { text: "Existing", createdAt: "2026-01-01T00:00:00.000Z" },
+        { text: "New note", createdAt: "2026-06-25T18:30:00.000Z" },
+      ]);
+    });
+
+    it("migrates a legacy plain-string note before appending", () => {
+      const timestamp = new Date("2026-06-25T18:30:00.000Z");
+      const result = JSON.parse(appendTaskNote("Old plain note", "New note", "2026-01-01T00:00:00.000Z", timestamp));
+      expect(result).toEqual([
+        { text: "Old plain note", createdAt: "2026-01-01T00:00:00.000Z" },
+        { text: "New note", createdAt: "2026-06-25T18:30:00.000Z" },
+      ]);
+    });
+
+    it("throws when new text is empty", () => {
+      expect(() => appendTaskNote(null, "   ")).toThrow();
+    });
+  });
+
+  describe("removeTaskNote", () => {
+    it("returns null when removing the only note", () => {
+      const existing = JSON.stringify([{ text: "Only note", createdAt: "2026-01-01T00:00:00.000Z" }]);
+      expect(removeTaskNote(existing, 0)).toBeNull();
+    });
+
+    it("removes the note at the specified index", () => {
+      const existing = JSON.stringify([
+        { text: "First", createdAt: "2026-01-01T00:00:00.000Z" },
+        { text: "Second", createdAt: "2026-01-02T00:00:00.000Z" },
+        { text: "Third", createdAt: "2026-01-03T00:00:00.000Z" },
+      ]);
+      const result = JSON.parse(removeTaskNote(existing, 1)!);
+      expect(result).toEqual([
+        { text: "First", createdAt: "2026-01-01T00:00:00.000Z" },
+        { text: "Third", createdAt: "2026-01-03T00:00:00.000Z" },
+      ]);
+    });
+
+    it("migrates a legacy plain-string note before removing it", () => {
+      expect(removeTaskNote("Legacy note", 0, "2026-01-01T00:00:00.000Z")).toBeNull();
+    });
+
+    it("returns null when removing from null", () => {
+      expect(removeTaskNote(null, 0)).toBeNull();
+    });
+  });
+
 
   describe("createTaskNotePayload", () => {
     it("returns a persisted note with timestamp", () => {

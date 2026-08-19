@@ -4,8 +4,10 @@ import { getCurrentUser } from "aws-amplify/auth";
 import type { Schema } from "../../amplify/data/resource";
 import { defaultWorkflow } from "../data/defaultWorkflow";
 import {
+  appendTaskNote,
   createTaskNotePayload,
-  createTaskNoteUpdatePayload,
+  parseTaskNotes,
+  removeTaskNote,
   getTasksForTab,
   getWorkflowTabs,
   loadWorkflowAlertRecipients,
@@ -436,16 +438,17 @@ function PropertyWorkflow({ propertyId }: Props) {
     setNoteDraftByTaskId((current) => ({ ...current, [taskId]: value }));
   }, []);
 
-  const handleTaskNoteCreate = useCallback(async (task: PropertyTask, noteDraft: string = noteDraftByTaskId[task.id] ?? "") => {
-    const payload = createTaskNoteUpdatePayload(noteDraft, task.taskNote);
-    if (!payload) return;
+  const handleTaskNoteAdd = useCallback(async (task: PropertyTask) => {
+    const draft = noteDraftByTaskId[task.id] ?? "";
+    if (!draft.trim()) return;
 
     setError("");
-    const previousDraft = noteDraftByTaskId[task.id] ?? "";
-    setTasks((currentTasks) => updateTask(currentTasks, task.id, payload));
+    const newTaskNote = appendTaskNote(task.taskNote, draft, task.taskNoteCreatedAt);
+    const previousDraft = draft;
+    setTasks((currentTasks) => updateTask(currentTasks, task.id, { taskNote: newTaskNote, taskNoteCreatedAt: null }));
     setNoteDraftByTaskId((current) => ({ ...current, [task.id]: "" }));
 
-    const { errors } = await updateTaskNote(task, payload.taskNote, payload.taskNoteCreatedAt);
+    const { errors } = await updateTaskNote(task, newTaskNote, null);
 
     if (errors?.length) {
       setTasks((currentTasks) =>
@@ -458,6 +461,24 @@ function PropertyWorkflow({ propertyId }: Props) {
       setError(errors.map((item) => item.message).join("; "));
     }
   }, [noteDraftByTaskId, updateTaskNote]);
+
+  const handleTaskNoteRemove = useCallback(async (task: PropertyTask, index: number) => {
+    setError("");
+    const newTaskNote = removeTaskNote(task.taskNote, index, task.taskNoteCreatedAt);
+    setTasks((currentTasks) => updateTask(currentTasks, task.id, { taskNote: newTaskNote, taskNoteCreatedAt: null }));
+
+    const { errors } = await updateTaskNote(task, newTaskNote, null);
+
+    if (errors?.length) {
+      setTasks((currentTasks) =>
+        updateTask(currentTasks, task.id, {
+          taskNote: task.taskNote ?? null,
+          taskNoteCreatedAt: task.taskNoteCreatedAt ?? null,
+        })
+      );
+      setError(errors.map((item) => item.message).join("; "));
+    }
+  }, [updateTaskNote]);
 
   const tabs = useMemo(() => getWorkflowTabs(dedupedTasks), [dedupedTasks]);
   const activeTab = useMemo(
@@ -618,12 +639,24 @@ function PropertyWorkflow({ propertyId }: Props) {
                 </div>
                 {task.responsibilities && <p>{task.responsibilities}</p>}
                 {task.notes && <p className="pwNotes">{task.notes}</p>}
-                {task.taskNote && (
-                  <p className="pwTaskNote">
-                    {task.taskNote}
-                    {task.taskNoteCreatedAt && <span className="pwTaskNoteMeta">Added {new Date(task.taskNoteCreatedAt).toLocaleString()}</span>}
+                {parseTaskNotes(task.taskNote, task.taskNoteCreatedAt).map((entry, index) => (
+                  <p key={index} className="pwTaskNote">
+                    {entry.text}
+                    <span className="pwTaskNoteMeta">
+                      Added {new Date(entry.createdAt).toLocaleString()}
+                      <button
+                        type="button"
+                        className="pwTaskNoteRemove"
+                        aria-label={`Remove note ${index + 1} for ${toTitleCase(task.stage ?? "")}`}
+                        onClick={() => {
+                          void handleTaskNoteRemove(task, index);
+                        }}
+                      >
+                        ×
+                      </button>
+                    </span>
                   </p>
-                )}
+                ))}
                 <div className="pwTaskNoteComposer">
                   <input
                     type="text"
@@ -640,22 +673,11 @@ function PropertyWorkflow({ propertyId }: Props) {
                     className="pwTaskNoteButton"
                     disabled={!createTaskNotePayload(noteDraftByTaskId[task.id] ?? "")}
                     onClick={() => {
-                      void handleTaskNoteCreate(task);
+                      void handleTaskNoteAdd(task);
                     }}
                   >
-                    Save note
+                    Add note
                   </button>
-                  {task.taskNote && (
-                    <button
-                      type="button"
-                      className="pwTaskNoteButton"
-                      onClick={() => {
-                        void handleTaskNoteCreate(task, "");
-                      }}
-                    >
-                      Remove note
-                    </button>
-                  )}
                 </div>
               </div>
             </label>
