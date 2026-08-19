@@ -155,6 +155,7 @@ export default function ProjectDetailsModal({ project: row, onClose, onViewFullP
     backdropFilter: "blur(6px)",
     zIndex: 1000,
     display: "block",
+    overflow: "hidden",
     padding: 0,
     animation: "fadeIn 0.18s ease",
   };
@@ -168,6 +169,7 @@ export default function ProjectDetailsModal({ project: row, onClose, onViewFullP
     maxWidth: "100vw",
     maxHeight: "100vh",
     overflowY: "auto",
+    overflowX: "hidden",
     boxShadow: "0 24px 80px rgba(0,0,0,0.15), 0 0 0 1px rgba(26,122,60,0.10)",
     animation: "slideUp 0.22s ease",
     position: "relative",
