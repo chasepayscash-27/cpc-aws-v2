@@ -55,10 +55,17 @@ export default function ProjectsTable({ rows, onViewFullPnL, onEditCustomProject
   };
 
   const tdStyle: CSSProperties = {
-    padding: "10px 12px",
+    padding: "9px 12px",
     borderBottom: "1px solid var(--border)",
     fontSize: 13,
     verticalAlign: "middle",
+  };
+
+  const tdNumStyle: CSSProperties = {
+    ...tdStyle,
+    textAlign: "right",
+    fontVariantNumeric: "tabular-nums",
+    fontFamily: "'Inter', ui-monospace, monospace",
   };
 
   return (
@@ -91,14 +98,19 @@ export default function ProjectsTable({ rows, onViewFullPnL, onEditCustomProject
           {rows.map((row, i) => (
             <tr
               key={row.project_uuid ?? i}
-              style={{ transition: "background 0.15s", cursor: "pointer" }}
+              style={{
+                background: i % 2 === 1 ? "var(--panel3)" : undefined,
+                transition: "background 0.15s",
+                cursor: "pointer",
+              }}
               onClick={() => setSelectedProject(row)}
               onMouseEnter={(e) =>
                 ((e.currentTarget as HTMLTableRowElement).style.background =
-                  "rgba(26,122,60,0.04)")
+                  "var(--accent-dim)")
               }
               onMouseLeave={(e) =>
-                ((e.currentTarget as HTMLTableRowElement).style.background = "")
+                ((e.currentTarget as HTMLTableRowElement).style.background =
+                  i % 2 === 1 ? "var(--panel3)" : "")
               }
             >
               <td style={tdStyle}>
@@ -139,15 +151,15 @@ export default function ProjectsTable({ rows, onViewFullPnL, onEditCustomProject
               </td>
               <td style={tdStyle}>{badge(row.stage, STAGE_COLORS)}</td>
               <td style={tdStyle}>{badge(row.investment_strategy, STRATEGY_COLORS)}</td>
-              <td style={{ ...tdStyle, textAlign: "right" }}>
+              <td style={tdNumStyle}>
                 {row.square_feet && !isNaN(Number(row.square_feet))
                 ? Number(row.square_feet).toLocaleString()
                 : "—"}
               </td>
-              <td style={{ ...tdStyle, textAlign: "right" }}>
+              <td style={tdNumStyle}>
                 {row.beds || row.baths ? `${row.beds ?? "?"} / ${row.baths ?? "?"}` : "—"}
               </td>
-              <td style={{ ...tdStyle, textAlign: "right" }}>{row.year_built ?? "—"}</td>
+              <td style={tdNumStyle}>{row.year_built ?? "—"}</td>
               {onArchive && (
                 <td style={{ ...tdStyle, textAlign: "right" }}>
                   <button
