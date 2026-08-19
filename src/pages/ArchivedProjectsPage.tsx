@@ -5,6 +5,7 @@ import {
   ARCHIVED_PROJECTS_STORAGE_KEY,
   loadArchivedProjects,
   saveArchivedProjects,
+  deleteArchivedProject,
 } from "../utils/archivedProjects";
 import { getPipelineStatusColor, getPipelineStatusLabel } from "../utils/pipelineStatus";
 import PropertyMainImage from "../components/PropertyMainImage";
@@ -31,6 +32,7 @@ export default function ArchivedProjectsPage() {
   );
   const [selectedProject, setSelectedProject] = useState<ProjectRow | null>(null);
   const [returnProject, setReturnProject] = useState<ProjectRow | null>(null);
+  const [deleteConfirmProject, setDeleteConfirmProject] = useState<ProjectRow | null>(null);
   const { setOverride } = useStageOverrides();
 
   // Keep the archived list in sync when projects are archived/unarchived from
@@ -57,6 +59,14 @@ export default function ArchivedProjectsPage() {
       saveArchivedProjects(next);
       return next;
     });
+  }
+
+  function handleDelete(project: ProjectRow) {
+    if (project.project_uuid) {
+      deleteArchivedProject(project.project_uuid);
+    }
+    setArchived((prev) => prev.filter((r) => r.project_uuid !== project.project_uuid));
+    setDeleteConfirmProject(null);
   }
 
   async function handleReturnToPipeline(project: ProjectRow, stage: string) {
@@ -103,6 +113,92 @@ export default function ArchivedProjectsPage() {
           onConfirm={(stage) => handleReturnToPipeline(returnProject, stage)}
           onCancel={() => setReturnProject(null)}
         />
+      )}
+
+      {deleteConfirmProject && (
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            background: "rgba(0,0,0,0.55)",
+            zIndex: 1000,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: 16,
+          }}
+          onClick={() => setDeleteConfirmProject(null)}
+        >
+          <div
+            style={{
+              background: "var(--panel)",
+              borderRadius: 18,
+              padding: "28px 28px 24px",
+              maxWidth: 420,
+              width: "100%",
+              boxShadow: "0 24px 60px rgba(0,0,0,0.35)",
+              border: "1px solid var(--border)",
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div style={{ fontSize: 32, marginBottom: 12, textAlign: "center" }}>🗑️</div>
+            <h2
+              style={{
+                fontSize: 16,
+                fontWeight: 700,
+                textAlign: "center",
+                marginBottom: 8,
+              }}
+            >
+              Delete Project?
+            </h2>
+            <p
+              style={{
+                fontSize: 13,
+                color: "var(--muted)",
+                textAlign: "center",
+                marginBottom: 20,
+              }}
+            >
+              <strong>{deleteConfirmProject.name ?? "This project"}</strong> will be
+              permanently deleted and cannot be recovered.
+            </p>
+            <div style={{ display: "flex", gap: 10 }}>
+              <button
+                onClick={() => setDeleteConfirmProject(null)}
+                style={{
+                  flex: 1,
+                  padding: "9px 0",
+                  borderRadius: 10,
+                  border: "1px solid var(--border)",
+                  background: "var(--panel2)",
+                  color: "var(--muted)",
+                  fontSize: 13,
+                  fontWeight: 600,
+                  cursor: "pointer",
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => handleDelete(deleteConfirmProject)}
+                style={{
+                  flex: 1,
+                  padding: "9px 0",
+                  borderRadius: 10,
+                  border: "1px solid rgba(239,68,68,0.6)",
+                  background: "rgba(239,68,68,0.1)",
+                  color: "rgb(239,68,68)",
+                  fontSize: 13,
+                  fontWeight: 700,
+                  cursor: "pointer",
+                }}
+              >
+                Delete Permanently
+              </button>
+            </div>
+          </div>
+        </div>
       )}
 
       <div className="pageHeader">
@@ -336,6 +432,7 @@ export default function ArchivedProjectsPage() {
                           justifyContent: "center",
                           gap: 5,
                           transition: "background 0.15s, color 0.15s",
+                          marginBottom: 6,
                         }}
                         onMouseEnter={(e) => {
                           (
@@ -360,6 +457,49 @@ export default function ArchivedProjectsPage() {
                         aria-label="Restore project from archive"
                       >
                         ↩️ Restore Project
+                      </button>
+
+                      {/* Delete button */}
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setDeleteConfirmProject(row);
+                        }}
+                        style={{
+                          width: "100%",
+                          padding: "7px 0",
+                          borderRadius: 10,
+                          border: "1px solid rgba(239,68,68,0.35)",
+                          background: "transparent",
+                          color: "rgba(239,68,68,0.7)",
+                          fontSize: 12,
+                          fontWeight: 600,
+                          cursor: "pointer",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          gap: 5,
+                          transition: "background 0.15s, color 0.15s, border-color 0.15s",
+                        }}
+                        onMouseEnter={(e) => {
+                          (e.currentTarget as HTMLButtonElement).style.background =
+                            "rgba(239,68,68,0.1)";
+                          (e.currentTarget as HTMLButtonElement).style.color =
+                            "rgb(239,68,68)";
+                          (e.currentTarget as HTMLButtonElement).style.borderColor =
+                            "rgb(239,68,68)";
+                        }}
+                        onMouseLeave={(e) => {
+                          (e.currentTarget as HTMLButtonElement).style.background =
+                            "transparent";
+                          (e.currentTarget as HTMLButtonElement).style.color =
+                            "rgba(239,68,68,0.7)";
+                          (e.currentTarget as HTMLButtonElement).style.borderColor =
+                            "rgba(239,68,68,0.35)";
+                        }}
+                        aria-label="Permanently delete project"
+                      >
+                        🗑️ Delete Project
                       </button>
                     </div>
                   </div>
