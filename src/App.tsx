@@ -4,6 +4,7 @@ import Navigation from './components/Navigation';
 import { PropertyTasksProvider } from './contexts/PropertyTasksContext';
 import { StageOverrideProvider } from './contexts/StageOverrideContext';
 import { useAuth } from './contexts/AuthContext';
+import logo from './assets/logo.png';
 import './App.css';
 
 // Lazy-load each page so Vite emits a separate chunk per route.
@@ -69,7 +70,9 @@ const App = () => {
             {sidebarOpen ? '◀' : '▶'}
           </button>
           <div className="brand">
-            <div className="brandMark">CPC</div>
+            <div className="brandMark">
+              <img src={logo} alt="Chase Pays Cash logo" className="brandLogo" />
+            </div>
             <div>
               <div className="brandTitle">Chase Pays Cash</div>
               <div className="brandSub">Analytics Dashboard</div>

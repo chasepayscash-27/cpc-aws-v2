@@ -1,9 +1,25 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
+import {
+  Home,
+  HardHat,
+  Tag,
+  Map,
+  Workflow,
+  ClipboardList,
+  Wrench,
+  Bot,
+  Users,
+  MessageSquare,
+  Construction,
+  CheckCircle2,
+  Archive,
+  type LucideIcon,
+} from 'lucide-react';
 
 interface NavItem {
   label: string;
-  icon: string;
+  Icon: LucideIcon;
   path: string;
 }
 
@@ -16,43 +32,43 @@ const navGroups: NavGroup[] = [
   {
     title: 'Portfolio',
     items: [
-      { icon: '🏠', label: 'Home', path: '/' },
-      { icon: '🏗️', label: 'Projects', path: '/projects' },
-      { icon: '🏷️', label: 'Active Listing', path: '/active-listing' },
-      { icon: '🗺️', label: 'Maps', path: '/maps' },
+      { Icon: Home,          label: 'Home',           path: '/' },
+      { Icon: HardHat,       label: 'Projects',       path: '/projects' },
+      { Icon: Tag,           label: 'Active Listing', path: '/active-listing' },
+      { Icon: Map,           label: 'Maps',           path: '/maps' },
     ],
   },
   {
     title: 'Operations',
     items: [
-      { icon: '🧭', label: 'Workflow', path: '/workflow' },
-      { icon: '📋', label: 'Sales Meetings', path: '/sales-meetings' },
-      { icon: '🔧', label: 'Resources', path: '/resources' },
+      { Icon: Workflow,      label: 'Workflow',       path: '/workflow' },
+      { Icon: ClipboardList, label: 'Sales Meetings', path: '/sales-meetings' },
+      { Icon: Wrench,        label: 'Resources',      path: '/resources' },
     ],
   },
   {
     title: 'Intelligence',
     items: [
       // Temporarily hidden: analytics nav can be re-enabled by uncommenting this entry.
-      // { icon: '📊', label: 'Analytics', path: '/analytics' },
+      // { Icon: BarChart2, label: 'Analytics', path: '/analytics' },
       // Temporarily hidden: financials nav can be re-enabled by uncommenting this entry.
-      // { icon: '💰', label: 'Financials', path: '/financials' },
-      { icon: '🤖', label: 'AI Chat', path: '/chat' },
+      // { Icon: DollarSign, label: 'Financials', path: '/financials' },
+      { Icon: Bot,           label: 'AI Chat',        path: '/chat' },
     ],
   },
   {
     title: 'Team',
     items: [
-      { icon: '👥', label: 'Team', path: '/team' },
-      { icon: '💬', label: 'Team Chat', path: '/team-chat' },
-      { icon: '🚧', label: 'Team - WIP', path: '/team-wip' },
+      { Icon: Users,         label: 'Team',           path: '/team' },
+      { Icon: MessageSquare, label: 'Team Chat',      path: '/team-chat' },
+      { Icon: Construction,  label: 'Team - WIP',     path: '/team-wip' },
     ],
   },
   {
     title: 'Archive',
     items: [
-      { icon: '✅', label: 'Completed Projects', path: '/completed-projects' },
-      { icon: '🗃️', label: 'Archived Projects', path: '/archived-projects' },
+      { Icon: CheckCircle2,  label: 'Completed Projects', path: '/completed-projects' },
+      { Icon: Archive,       label: 'Archived Projects',  path: '/archived-projects' },
     ],
   },
 ];
@@ -74,9 +90,9 @@ const Navigation: React.FC<NavigationProps> = ({ collapsed = false }) => {
               end={item.path === '/'}
               className={({ isActive }) => `navItem${isActive ? ' active' : ''}`}
               style={{ textDecoration: 'none', display: 'block' }}
-              title={collapsed ? item.label : undefined}
+              title={item.label}
             >
-              <span className="navItemIcon">{item.icon}</span>
+              <span className="navItemIcon"><item.Icon size={16} strokeWidth={2} /></span>
               {!collapsed && <span className="navItemLabel">{item.label}</span>}
             </NavLink>
           ))}
