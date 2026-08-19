@@ -19,6 +19,11 @@ export interface SalesMeetingEntry {
 
 const salesMeetingIndex: SalesMeetingEntry[] = [
   {
+    filename: 'sales_meeting_summary_08172026.md',
+    date: 'August 17, 2026',
+    title: 'Sales & Property Meeting Summary — August 17, 2026',
+  },
+  {
     filename: 'sales_meeting_summary_07202026.md',
     date: 'July 20, 2026',
     title: 'Sales & Property Operations Meeting — July 20, 2026',
