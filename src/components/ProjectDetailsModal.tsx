@@ -1,4 +1,4 @@
-import { CSSProperties, useEffect, useCallback, useMemo, useRef, useState } from "react";
+import { CSSProperties, useEffect, useCallback, useMemo, useState } from "react";
 import type { CustomProjectAttachment, ProjectRow } from "../types/project";
 import type { PhotoLogRow } from "../types/photoLog";
 import { loadCsv } from "../utils/csv";
@@ -58,7 +58,6 @@ function DetailRow({ label, value }: { label: string; value?: string | null }) {
 const COST_LABELS = ["Labor", "Materials", "3rd Party"] as const;
 
 export default function ProjectDetailsModal({ project: row, onClose, onViewFullPnL, onEditCustomProject }: Props) {
-  const overlayRef = useRef<HTMLDivElement>(null);
   const [photos, setPhotos] = useState<PhotoLogRow[]>([]);
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
   const [showPhotoGrid, setShowPhotoGrid] = useState(false);
@@ -129,12 +128,6 @@ export default function ProjectDetailsModal({ project: row, onClose, onViewFullP
   }, [handleKeyDown]);
 
   useEffect(() => {
-    if (overlayRef.current) {
-      overlayRef.current.scrollTop = 0;
-    }
-  }, []);
-
-  useEffect(() => {
     async function fetchPhotos() {
       try {
         const all = await loadCsv<PhotoLogRow>("/data/project_photo_log_v2.csv");
@@ -161,9 +154,9 @@ export default function ProjectDetailsModal({ project: row, onClose, onViewFullP
     background: "rgba(0,0,0,0.70)",
     backdropFilter: "blur(6px)",
     zIndex: 1000,
-    display: "block",
-    overflowY: "auto",
-    overflowX: "hidden",
+    display: "flex",
+    flexDirection: "column",
+    overflow: "hidden",
     padding: 0,
     animation: "fadeIn 0.18s ease",
   };
@@ -173,7 +166,10 @@ export default function ProjectDetailsModal({ project: row, onClose, onViewFullP
     border: "1px solid var(--border)",
     borderRadius: 0,
     width: "100%",
-    minHeight: "100%",
+    flex: 1,
+    display: "flex",
+    flexDirection: "column",
+    overflow: "hidden",
     boxShadow: "0 24px 80px rgba(0,0,0,0.15), 0 0 0 1px rgba(26,122,60,0.10)",
     animation: "slideUp 0.22s ease",
     position: "relative",
@@ -238,7 +234,7 @@ export default function ProjectDetailsModal({ project: row, onClose, onViewFullP
         .modal-close-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
         .lightbox-nav-btn:hover { background: rgba(255,255,255,0.25) !important; }
       `}</style>
-      <div ref={overlayRef} style={overlayStyle} onClick={onClose} role="dialog" aria-modal="true" aria-label={row.name ?? "Project details"}>
+      <div style={overlayStyle} onClick={onClose} role="dialog" aria-modal="true" aria-label={row.name ?? "Project details"}>
         <div style={modalStyle} onClick={(e) => e.stopPropagation()}>
           {/* Close button */}
           <button
@@ -296,7 +292,7 @@ export default function ProjectDetailsModal({ project: row, onClose, onViewFullP
           )}
 
           {/* Content */}
-          <div style={{ padding: "24px 24px 28px" }}>
+          <div style={{ padding: "24px 24px 28px", flex: 1, overflowY: "auto", overflowX: "hidden" }}>
             {/* Cost placeholders */}
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 12, marginBottom: 20 }}>
               {COST_LABELS.map((label, i) => (
@@ -412,6 +408,20 @@ export default function ProjectDetailsModal({ project: row, onClose, onViewFullP
               <div style={{ marginBottom: 20 }}>
                 <PropertyWorksheet row={row} />
               </div>
+            )}
+
+            {/* Financials section */}
+            {row.name && (
+              <>
+                <div style={dividerStyle} />
+                <div style={sectionLabelStyle}>💰 Financials</div>
+                <PropertyFinancials
+                  propertyName={row.name}
+                  onViewFullPnL={onViewFullPnL && row.name ? handleViewFullPnL : undefined}
+                  onSummary={handleFinancialSummary}
+                />
+                <div style={dividerStyle} />
+              </>
             )}
 
             <div style={{ marginBottom: 24 }}>
@@ -569,18 +579,6 @@ export default function ProjectDetailsModal({ project: row, onClose, onViewFullP
               </>
             )}
 
-            {/* Financials section */}
-            {row.name && (
-              <>
-                <div style={dividerStyle} />
-                <div style={sectionLabelStyle}>💰 Financials</div>
-                <PropertyFinancials
-                  propertyName={row.name}
-                  onViewFullPnL={onViewFullPnL && row.name ? handleViewFullPnL : undefined}
-                  onSummary={handleFinancialSummary}
-                />
-              </>
-            )}
           </div>
         </div>
       </div>
