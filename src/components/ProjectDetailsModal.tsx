@@ -1,4 +1,4 @@
-import { CSSProperties, useEffect, useCallback, useMemo, useState } from "react";
+import { CSSProperties, useEffect, useCallback, useMemo, useRef, useState } from "react";
 import type { CustomProjectAttachment, ProjectRow } from "../types/project";
 import type { PhotoLogRow } from "../types/photoLog";
 import { loadCsv } from "../utils/csv";
@@ -58,6 +58,7 @@ function DetailRow({ label, value }: { label: string; value?: string | null }) {
 const COST_LABELS = ["Labor", "Materials", "3rd Party"] as const;
 
 export default function ProjectDetailsModal({ project: row, onClose, onViewFullPnL, onEditCustomProject }: Props) {
+  const overlayRef = useRef<HTMLDivElement>(null);
   const [photos, setPhotos] = useState<PhotoLogRow[]>([]);
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
   const [showPhotoGrid, setShowPhotoGrid] = useState(false);
@@ -126,6 +127,12 @@ export default function ProjectDetailsModal({ project: row, onClose, onViewFullP
       document.body.style.overflow = "";
     };
   }, [handleKeyDown]);
+
+  useEffect(() => {
+    if (overlayRef.current) {
+      overlayRef.current.scrollTop = 0;
+    }
+  }, []);
 
   useEffect(() => {
     async function fetchPhotos() {
@@ -231,7 +238,7 @@ export default function ProjectDetailsModal({ project: row, onClose, onViewFullP
         .modal-close-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
         .lightbox-nav-btn:hover { background: rgba(255,255,255,0.25) !important; }
       `}</style>
-      <div style={overlayStyle} onClick={onClose} role="dialog" aria-modal="true" aria-label={row.name ?? "Project details"}>
+      <div ref={overlayRef} style={overlayStyle} onClick={onClose} role="dialog" aria-modal="true" aria-label={row.name ?? "Project details"}>
         <div style={modalStyle} onClick={(e) => e.stopPropagation()}>
           {/* Close button */}
           <button
