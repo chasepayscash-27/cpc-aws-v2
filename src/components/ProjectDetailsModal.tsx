@@ -1,4 +1,5 @@
 import { CSSProperties, useEffect, useCallback, useMemo, useState } from "react";
+import { createPortal } from "react-dom";
 import type { CustomProjectAttachment, ProjectRow } from "../types/project";
 import type { PhotoLogRow } from "../types/photoLog";
 import { loadCsv } from "../utils/csv";
@@ -225,7 +226,7 @@ export default function ProjectDetailsModal({ project: row, onClose, onViewFullP
     row.full_address?.trim() ||
     "";
 
-  return (
+  return createPortal(
     <>
       <style>{`
         @keyframes fadeIn { from { opacity: 0 } to { opacity: 1 } }
@@ -808,6 +809,7 @@ export default function ProjectDetailsModal({ project: row, onClose, onViewFullP
           )}
         </div>
       )}
-    </>
+    </>,
+    document.body
   );
 }
