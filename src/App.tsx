@@ -1,5 +1,5 @@
 import { lazy, Suspense, useState, useEffect } from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate, Link } from 'react-router-dom';
 import Navigation from './components/Navigation';
 import { PropertyTasksProvider } from './contexts/PropertyTasksContext';
 import { StageOverrideProvider } from './contexts/StageOverrideContext';
@@ -23,6 +23,7 @@ const SalesMeetingsPage   = lazy(() => import('./pages/SalesMeetingsPage'));
 const TeamWipPage         = lazy(() => import('./pages/TeamWipPage'));
 const ArchivedProjectsPage = lazy(() => import('./pages/ArchivedProjectsPage'));
 const CompletedProjectsPage = lazy(() => import('./pages/CompletedProjectsPage'));
+const InterestPaymentsPage = lazy(() => import('./pages/InterestPaymentsPage'));
 const LoginPage           = lazy(() => import('./pages/LoginPage'));
 const AuthCallbackPage    = lazy(() => import('./pages/AuthCallbackPage'));
 
@@ -70,13 +71,15 @@ const App = () => {
             {sidebarOpen ? '◀' : '▶'}
           </button>
           <div className="brand">
-            <div className="brandMark">
-              <img src={logo} alt="Chase Pays Cash logo" className="brandLogo" />
-            </div>
-            <div>
-              <div className="brandTitle">Chase Pays Cash</div>
-              <div className="brandSub">Analytics Dashboard</div>
-            </div>
+            <Link to="/" className="brandHomeLink" aria-label="Go to home" title="Go to home">
+              <div className="brandMark">
+                <img src={logo} alt="Chase Pays Cash logo" className="brandLogo" />
+              </div>
+              <div>
+                <div className="brandTitle">Chase Pays Cash</div>
+                <div className="brandSub">Analytics Dashboard</div>
+              </div>
+            </Link>
           </div>
         </div>
         <div className="topbarActions">
@@ -130,6 +133,7 @@ const App = () => {
                 <Route path="/team-wip" element={<TeamWipPage />} />
                 <Route path="/archived-projects" element={<ArchivedProjectsPage />} />
                 <Route path="/completed-projects" element={<CompletedProjectsPage />} />
+                <Route path="/interest-payments" element={<InterestPaymentsPage />} />
 
                 <Route path="*" element={<Navigate to="/" replace />} />
               </Routes>

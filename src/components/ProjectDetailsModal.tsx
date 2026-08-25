@@ -3,6 +3,7 @@ import { createPortal } from "react-dom";
 import type { CustomProjectAttachment, ProjectRow } from "../types/project";
 import type { PhotoLogRow } from "../types/photoLog";
 import { loadCsv } from "../utils/csv";
+import { normalizePipelineStatus } from "../utils/pipelineStatus";
 import PropertyFinancials from "./PropertyFinancials";
 import PropertyWorksheet from "./PropertyWorksheet";
 import PropertyWorkflow from "./PropertyWorkflow";
@@ -226,6 +227,11 @@ export default function ProjectDetailsModal({ project: row, onClose, onViewFullP
     row.full_address?.trim() ||
     "";
 
+  // Hide workflow sections once a property reaches Active Listing or Under Contract.
+  // The data is preserved on the backend; it is only hidden in the UI.
+  const normalizedStage = normalizePipelineStatus(row.stage);
+  const showWorkflows = normalizedStage !== "active listing" && normalizedStage !== "under contract";
+
   return createPortal(
     <>
       <style>{`
@@ -425,6 +431,7 @@ export default function ProjectDetailsModal({ project: row, onClose, onViewFullP
               </>
             )}
 
+            {showWorkflows && (
             <div style={{ marginBottom: 24 }}>
               <div
                 style={{
@@ -450,6 +457,7 @@ export default function ProjectDetailsModal({ project: row, onClose, onViewFullP
                 </section>
               </div>
             </div>
+            )}
 
             {/* Quick stats */}
             {(row.beds || row.baths || sqft || row.year_built) && (
