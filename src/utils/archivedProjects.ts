@@ -1,4 +1,5 @@
 import type { ProjectRow } from "../types/project";
+import { loadCustomProjects, saveCustomProjects } from "./customProjects";
 
 export const ARCHIVED_PROJECTS_STORAGE_KEY = "cpc_archived_projects_v1";
 const STORAGE_KEY = ARCHIVED_PROJECTS_STORAGE_KEY;
@@ -51,4 +52,18 @@ export function archiveProject(project: ProjectRow): void {
 export function unarchiveProject(projectUuid: string): void {
   const archived = loadArchivedProjects();
   saveArchivedProjects(archived.filter((r) => r.project_uuid !== projectUuid));
+}
+
+/**
+ * Permanently delete a project: removes it from the archived list and, if it
+ * was a custom-uploaded project, also removes it from the custom projects list
+ * so it no longer appears anywhere in the app.
+ */
+export function deleteArchivedProject(projectUuid: string): void {
+  unarchiveProject(projectUuid);
+  const custom = loadCustomProjects();
+  const filtered = custom.filter((r) => r.project_uuid !== projectUuid);
+  if (filtered.length !== custom.length) {
+    saveCustomProjects(filtered);
+  }
 }

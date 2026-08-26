@@ -14,6 +14,7 @@ import {
   Construction,
   CheckCircle2,
   Archive,
+  Landmark,
   type LucideIcon,
 } from 'lucide-react';
 
@@ -62,6 +63,12 @@ const navGroups: NavGroup[] = [
       { Icon: Users,         label: 'Team',           path: '/team' },
       { Icon: MessageSquare, label: 'Team Chat',      path: '/team-chat' },
       { Icon: Construction,  label: 'Team - WIP',     path: '/team-wip' },
+    ],
+  },
+  {
+    title: 'Finance',
+    items: [
+      { Icon: Landmark,      label: 'Interest Payments', path: '/interest-payments' },
     ],
   },
   {

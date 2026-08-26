@@ -1,7 +1,9 @@
 import { CSSProperties, useEffect, useCallback, useMemo, useState } from "react";
+import { createPortal } from "react-dom";
 import type { CustomProjectAttachment, ProjectRow } from "../types/project";
 import type { PhotoLogRow } from "../types/photoLog";
 import { loadCsv } from "../utils/csv";
+import { normalizePipelineStatus } from "../utils/pipelineStatus";
 import PropertyFinancials from "./PropertyFinancials";
 import PropertyWorksheet from "./PropertyWorksheet";
 import PropertyWorkflow from "./PropertyWorkflow";
@@ -154,7 +156,9 @@ export default function ProjectDetailsModal({ project: row, onClose, onViewFullP
     background: "rgba(0,0,0,0.70)",
     backdropFilter: "blur(6px)",
     zIndex: 1000,
-    display: "block",
+    display: "flex",
+    flexDirection: "column",
+    overflow: "hidden",
     padding: 0,
     animation: "fadeIn 0.18s ease",
   };
@@ -163,11 +167,11 @@ export default function ProjectDetailsModal({ project: row, onClose, onViewFullP
     background: "var(--panel)",
     border: "1px solid var(--border)",
     borderRadius: 0,
-    width: "100vw",
-    height: "100vh",
-    maxWidth: "100vw",
-    maxHeight: "100vh",
-    overflowY: "auto",
+    width: "100%",
+    flex: 1,
+    display: "flex",
+    flexDirection: "column",
+    overflow: "hidden",
     boxShadow: "0 24px 80px rgba(0,0,0,0.15), 0 0 0 1px rgba(26,122,60,0.10)",
     animation: "slideUp 0.22s ease",
     position: "relative",
@@ -223,7 +227,12 @@ export default function ProjectDetailsModal({ project: row, onClose, onViewFullP
     row.full_address?.trim() ||
     "";
 
-  return (
+  // Hide workflow sections once a property reaches Active Listing or Under Contract.
+  // The data is preserved on the backend; it is only hidden in the UI.
+  const normalizedStage = normalizePipelineStatus(row.stage);
+  const showWorkflows = normalizedStage !== "active listing" && normalizedStage !== "under contract";
+
+  return createPortal(
     <>
       <style>{`
         @keyframes fadeIn { from { opacity: 0 } to { opacity: 1 } }
@@ -290,7 +299,7 @@ export default function ProjectDetailsModal({ project: row, onClose, onViewFullP
           )}
 
           {/* Content */}
-          <div style={{ padding: "24px 24px 28px" }}>
+          <div style={{ padding: "24px 24px 28px", flex: 1, overflowY: "auto", overflowX: "hidden" }}>
             {/* Cost placeholders */}
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 12, marginBottom: 20 }}>
               {COST_LABELS.map((label, i) => (
@@ -408,6 +417,21 @@ export default function ProjectDetailsModal({ project: row, onClose, onViewFullP
               </div>
             )}
 
+            {/* Financials section */}
+            {row.name && (
+              <>
+                <div style={dividerStyle} />
+                <div style={sectionLabelStyle}>💰 Financials</div>
+                <PropertyFinancials
+                  propertyName={row.name}
+                  onViewFullPnL={onViewFullPnL && row.name ? handleViewFullPnL : undefined}
+                  onSummary={handleFinancialSummary}
+                />
+                <div style={dividerStyle} />
+              </>
+            )}
+
+            {showWorkflows && (
             <div style={{ marginBottom: 24 }}>
               <div
                 style={{
@@ -433,6 +457,7 @@ export default function ProjectDetailsModal({ project: row, onClose, onViewFullP
                 </section>
               </div>
             </div>
+            )}
 
             {/* Quick stats */}
             {(row.beds || row.baths || sqft || row.year_built) && (
@@ -563,18 +588,6 @@ export default function ProjectDetailsModal({ project: row, onClose, onViewFullP
               </>
             )}
 
-            {/* Financials section */}
-            {row.name && (
-              <>
-                <div style={dividerStyle} />
-                <div style={sectionLabelStyle}>💰 Financials</div>
-                <PropertyFinancials
-                  propertyName={row.name}
-                  onViewFullPnL={onViewFullPnL && row.name ? handleViewFullPnL : undefined}
-                  onSummary={handleFinancialSummary}
-                />
-              </>
-            )}
           </div>
         </div>
       </div>
@@ -804,6 +817,7 @@ export default function ProjectDetailsModal({ project: row, onClose, onViewFullP
           )}
         </div>
       )}
-    </>
+    </>,
+    document.body
   );
 }
