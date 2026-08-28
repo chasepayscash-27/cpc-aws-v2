@@ -1,4 +1,5 @@
 import { lazy, Suspense, useEffect, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import { loadCsv } from '../utils/csv';
 import type { ProjectRow } from '../types/project';
 import PipelineTracker from '../components/PipelineTracker';
@@ -30,6 +31,7 @@ function parsePercent(value: string): number {
 }
 
 export default function YTDSummaryPage() {
+  const location = useLocation();
   const [data, setData] = useState<YTDRow | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -38,6 +40,12 @@ export default function YTDSummaryPage() {
   const [stagesLoading, setStagesLoading] = useState(true);
   const [selectedProject, setSelectedProject] = useState<ProjectRow | null>(null);
   const [uploadOpen, setUploadOpen] = useState(false);
+
+  // Close any open project modal whenever the user navigates (including back to
+  // the same "/" route via the home button, which does not remount this component).
+  useEffect(() => {
+    setSelectedProject(null);
+  }, [location.key]);
 
   function handleSaveProject(project: ProjectRow) {
     const prev = loadCustomProjects();

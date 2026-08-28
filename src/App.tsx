@@ -52,7 +52,7 @@ const App = () => {
   const navigate = useNavigate();
 
   function handleHomeClick() {
-    navigate('/');
+    navigate('/', { state: { ts: Date.now() } });
     window.scrollTo({ top: 0, behavior: 'smooth' });
     if (window.innerWidth <= 768) setSidebarOpen(false);
   }
