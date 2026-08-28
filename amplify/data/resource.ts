@@ -153,6 +153,26 @@ const schema = a.schema({
       allow.guest(),
       allow.publicApiKey(),
     ]),
+
+  // ─── Completed Projects ────────────────────────────────────────────────────
+  // Tracks which projects have been marked as completed by the team.
+  // Replaces the previous localStorage-only approach so completions sync
+  // across all devices in real time.
+
+  CompletedProject: a
+    .model({
+      // Stable identifier — maps to project_uuid in projects_v2.csv
+      propertyId: a.string().required(),
+      // ISO timestamp of when the project was marked complete
+      completedAt: a.datetime(),
+      // Who marked it complete (Cognito sub or display name when available)
+      completedBy: a.string(),
+    })
+    .authorization((allow) => [
+      allow.authenticated("identityPool"),
+      allow.guest(),
+      allow.publicApiKey(),
+    ]),
 });
 
 export type Schema = ClientSchema<typeof schema>;
