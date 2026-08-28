@@ -198,12 +198,12 @@ export default function LoginPage() {
       >
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
           <label htmlFor="login-username" className="muted" style={{ fontSize: '0.875rem' }}>
-            Username
+            Email
           </label>
           <input
             id="login-username"
-            type="text"
-            autoComplete="username"
+            type="email"
+            autoComplete="email"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
             required
