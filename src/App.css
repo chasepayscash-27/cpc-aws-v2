@@ -233,6 +233,9 @@ body {
   box-shadow: var(--shadow-sm);
   transition: all 0.25s ease;
   overflow-x: hidden;
+  /* Ensure the sidebar remains above any fixed modal overlays so nav links
+     stay reachable while a project-details modal is open. */
+  z-index: 1010;
 }
 .sidebar.collapsed {
   padding: 10px 6px;
