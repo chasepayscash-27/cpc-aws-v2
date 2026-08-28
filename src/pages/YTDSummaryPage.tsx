@@ -6,7 +6,7 @@ import { isArchivedStage } from '../utils/pipelineStatus';
 import ProjectUploadModal from '../components/ProjectUploadModal';
 import { saveCustomProjects, loadCustomProjects } from '../utils/customProjects';
 import { archiveProject, getArchivedProjectUuidSet, ARCHIVED_PROJECTS_STORAGE_KEY, ARCHIVE_CHANGE_EVENT } from '../utils/archivedProjects';
-import { markProjectCompleted, getCompletedProjectUuidSet, COMPLETED_PROJECTS_STORAGE_KEY, COMPLETED_CHANGE_EVENT } from '../utils/completedProjects';
+import { useCompletedProjects } from '../contexts/CompletedProjectContext';
 import '../App.css';
 
 const ProjectDetailsModal = lazy(() => import('../components/ProjectDetailsModal'));
@@ -30,6 +30,7 @@ function parsePercent(value: string): number {
 }
 
 export default function YTDSummaryPage() {
+  const { completedIds, markCompleted } = useCompletedProjects();
   const [data, setData] = useState<YTDRow | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -61,20 +62,19 @@ export default function YTDSummaryPage() {
   }
 
   function handleMarkCompleted(project: ProjectRow) {
-    markProjectCompleted(project);
+    void markCompleted(project);
     setProjectRows((prev) => prev.filter((r) => r.project_uuid !== project.project_uuid));
   }
 
   function buildActiveRows(csvRows: ProjectRow[]): ProjectRow[] {
     const archivedProjectUuids = getArchivedProjectUuidSet();
-    const completedProjectUuids = getCompletedProjectUuidSet();
     return csvRows.filter(
       (r) =>
         !r.archived_at &&
         !r.completed_at &&
         !isArchivedStage(r.stage) &&
         (!r.project_uuid || !archivedProjectUuids.has(r.project_uuid)) &&
-        (!r.project_uuid || !completedProjectUuids.has(r.project_uuid))
+        (!r.project_uuid || !completedIds.has(r.project_uuid))
     );
   }
 
@@ -105,6 +105,7 @@ export default function YTDSummaryPage() {
 
   // Re-derive active rows when a project is returned to the pipeline from
   // the Archived Projects page (which updates localStorage in the same tab).
+  // Completed project changes are handled reactively via completedIds from context.
   useEffect(() => {
     function handleArchiveChange() {
       setProjectRows(buildActiveRows(allCsvRows));
@@ -112,20 +113,26 @@ export default function YTDSummaryPage() {
     // ARCHIVE_CHANGE_EVENT covers same-tab changes (e.g. navigating back from
     // ArchivedProjectsPage after clicking "Return To Pipeline").
     window.addEventListener(ARCHIVE_CHANGE_EVENT, handleArchiveChange);
-    window.addEventListener(COMPLETED_CHANGE_EVENT, handleArchiveChange);
     // The native storage event covers cross-tab changes.
     function handleStorageChange(e: StorageEvent) {
-      if (e.key === ARCHIVED_PROJECTS_STORAGE_KEY || e.key === COMPLETED_PROJECTS_STORAGE_KEY) {
+      if (e.key === ARCHIVED_PROJECTS_STORAGE_KEY) {
         setProjectRows(buildActiveRows(allCsvRows));
       }
     }
     window.addEventListener('storage', handleStorageChange);
     return () => {
       window.removeEventListener(ARCHIVE_CHANGE_EVENT, handleArchiveChange);
-      window.removeEventListener(COMPLETED_CHANGE_EVENT, handleArchiveChange);
       window.removeEventListener('storage', handleStorageChange);
     };
   }, [allCsvRows]);
+
+  // Re-derive active rows when completed project set changes (cross-device sync via Amplify).
+  useEffect(() => {
+    if (allCsvRows.length > 0) {
+      setProjectRows(buildActiveRows(allCsvRows));
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [completedIds]);
 
   if (loading) {
     return (

@@ -1,9 +1,6 @@
 import { CSSProperties, useState } from "react";
 import type { ProjectRow } from "../types/project";
-import {
-  loadCompletedProjects,
-  saveCompletedProjects,
-} from "../utils/completedProjects";
+import { useCompletedProjects } from "../contexts/CompletedProjectContext";
 import { getPipelineStatusColor, getPipelineStatusLabel } from "../utils/pipelineStatus";
 import PropertyMainImage from "../components/PropertyMainImage";
 import ProjectDetailsModal from "../components/ProjectDetailsModal";
@@ -22,17 +19,21 @@ function formatDate(iso?: string): string {
 }
 
 export default function CompletedProjectsPage() {
-  const [completed, setCompleted] = useState<ProjectRow[]>(() =>
-    loadCompletedProjects()
-  );
+  const { completedRecords, unmarkCompleted, isLoading } = useCompletedProjects();
   const [selectedProject, setSelectedProject] = useState<ProjectRow | null>(null);
 
+  // Build display-ready ProjectRow objects from the Amplify records.
+  // The CompletedProject model stores only propertyId and completedAt; we use
+  // those fields to create minimal ProjectRow objects for display purposes.
+  const completed: ProjectRow[] = completedRecords.map((r) => ({
+    project_uuid: r.propertyId,
+    completed_at: r.completedAt ?? undefined,
+  }));
+
   function handleUncomplete(project: ProjectRow) {
-    setCompleted((prev) => {
-      const next = prev.filter((r) => r.project_uuid !== project.project_uuid);
-      saveCompletedProjects(next);
-      return next;
-    });
+    if (project.project_uuid) {
+      void unmarkCompleted(project.project_uuid);
+    }
   }
 
   const gridStyle: CSSProperties = {
@@ -69,7 +70,12 @@ export default function CompletedProjectsPage() {
       </div>
 
       <div className="card" style={{ padding: 16, overflow: "hidden" }}>
-        {completed.length === 0 && (
+        {isLoading && (
+          <div style={{ padding: 40, textAlign: "center", color: "var(--muted)" }}>
+            Loading completed projects…
+          </div>
+        )}
+        {!isLoading && completed.length === 0 && (
           <div style={{ padding: 40, textAlign: "center", color: "var(--muted)" }}>
             No completed projects yet.
           </div>

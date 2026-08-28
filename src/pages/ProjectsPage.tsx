@@ -7,7 +7,7 @@ import { isArchivedStage } from "../utils/pipelineStatus";
 import ProjectUploadModal from "../components/ProjectUploadModal";
 import { loadCustomProjects, saveCustomProjects } from "../utils/customProjects";
 import { archiveProject, getArchivedProjectUuidSet, ARCHIVED_PROJECTS_STORAGE_KEY, ARCHIVE_CHANGE_EVENT } from "../utils/archivedProjects";
-import { markProjectCompleted, getCompletedProjectUuidSet, COMPLETED_PROJECTS_STORAGE_KEY, COMPLETED_CHANGE_EVENT } from "../utils/completedProjects";
+import { useCompletedProjects } from "../contexts/CompletedProjectContext";
 
 type ViewMode = "table" | "gallery";
 
@@ -30,6 +30,7 @@ function formatLabel(value: string): string {
 }
 
 export default function ProjectsPage({ onViewFullPnL }: Props) {
+  const { completedIds, markCompleted } = useCompletedProjects();
   const [csvRows, setCsvRows] = useState<ProjectRow[]>([]);
   const [customRows, setCustomRows] = useState<ProjectRow[]>([]);
   const [loading, setLoading] = useState(true);
@@ -50,7 +51,6 @@ export default function ProjectsPage({ onViewFullPnL }: Props) {
         setLoading(true);
         const data = await loadCsv<ProjectRow>("/data/projects_v2.csv");
         const archivedProjectUuids = getArchivedProjectUuidSet();
-        const completedProjectUuids = getCompletedProjectUuidSet();
         // Exclude archived and completed projects; they should not appear in any active view.
         setCsvRows(
           data.filter(
@@ -59,7 +59,7 @@ export default function ProjectsPage({ onViewFullPnL }: Props) {
               !r.completed_at &&
               !isArchivedStage(r.stage) &&
               (!r.project_uuid || !archivedProjectUuids.has(r.project_uuid)) &&
-              (!r.project_uuid || !completedProjectUuids.has(r.project_uuid))
+              (!r.project_uuid || !completedIds.has(r.project_uuid))
           )
         );
         setCustomRows(
@@ -69,7 +69,7 @@ export default function ProjectsPage({ onViewFullPnL }: Props) {
               !r.completed_at &&
               !isArchivedStage(r.stage) &&
               (!r.project_uuid || !archivedProjectUuids.has(r.project_uuid)) &&
-              (!r.project_uuid || !completedProjectUuids.has(r.project_uuid))
+              (!r.project_uuid || !completedIds.has(r.project_uuid))
           )
         );
       } catch (err) {
@@ -80,25 +80,23 @@ export default function ProjectsPage({ onViewFullPnL }: Props) {
     }
 
     fetchData();
-  }, [archiveVersion]);
+  }, [archiveVersion, completedIds]);
 
-  // Listen for same-tab and cross-tab archive/completed changes so the list stays
+  // Listen for same-tab and cross-tab archive changes so the list stays
   // current without requiring a page reload.
   useEffect(() => {
     function handleArchiveChange() {
       setArchiveVersion((v) => v + 1);
     }
     window.addEventListener(ARCHIVE_CHANGE_EVENT, handleArchiveChange);
-    window.addEventListener(COMPLETED_CHANGE_EVENT, handleArchiveChange);
     function handleStorageChange(e: StorageEvent) {
-      if (e.key === ARCHIVED_PROJECTS_STORAGE_KEY || e.key === COMPLETED_PROJECTS_STORAGE_KEY) {
+      if (e.key === ARCHIVED_PROJECTS_STORAGE_KEY) {
         setArchiveVersion((v) => v + 1);
       }
     }
     window.addEventListener("storage", handleStorageChange);
     return () => {
       window.removeEventListener(ARCHIVE_CHANGE_EVENT, handleArchiveChange);
-      window.removeEventListener(COMPLETED_CHANGE_EVENT, handleArchiveChange);
       window.removeEventListener("storage", handleStorageChange);
     };
   }, []);
@@ -202,7 +200,7 @@ export default function ProjectsPage({ onViewFullPnL }: Props) {
   }
 
   function handleMarkCompleted(project: ProjectRow) {
-    markProjectCompleted(project);
+    void markCompleted(project);
     // Remove from current view
     if (project.custom_project) {
       setCustomRows((prev) => {

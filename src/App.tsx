@@ -3,6 +3,7 @@ import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import Navigation from './components/Navigation';
 import { PropertyTasksProvider } from './contexts/PropertyTasksContext';
 import { StageOverrideProvider } from './contexts/StageOverrideContext';
+import { CompletedProjectProvider } from './contexts/CompletedProjectContext';
 import { useAuth } from './contexts/AuthContext';
 import logo from './assets/logo.png';
 import './App.css';
@@ -123,6 +124,7 @@ const App = () => {
         <Navigation collapsed={!sidebarOpen} />
         <main className="content">
           <StageOverrideProvider>
+          <CompletedProjectProvider>
           <PropertyTasksProvider>
           <Suspense fallback={<div className="pageHeader" role="status" aria-live="polite"><p className="muted">Loading…</p></div>}>
               <Routes>
@@ -155,6 +157,7 @@ const App = () => {
               </Routes>
           </Suspense>
           </PropertyTasksProvider>
+          </CompletedProjectProvider>
           </StageOverrideProvider>
         </main>
       </div>
