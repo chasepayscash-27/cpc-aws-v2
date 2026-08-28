@@ -26,6 +26,10 @@ frontend:
     baseDirectory: dist
     files:
       - '**/*'
+  redirects:
+    - source: </^[^.]+$|\.(?!(css|gif|ico|jpg|jpeg|js|json|png|svg|txt|webp|woff|woff2)$)([^.]+$)/>
+      target: /index.html
+      status: '200'
   cache:
     paths:
       - .npm/**/*

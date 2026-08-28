@@ -1,5 +1,5 @@
 import React from 'react';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useNavigate, useLocation } from 'react-router-dom';
 import {
   Home,
   HardHat,
@@ -85,6 +85,19 @@ interface NavigationProps {
 }
 
 const Navigation: React.FC<NavigationProps> = ({ collapsed = false }) => {
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  function handleNavClick(e: React.MouseEvent<HTMLAnchorElement>, path: string) {
+    if (path === '/' && location.pathname === '/') {
+      e.preventDefault();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } else if (path === '/') {
+      e.preventDefault();
+      navigate('/');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }
   return (
     <nav className={`sidebar${collapsed ? ' collapsed' : ''}`}>
       {navGroups.map((group) => (
@@ -98,6 +111,7 @@ const Navigation: React.FC<NavigationProps> = ({ collapsed = false }) => {
               className={({ isActive }) => `navItem${isActive ? ' active' : ''}`}
               style={{ textDecoration: 'none', display: 'block' }}
               title={item.label}
+              onClick={item.path === '/' ? (e) => handleNavClick(e, item.path) : undefined}
             >
               <span className="navItemIcon"><item.Icon size={16} strokeWidth={2} /></span>
               {!collapsed && <span className="navItemLabel">{item.label}</span>}

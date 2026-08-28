@@ -1,5 +1,5 @@
 import { lazy, Suspense, useState, useEffect } from 'react';
-import { Routes, Route, Navigate, Link } from 'react-router-dom';
+import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import Navigation from './components/Navigation';
 import { PropertyTasksProvider } from './contexts/PropertyTasksContext';
 import { StageOverrideProvider } from './contexts/StageOverrideContext';
@@ -49,6 +49,13 @@ const App = () => {
   }
 
   const { isAuthenticated, logout, user } = useAuth();
+  const navigate = useNavigate();
+
+  function handleHomeClick() {
+    navigate('/');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    if (window.innerWidth <= 768) setSidebarOpen(false);
+  }
 
   return (
     <div className="appShell">
@@ -71,14 +78,14 @@ const App = () => {
             {sidebarOpen ? '◀' : '▶'}
           </button>
           <div className="brand">
-            <Link
-              to="/"
+            <a
+              href="/"
               className="brandHomeLink"
               aria-label="Go to home"
               title="Go to home"
-              onClick={() => {
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-                if (window.innerWidth <= 768) setSidebarOpen(false);
+              onClick={(e) => {
+                e.preventDefault();
+                handleHomeClick();
               }}
             >
               <div className="brandMark">
@@ -88,7 +95,7 @@ const App = () => {
                 <div className="brandTitle">Chase Pays Cash</div>
                 <div className="brandSub">Analytics Dashboard</div>
               </div>
-            </Link>
+            </a>
           </div>
         </div>
         <div className="topbarActions">
