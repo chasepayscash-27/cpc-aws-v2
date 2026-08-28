@@ -1,9 +1,11 @@
-import { CSSProperties, useState } from "react";
+import { CSSProperties, useEffect, useMemo, useState } from "react";
 import type { ProjectRow } from "../types/project";
 import { useCompletedProjects } from "../contexts/CompletedProjectContext";
 import { getPipelineStatusColor, getPipelineStatusLabel } from "../utils/pipelineStatus";
 import PropertyMainImage from "../components/PropertyMainImage";
 import ProjectDetailsModal from "../components/ProjectDetailsModal";
+import { loadCsv } from "../utils/csv";
+import { loadCustomProjects } from "../utils/customProjects";
 
 function formatDate(iso?: string): string {
   if (!iso) return "—";
@@ -21,14 +23,41 @@ function formatDate(iso?: string): string {
 export default function CompletedProjectsPage() {
   const { completedRecords, unmarkCompleted, isLoading } = useCompletedProjects();
   const [selectedProject, setSelectedProject] = useState<ProjectRow | null>(null);
+  const [allProjects, setAllProjects] = useState<ProjectRow[]>([]);
 
-  // Build display-ready ProjectRow objects from the Amplify records.
-  // The CompletedProject model stores only propertyId and completedAt; we use
-  // those fields to create minimal ProjectRow objects for display purposes.
-  const completed: ProjectRow[] = completedRecords.map((r) => ({
-    project_uuid: r.propertyId,
-    completed_at: r.completedAt ?? undefined,
-  }));
+  // Load all project data so we can enrich the completed records with full details.
+  useEffect(() => {
+    async function loadAll() {
+      try {
+        const csvRows = await loadCsv<ProjectRow>("/data/projects_v2.csv");
+        const customRows = loadCustomProjects();
+        setAllProjects([...csvRows, ...customRows]);
+      } catch {
+        // If CSV fails, custom projects are still available.
+        setAllProjects(loadCustomProjects());
+      }
+    }
+    void loadAll();
+  }, []);
+
+  // Build a lookup map from project_uuid → full ProjectRow.
+  const projectMap = useMemo(() => {
+    const map = new Map<string, ProjectRow>();
+    for (const p of allProjects) {
+      if (p.project_uuid) map.set(p.project_uuid, p);
+    }
+    return map;
+  }, [allProjects]);
+
+  // Merge Amplify completed records with full project data.
+  const completed: ProjectRow[] = completedRecords.map((r) => {
+    const full = r.propertyId ? projectMap.get(r.propertyId) : undefined;
+    return {
+      ...(full ?? {}),
+      project_uuid: r.propertyId,
+      completed_at: r.completedAt ?? undefined,
+    };
+  });
 
   function handleUncomplete(project: ProjectRow) {
     if (project.project_uuid) {
