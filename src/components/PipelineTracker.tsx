@@ -509,11 +509,13 @@ export default function PipelineTracker({ rows, onProjectClick, onArchive, onMar
                         >
                           {label}
                         </span>
-                        <ProgressStatusBadge
-                          percent={percent}
-                          propertyName={label}
-                          loading={tasksLoading && !progress}
-                        />
+                        {stage !== 'active_listing' && stage !== 'under_contract' && (
+                          <ProgressStatusBadge
+                            percent={percent}
+                            propertyName={label}
+                            loading={tasksLoading && !progress}
+                          />
+                        )}
                       </div>
                       {sub && (
                         <div
