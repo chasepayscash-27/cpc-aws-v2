@@ -1,44 +1,35 @@
 /**
- * AuthContext — provides current Cognito authentication state to the app.
+ * AuthContext — lightweight env-var password authentication.
  *
- * Uses `aws-amplify/auth` to:
- *  - Fetch the current authenticated user on mount.
- *  - Expose `login(username, password)` (native Cognito sign-in) and `logout()`.
- *  - Keep `user`, `isAuthenticated`, and `isLoading` in sync.
+ * The app password is set via the VITE_APP_PASSWORD environment variable on
+ * the hosting platform (e.g. AWS Amplify Console → Environment variables).
+ * The entered password is compared directly; a flag is persisted in
+ * sessionStorage so a page refresh keeps the user logged in for the session.
+ *
+ * ⚠️  This is a simple stopgap — no per-user accounts, no tokens.
+ *     Replace with a proper auth provider (Cognito, Clerk, etc.) when ready.
  */
 
 import {
   createContext,
   useCallback,
   useContext,
-  useEffect,
   useState,
   type ReactNode,
 } from 'react';
-import {
-  fetchAuthSession,
-  getCurrentUser,
-  signIn,
-  signOut,
-  confirmSignIn,
-  type AuthUser,
-} from 'aws-amplify/auth';
-import { Hub } from 'aws-amplify/utils';
+
+const SESSION_KEY = 'cpc_auth_session';
 
 interface AuthContextValue {
-  /** The currently authenticated Cognito user, or null if unauthenticated. */
-  user: AuthUser | null;
-  /** True while the initial auth check (or token exchange) is in progress. */
+  /** Stub user object — username is always "user" when authenticated. */
+  user: { username: string } | null;
+  /** True while the initial session check is in progress. */
   isLoading: boolean;
-  /** True once the initial check is complete and a valid session was found. */
+  /** True once a valid session is found. */
   isAuthenticated: boolean;
-  /** True when Cognito requires a new password to be set before continuing. */
-  requiresNewPassword: boolean;
-  /** Sign in with Cognito username and password. Throws on failure. */
+  /** Checks the provided password against VITE_APP_PASSWORD. Throws on mismatch. */
   login: (username: string, password: string) => Promise<void>;
-  /** Completes the NEW_PASSWORD_REQUIRED challenge. Throws on failure. */
-  completeNewPassword: (newPassword: string) => Promise<void>;
-  /** Signs the user out of Amplify. */
+  /** Clears the session. */
   logout: () => Promise<void>;
 }
 
@@ -46,87 +37,46 @@ const AuthContext = createContext<AuthContextValue>({
   user: null,
   isLoading: true,
   isAuthenticated: false,
-  requiresNewPassword: false,
   login: async () => undefined,
-  completeNewPassword: async () => undefined,
   logout: async () => undefined,
 });
 
-/** Checks whether there is a valid Cognito session and returns the user if so. */
-async function resolveCurrentUser(): Promise<AuthUser | null> {
-  try {
-    const session = await fetchAuthSession({ forceRefresh: false });
-    if (!session.tokens?.accessToken) return null;
-    return await getCurrentUser();
-  } catch {
-    return null;
-  }
-}
-
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<AuthUser | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [requiresNewPassword, setRequiresNewPassword] = useState(false);
-
-  const refresh = useCallback(async () => {
-    setIsLoading(true);
-    const resolved = await resolveCurrentUser();
-    setUser(resolved);
-    setIsLoading(false);
-  }, []);
-
-  // Resolve session on mount.
-  useEffect(() => {
-    refresh();
-  }, [refresh]);
-
-  // Keep session state in sync when Amplify Hub fires auth events
-  // (e.g. after the Hosted UI callback exchange completes).
-  useEffect(() => {
-    const unsubscribe = Hub.listen('auth', ({ payload }) => {
-      const { event } = payload;
-      if (
-        event === 'signedIn' ||
-        event === 'tokenRefresh'
-      ) {
-        refresh();
-      }
-      if (event === 'signedOut') {
-        setUser(null);
-        setIsLoading(false);
-      }
-    });
-    return unsubscribe;
-  }, [refresh]);
+  const [user, setUser] = useState<{ username: string } | null>(() => {
+    try {
+      const stored = sessionStorage.getItem(SESSION_KEY);
+      if (stored) return JSON.parse(stored) as { username: string };
+    } catch {
+      // ignore
+    }
+    return null;
+  });
+  const [isLoading] = useState(false);
 
   const login = useCallback(async (username: string, password: string) => {
-    try {
-      const result = await signIn({ username, password });
-      if (result.nextStep?.signInStep === 'CONFIRM_SIGN_IN_WITH_NEW_PASSWORD_REQUIRED') {
-        setRequiresNewPassword(true);
-        return;
-      }
-      setRequiresNewPassword(false);
-      await refresh();
-    } catch (err) {
-      console.error('[auth] signIn failed', err);
-      throw err;
+    const appPassword = import.meta.env.VITE_APP_PASSWORD as string | undefined;
+    if (!appPassword) {
+      throw new Error('App password is not configured. Set VITE_APP_PASSWORD in your environment variables.');
     }
-  }, [refresh]);
-
-  const completeNewPassword = useCallback(async (newPassword: string) => {
-    try {
-      await confirmSignIn({ challengeResponse: newPassword });
-      setRequiresNewPassword(false);
-      await refresh();
-    } catch (err) {
-      console.error('[auth] confirmSignIn failed', err);
-      throw err;
+    if (password !== appPassword) {
+      throw new Error('Incorrect password. Please try again.');
     }
-  }, [refresh]);
+    const sessionUser = { username: username || 'user' };
+    try {
+      sessionStorage.setItem(SESSION_KEY, JSON.stringify(sessionUser));
+    } catch {
+      // ignore
+    }
+    setUser(sessionUser);
+  }, []);
 
   const logout = useCallback(async () => {
-    await signOut({ global: true });
+    try {
+      sessionStorage.removeItem(SESSION_KEY);
+    } catch {
+      // ignore
+    }
+    setUser(null);
   }, []);
 
   return (
@@ -135,9 +85,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         user,
         isLoading,
         isAuthenticated: user !== null,
-        requiresNewPassword,
         login,
-        completeNewPassword,
         logout,
       }}
     >
