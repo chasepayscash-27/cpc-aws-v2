@@ -4,6 +4,8 @@ import type { CustomProjectAttachment, ProjectRow } from "../types/project";
 import type { PhotoLogRow } from "../types/photoLog";
 import { loadCsv } from "../utils/csv";
 import { normalizePipelineStatus } from "../utils/pipelineStatus";
+import { useStageOverrides } from "../contexts/StageOverrideContext";
+import { effectiveStage } from "../utils/stageOverride";
 import PropertyFinancials from "./PropertyFinancials";
 import PropertyWorksheet from "./PropertyWorksheet";
 import PropertyWorkflow from "./PropertyWorkflow";
@@ -60,6 +62,8 @@ function DetailRow({ label, value }: { label: string; value?: string | null }) {
 const COST_LABELS = ["Labor", "Materials", "3rd Party"] as const;
 
 export default function ProjectDetailsModal({ project: row, onClose, onViewFullPnL, onEditCustomProject }: Props) {
+  const { overrides } = useStageOverrides();
+  const displayStage = effectiveStage(row, overrides) ?? row.stage;
   const [photos, setPhotos] = useState<PhotoLogRow[]>([]);
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
   const [showPhotoGrid, setShowPhotoGrid] = useState(false);
@@ -229,7 +233,7 @@ export default function ProjectDetailsModal({ project: row, onClose, onViewFullP
 
   // Hide workflow sections once a property reaches Active Listing or Under Contract.
   // The data is preserved on the backend; it is only hidden in the UI.
-  const normalizedStage = normalizePipelineStatus(row.stage);
+  const normalizedStage = normalizePipelineStatus(displayStage);
   const showWorkflows = normalizedStage !== "active listing" && normalizedStage !== "under contract";
 
   return createPortal(
@@ -338,11 +342,11 @@ export default function ProjectDetailsModal({ project: row, onClose, onViewFullP
             </div>
 
             {/* Badges */}
-            {(row.stage || row.investment_strategy) && (
+            {(displayStage || row.investment_strategy) && (
               <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 16 }}>
-                {row.stage && (
-                  <span style={badgeStyle(row.stage, STAGE_COLORS)}>
-                    {row.stage.replace(/_/g, " ")}
+                {displayStage && (
+                  <span style={badgeStyle(displayStage, STAGE_COLORS)}>
+                    {displayStage.replace(/_/g, " ")}
                   </span>
                 )}
                 {row.investment_strategy && (
@@ -448,12 +452,12 @@ export default function ProjectDetailsModal({ project: row, onClose, onViewFullP
 
                 <section style={{ background: "var(--panel2)", border: "1px solid var(--border)", borderRadius: 12, padding: 12 }}>
                   <div style={sectionLabelStyle}>Construction Workflow</div>
-                  <ConstructionWorkflowTemplate key={`${propertyId}-construction`} propertyId={propertyId} propertyName={row.name} projectStage={row.stage} />
+                  <ConstructionWorkflowTemplate key={`${propertyId}-construction`} propertyId={propertyId} propertyName={row.name} projectStage={displayStage} />
                 </section>
 
                 <section style={{ background: "var(--panel2)", border: "1px solid var(--border)", borderRadius: 12, padding: 12 }}>
                   <div style={sectionLabelStyle}>Checklist Workflow</div>
-                  <ChecklistWorkflowTemplate key={`${propertyId}-checklist`} propertyId={propertyId} propertyName={row.name} projectStage={row.stage} />
+                  <ChecklistWorkflowTemplate key={`${propertyId}-checklist`} propertyId={propertyId} propertyName={row.name} projectStage={displayStage} />
                 </section>
               </div>
             </div>
