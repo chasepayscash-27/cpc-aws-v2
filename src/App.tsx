@@ -71,7 +71,16 @@ const App = () => {
             {sidebarOpen ? '◀' : '▶'}
           </button>
           <div className="brand">
-            <Link to="/" className="brandHomeLink" aria-label="Go to home" title="Go to home">
+            <Link
+              to="/"
+              className="brandHomeLink"
+              aria-label="Go to home"
+              title="Go to home"
+              onClick={() => {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                if (window.innerWidth <= 768) setSidebarOpen(false);
+              }}
+            >
               <div className="brandMark">
                 <img src={logo} alt="Chase Pays Cash logo" className="brandLogo" />
               </div>
