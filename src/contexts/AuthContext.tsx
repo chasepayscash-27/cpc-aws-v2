@@ -3,7 +3,7 @@
  *
  * Uses `aws-amplify/auth` to:
  *  - Fetch the current authenticated user on mount.
- *  - Expose `login()` (redirect to Hosted UI) and `logout()` (Cognito logout).
+ *  - Expose `login(username, password)` (native Cognito sign-in) and `logout()`.
  *  - Keep `user`, `isAuthenticated`, and `isLoading` in sync.
  */
 
@@ -18,7 +18,7 @@ import {
 import {
   fetchAuthSession,
   getCurrentUser,
-  signInWithRedirect,
+  signIn,
   signOut,
   type AuthUser,
 } from 'aws-amplify/auth';
@@ -31,9 +31,9 @@ interface AuthContextValue {
   isLoading: boolean;
   /** True once the initial check is complete and a valid session was found. */
   isAuthenticated: boolean;
-  /** Redirects the browser to the Cognito Hosted UI sign-in page. */
-  login: () => Promise<void>;
-  /** Signs the user out of Amplify and redirects to the Cognito logout endpoint. */
+  /** Sign in with Cognito username and password. Throws on failure. */
+  login: (username: string, password: string) => Promise<void>;
+  /** Signs the user out of Amplify. */
   logout: () => Promise<void>;
 }
 
@@ -79,8 +79,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const { event } = payload;
       if (
         event === 'signedIn' ||
-        event === 'tokenRefresh' ||
-        event === 'signInWithRedirect'
+        event === 'tokenRefresh'
       ) {
         refresh();
       }
@@ -92,14 +91,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return unsubscribe;
   }, [refresh]);
 
-  const login = useCallback(async () => {
+  const login = useCallback(async (username: string, password: string) => {
     try {
-      await signInWithRedirect();
+      await signIn({ username, password });
+      await refresh();
     } catch (err) {
-      console.error('[auth] signInWithRedirect failed', err);
+      console.error('[auth] signIn failed', err);
       throw err;
     }
-  }, []);
+  }, [refresh]);
 
   const logout = useCallback(async () => {
     await signOut({ global: true });

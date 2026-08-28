@@ -4,7 +4,6 @@ import { BrowserRouter } from "react-router-dom";
 import { Amplify } from "aws-amplify";
 import { AuthProvider } from "./contexts/AuthContext";
 import { buildAmplifyConfig } from "./config/amplify";
-import { getCognitoConfig } from "./config/cognito";
 import App from "./App";
 import "leaflet/dist/leaflet.css";
 
@@ -19,23 +18,6 @@ const envOverrides = {
 };
 
 let amplifyConfig = buildAmplifyConfig(envOverrides);
-
-// Configure Cognito Hosted UI (OAuth / Authorization Code + PKCE) when the
-// required env vars are present.  If they are missing (e.g. during initial
-// setup or unit tests) Amplify still initialises with the base outputs — auth
-// features will be unavailable until the vars are set.
-try {
-  amplifyConfig = buildAmplifyConfig({
-    ...envOverrides,
-    cognitoConfig: getCognitoConfig(),
-  });
-} catch (err) {
-  console.warn(
-    "[main] Cognito Hosted UI env vars not set — auth will be limited. " +
-    "Copy .env.example to .env.local and fill in the VITE_COGNITO_* values.",
-    err,
-  );
-}
 
 Amplify.configure(amplifyConfig);
 
