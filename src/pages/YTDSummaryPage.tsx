@@ -2,7 +2,7 @@ import { lazy, Suspense, useEffect, useState } from 'react';
 import { loadCsv } from '../utils/csv';
 import type { ProjectRow } from '../types/project';
 import PipelineTracker from '../components/PipelineTracker';
-import { isArchivedStage } from '../utils/pipelineStatus';
+import { isArchivedStage, normalizePipelineStatus } from '../utils/pipelineStatus';
 import ProjectUploadModal from '../components/ProjectUploadModal';
 import { saveCustomProjects, loadCustomProjects } from '../utils/customProjects';
 import { archiveProject, getArchivedProjectUuidSet, ARCHIVED_PROJECTS_STORAGE_KEY, ARCHIVE_CHANGE_EVENT } from '../utils/archivedProjects';
@@ -73,6 +73,7 @@ export default function YTDSummaryPage() {
         !r.archived_at &&
         !r.completed_at &&
         !isArchivedStage(r.stage) &&
+        normalizePipelineStatus(r.stage) !== 'completed portfolio' &&
         (!r.project_uuid || !archivedProjectUuids.has(r.project_uuid)) &&
         (!r.project_uuid || !completedIds.has(r.project_uuid))
     );
