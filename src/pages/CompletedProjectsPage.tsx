@@ -1,7 +1,7 @@
 import { CSSProperties, useEffect, useMemo, useState } from "react";
 import type { ProjectRow } from "../types/project";
 import { useCompletedProjects } from "../contexts/CompletedProjectContext";
-import { getPipelineStatusColor, getPipelineStatusLabel } from "../utils/pipelineStatus";
+import { getPipelineStatusColor, getPipelineStatusLabel, normalizePipelineStatus } from "../utils/pipelineStatus";
 import PropertyMainImage from "../components/PropertyMainImage";
 import ProjectDetailsModal from "../components/ProjectDetailsModal";
 import { loadCsv } from "../utils/csv";
@@ -59,6 +59,16 @@ export default function CompletedProjectsPage() {
     };
   });
 
+  // Also include CSV rows with completed_portfolio stage that are not already
+  // represented in the DynamoDB completed records above.
+  const completedUuids = new Set(completedRecords.map((r) => r.propertyId).filter(Boolean));
+  const csvCompletedPortfolio: ProjectRow[] = allProjects.filter(
+    (p) =>
+      normalizePipelineStatus(p.stage) === 'completed portfolio' &&
+      (!p.project_uuid || !completedUuids.has(p.project_uuid))
+  );
+  const allCompleted = [...completed, ...csvCompletedPortfolio];
+
   function handleUncomplete(project: ProjectRow) {
     if (project.project_uuid) {
       void unmarkCompleted(project.project_uuid);
@@ -104,12 +114,12 @@ export default function CompletedProjectsPage() {
             Loading completed projects…
           </div>
         )}
-        {!isLoading && completed.length === 0 && (
+        {!isLoading && allCompleted.length === 0 && (
           <div style={{ padding: 40, textAlign: "center", color: "var(--muted)" }}>
             No completed projects yet.
           </div>
         )}
-        {completed.length > 0 && (
+        {allCompleted.length > 0 && (
           <>
             <div
               style={{
@@ -118,10 +128,10 @@ export default function CompletedProjectsPage() {
                 color: "var(--muted)",
               }}
             >
-              {completed.length} completed project{completed.length !== 1 ? "s" : ""}
+              {allCompleted.length} completed project{allCompleted.length !== 1 ? "s" : ""}
             </div>
             <div style={gridStyle}>
-              {completed.map((row, i) => {
+              {allCompleted.map((row, i) => {
                 const statusColor = getPipelineStatusColor(row.stage);
                 const statusLabel = getPipelineStatusLabel(row.stage);
 
@@ -260,8 +270,8 @@ export default function CompletedProjectsPage() {
                         Completed {formatDate(row.completed_at)}
                       </div>
 
-                      {/* Restore button */}
-                      <button
+                      {/* Restore button — only for DynamoDB-marked completed projects */}
+                      {completedUuids.has(row.project_uuid ?? '') && <button
                         onClick={(e) => {
                           e.stopPropagation();
                           handleUncomplete(row);
@@ -305,7 +315,7 @@ export default function CompletedProjectsPage() {
                         aria-label="Restore project from completed"
                       >
                         ↩️ Restore Project
-                      </button>
+                      </button>}
                     </div>
                   </div>
                 );

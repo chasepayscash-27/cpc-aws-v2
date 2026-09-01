@@ -45,6 +45,7 @@ function toTrackerStage(rawStage?: string | null): string | null {
   const normalized = normalizePipelineStatus(rawStage);
   if (NEGOTIATION_STAGES.has(normalized)) return 'negotiation';
   if (normalized === 'planning permitting' || normalized === 'planning / permitting' || normalized === 'pending sale') return 'under_contract';
+  if (normalized === 'construction on hold' || normalized === 'on hold') return 'under_construction';
   // Convert space-separated form back to underscore form for lookup
   const underscored = normalized.replace(/\s+/g, '_');
   if (ACTIVE_STAGE_ORDER.includes(underscored)) return underscored;

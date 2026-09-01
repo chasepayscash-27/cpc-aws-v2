@@ -3,7 +3,7 @@ import { loadCsv } from "../utils/csv";
 import type { ProjectRow } from "../types/project";
 import ProjectsTable from "../components/ProjectsTable";
 import ProjectsGallery from "../components/ProjectsGallery";
-import { isArchivedStage } from "../utils/pipelineStatus";
+import { isArchivedStage, normalizePipelineStatus } from "../utils/pipelineStatus";
 import ProjectUploadModal from "../components/ProjectUploadModal";
 import { loadCustomProjects, saveCustomProjects } from "../utils/customProjects";
 import { archiveProject, getArchivedProjectUuidSet, ARCHIVED_PROJECTS_STORAGE_KEY, ARCHIVE_CHANGE_EVENT } from "../utils/archivedProjects";
@@ -58,6 +58,7 @@ export default function ProjectsPage({ onViewFullPnL }: Props) {
               !r.archived_at &&
               !r.completed_at &&
               !isArchivedStage(r.stage) &&
+              normalizePipelineStatus(r.stage) !== 'completed portfolio' &&
               (!r.project_uuid || !archivedProjectUuids.has(r.project_uuid)) &&
               (!r.project_uuid || !completedIds.has(r.project_uuid))
           )
@@ -68,6 +69,7 @@ export default function ProjectsPage({ onViewFullPnL }: Props) {
               !r.archived_at &&
               !r.completed_at &&
               !isArchivedStage(r.stage) &&
+              normalizePipelineStatus(r.stage) !== 'completed portfolio' &&
               (!r.project_uuid || !archivedProjectUuids.has(r.project_uuid)) &&
               (!r.project_uuid || !completedIds.has(r.project_uuid))
           )
