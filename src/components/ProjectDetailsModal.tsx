@@ -8,6 +8,7 @@ import { useStageOverrides } from "../contexts/StageOverrideContext";
 import { effectiveStage } from "../utils/stageOverride";
 import PropertyFinancials from "./PropertyFinancials";
 import PropertyWorksheet from "./PropertyWorksheet";
+import RepairAddendum from "./RepairAddendum";
 import PropertyWorkflow from "./PropertyWorkflow";
 import ConstructionWorkflowTemplate from "./ConstructionWorkflowTemplate";
 import ChecklistWorkflowTemplate from "./ChecklistWorkflowTemplate";
@@ -68,6 +69,8 @@ export default function ProjectDetailsModal({ project: row, onClose, onViewFullP
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
   const [showPhotoGrid, setShowPhotoGrid] = useState(false);
   const [worksheetOpen, setWorksheetOpen] = useState(false);
+  const [addendumOpen, setAddendumOpen] = useState(false);
+  const isUnderContract = displayStage === "under_contract";
   const [costSummary, setCostSummary] = useState<[number, number, number]>([0, 0, 0]);
 
   const customAttachments = useMemo<CustomProjectAttachment[]>(() => {
@@ -358,7 +361,7 @@ export default function ProjectDetailsModal({ project: row, onClose, onViewFullP
             )}
 
             {/* Worksheet toggle */}
-            <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: worksheetOpen ? 12 : 20 }}>
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: worksheetOpen || addendumOpen ? 12 : 20 }}>
               {row.custom_project === "true" && onEditCustomProject && (
                 <button
                   onClick={() => {
@@ -412,12 +415,54 @@ export default function ProjectDetailsModal({ project: row, onClose, onViewFullP
               >
                 📋 {worksheetOpen ? "Close Worksheet" : "Edit Worksheet"}
               </button>
+              {isUnderContract && (
+                <button
+                  onClick={() => setAddendumOpen((v) => !v)}
+                  style={{
+                    padding: "8px 18px",
+                    borderRadius: 12,
+                    border: "1px solid #b45309",
+                    background: addendumOpen ? "#b45309" : "var(--panel2)",
+                    color: addendumOpen ? "#0d1117" : "#b45309",
+                    fontSize: 13,
+                    fontWeight: 600,
+                    cursor: "pointer",
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: 6,
+                    transition: "background 0.15s, color 0.15s",
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!addendumOpen) {
+                      (e.currentTarget as HTMLButtonElement).style.background = "#b45309";
+                      (e.currentTarget as HTMLButtonElement).style.color = "#0d1117";
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!addendumOpen) {
+                      (e.currentTarget as HTMLButtonElement).style.background = "var(--panel2)";
+                      (e.currentTarget as HTMLButtonElement).style.color = "#b45309";
+                    }
+                  }}
+                  aria-expanded={addendumOpen}
+                  aria-label={addendumOpen ? "Close repair addendum" : "Open repair addendum"}
+                >
+                  🔧 {addendumOpen ? "Close Repair Addendum" : "Repair Addendum"}
+                </button>
+              )}
             </div>
 
             {/* Inline editable worksheet */}
             {worksheetOpen && (
               <div style={{ marginBottom: 20 }}>
                 <PropertyWorksheet row={row} />
+              </div>
+            )}
+
+            {/* Inline repair addendum (Under Contract properties only) */}
+            {addendumOpen && isUnderContract && (
+              <div style={{ marginBottom: 20 }}>
+                <RepairAddendum row={row} />
               </div>
             )}
 
