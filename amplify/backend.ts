@@ -13,6 +13,7 @@ import { auth } from "./auth/resource";
 import { data } from "./data/resource";
 import { rdsQuery } from "./functions/rds-query/resource";
 import { worksheet } from "./functions/worksheet/resource";
+import { repairAddendum } from "./functions/repair-addendum/resource";
 import { workflowAlertProcessor } from "./functions/workflow-alert-processor/resource";
 
 const backend = defineBackend({
@@ -21,6 +22,7 @@ const backend = defineBackend({
   rdsQuery,
   aiChat,
   worksheet,
+  repairAddendum,
   workflowAlertProcessor,
 });
 
@@ -119,6 +121,11 @@ const worksheetIntegration = new HttpLambdaIntegration(
   backend.worksheet.resources.lambda
 );
 
+const repairAddendumIntegration = new HttpLambdaIntegration(
+  "RepairAddendumIntegration",
+  backend.repairAddendum.resources.lambda
+);
+
 const httpApi = new HttpApi(apiStack, "HttpApi", {
   apiName: "cpcHttpApi",
 
@@ -151,6 +158,12 @@ httpApi.addRoutes({
   path: "/worksheet",
   methods: [HttpMethod.GET, HttpMethod.POST, HttpMethod.OPTIONS],
   integration: worksheetIntegration,
+});
+
+httpApi.addRoutes({
+  path: "/repair-addendum",
+  methods: [HttpMethod.GET, HttpMethod.POST, HttpMethod.OPTIONS],
+  integration: repairAddendumIntegration,
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
