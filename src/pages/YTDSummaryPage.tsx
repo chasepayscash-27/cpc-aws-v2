@@ -2,11 +2,13 @@ import { lazy, Suspense, useEffect, useState } from 'react';
 import { loadCsv } from '../utils/csv';
 import type { ProjectRow } from '../types/project';
 import PipelineTracker from '../components/PipelineTracker';
+import ProjectsTable from '../components/ProjectsTable';
 import { isArchivedStage, normalizePipelineStatus } from '../utils/pipelineStatus';
 import ProjectUploadModal from '../components/ProjectUploadModal';
 import { saveCustomProjects, loadCustomProjects } from '../utils/customProjects';
 import { archiveProject, getArchivedProjectUuidSet, ARCHIVED_PROJECTS_STORAGE_KEY, ARCHIVE_CHANGE_EVENT } from '../utils/archivedProjects';
 import { useCompletedProjects } from '../contexts/CompletedProjectContext';
+import { loadHomeViewMode, saveHomeViewMode, type HomeViewMode } from '../utils/homeViewMode';
 import '../App.css';
 
 const ProjectDetailsModal = lazy(() => import('../components/ProjectDetailsModal'));
@@ -39,6 +41,12 @@ export default function YTDSummaryPage() {
   const [stagesLoading, setStagesLoading] = useState(true);
   const [selectedProject, setSelectedProject] = useState<ProjectRow | null>(null);
   const [uploadOpen, setUploadOpen] = useState(false);
+  const [viewMode, setViewMode] = useState<HomeViewMode>(loadHomeViewMode);
+
+  function handleViewModeChange(mode: HomeViewMode) {
+    setViewMode(mode);
+    saveHomeViewMode(mode);
+  }
 
   function handleSaveProject(project: ProjectRow) {
     const prev = loadCustomProjects();
@@ -252,15 +260,57 @@ export default function YTDSummaryPage() {
         ))}
       </section>
 
-      {/* Pipeline by Stage — horizontal tracker */}
+      {/* Pipeline by Stage — toggle between the current tracker view and a table view */}
       <section style={{ margin: '0 0 14px' }}>
-        <h2 style={{ fontSize: 14, fontWeight: 700, color: 'var(--accent)', marginBottom: 10, letterSpacing: '0.04em', textTransform: 'uppercase' }}>
-          Pipeline by Stage
-        </h2>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 10, marginBottom: 10 }}>
+          <h2 style={{ fontSize: 14, fontWeight: 700, color: 'var(--accent)', margin: 0, letterSpacing: '0.04em', textTransform: 'uppercase' }}>
+            Pipeline by Stage
+          </h2>
+          <div style={{ display: 'flex', gap: 8 }} role="group" aria-label="Home view toggle">
+            <button
+              type="button"
+              aria-pressed={viewMode === 'current'}
+              style={{
+                padding: '6px 14px',
+                borderRadius: 12,
+                border: '1px solid',
+                cursor: 'pointer',
+                fontWeight: 600,
+                fontSize: 12,
+                transition: 'background 0.15s, border-color 0.15s',
+                ...(viewMode === 'current' ? homeActiveTabStyle : homeInactiveTabStyle),
+              }}
+              onClick={() => handleViewModeChange('current')}
+            >
+              ⊞ Current View
+            </button>
+            <button
+              type="button"
+              aria-pressed={viewMode === 'table'}
+              style={{
+                padding: '6px 14px',
+                borderRadius: 12,
+                border: '1px solid',
+                cursor: 'pointer',
+                fontWeight: 600,
+                fontSize: 12,
+                transition: 'background 0.15s, border-color 0.15s',
+                ...(viewMode === 'table' ? homeActiveTabStyle : homeInactiveTabStyle),
+              }}
+              onClick={() => handleViewModeChange('table')}
+            >
+              ☰ Table View
+            </button>
+          </div>
+        </div>
         {stagesLoading ? (
           <p className="muted" style={{ fontSize: 13 }}>Loading stage data…</p>
         ) : projectRows.length === 0 ? (
           <p className="muted" style={{ fontSize: 13 }}>No stage data available.</p>
+        ) : viewMode === 'table' ? (
+          <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
+            <ProjectsTable rows={projectRows} onArchive={handleArchive} onMarkCompleted={handleMarkCompleted} />
+          </div>
         ) : (
           <PipelineTracker rows={projectRows} onProjectClick={setSelectedProject} onArchive={handleArchive} onMarkCompleted={handleMarkCompleted} />
         )}
@@ -268,3 +318,15 @@ export default function YTDSummaryPage() {
     </div>
   );
 }
+
+const homeActiveTabStyle = {
+  background: 'var(--accent-dim)',
+  borderColor: 'var(--accent)',
+  color: 'var(--accent)',
+};
+
+const homeInactiveTabStyle = {
+  background: 'transparent',
+  borderColor: 'var(--border)',
+  color: 'var(--muted)',
+};
