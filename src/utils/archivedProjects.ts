@@ -23,7 +23,9 @@ export function saveArchivedProjects(rows: ProjectRow[]): void {
   // Dispatch a same-tab custom event so components that are mounted (or will
   // mount after navigation) can react immediately.  Cross-tab updates are
   // already handled via the native `window.storage` event.
-  window.dispatchEvent(new CustomEvent(ARCHIVE_CHANGE_EVENT));
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new CustomEvent(ARCHIVE_CHANGE_EVENT));
+  }
 }
 
 export function getArchivedProjectUuidSet(): Set<string> {

@@ -66,6 +66,12 @@ describe('addressesMatch', () => {
     expect(addressesMatch('424 County Road 3150', '424 Co Rd 3150')).toBe(true);
   });
 
+  it('matches 3834 County Road 11 ↔ 3834 Highway 11', () => {
+    expect(addressesMatch('3834 County Road 11', '3834 Highway 11')).toBe(true);
+    expect(addressesMatch('3834 Co Rd 11', '3834 Highway 11')).toBe(true);
+    expect(addressesMatch('3834 County Road 11', '3834 Hwy 11')).toBe(true);
+  });
+
   // ── Mtn / Mountain regression ─────────────────────────────────────────────
   it('matches 10 Anderson Mtn Dr ↔ 10 Anderson Mountain Drive (regression)', () => {
     expect(addressesMatch('10 Anderson Mtn Dr', '10 Anderson Mountain Drive')).toBe(true);

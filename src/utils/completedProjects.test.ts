@@ -9,6 +9,12 @@ import {
 } from "./completedProjects";
 import type { ProjectRow } from "../types/project";
 
+if (typeof globalThis.window === "undefined") {
+  (globalThis as unknown as Record<string, unknown>).window = {
+    dispatchEvent: () => true,
+  };
+}
+
 describe("completedProjects helpers", () => {
   const localStorageMock = {
     store: new Map<string, string>(),
