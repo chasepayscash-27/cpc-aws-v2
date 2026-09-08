@@ -96,15 +96,18 @@ function stripTrailingDirectional(normalized: string): string {
  * 1. Exact match after {@link normalizeAddress} (handles abbreviation differences).
  * 2. Compact match after {@link normalizeAddressCompact} (handles compound-word
  *    vs separated-word spellings such as "Ridgeview" vs "Ridge View").
- * 3. Match after stripping a trailing directional token from both sides
+ * 3. Match when "county road" and "highway" are interchanged
+ *    (handles "3834 County Road 11" ↔ "3834 Highway 11").
+ * 4. Match after stripping a trailing directional token from both sides
  *    (handles "505 Sunhill Road Northwest" ↔ "505 Sunhill Rd").
- * 4. Match when exactly one side ends with a street-type word that the other
+ * 5. Match when exactly one side ends with a street-type word that the other
  *    side omits (handles "150 Beaver Ridge Drive" ↔ "150 Beaver Ridge").
  *
  * @example
  * addressesMatch('5609 Ridgeview Dr', '5609 Ridge View Drive') // true
  * addressesMatch('10 Anderson Mtn Dr', '10 Anderson Mountain Drive') // true
  * addressesMatch('335 Co Rd 1130', '335 County Road 1130') // true
+ * addressesMatch('3834 County Road 11', '3834 Highway 11') // true
  * addressesMatch('505 Sunhill Road Northwest', '505 Sunhill Rd') // true
  * addressesMatch('150 Beaver Ridge Drive', '150 Beaver Ridge') // true
  * addressesMatch('123 Oak Street', '456 Oak Street') // false
@@ -119,13 +122,24 @@ export function addressesMatch(a: string, b: string): boolean {
   // Step 2: compact match (handles compound-word vs separated-word spellings)
   if (normA.replace(/\s+/g, '') === normB.replace(/\s+/g, '')) return true;
 
-  // Step 3: strip trailing directional from both sides, then compare
+  // Step 3: match when "county road" and "highway" are interchanged
+  const hwyA = normA.replace(/\bcounty road\b/g, 'highway');
+  const hwyB = normB.replace(/\bcounty road\b/g, 'highway');
+  if (hwyA === hwyB) return true;
+  if (hwyA.replace(/\s+/g, '') === hwyB.replace(/\s+/g, '')) return true;
+
+  // Step 4: strip trailing directional from both sides, then compare
   const dirA = stripTrailingDirectional(normA);
   const dirB = stripTrailingDirectional(normB);
   if (dirA === dirB) return true;
   if (dirA.replace(/\s+/g, '') === dirB.replace(/\s+/g, '')) return true;
 
-  // Step 4: when exactly one side ends with a street-type word that the other
+  const dirHwyA = stripTrailingDirectional(hwyA);
+  const dirHwyB = stripTrailingDirectional(hwyB);
+  if (dirHwyA === dirHwyB) return true;
+  if (dirHwyA.replace(/\s+/g, '') === dirHwyB.replace(/\s+/g, '')) return true;
+
+  // Step 5: when exactly one side ends with a street-type word that the other
   // omits, strip it and compare (asymmetric, to avoid false positives when
   // both sides name a street type)
   const aTokens = normA.split(' ');

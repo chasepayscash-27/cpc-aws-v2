@@ -7,6 +7,12 @@ import {
 } from "./archivedProjects";
 import type { ProjectRow } from "../types/project";
 
+if (typeof globalThis.window === "undefined") {
+  (globalThis as unknown as Record<string, unknown>).window = {
+    dispatchEvent: () => true,
+  };
+}
+
 describe("archivedProjects helpers", () => {
   const localStorageMock = {
     store: new Map<string, string>(),
