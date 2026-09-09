@@ -8,7 +8,7 @@ Creates a Cognito user account for every employee listed in
 | Field used | CSV column | Value |
 |---|---|---|
 | Username / email | `employee_email` (B) | e.g. `chase@chasepayscash.com` |
-| Temporary password | `default_password` (E) | `cpc2026` |
+| Temporary password | `default_password` (E) | `cpc2027` |
 
 Each user is created in **FORCE_CHANGE_PASSWORD** status — they must set a
 personal password on their very first login.
