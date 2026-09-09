@@ -54,7 +54,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isLoading] = useState(false);
 
   const login = useCallback(async (username: string, password: string) => {
-    const appPassword = (import.meta.env.VITE_APP_PASSWORD as string | undefined) || 'cpc2026';
+    const appPassword = (import.meta.env.VITE_APP_PASSWORD as string | undefined) || 'cpc2027';
     if (password !== appPassword) {
       throw new Error('Incorrect password. Please try again.');
     }

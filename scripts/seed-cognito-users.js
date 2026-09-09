@@ -7,7 +7,7 @@
  *
  * Each account is created with:
  *   - username  : employee_email (column B)
- *   - temp pwd  : default_password (column E, currently "cpc2026")
+ *   - temp pwd  : default_password (column E, currently "cpc2027")
  *   - status    : FORCE_CHANGE_PASSWORD  (user must set a new password on first login)
  *
  * Usage:
