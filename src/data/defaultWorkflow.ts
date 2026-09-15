@@ -88,6 +88,7 @@ export const defaultWorkflow: DefaultWorkflowTask[] = [
   { order: 72, stage: "Foundation Work", workflowType: "Check List Workflow", subWorkflowType: "Ordering & Scope Checklist", owner: "", responsibilities: "", notes: "Crack guys scheduled" },
   { order: 73, stage: "Gutters Ordered", workflowType: "Check List Workflow", subWorkflowType: "Ordering & Scope Checklist", owner: "", responsibilities: "", notes: "" },
   { order: 74, stage: "Glass Shower Door", workflowType: "Check List Workflow", subWorkflowType: "Ordering & Scope Checklist", owner: "", responsibilities: "", notes: "" },
+  { order: 76, stage: "Plumbing Supplies Ordered", workflowType: "Check List Workflow", subWorkflowType: "Ordering & Scope Checklist", owner: "", responsibilities: "", notes: "" },
 ];
 
 export const workflowDefinitionByOrder = new Map(defaultWorkflow.map((task) => [task.order, task]));
