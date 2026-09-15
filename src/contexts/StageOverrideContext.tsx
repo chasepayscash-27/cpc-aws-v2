@@ -79,9 +79,11 @@ export function StageOverrideProvider({ children }: { children: ReactNode }) {
       let nextToken: string | null | undefined = undefined;
 
       do {
-        const { data, errors, nextToken: token } = await stageOverrideModel.list(
+        const response = await stageOverrideModel.list(
           nextToken ? { nextToken } : undefined,
         );
+        const { data, errors } = response;
+        const token = response.nextToken as string | null | undefined;
         if (errors?.length) {
           throw new Error(errors.map((item) => item.message).join('; '));
         }
