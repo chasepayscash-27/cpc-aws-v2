@@ -159,16 +159,18 @@ describe("getConstructionWorkflowTasks", () => {
 });
 
 describe("getChecklistWorkflowTasks", () => {
-  it("returns checklist workflow items in canonical order including glass shower door", () => {
+  it("returns checklist workflow items in canonical order including plumbing supplies ordered", () => {
     const tasks = [
       buildTask({ id: "main", stage: "Make An Offer", order: 1 }),
       buildTask({ id: "tile", stage: "Tile Ordered", order: 61 }),
       buildTask({ id: "glass-shower-door", stage: "Glass Shower Door", order: 74 }),
+      buildTask({ id: "plumbing-supplies", stage: "Plumbing Supplies Ordered", order: 76 }),
     ];
 
     expect(getChecklistWorkflowTasks(tasks).map((task) => task.id)).toEqual([
       "tile",
       "glass-shower-door",
+      "plumbing-supplies",
     ]);
   });
 });
