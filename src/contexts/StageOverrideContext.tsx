@@ -72,19 +72,71 @@ export function StageOverrideProvider({ children }: { children: ReactNode }) {
       return;
     }
 
+    let cancelled = false;
+    let hasReceivedInitialSnapshot = false;
+
+    const loadOverridesFromList = async () => {
+      const loadedRecords: PropertyStageOverride[] = [];
+      let nextToken: string | null | undefined = undefined;
+
+      do {
+        const response = await stageOverrideModel.list(
+          nextToken ? { nextToken } : undefined,
+        );
+        const { data, errors } = response;
+        const token = response.nextToken as string | null | undefined;
+        if (errors?.length) {
+          throw new Error(errors.map((item) => item.message).join('; '));
+        }
+        if (data?.length) {
+          loadedRecords.push(...data);
+        }
+        nextToken = token;
+      } while (nextToken);
+
+      if (!cancelled) {
+        setRecords(loadedRecords);
+        setError('');
+        setIsLoading(false);
+      }
+    };
+
     const subscription = stageOverrideModel.observeQuery().subscribe({
       next: ({ items }) => {
+        hasReceivedInitialSnapshot = true;
         setRecords([...items]);
         setError('');
         setIsLoading(false);
       },
       error: (err: unknown) => {
-        const msg = err instanceof Error ? err.message : 'Failed to load stage overrides';
-        setError(msg);
-        setIsLoading(false);
+        const primaryError =
+          err instanceof Error ? err.message : 'Failed to load stage overrides';
+        if (hasReceivedInitialSnapshot) {
+          if (!cancelled) {
+            setError(`Realtime stage override sync failed: ${primaryError}`);
+            setIsLoading(false);
+          }
+          return;
+        }
+
+        void loadOverridesFromList().catch((listError: unknown) => {
+          const fallbackError =
+            listError instanceof Error
+              ? listError.message
+              : 'Failed to load stage overrides';
+          if (!cancelled) {
+            setError(
+              `Realtime stage override sync failed: ${primaryError}. Fallback override load failed: ${fallbackError}`,
+            );
+            setIsLoading(false);
+          }
+        });
       },
     });
-    return () => subscription.unsubscribe();
+    return () => {
+      cancelled = true;
+      subscription.unsubscribe();
+    };
   }, [stageOverrideModel]);
 
   const setOverride = useCallback(

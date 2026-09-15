@@ -54,29 +54,89 @@ export function groupTasksByProperty(tasks: PropertyTask[]): PropertyTasksByProp
  */
 export function PropertyTasksProvider({ children }: { children: ReactNode }) {
   const client = useMemo(() => getAmplifyDataClient(), []);
+  const propertyTaskModel = useMemo(() => client.models.PropertyTask, [client]);
   const [allTasks, setAllTasks] = useState<PropertyTask[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(() => !!propertyTaskModel);
+  const [error, setError] = useState(() =>
+    propertyTaskModel
+      ? ''
+      : 'Workflow tasks are unavailable because the PropertyTask model is missing from amplify/amplify_outputs.json. Redeploy Amplify to regenerate the frontend outputs.',
+  );
   const tasksByProperty = useMemo(() => groupTasksByProperty(allTasks), [allTasks]);
 
   useEffect(() => {
-    const subscription = client.models.PropertyTask.observeQuery().subscribe({
+    if (!propertyTaskModel) {
+      return;
+    }
+
+    let cancelled = false;
+    let hasReceivedInitialSnapshot = false;
+
+    const loadTasksFromList = async () => {
+      const loadedTasks: PropertyTask[] = [];
+      let nextToken: string | null | undefined = undefined;
+
+      do {
+        const response = await propertyTaskModel.list(
+          nextToken ? { nextToken } : undefined,
+        );
+        const { data, errors } = response;
+        const token = response.nextToken as string | null | undefined;
+        if (errors?.length) {
+          throw new Error(errors.map((item) => item.message).join('; '));
+        }
+        if (data?.length) {
+          loadedTasks.push(...data);
+        }
+        nextToken = token;
+      } while (nextToken);
+
+      if (!cancelled) {
+        setAllTasks(loadedTasks);
+        setError('');
+        setIsLoading(false);
+      }
+    };
+
+    const subscription = propertyTaskModel.observeQuery().subscribe({
       next: ({ items }) => {
+        hasReceivedInitialSnapshot = true;
         setAllTasks([...items]);
         setError('');
         setIsLoading(false);
       },
       error: (subscriptionError: unknown) => {
-        setError(
+        const primaryError =
           subscriptionError instanceof Error
             ? subscriptionError.message
-            : 'Failed to load workflow tasks.'
-        );
-        setIsLoading(false);
+            : 'Failed to load workflow tasks.';
+        if (hasReceivedInitialSnapshot) {
+          if (!cancelled) {
+            setError(`Realtime workflow sync failed: ${primaryError}`);
+            setIsLoading(false);
+          }
+          return;
+        }
+
+        void loadTasksFromList().catch((listError: unknown) => {
+          const fallbackError =
+            listError instanceof Error
+              ? listError.message
+              : 'Failed to load workflow tasks.';
+          if (!cancelled) {
+            setError(
+              `Realtime workflow sync failed: ${primaryError}. Fallback task load failed: ${fallbackError}`,
+            );
+            setIsLoading(false);
+          }
+        });
       },
     });
-    return () => subscription.unsubscribe();
-  }, [client]);
+    return () => {
+      cancelled = true;
+      subscription.unsubscribe();
+    };
+  }, [propertyTaskModel]);
 
   /**
    * Optimistically toggles a task's completion state in the shared snapshot,
