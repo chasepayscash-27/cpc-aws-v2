@@ -70,6 +70,7 @@ export function PropertyTasksProvider({ children }: { children: ReactNode }) {
     }
 
     let cancelled = false;
+    let hasReceivedInitialSnapshot = false;
 
     const loadTasksFromList = async () => {
       const loadedTasks: PropertyTask[] = [];
@@ -99,16 +100,25 @@ export function PropertyTasksProvider({ children }: { children: ReactNode }) {
 
     const subscription = propertyTaskModel.observeQuery().subscribe({
       next: ({ items }) => {
+        hasReceivedInitialSnapshot = true;
         setAllTasks([...items]);
         setError('');
         setIsLoading(false);
       },
       error: (subscriptionError: unknown) => {
+        const primaryError =
+          subscriptionError instanceof Error
+            ? subscriptionError.message
+            : 'Failed to load workflow tasks.';
+        if (hasReceivedInitialSnapshot) {
+          if (!cancelled) {
+            setError(`Realtime workflow sync failed: ${primaryError}`);
+            setIsLoading(false);
+          }
+          return;
+        }
+
         void loadTasksFromList().catch((listError: unknown) => {
-          const primaryError =
-            subscriptionError instanceof Error
-              ? subscriptionError.message
-              : 'Failed to load workflow tasks.';
           const fallbackError =
             listError instanceof Error
               ? listError.message

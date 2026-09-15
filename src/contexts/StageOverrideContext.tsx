@@ -73,6 +73,7 @@ export function StageOverrideProvider({ children }: { children: ReactNode }) {
     }
 
     let cancelled = false;
+    let hasReceivedInitialSnapshot = false;
 
     const loadOverridesFromList = async () => {
       const loadedRecords: PropertyStageOverride[] = [];
@@ -102,14 +103,23 @@ export function StageOverrideProvider({ children }: { children: ReactNode }) {
 
     const subscription = stageOverrideModel.observeQuery().subscribe({
       next: ({ items }) => {
+        hasReceivedInitialSnapshot = true;
         setRecords([...items]);
         setError('');
         setIsLoading(false);
       },
       error: (err: unknown) => {
+        const primaryError =
+          err instanceof Error ? err.message : 'Failed to load stage overrides';
+        if (hasReceivedInitialSnapshot) {
+          if (!cancelled) {
+            setError(`Realtime stage override sync failed: ${primaryError}`);
+            setIsLoading(false);
+          }
+          return;
+        }
+
         void loadOverridesFromList().catch((listError: unknown) => {
-          const primaryError =
-            err instanceof Error ? err.message : 'Failed to load stage overrides';
           const fallbackError =
             listError instanceof Error
               ? listError.message
