@@ -72,6 +72,32 @@ export function StageOverrideProvider({ children }: { children: ReactNode }) {
       return;
     }
 
+    let cancelled = false;
+
+    const loadOverridesFromList = async () => {
+      const loadedRecords: PropertyStageOverride[] = [];
+      let nextToken: string | null | undefined = undefined;
+
+      do {
+        const { data, errors, nextToken: token } = await stageOverrideModel.list(
+          nextToken ? { nextToken } : undefined,
+        );
+        if (errors?.length) {
+          throw new Error(errors.map((item) => item.message).join('; '));
+        }
+        if (data?.length) {
+          loadedRecords.push(...data);
+        }
+        nextToken = token;
+      } while (nextToken);
+
+      if (!cancelled) {
+        setRecords(loadedRecords);
+        setError('');
+        setIsLoading(false);
+      }
+    };
+
     const subscription = stageOverrideModel.observeQuery().subscribe({
       next: ({ items }) => {
         setRecords([...items]);
@@ -79,12 +105,24 @@ export function StageOverrideProvider({ children }: { children: ReactNode }) {
         setIsLoading(false);
       },
       error: (err: unknown) => {
-        const msg = err instanceof Error ? err.message : 'Failed to load stage overrides';
-        setError(msg);
-        setIsLoading(false);
+        void loadOverridesFromList().catch((listError: unknown) => {
+          const primaryError =
+            err instanceof Error ? err.message : 'Failed to load stage overrides';
+          const fallbackError =
+            listError instanceof Error
+              ? listError.message
+              : 'Failed to load stage overrides';
+          if (!cancelled) {
+            setError(`${primaryError} Fallback load failed: ${fallbackError}`);
+            setIsLoading(false);
+          }
+        });
       },
     });
-    return () => subscription.unsubscribe();
+    return () => {
+      cancelled = true;
+      subscription.unsubscribe();
+    };
   }, [stageOverrideModel]);
 
   const setOverride = useCallback(
