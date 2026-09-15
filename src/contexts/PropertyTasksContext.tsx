@@ -54,7 +54,7 @@ export function groupTasksByProperty(tasks: PropertyTask[]): PropertyTasksByProp
  */
 export function PropertyTasksProvider({ children }: { children: ReactNode }) {
   const client = useMemo(() => getAmplifyDataClient(), []);
-  const propertyTaskModel = client.models.PropertyTask;
+  const propertyTaskModel = useMemo(() => client.models.PropertyTask, [client]);
   const [allTasks, setAllTasks] = useState<PropertyTask[]>([]);
   const [isLoading, setIsLoading] = useState(() => !!propertyTaskModel);
   const [error, setError] = useState(() =>
