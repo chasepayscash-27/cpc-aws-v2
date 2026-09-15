@@ -114,7 +114,9 @@ export function PropertyTasksProvider({ children }: { children: ReactNode }) {
               ? listError.message
               : 'Failed to load workflow tasks.';
           if (!cancelled) {
-            setError(`${primaryError} Fallback load failed: ${fallbackError}`);
+            setError(
+              `Realtime workflow sync failed: ${primaryError}. Fallback task load failed: ${fallbackError}`,
+            );
             setIsLoading(false);
           }
         });

@@ -115,7 +115,9 @@ export function StageOverrideProvider({ children }: { children: ReactNode }) {
               ? listError.message
               : 'Failed to load stage overrides';
           if (!cancelled) {
-            setError(`${primaryError} Fallback load failed: ${fallbackError}`);
+            setError(
+              `Realtime stage override sync failed: ${primaryError}. Fallback override load failed: ${fallbackError}`,
+            );
             setIsLoading(false);
           }
         });
