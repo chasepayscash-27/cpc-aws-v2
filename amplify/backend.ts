@@ -11,6 +11,7 @@ import { LambdaFunction as EventBridgeLambdaTarget } from "aws-cdk-lib/aws-event
 
 import { auth } from "./auth/resource";
 import { data } from "./data/resource";
+import { storage } from "./storage/resource";
 import { rdsQuery } from "./functions/rds-query/resource";
 import { worksheet } from "./functions/worksheet/resource";
 import { repairAddendum } from "./functions/repair-addendum/resource";
@@ -19,6 +20,7 @@ import { workflowAlertProcessor } from "./functions/workflow-alert-processor/res
 const backend = defineBackend({
   auth,
   data,
+  storage,
   rdsQuery,
   aiChat,
   worksheet,

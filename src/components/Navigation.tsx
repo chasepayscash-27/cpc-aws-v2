@@ -5,7 +5,6 @@ import {
   HardHat,
   Tag,
   Map,
-  Workflow,
   ClipboardList,
   Wrench,
   Bot,
@@ -42,7 +41,6 @@ const navGroups: NavGroup[] = [
   {
     title: 'Operations',
     items: [
-      { Icon: Workflow,      label: 'Workflow',       path: '/workflow' },
       { Icon: ClipboardList, label: 'Sales Meetings', path: '/sales-meetings' },
       { Icon: Wrench,        label: 'Resources',      path: '/resources' },
     ],

@@ -18,7 +18,6 @@ const FinancialsPage = lazy(() => import('./pages/FinancialsPage'));
 const ResourcesPage  = lazy(() => import('./pages/ResourcesPage'));
 const TeamPage       = lazy(() => import('./pages/TeamPage'));
 const ChatPage       = lazy(() => import('./pages/ChatPage'));
-const WorkflowPage      = lazy(() => import('./pages/WorkflowPage'));
 const TeamChatPage        = lazy(() => import('./pages/TeamChatPage'));
 const ActiveListingPage   = lazy(() => import('./pages/ActiveListingPage'));
 const SalesMeetingsPage   = lazy(() => import('./pages/SalesMeetingsPage'));
@@ -146,7 +145,7 @@ const App = () => {
                       2. Restore this route: <Route path="/analytics" element={<AnalyticsPage />} /> */}
                   <Route path="/analytics" element={<Navigate to="/" replace />} />
                   <Route path="/chat" element={<ChatPage />} />
-                  <Route path="/workflow" element={<WorkflowPage />} />
+                  <Route path="/workflow" element={<Navigate to="/" replace />} />
                   <Route path="/team-chat" element={<TeamChatPage />} />
                   <Route path="/active-listing" element={<ActiveListingPage />} />
                   <Route path="/sales-meetings" element={<SalesMeetingsPage />} />
