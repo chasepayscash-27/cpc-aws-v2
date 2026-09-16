@@ -1,6 +1,46 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useId, useState } from 'react';
+import { getUrl, list, uploadData } from 'aws-amplify/storage';
+import outputs from '../../amplify/amplify_outputs.json';
 import salesMeetingIndex, { type SalesMeetingEntry } from '../data/salesMeetingIndex';
 import '../App.css';
+
+const VOICE_MEMO_PREFIX = 'sales-meetings/voice-memos/';
+const AUDIO_ACCEPT = 'audio/*,.m4a,.mp3,.wav,.aac,.ogg,.webm';
+const hasStorageConfig = typeof outputs === 'object' && outputs !== null && 'storage' in outputs;
+
+interface VoiceMemoItem {
+  path: string;
+  displayName: string;
+  size?: number;
+  uploadedAt?: string;
+  url: string;
+}
+
+function sanitizeFilename(filename: string): string {
+  const sanitized = filename
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9._-]+/g, '-')
+    .replace(/-+/g, '-')
+    .replace(/^-|-$/g, '');
+  return sanitized || 'voice-memo';
+}
+
+function formatVoiceMemoName(path: string): string {
+  const filename = path.split('/').pop() ?? path;
+  return filename.replace(/^\d+-[0-9a-f-]+-/, '');
+}
+
+function formatFileSize(size?: number): string {
+  if (!size || size < 1024) return `${size ?? 0} B`;
+  if (size < 1024 * 1024) return `${(size / 1024).toFixed(1)} KB`;
+  return `${(size / (1024 * 1024)).toFixed(1)} MB`;
+}
+
+function formatUploadedAt(uploadedAt?: string): string {
+  if (!uploadedAt) return 'Upload date unavailable';
+  return new Date(uploadedAt).toLocaleString();
+}
 
 /**
  * Minimal markdown-to-HTML renderer covering the subset of markdown used in
@@ -141,6 +181,138 @@ function MeetingContent({ entry }: { entry: SalesMeetingEntry }) {
   );
 }
 
+function VoiceMemoPanel() {
+  const inputId = useId();
+  const [voiceMemos, setVoiceMemos] = useState<VoiceMemoItem[]>([]);
+  const [isLoading, setIsLoading] = useState(hasStorageConfig);
+  const [isUploading, setIsUploading] = useState(false);
+  const [error, setError] = useState('');
+  const [notice, setNotice] = useState('');
+
+  async function loadVoiceMemos() {
+    if (!hasStorageConfig) return;
+    setIsLoading(true);
+    setError('');
+    try {
+      const listed = await list({ path: VOICE_MEMO_PREFIX });
+      const files = (listed as {
+        files?: Array<{ path: string; size?: number; lastModified?: Date }>;
+      }).files ?? [];
+      const sortedFiles = [...files].sort(
+        (a, b) => (b.lastModified?.getTime() ?? 0) - (a.lastModified?.getTime() ?? 0),
+      );
+      const resolved = await Promise.all(
+        sortedFiles.map(async (file) => {
+          const { url } = await getUrl({ path: file.path });
+          return {
+            path: file.path,
+            displayName: formatVoiceMemoName(file.path),
+            size: file.size,
+            uploadedAt: file.lastModified?.toISOString(),
+            url: url.toString(),
+          };
+        }),
+      );
+      setVoiceMemos(resolved);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Unable to load voice memos.');
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    void loadVoiceMemos();
+  }, []);
+
+  async function handleUpload(event: React.ChangeEvent<HTMLInputElement>) {
+    const files = event.target.files;
+    if (!files || files.length === 0) return;
+    setError('');
+    setNotice('');
+    setIsUploading(true);
+    try {
+      await Promise.all(
+        Array.from(files).map((file) =>
+          uploadData({
+            path: `${VOICE_MEMO_PREFIX}${Date.now()}-${crypto.randomUUID()}-${sanitizeFilename(file.name)}`,
+            data: file,
+            options: {
+              contentType: file.type || 'application/octet-stream',
+            },
+          }).result,
+        ),
+      );
+      setNotice(`${files.length} voice memo${files.length === 1 ? '' : 's'} uploaded.`);
+      await loadVoiceMemos();
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Unable to upload voice memo.');
+    } finally {
+      setIsUploading(false);
+      event.target.value = '';
+    }
+  }
+
+  return (
+    <section className="smVoiceCard card">
+      <div className="smVoiceHeader">
+        <div>
+          <h2 className="smVoiceTitle">Voice Memos</h2>
+          <p className="muted smVoiceSubtitle">Upload recordings here instead of manually adding files to the repo.</p>
+        </div>
+        <label
+          className={`smUploadBtn${!hasStorageConfig || isUploading ? ' disabled' : ''}`}
+          htmlFor={inputId}
+          aria-disabled={!hasStorageConfig || isUploading}
+        >
+          {isUploading ? 'Uploading…' : 'Upload Voice Memo'}
+        </label>
+        <input
+          id={inputId}
+          type="file"
+          accept={AUDIO_ACCEPT}
+          multiple
+          className="smFileInput"
+          onChange={(event) => void handleUpload(event)}
+          disabled={!hasStorageConfig || isUploading}
+        />
+      </div>
+
+      {!hasStorageConfig && (
+        <p className="muted smVoiceState">
+          Voice memo uploads will activate after the next Amplify backend deploy refreshes storage outputs.
+        </p>
+      )}
+      {error && <p className="smVoiceError">{error}</p>}
+      {notice && <p className="smVoiceNotice">{notice}</p>}
+      {isLoading && <p className="muted smVoiceState">Loading voice memos…</p>}
+      {!isLoading && hasStorageConfig && voiceMemos.length === 0 && (
+        <p className="muted smVoiceState">No voice memos uploaded yet.</p>
+      )}
+
+      {!isLoading && voiceMemos.length > 0 && (
+        <div className="smVoiceList">
+          {voiceMemos.map((memo) => (
+            <article key={memo.path} className="smVoiceItem">
+              <div className="smVoiceMeta">
+                <div className="smVoiceName">{memo.displayName}</div>
+                <div className="smVoiceDetails">
+                  <span>{formatUploadedAt(memo.uploadedAt)}</span>
+                  <span>{formatFileSize(memo.size)}</span>
+                </div>
+              </div>
+              <audio controls preload="none" className="smVoiceAudio">
+                <source src={memo.url} />
+                Your browser does not support audio playback.
+              </audio>
+            </article>
+          ))}
+        </div>
+      )}
+    </section>
+  );
+}
+
 export default function SalesMeetingsPage() {
   // Default to the newest entry (index 0 — array is newest-first)
   const [selected, setSelected] = useState<SalesMeetingEntry>(salesMeetingIndex[0]);
@@ -151,6 +323,8 @@ export default function SalesMeetingsPage() {
         <h1 className="h1">📋 Sales Meetings</h1>
         <p className="muted">Monday morning sales meeting notes — newest first.</p>
       </div>
+
+      <VoiceMemoPanel />
 
       <div className="smLayout">
         {/* Sidebar: list of meetings */}
@@ -183,6 +357,116 @@ export default function SalesMeetingsPage() {
           grid-template-columns: 200px 1fr;
           gap: 14px;
           align-items: start;
+        }
+
+        .smVoiceCard {
+          margin-bottom: 14px;
+        }
+
+        .smVoiceHeader {
+          display: flex;
+          justify-content: space-between;
+          align-items: flex-start;
+          gap: 12px;
+          flex-wrap: wrap;
+        }
+
+        .smVoiceTitle {
+          margin: 0 0 4px;
+          font-size: 18px;
+          color: var(--accent);
+        }
+
+        .smVoiceSubtitle {
+          margin: 0;
+        }
+
+        .smUploadBtn {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          min-height: 40px;
+          padding: 0 14px;
+          border-radius: 10px;
+          border: 1px solid var(--accent);
+          background: rgba(26, 122, 60, 0.12);
+          color: var(--accent);
+          font-size: 13px;
+          font-weight: 700;
+          cursor: pointer;
+          transition: opacity 0.2s ease, transform 0.2s ease;
+        }
+
+        .smUploadBtn:hover {
+          transform: translateY(-1px);
+        }
+
+        .smUploadBtn.disabled {
+          opacity: 0.55;
+          cursor: not-allowed;
+          transform: none;
+        }
+
+        .smFileInput {
+          position: absolute;
+          width: 1px;
+          height: 1px;
+          opacity: 0;
+          pointer-events: none;
+        }
+
+        .smVoiceState,
+        .smVoiceError,
+        .smVoiceNotice {
+          margin: 12px 0 0;
+          font-size: 13px;
+        }
+
+        .smVoiceError {
+          color: rgba(239, 68, 68, 0.95);
+        }
+
+        .smVoiceNotice {
+          color: var(--accent);
+        }
+
+        .smVoiceList {
+          display: grid;
+          gap: 10px;
+          margin-top: 14px;
+        }
+
+        .smVoiceItem {
+          display: grid;
+          gap: 10px;
+          padding: 12px;
+          border: 1px solid var(--border);
+          border-radius: 12px;
+          background: var(--panel2);
+        }
+
+        .smVoiceMeta {
+          display: grid;
+          gap: 4px;
+        }
+
+        .smVoiceName {
+          font-size: 14px;
+          font-weight: 700;
+          color: var(--text);
+          word-break: break-word;
+        }
+
+        .smVoiceDetails {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 10px;
+          font-size: 12px;
+          color: var(--muted);
+        }
+
+        .smVoiceAudio {
+          width: 100%;
         }
 
         @media (max-width: 980px) {
