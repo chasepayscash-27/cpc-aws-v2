@@ -146,7 +146,7 @@ const App = () => {
                       2. Restore this route: <Route path="/analytics" element={<AnalyticsPage />} /> */}
                   <Route path="/analytics" element={<Navigate to="/" replace />} />
                   <Route path="/chat" element={<ChatPage />} />
-                  <Route path="/workflow" element={<WorkflowPage />} />
+                  <Route path="/workflow" element={<Navigate to="/" replace />} />
                   <Route path="/team-chat" element={<TeamChatPage />} />
                   <Route path="/active-listing" element={<ActiveListingPage />} />
                   <Route path="/sales-meetings" element={<SalesMeetingsPage />} />
