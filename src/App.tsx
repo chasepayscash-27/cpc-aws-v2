@@ -18,7 +18,6 @@ const FinancialsPage = lazy(() => import('./pages/FinancialsPage'));
 const ResourcesPage  = lazy(() => import('./pages/ResourcesPage'));
 const TeamPage       = lazy(() => import('./pages/TeamPage'));
 const ChatPage       = lazy(() => import('./pages/ChatPage'));
-const WorkflowPage      = lazy(() => import('./pages/WorkflowPage'));
 const TeamChatPage        = lazy(() => import('./pages/TeamChatPage'));
 const ActiveListingPage   = lazy(() => import('./pages/ActiveListingPage'));
 const SalesMeetingsPage   = lazy(() => import('./pages/SalesMeetingsPage'));

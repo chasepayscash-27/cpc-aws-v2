@@ -1,4 +1,4 @@
-import { useEffect, useId, useState } from 'react';
+import { type ChangeEvent, useEffect, useId, useState } from 'react';
 import { getUrl, list, uploadData } from 'aws-amplify/storage';
 import outputs from '../../amplify/amplify_outputs.json';
 import salesMeetingIndex, { type SalesMeetingEntry } from '../data/salesMeetingIndex';
@@ -225,7 +225,7 @@ function VoiceMemoPanel() {
     void loadVoiceMemos();
   }, []);
 
-  async function handleUpload(event: React.ChangeEvent<HTMLInputElement>) {
+  async function handleUpload(event: ChangeEvent<HTMLInputElement>) {
     const files = event.target.files;
     if (!files || files.length === 0) return;
     setError('');
