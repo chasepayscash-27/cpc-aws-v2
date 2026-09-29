@@ -686,7 +686,8 @@ body {
     position: fixed;
     left: 0;
     top: 60px;
-    height: calc(100% - 60px);
+    bottom: 0;
+    height: auto;
     width: 260px;
     z-index: 100;
     border-radius: 0 18px 18px 0;
