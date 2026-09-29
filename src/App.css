@@ -681,13 +681,13 @@ body {
     gap: 8px;
   }
 
-  /* Sidebar slides in from the left as a fixed overlay */
+  /* Sidebar slides in from the left as a fixed overlay, below the 60px top bar */
   .sidebar {
     position: fixed;
     left: 0;
-    top: 0;
-    height: 100%;
-    height: -webkit-fill-available;
+    top: 60px;
+    bottom: 0;
+    height: auto;
     width: 260px;
     z-index: 100;
     border-radius: 0 18px 18px 0;

@@ -1,5 +1,6 @@
 import React from 'react';
 import { NavLink, useNavigate, useLocation } from 'react-router-dom';
+import { scrollToTop } from '../utils/scrollToTop';
 import {
   Home,
   HardHat,
@@ -80,21 +81,21 @@ const navGroups: NavGroup[] = [
 
 interface NavigationProps {
   collapsed?: boolean;
+  /** Called after any nav item is clicked (used to close the sidebar on mobile). */
+  onNavigate?: () => void;
 }
 
-const Navigation: React.FC<NavigationProps> = ({ collapsed = false }) => {
+const Navigation: React.FC<NavigationProps> = ({ collapsed = false, onNavigate }) => {
   const navigate = useNavigate();
   const location = useLocation();
 
   function handleNavClick(e: React.MouseEvent<HTMLAnchorElement>, path: string) {
-    if (path === '/' && location.pathname === '/') {
+    if (path === '/') {
       e.preventDefault();
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    } else if (path === '/') {
-      e.preventDefault();
-      navigate('/');
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      if (location.pathname !== '/') navigate('/');
+      scrollToTop();
     }
+    onNavigate?.();
   }
   return (
     <nav className={`sidebar${collapsed ? ' collapsed' : ''}`}>
@@ -109,7 +110,7 @@ const Navigation: React.FC<NavigationProps> = ({ collapsed = false }) => {
               className={({ isActive }) => `navItem${isActive ? ' active' : ''}`}
               style={{ textDecoration: 'none', display: 'block' }}
               title={item.label}
-              onClick={item.path === '/' ? (e) => handleNavClick(e, item.path) : undefined}
+              onClick={(e) => handleNavClick(e, item.path)}
             >
               <span className="navItemIcon"><item.Icon size={16} strokeWidth={2} /></span>
               {!collapsed && <span className="navItemLabel">{item.label}</span>}

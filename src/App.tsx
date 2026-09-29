@@ -6,6 +6,7 @@ import { PropertyTasksProvider } from './contexts/PropertyTasksContext';
 import { StageOverrideProvider } from './contexts/StageOverrideContext';
 import { CompletedProjectProvider } from './contexts/CompletedProjectContext';
 import { useAuth } from './contexts/AuthContext';
+import { scrollToTop } from './utils/scrollToTop';
 import logo from './assets/logo.png';
 import './App.css';
 
@@ -52,10 +53,14 @@ const App = () => {
   const { isAuthenticated, logout, user } = useAuth();
   const navigate = useNavigate();
 
+  function closeSidebarOnMobile() {
+    if (window.innerWidth <= 768) setSidebarOpen(false);
+  }
+
   function handleHomeClick() {
     navigate('/');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-    if (window.innerWidth <= 768) setSidebarOpen(false);
+    scrollToTop();
+    closeSidebarOnMobile();
   }
 
   return (
@@ -121,7 +126,7 @@ const App = () => {
         </div>
       </header>
       <div className={`body${sidebarOpen ? '' : ' sidebarCollapsed'}`}>
-        <Navigation collapsed={!sidebarOpen} />
+        <Navigation collapsed={!sidebarOpen} onNavigate={closeSidebarOnMobile} />
         <main className="content">
           <StageOverrideProvider>
           <CompletedProjectProvider>
