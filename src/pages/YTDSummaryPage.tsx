@@ -1,4 +1,5 @@
 import { lazy, Suspense, useEffect, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import { loadCsv } from '../utils/csv';
 import type { ProjectRow } from '../types/project';
 import PipelineTracker from '../components/PipelineTracker';
@@ -42,6 +43,15 @@ export default function YTDSummaryPage() {
   const [selectedProject, setSelectedProject] = useState<ProjectRow | null>(null);
   const [uploadOpen, setUploadOpen] = useState(false);
   const [viewMode, setViewMode] = useState<HomeViewMode>(loadHomeViewMode);
+  const location = useLocation();
+
+  // Clicking the "Chase Pays Cash" brand link (or sidebar Home) while already on
+  // this page doesn't remount it, but each navigation gets a new location.key.
+  // Close any open property/upload modal so the user lands back on Home.
+  useEffect(() => {
+    setSelectedProject(null);
+    setUploadOpen(false);
+  }, [location.key]);
 
   function handleViewModeChange(mode: HomeViewMode) {
     setViewMode(mode);
