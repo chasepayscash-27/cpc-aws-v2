@@ -16,6 +16,8 @@ import { rdsQuery } from "./functions/rds-query/resource";
 import { worksheet } from "./functions/worksheet/resource";
 import { repairAddendum } from "./functions/repair-addendum/resource";
 import { workflowAlertProcessor } from "./functions/workflow-alert-processor/resource";
+import { salesMeetingTranscription } from "./functions/sales-meeting-transcription/resource";
+import { Role, ServicePrincipal } from "aws-cdk-lib/aws-iam";
 
 const backend = defineBackend({
   auth,
@@ -26,13 +28,73 @@ const backend = defineBackend({
   worksheet,
   repairAddendum,
   workflowAlertProcessor,
+  salesMeetingTranscription,
 });
 
 backend.auth.resources.cfnResources.cfnIdentityPool.allowUnauthenticatedIdentities = true;
 const region = Stack.of(backend.aiChat.resources.lambda).region;
 const workflowAlertProcessorLambda = backend.workflowAlertProcessor.resources.lambda as LambdaFunction;
+const salesMeetingTranscriptionLambda = backend.salesMeetingTranscription.resources.lambda as LambdaFunction;
 const workflowAlertEventTable = backend.data.resources.tables["WorkflowAlertEvent"];
 
+const meetingArtifactsBucket = new Bucket(
+  Stack.of(salesMeetingTranscriptionLambda),
+  "SalesMeetingTranscriptionArtifacts",
+  {
+    encryption: BucketEncryption.S3_MANAGED,
+    blockPublicAccess: BlockPublicAccess.BLOCK_ALL,
+    enforceSSL: true,
+  },
+);
+const transcribeDataAccessRole = new Role(
+  Stack.of(salesMeetingTranscriptionLambda),
+  "SalesMeetingTranscribeDataAccessRole",
+  { assumedBy: new ServicePrincipal("transcribe.amazonaws.com") },
+);
+backend.storage.resources.bucket.grantRead(
+  transcribeDataAccessRole,
+  "sales-meetings/voice-memos/*",
+);
+meetingArtifactsBucket.grantPut(
+  transcribeDataAccessRole,
+  "sales-meetings/transcripts/*",
+);
+backend.storage.resources.bucket.grantRead(
+  salesMeetingTranscriptionLambda,
+  "sales-meetings/voice-memos/*",
+);
+meetingArtifactsBucket.grantReadWrite(salesMeetingTranscriptionLambda);
+salesMeetingTranscriptionLambda.addEnvironment(
+  "VOICE_MEMO_BUCKET_NAME",
+  backend.storage.resources.bucket.bucketName,
+);
+salesMeetingTranscriptionLambda.addEnvironment(
+  "TRANSCRIPTION_ARTIFACT_BUCKET_NAME",
+  meetingArtifactsBucket.bucketName,
+);
+salesMeetingTranscriptionLambda.addEnvironment(
+  "TRANSCRIBE_DATA_ACCESS_ROLE_ARN",
+  transcribeDataAccessRole.roleArn,
+);
+salesMeetingTranscriptionLambda.addToRolePolicy(
+  new PolicyStatement({
+    effect: Effect.ALLOW,
+    actions: [
+      "transcribe:DeleteTranscriptionJob",
+      "transcribe:GetTranscriptionJob",
+      "transcribe:StartTranscriptionJob",
+    ],
+    resources: ["*"],
+  }),
+);
+salesMeetingTranscriptionLambda.addToRolePolicy(
+  new PolicyStatement({
+    effect: Effect.ALLOW,
+    actions: ["iam:PassRole"],
+    resources: [transcribeDataAccessRole.roleArn],
+    conditions: { StringEquals: { "iam:PassedToService": "transcribe.amazonaws.com" } },
+  }),
+);
 workflowAlertEventTable.grantReadWriteData(workflowAlertProcessorLambda);
 workflowAlertProcessorLambda.addToRolePolicy(
   new PolicyStatement({
@@ -85,6 +147,7 @@ const bedrockPolicy = new PolicyStatement({
 });
 
 backend.aiChat.resources.lambda.addToRolePolicy(bedrockPolicy);
+salesMeetingTranscriptionLambda.addToRolePolicy(bedrockPolicy);
 
 console.log(
   `[amplify/backend] Bedrock policy configured for Lambda aiChat route only. deployRegion=${region}`
@@ -128,6 +191,11 @@ const repairAddendumIntegration = new HttpLambdaIntegration(
   backend.repairAddendum.resources.lambda
 );
 
+const salesMeetingTranscriptionIntegration = new HttpLambdaIntegration(
+  "SalesMeetingTranscriptionIntegration",
+  salesMeetingTranscriptionLambda,
+);
+
 const httpApi = new HttpApi(apiStack, "HttpApi", {
   apiName: "cpcHttpApi",
 
@@ -166,6 +234,12 @@ httpApi.addRoutes({
   path: "/repair-addendum",
   methods: [HttpMethod.GET, HttpMethod.POST, HttpMethod.OPTIONS],
   integration: repairAddendumIntegration,
+});
+
+httpApi.addRoutes({
+  path: "/sales-meeting-transcription",
+  methods: [HttpMethod.GET, HttpMethod.POST, HttpMethod.OPTIONS],
+  integration: salesMeetingTranscriptionIntegration,
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
