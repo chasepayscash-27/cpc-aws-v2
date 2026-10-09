@@ -1,12 +1,17 @@
-import { type ChangeEvent, useEffect, useId, useState } from 'react';
+import { type ChangeEvent, useCallback, useEffect, useId, useState } from 'react';
 import { getUrl, list, uploadData } from 'aws-amplify/storage';
 import outputs from '../../amplify/amplify_outputs.json';
 import salesMeetingIndex, { type SalesMeetingEntry } from '../data/salesMeetingIndex';
 import '../App.css';
 
 const VOICE_MEMO_PREFIX = 'sales-meetings/voice-memos/';
-const AUDIO_ACCEPT = 'audio/*,.m4a,.mp3,.wav,.aac,.ogg,.webm';
+const AUDIO_ACCEPT = '.amr,.flac,.m4a,.mp3,.mp4,.ogg,.wav,.webm';
 const hasStorageConfig = typeof outputs === 'object' && outputs !== null && 'storage' in outputs;
+const HTTP_API_URL =
+  (outputs as { custom?: { cpcHttpApi?: { url?: string } } }).custom?.cpcHttpApi?.url ?? '';
+const TRANSCRIPTION_ENDPOINT = HTTP_API_URL
+  ? `${HTTP_API_URL.replace(/\/?$/, '/')}sales-meeting-transcription`
+  : '';
 
 interface VoiceMemoItem {
   path: string;
@@ -14,6 +19,9 @@ interface VoiceMemoItem {
   size?: number;
   uploadedAt?: string;
   url: string;
+  transcriptionStatus?: string;
+  transcriptionSummary?: string;
+  transcriptionError?: string;
 }
 
 function sanitizeFilename(filename: string): string {
@@ -189,7 +197,99 @@ function VoiceMemoPanel() {
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
 
-  async function loadVoiceMemos() {
+  const updateVoiceMemo = useCallback((path: string, updates: Partial<VoiceMemoItem>) => {
+    setVoiceMemos((current) =>
+      current.map((memo) => (memo.path === path ? { ...memo, ...updates } : memo)),
+    );
+  }, []);
+
+  async function requestTranscriptionStatus(path: string): Promise<{
+    status: string;
+    summary?: string;
+    error?: string;
+  }> {
+    if (!TRANSCRIPTION_ENDPOINT) throw new Error('Meeting transcription is not configured.');
+    const response = await fetch(
+      `${TRANSCRIPTION_ENDPOINT}?path=${encodeURIComponent(path)}`,
+    );
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.error ?? 'Unable to check transcription status.');
+    return result;
+  }
+
+  async function refreshTranscriptionStatus(path: string) {
+    try {
+      const result = await requestTranscriptionStatus(path);
+      updateVoiceMemo(path, {
+        transcriptionStatus: result.status,
+        transcriptionSummary: result.summary,
+        transcriptionError: result.error,
+      });
+    } catch (err: unknown) {
+      updateVoiceMemo(path, {
+        transcriptionError:
+          err instanceof Error ? err.message : 'Unable to check transcription status.',
+      });
+    }
+  }
+
+  async function pollTranscription(path: string) {
+    for (let attempt = 0; attempt < 120; attempt += 1) {
+      await new Promise((resolve) => setTimeout(resolve, 5000));
+      try {
+        const result = await requestTranscriptionStatus(path);
+        updateVoiceMemo(path, {
+          transcriptionStatus: result.status,
+          transcriptionSummary: result.summary,
+          transcriptionError: result.error,
+        });
+        if (result.status === 'COMPLETED' || result.status === 'FAILED') return;
+      } catch (err: unknown) {
+        updateVoiceMemo(path, {
+          transcriptionError:
+            err instanceof Error ? err.message : 'Unable to check transcription status.',
+        });
+        return;
+      }
+    }
+    updateVoiceMemo(path, {
+      transcriptionError: 'Still processing. Refresh the page to check again.',
+    });
+  }
+
+  async function startTranscription(path: string) {
+    if (!TRANSCRIPTION_ENDPOINT) {
+      updateVoiceMemo(path, {
+        transcriptionStatus: 'FAILED',
+        transcriptionError: 'Meeting transcription is not configured.',
+      });
+      return;
+    }
+    updateVoiceMemo(path, {
+      transcriptionStatus: 'STARTING',
+      transcriptionError: undefined,
+      transcriptionSummary: undefined,
+    });
+    try {
+      const response = await fetch(TRANSCRIPTION_ENDPOINT, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ path }),
+      });
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error ?? 'Unable to start transcription.');
+      updateVoiceMemo(path, { transcriptionStatus: result.status ?? 'QUEUED' });
+      void pollTranscription(path);
+    } catch (err: unknown) {
+      updateVoiceMemo(path, {
+        transcriptionStatus: 'FAILED',
+        transcriptionError:
+          err instanceof Error ? err.message : 'Unable to start transcription.',
+      });
+    }
+  }
+
+  const loadVoiceMemos = useCallback(async () => {
     if (!hasStorageConfig) return;
     setIsLoading(true);
     setError('');
@@ -214,16 +314,38 @@ function VoiceMemoPanel() {
         }),
       );
       setVoiceMemos(resolved);
+      if (TRANSCRIPTION_ENDPOINT) {
+        resolved.forEach((memo) => {
+          void fetch(`${TRANSCRIPTION_ENDPOINT}?path=${encodeURIComponent(memo.path)}`)
+            .then(async (response) => {
+              const result = await response.json();
+              if (!response.ok) {
+                throw new Error(result.error ?? 'Unable to check transcription status.');
+              }
+              updateVoiceMemo(memo.path, {
+                transcriptionStatus: result.status,
+                transcriptionSummary: result.summary,
+                transcriptionError: result.error,
+              });
+            })
+            .catch((err: unknown) => {
+              updateVoiceMemo(memo.path, {
+                transcriptionError:
+                  err instanceof Error ? err.message : 'Unable to check transcription status.',
+              });
+            });
+        });
+      }
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Unable to load voice memos.');
     } finally {
       setIsLoading(false);
     }
-  }
+  }, [updateVoiceMemo]);
 
   useEffect(() => {
     void loadVoiceMemos();
-  }, []);
+  }, [loadVoiceMemos]);
 
   async function handleUpload(event: ChangeEvent<HTMLInputElement>) {
     const files = event.target.files;
@@ -232,19 +354,25 @@ function VoiceMemoPanel() {
     setNotice('');
     setIsUploading(true);
     try {
-      await Promise.all(
-        Array.from(files).map((file) =>
-          uploadData({
-            path: `${VOICE_MEMO_PREFIX}${Date.now()}-${crypto.randomUUID()}-${sanitizeFilename(file.name)}`,
+      const uploadedPaths = await Promise.all(
+        Array.from(files).map(async (file) => {
+          const path = `${VOICE_MEMO_PREFIX}${Date.now()}-${crypto.randomUUID()}-${sanitizeFilename(file.name)}`;
+          await uploadData({
+            path,
             data: file,
             options: {
               contentType: file.type || 'application/octet-stream',
             },
-          }).result,
-        ),
+          }).result;
+          return path;
+        }),
       );
-      setNotice(`${files.length} voice memo${files.length === 1 ? '' : 's'} uploaded.`);
+      setNotice(
+        `${files.length} voice memo${files.length === 1 ? '' : 's'} uploaded.` +
+          (TRANSCRIPTION_ENDPOINT ? ' Transcription started.' : ' Transcription is not configured.'),
+      );
       await loadVoiceMemos();
+      uploadedPaths.forEach((path) => void startTranscription(path));
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Unable to upload voice memo.');
     } finally {
@@ -305,6 +433,57 @@ function VoiceMemoPanel() {
                 <source src={memo.url} />
                 Your browser does not support audio playback.
               </audio>
+              <div className="smTranscription">
+                {memo.transcriptionStatus === 'NOT_STARTED' && (
+                  <button
+                    type="button"
+                    className="smTranscribeBtn"
+                    onClick={() => void startTranscription(memo.path)}
+                  >
+                    Transcribe &amp; summarize
+                  </button>
+                )}
+                {memo.transcriptionStatus &&
+                  !['NOT_STARTED', 'COMPLETED', 'FAILED'].includes(memo.transcriptionStatus) && (
+                    <p className="muted smTranscriptionState" role="status">
+                      {memo.transcriptionStatus === 'STARTING'
+                        ? 'Starting transcription…'
+                        : 'Transcribing and preparing the team summary…'}
+                    </p>
+                  )}
+                {memo.transcriptionError && (
+                  <p className="smVoiceError" role="alert">{memo.transcriptionError}</p>
+                )}
+                {memo.transcriptionStatus === 'FAILED' && (
+                  <button
+                    type="button"
+                    className="smTranscribeBtn"
+                    onClick={() => void startTranscription(memo.path)}
+                  >
+                    Retry transcription
+                  </button>
+                )}
+                {memo.transcriptionStatus === 'COMPLETED' && memo.transcriptionSummary && (
+                  <details className="smSummaryDetails">
+                    <summary>Team meeting summary</summary>
+                    <pre className="smSummary">{memo.transcriptionSummary}</pre>
+                  </details>
+                )}
+                {memo.transcriptionStatus === 'COMPLETED' &&
+                  !memo.transcriptionSummary &&
+                  !memo.transcriptionError && (
+                    <p className="muted smTranscriptionState">Transcription complete; preparing summary…</p>
+                  )}
+                {memo.transcriptionStatus === 'COMPLETED' && memo.transcriptionError && (
+                  <button
+                    type="button"
+                    className="smTranscribeBtn"
+                    onClick={() => void refreshTranscriptionStatus(memo.path)}
+                  >
+                    Retry summary
+                  </button>
+                )}
+              </div>
             </article>
           ))}
         </div>
@@ -467,6 +646,50 @@ export default function SalesMeetingsPage() {
 
         .smVoiceAudio {
           width: 100%;
+        }
+
+        .smTranscription {
+          display: grid;
+          gap: 8px;
+        }
+
+        .smTranscribeBtn {
+          justify-self: start;
+          min-height: 34px;
+          padding: 0 12px;
+          border: 1px solid var(--accent);
+          border-radius: 8px;
+          background: transparent;
+          color: var(--accent);
+          font: inherit;
+          font-size: 12px;
+          font-weight: 700;
+          cursor: pointer;
+        }
+
+        .smTranscriptionState {
+          margin: 0;
+          font-size: 12px;
+        }
+
+        .smSummaryDetails {
+          color: var(--text);
+          font-size: 13px;
+        }
+
+        .smSummaryDetails summary {
+          color: var(--accent);
+          font-weight: 700;
+          cursor: pointer;
+        }
+
+        .smSummary {
+          overflow-x: auto;
+          white-space: pre-wrap;
+          overflow-wrap: anywhere;
+          color: var(--text);
+          font: inherit;
+          line-height: 1.6;
         }
 
         @media (max-width: 980px) {
