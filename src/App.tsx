@@ -25,6 +25,7 @@ const SalesMeetingsPage   = lazy(() => import('./pages/SalesMeetingsPage'));
 const TeamWipPage         = lazy(() => import('./pages/TeamWipPage'));
 const ArchivedProjectsPage = lazy(() => import('./pages/ArchivedProjectsPage'));
 const CompletedProjectsPage = lazy(() => import('./pages/CompletedProjectsPage'));
+const SoldProjectsPage = lazy(() => import('./pages/SoldProjectsPage'));
 const InterestPaymentsPage = lazy(() => import('./pages/InterestPaymentsPage'));
 const LoginPage           = lazy(() => import('./pages/LoginPage'));
 const AuthCallbackPage    = lazy(() => import('./pages/AuthCallbackPage'));
@@ -157,6 +158,8 @@ const App = () => {
                   <Route path="/team-wip" element={<TeamWipPage />} />
                   <Route path="/archived-projects" element={<ArchivedProjectsPage />} />
                   <Route path="/completed-projects" element={<CompletedProjectsPage />} />
+                  <Route path="/completed-projects/2024-sold" element={<SoldProjectsPage key="2024" year="2024" />} />
+                  <Route path="/completed-projects/2025-sold" element={<SoldProjectsPage key="2025" year="2025" />} />
                   <Route path="/interest-payments" element={<InterestPaymentsPage />} />
                 </Route>
 
