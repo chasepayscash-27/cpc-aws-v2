@@ -22,6 +22,7 @@ interface NavItem {
   label: string;
   Icon: LucideIcon;
   path: string;
+  child?: boolean;
 }
 
 interface NavGroup {
@@ -74,6 +75,8 @@ const navGroups: NavGroup[] = [
     title: 'Archive',
     items: [
       { Icon: CheckCircle2,  label: 'Completed Projects', path: '/completed-projects' },
+      { Icon: Tag, label: '2024 Sold', path: '/completed-projects/2024-sold', child: true },
+      { Icon: Tag, label: '2025 Sold', path: '/completed-projects/2025-sold', child: true },
       { Icon: Archive,       label: 'Archived Projects',  path: '/archived-projects' },
     ],
   },
@@ -106,9 +109,9 @@ const Navigation: React.FC<NavigationProps> = ({ collapsed = false, onNavigate }
             <NavLink
               key={item.path}
               to={item.path}
-              end={item.path === '/'}
+              end={item.path === '/' || item.path === '/completed-projects'}
               className={({ isActive }) => `navItem${isActive ? ' active' : ''}`}
-              style={{ textDecoration: 'none', display: 'block' }}
+              style={{ textDecoration: 'none', display: 'block', paddingLeft: item.child && !collapsed ? 28 : undefined }}
               title={item.label}
               onClick={(e) => handleNavClick(e, item.path)}
             >

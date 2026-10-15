@@ -6,6 +6,7 @@ import PropertyMainImage from "../components/PropertyMainImage";
 import ProjectDetailsModal from "../components/ProjectDetailsModal";
 import { loadCsv } from "../utils/csv";
 import { loadCustomProjects } from "../utils/customProjects";
+import { CompletedProjectsLinks } from "./SoldProjectsPage";
 
 function formatDate(iso?: string): string {
   if (!iso) return "—";
@@ -108,6 +109,7 @@ export default function CompletedProjectsPage() {
         </p>
       </div>
 
+      <CompletedProjectsLinks />
       <div className="card" style={{ padding: 16, overflow: "hidden" }}>
         {isLoading && (
           <div style={{ padding: 40, textAlign: "center", color: "var(--muted)" }}>
