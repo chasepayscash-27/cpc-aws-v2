@@ -142,6 +142,30 @@ For the backend Lambda functions that connect to the RDS database, the following
 
 For detailed instructions on deploying your application, refer to the [deployment section](https://docs.amplify.aws/react/start/quickstart/#deploy-a-fullstack-app-to-aws) of our documentation.
 
+### Completed-project dashboards and deployment troubleshooting
+
+The sidebar includes **2024 Sold** and **2025 Sold** under **Completed Projects**.
+Their source files are `public/data/cpc_sold_2024.csv` and
+`public/data/cpc_sold_2025.csv`.
+
+If a merged change does not appear on the website, check the Amplify Hosting
+deployment for `main`; merging a PR does not publish a failed build.
+The backend build must install the sales-meeting transcription function's
+separate dependencies before running TypeScript or `ampx pipeline-deploy`.
+To reproduce those checks locally after installing root dependencies:
+
+```bash
+npm ci --prefix amplify/functions/sales-meeting-transcription --legacy-peer-deps
+cd amplify && npx tsc && cd ..
+npm run build
+```
+
+Keep `csv` in the SPA rewrite rule's excluded static-file extensions. In the
+Amplify Console, verify the deployed rewrite rules also exclude `csv`, so
+`/data/cpc_sold_2024.csv` and `/data/cpc_sold_2025.csv` return CSV rather than
+`index.html`. After deployment, open both year links and refresh each page to
+confirm that the routes and data work.
+
 ## Security
 
 See [CONTRIBUTING](CONTRIBUTING.md#security-issue-notifications) for more information.
